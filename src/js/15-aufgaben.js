@@ -26,14 +26,15 @@ function tdSetToken(v) {
   try { if (v) localStorage.setItem(TK_TOKEN, v); else localStorage.removeItem(TK_TOKEN); return true; } catch { return false; }
 }
 function tdErr(code, msg, extra) { const e = new Error(msg || code); e.code = code; Object.assign(e, extra || {}); return e; }
-async function tdFetch(path, method, token) {
+async function tdFetch(path, method, token, body) {
   const tok = token || tdToken();
   if (!tok) throw tdErr('no_token');
   let r;
   try {
     r = await fetch(TD_API + path, {
       method: method || 'GET',
-      headers: { Authorization: 'Bearer ' + tok },
+      headers: body ? { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' } : { Authorization: 'Bearer ' + tok },
+      body: body ? JSON.stringify(body) : undefined,
       cache: 'no-store',
       signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined
     });
@@ -179,6 +180,57 @@ async function tdConnect(v) {
   }
 }
 
+/* Neue Aufgabe über Quick Add: Datum, Uhrzeit, p1 bis p4 und @Labels versteht Todoist selbst, wie in der App */
+const tkAddProjects = v => state.widgets[v.id].cfg.projects.map(n => [n.toLowerCase(), n]).filter(([k]) => tk.proj[k]);
+function renderTaskAdd(v) {
+  const f = v.q('[data-r="addform"]'), sel = v.q('[data-r="proj"]'), list = tkAddProjects(v);
+  f.hidden = !tdToken() || !!tk.ask || !list.length;
+  const sig = list.map(([k, n]) => `${k}|${n}`).join(',');
+  if (sel.dataset.sig !== sig) {
+    const cur = sel.value;
+    sel.textContent = '';
+    for (const [k, n] of list) sel.add(new Option(n, k));
+    if (list.some(([k]) => k === cur)) sel.value = cur;
+    sel.dataset.sig = sig;
+  }
+  sel.hidden = list.length < 2;
+}
+async function tdQuickAdd(v) {
+  const inp = v.q('[data-r="new"]'), sel = v.q('[data-r="proj"]'), btn = v.q('[data-r="addbtn"]');
+  const text = inp.value.trim();
+  if (!text || btn.disabled) return;
+  const key = sel.value || (tkAddProjects(v)[0] || [])[0];
+  const proj = key && tk.proj[key];
+  if (!proj) return;
+  const ownProj = /(^|\s)#\S/.test(text);
+  const full = ownProj ? text : `${text} #${String(proj.name).trim().replace(/ /g, '\\ ')}`;
+  btn.disabled = true;
+  inp.disabled = true;
+  try {
+    let t = await tdFetch('/tasks/quick', 'POST', null, { text: full });
+    // Falls Todoist das Projekt im Text nicht erkannt hat, die Aufgabe ins richtige Projekt schieben
+    if (t && t.id && !ownProj && String(t.project_id) !== String(proj.id)) {
+      try { t = (await tdFetch(`/tasks/${encodeURIComponent(t.id)}/move`, 'POST', null, { project_id: proj.id })) || t; } catch { /* bleibt, wo Todoist sie angelegt hat */ }
+    }
+    inp.value = '';
+    const name = t && t.content ? plain(t.content) : text;
+    if (t && t.id && tk.tasks[key] && String(t.project_id) === String(proj.id)) tk.tasks[key] = [...tk.tasks[key], tdTask(t)];
+    renderTasksAll();
+    toast(`„${name}“ angelegt`, t && t.id ? async () => {
+      try { await tdFetch(`/tasks/${encodeURIComponent(t.id)}`, 'DELETE'); } catch (err) { tdError(err); }
+      tdLoad();
+    } : null);
+    tdLoad();
+  } catch (err) {
+    if (err && ['bad_token', 'rate'].includes(err.code)) tdError(err);
+    else tkMsg(`Die Aufgabe konnte nicht angelegt werden.${err && err.code === 'network' ? ' Todoist ist gerade nicht erreichbar.' : ''}`);
+  } finally {
+    btn.disabled = false;
+    inp.disabled = false;
+    inp.focus();
+  }
+}
+
 function renderTaskView(v) {
   const q = v.q, w = state.widgets[v.id];
   if (!w) return;
@@ -203,6 +255,7 @@ function renderTaskView(v) {
   cols.hidden = !has || !!(ask && ask.err);
   if (!cols.hidden) renderTaskCols(v, cols, w.cfg.projects);
   q('[data-r="src"]').textContent = tk.stamp ? `Stand ${hm(new Date(tk.stamp))} Uhr` : '';
+  renderTaskAdd(v);
 }
 function renderTaskCols(v, wrap, projects) {
   wrap.textContent = '';
@@ -315,6 +368,7 @@ defineWidget('tasks', {
     q('[data-r="cancel"]').addEventListener('click', tdAskClose);
     q('[data-r="forget"]').addEventListener('click', () => { tdSetToken(''); tkReset(); tdAsk(); });
     q('[data-r="form"]').addEventListener('submit', e => { e.preventDefault(); tdConnect(v); });
+    q('[data-r="addform"]').addEventListener('submit', e => { e.preventDefault(); tdQuickAdd(v); });
     q('[data-r="cols"]').addEventListener('click', e => {
       const more = e.target.closest('[data-more]');
       if (more) { const k = `${v.id}:${more.dataset.more}`; tk.open[k] = !tk.open[k]; renderTaskView(v); return; }

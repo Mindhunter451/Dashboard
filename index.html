@@ -276,6 +276,12 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .tk-state{background:var(--raise);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .tk-state p{margin:0;font-size:14px}
 .tk-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.tk-add{display:flex;gap:8px;align-items:center}
+.tk-add input,.tk-add select,.ln-add input,.fx-in{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+.tk-add input,.ln-add input{flex:1}
+.tk-add select{max-width:10em}
+.tk-add :disabled{opacity:.6}
+@container (max-width:380px){.tk-add{flex-wrap:wrap}.tk-add input{flex-basis:100%}}
 
 /* Pendeln */
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--raise)}
@@ -350,6 +356,88 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .ql .nm{font-weight:600;font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ql .dom{font:400 11px/1.3 var(--f-data);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ql .icon-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:30px;height:30px}
+
+/* Pomodoro */
+.po-main{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px 22px;align-items:center}
+@container (max-width:370px){.po-main{grid-template-columns:minmax(0,1fr);justify-items:center}.po-side{width:100%}}
+.po-ring{position:relative;width:156px;height:156px}
+.po-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.po-track{fill:none;stroke:var(--raise);stroke-width:9}
+.po-arc{fill:none;stroke:var(--accent);stroke-width:9;stroke-linecap:round;stroke-dasharray:326.73;transition:stroke-dashoffset .95s linear}
+.po-ring[data-mode="short"] .po-arc,.po-ring[data-mode="long"] .po-arc{stroke:var(--good)}
+@media (prefers-reduced-motion: reduce){.po-arc{transition:none}}
+.po-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center}
+.po-mode{font:600 11px/1.2 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.po-time{font:500 36px/1 var(--f-data);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.po-round{font-size:12px;color:var(--muted)}
+.po-side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.po-stats{display:flex;flex-direction:column;gap:6px}
+.po-dots{display:flex;flex-wrap:wrap;gap:6px}
+.po-dots i{width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.po-dots i.e{background:transparent;border:1.5px solid var(--line)}
+
+/* Gewohnheiten */
+.habits{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.habit{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;padding:12px 0;border-top:1px solid var(--line);align-items:start}
+.habit:first-child{border-top:0;padding-top:0}
+.habit.empty{display:block;border:0;padding:0}
+.hb-check{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);background:transparent;display:grid;place-items:center;color:transparent;padding:0;margin-top:2px}
+.hb-check svg{width:17px;height:17px}
+.hb-check:hover{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent-ink)}
+.hb-check[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.hb-main{min-width:0}
+.hb-top{display:flex;align-items:center;gap:8px;min-width:0}
+.hb-name{font-weight:700;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hb-streak{font:600 11px/1.6 var(--f-data);color:var(--accent-ink);background:var(--chip-bg);padding:0 7px;border-radius:999px;white-space:nowrap}
+.hb-top .icon-btn{margin-left:auto;width:28px;height:28px;flex-basis:28px}
+.hb-meta{font-size:12px;color:var(--muted)}
+.hb-days{display:flex;gap:9px;margin-top:8px}
+.hb-week{display:grid;grid-template-columns:repeat(7,13px);gap:3px}
+.hb-day{width:13px;height:13px;border-radius:3px;border:1px solid var(--line);background:var(--raise);padding:0}
+.hb-day:hover:not(:disabled){border-color:var(--accent)}
+.hb-day[aria-pressed="true"]{background:var(--accent);border-color:var(--accent)}
+.hb-day.opt:not([aria-pressed="true"]){opacity:.45}
+.hb-day.today{outline:1.5px solid var(--ink);outline-offset:1px}
+.hb-day:disabled{background:transparent;border-style:dashed;cursor:default;opacity:.5}
+@container (max-width:340px){.hb-week:first-child{display:none}}
+
+/* Lernfortschritt */
+.ln-add{display:flex;gap:8px}
+.topics{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tp{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid var(--line)}
+.tp:first-child{border-top:0}
+.tp .check-row{flex:1;min-width:0;padding:3px 0}
+.tp .check-row span{overflow-wrap:anywhere}
+.tp.done .check-row span{text-decoration:line-through;color:var(--muted)}
+.tp small{font:400 11px var(--f-data);color:var(--muted);white-space:nowrap}
+.tp .icon-btn{width:28px;height:28px;flex-basis:28px;opacity:.55}
+.tp .icon-btn:hover,.tp .icon-btn:focus-visible{opacity:1}
+[data-type="learn"] .seg-taken{background:var(--accent)}
+.tp-head{font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:12px 0 4px}
+
+/* Gleitzeit */
+.big[data-s="plus"] b{color:var(--good)}
+.big[data-s="minus"] b{color:var(--bad)}
+.fx-now{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px;padding:12px 14px;border-radius:12px;background:var(--raise)}
+.fx-now p{margin:0;font-size:14px;line-height:1.45;flex:1 1 200px}
+.fx-now b{font-weight:700}
+.fx-stamp{min-width:104px}
+.fx-now[data-s="in"] .fx-stamp{background:var(--accent);color:var(--on-accent)}
+.fx-week-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.fx-week-head .sub-h{text-align:center}
+.fx-week-head .icon-btn:disabled{opacity:.3;cursor:default}
+.fx-week{list-style:none;margin:0;padding:0}
+.fx-row{display:grid;grid-template-columns:5.6em minmax(0,1fr) auto 4.2em;gap:2px 10px;align-items:center;width:100%;padding:7px 6px;border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:inherit;font:inherit;font-size:13px}
+.fx-week li:first-child .fx-row{border-top:0}
+.fx-row:hover{background:var(--raise)}
+.fx-row.today{background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:8px}
+.fx-row .d{font-weight:700;white-space:nowrap}
+.fx-row .t{color:var(--muted);font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fx-row .i{font:500 13px var(--f-data);font-variant-numeric:tabular-nums}
+.fx-row .x{font:600 13px var(--f-data);font-variant-numeric:tabular-nums;text-align:right}
+.fx-row .x[data-s="plus"]{color:var(--good)}
+.fx-row .x[data-s="minus"]{color:var(--bad)}
+.fx-row.off .d,.fx-row.off .i{color:var(--muted)}
 
 /* 40-anpassen.css */
 /* Anpassen */
@@ -664,6 +752,132 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
     <p class="hint" id="vac-rule"></p>
   </section>
 
+  <!-- Pomodoro -->
+  <section class="card" id="pomodoro" data-type="pomodoro" aria-labelledby="po-h">
+    <div class="card-head">
+      <h2 id="po-h"><span data-r="title">Pomodoro</span></h2>
+      <button type="button" class="btn-ghost" id="po-set-btn">Zeiten</button>
+    </div>
+    <form class="panel" id="po-form" hidden novalidate>
+      <h3>Zeiten in Minuten</h3>
+      <div class="grid2">
+        <div class="field"><label for="po-focus">Fokus</label><input id="po-focus" type="number" min="1" max="120" inputmode="numeric"></div>
+        <div class="field"><label for="po-short">Kurze Pause</label><input id="po-short" type="number" min="1" max="60" inputmode="numeric"></div>
+        <div class="field"><label for="po-long">Lange Pause</label><input id="po-long" type="number" min="1" max="90" inputmode="numeric"></div>
+        <div class="field"><label for="po-every">Lange Pause nach Runden</label><input id="po-every" type="number" min="2" max="8" inputmode="numeric"></div>
+      </div>
+      <label class="check-row"><input type="checkbox" id="po-sound"> Ton am Ende einer Phase</label>
+      <label class="check-row"><input type="checkbox" id="po-auto"> Nächste Phase automatisch starten</label>
+      <p class="err" id="po-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="po-cancel">Abbrechen</button>
+      </div>
+    </form>
+    <div class="po-main">
+      <div class="po-ring" id="po-ring" data-mode="focus">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="po-track" cx="60" cy="60" r="52"/><circle class="po-arc" id="po-arc" cx="60" cy="60" r="52"/></svg>
+        <div class="po-center"><span class="po-mode" id="po-mode">Fokus</span><b class="po-time" id="po-time" role="timer" aria-live="off">25:00</b><span class="po-round" id="po-round"></span></div>
+      </div>
+      <div class="po-side">
+        <div class="seg sm" role="group" aria-label="Phase" id="po-phase">
+          <button type="button" data-v="focus">Fokus</button><button type="button" data-v="short">Pause</button><button type="button" data-v="long">Lange Pause</button>
+        </div>
+        <div class="form-row">
+          <button type="button" class="btn" id="po-start">Start</button>
+          <button type="button" class="btn-ghost" id="po-reset">Neu</button>
+          <button type="button" class="btn-ghost" id="po-skip">Weiter</button>
+        </div>
+        <div class="field"><label for="po-task">Woran arbeitest du?</label><input id="po-task" type="text" maxlength="120" list="po-tasks" autocomplete="off" placeholder="Aufgabe aus Todoist oder frei"><datalist id="po-tasks"></datalist></div>
+        <button type="button" class="btn-ghost" id="po-done" hidden>In Todoist abhaken</button>
+      </div>
+    </div>
+    <div class="po-stats">
+      <div class="po-dots" id="po-dots" aria-hidden="true"></div>
+      <p class="hint" id="po-today"></p>
+    </div>
+    <div class="form-row" id="po-notify-row" hidden><button type="button" class="btn-ghost" id="po-notify">Hinweis am Ende auch im Hintergrund</button></div>
+  </section>
+
+  <!-- Gleitzeit -->
+  <section class="card" id="flex" data-type="flex" aria-labelledby="fx-h">
+    <div class="card-head">
+      <h2 id="fx-h"><span data-r="title">Gleitzeit</span></h2>
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="fx-set-btn">Regeln</button>
+        <button type="button" class="btn-ghost" id="fx-add-btn">+ Tag</button>
+      </div>
+    </div>
+    <form class="panel" id="fx-set" hidden novalidate>
+      <h3>Deine Regeln</h3>
+      <div class="grid2">
+        <div class="field"><label for="fx-soll">Soll pro Arbeitstag (Std:Min)</label><input id="fx-soll" type="text" inputmode="decimal" maxlength="6" placeholder="8:00" autocomplete="off"></div>
+        <div class="field"><label for="fx-carry">Saldo zum Start (Std:Min, auch minus)</label><input id="fx-carry" type="text" inputmode="text" maxlength="8" placeholder="0:00" autocomplete="off"></div>
+      </div>
+      <fieldset class="days" id="fx-days">
+        <legend class="lbl">Arbeitstage</legend>
+        <label><input type="checkbox" data-fxday="1"><span>Mo</span></label>
+        <label><input type="checkbox" data-fxday="2"><span>Di</span></label>
+        <label><input type="checkbox" data-fxday="3"><span>Mi</span></label>
+        <label><input type="checkbox" data-fxday="4"><span>Do</span></label>
+        <label><input type="checkbox" data-fxday="5"><span>Fr</span></label>
+        <label><input type="checkbox" data-fxday="6"><span>Sa</span></label>
+        <label><input type="checkbox" data-fxday="0"><span>So</span></label>
+      </fieldset>
+      <div class="field"><label for="fx-from">Zählen ab</label><input id="fx-from" type="date"></div>
+      <label class="check-row"><input type="checkbox" id="fx-break"> Gesetzliche Pause abziehen, wenn du weniger gestempelt hast (über 6 Std 30 Min, über 9 Std 45 Min)</label>
+      <p class="hint">Feiertage und Urlaub aus dem Urlaub-Widget senken das Soll automatisch, halbe Urlaubstage zur Hälfte.</p>
+      <p class="err" id="fx-set-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="fx-set-cancel">Abbrechen</button>
+      </div>
+    </form>
+    <form class="panel" id="fx-day" hidden novalidate>
+      <h3 id="fx-day-title">Tag eintragen</h3>
+      <div class="grid2">
+        <div class="field"><label for="fx-d-date">Datum</label><input id="fx-d-date" type="date"></div>
+        <div class="field"><label for="fx-d-kind">Art</label>
+          <select id="fx-d-kind">
+            <option value="">Arbeit</option>
+            <option value="school">Berufsschule (zählt wie Soll)</option>
+            <option value="sick">Krank (zählt wie Soll)</option>
+            <option value="flexday">Gleittag (Soll geht vom Saldo ab)</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid3" id="fx-d-times">
+        <div class="field"><label for="fx-d-in">Kommen</label><input id="fx-d-in" type="time"></div>
+        <div class="field"><label for="fx-d-out">Gehen</label><input id="fx-d-out" type="time"></div>
+        <div class="field"><label for="fx-d-pause">Pause (Min)</label><input id="fx-d-pause" type="number" min="0" max="600" inputmode="numeric"></div>
+      </div>
+      <p class="preview" id="fx-d-prev"></p>
+      <p class="err" id="fx-d-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="fx-d-cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" id="fx-d-del" hidden>Eintrag löschen</button>
+      </div>
+    </form>
+    <div class="vac-hero">
+      <div class="big" id="fx-big"><b id="fx-saldo">0:00</b><span>Std auf dem Gleitzeitkonto</span></div>
+      <dl class="legend" id="fx-dl"></dl>
+    </div>
+    <div class="fx-now" id="fx-now">
+      <p id="fx-now-txt"></p>
+      <button type="button" class="btn fx-stamp" id="fx-stamp">Kommen</button>
+    </div>
+    <p class="hint" id="fx-missing" hidden></p>
+    <div>
+      <div class="fx-week-head">
+        <button type="button" class="icon-btn" id="fx-prev" aria-label="Woche davor"></button>
+        <p class="sub-h" id="fx-week-lbl"></p>
+        <button type="button" class="icon-btn" id="fx-next" aria-label="Woche danach"></button>
+      </div>
+      <ul class="fx-week" id="fx-week"></ul>
+    </div>
+  </section>
+
   <button type="button" class="card add-tile" id="add-tile" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Widget hinzufügen<span>Neu anlegen oder ein vorhandenes einfügen</span></button>
 </main>
 
@@ -813,6 +1027,11 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
         <button type="button" class="btn-danger" data-r="forget" hidden>Trennen</button>
       </div>
     </form>
+    <form class="tk-add" data-r="addform" hidden novalidate>
+      <input data-r="new" type="text" maxlength="400" autocomplete="off" enterkeyhint="done" placeholder="Neue Aufgabe, z. B. Ticket prüfen morgen p2" aria-label="Neue Aufgabe" title="Datum, Uhrzeit, p1 bis p4 und @Labels erkennt Todoist direkt, wie in der App.">
+      <select data-r="proj" aria-label="Projekt"></select>
+      <button type="submit" class="btn-ghost" data-r="addbtn">Anlegen</button>
+    </form>
     <div class="tk-cols" data-r="cols"></div>
     <div class="tk-foot">
       <a class="btn-ghost" href="https://app.todoist.com/app/today" target="_blank" rel="noopener">Todoist öffnen ↗</a>
@@ -900,6 +1119,77 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
       <span class="src" data-r="state"></span>
     </div>
     <textarea class="notes" data-r="text" maxlength="8000" placeholder="Schnell was notieren, wird automatisch gespeichert."></textarea>
+  </section>
+</template>
+
+<template id="tpl-habits">
+  <section class="card" data-type="habits">
+    <div class="card-head">
+      <h2 data-r="title">Gewohnheiten</h2>
+      <button type="button" class="btn-ghost" data-r="add">+ Gewohnheit</button>
+    </div>
+    <form class="panel" data-r="form" hidden novalidate>
+      <h3 data-r="form-title">Neue Gewohnheit</h3>
+      <label class="field"><span class="lbl">Name</span><input data-r="name" type="text" maxlength="40" autocomplete="off" placeholder="z. B. Sport, Lesen, Vokabeln"></label>
+      <div class="grid2">
+        <label class="field"><span class="lbl">Rhythmus</span>
+          <select data-r="rhythm">
+            <option value="daily">Jeden Tag</option>
+            <option value="workdays">Werktags (Mo bis Fr)</option>
+            <option value="weekly">Ein paar Mal pro Woche</option>
+          </select>
+        </label>
+        <label class="field" data-r="n-wrap"><span class="lbl">Wie oft pro Woche</span><input data-r="n" type="number" min="1" max="7" inputmode="numeric"></label>
+      </div>
+      <p class="err" data-r="err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" data-r="del" hidden>Löschen</button>
+      </div>
+    </form>
+    <ul class="habits" data-r="list"></ul>
+    <p class="hint" data-r="legend">Kreis antippen, wenn du es heute geschafft hast. Mit den Kästchen trägst du die letzten Wochen nach.</p>
+  </section>
+</template>
+
+<template id="tpl-learn">
+  <section class="card" data-type="learn">
+    <div class="card-head">
+      <h2 data-r="title">Lernfortschritt</h2>
+      <button type="button" class="btn-ghost" data-r="set">Prüfung</button>
+    </div>
+    <form class="panel" data-r="form" hidden novalidate>
+      <h3>Prüfung</h3>
+      <div class="grid2">
+        <label class="field"><span class="lbl">Datum</span><input data-r="date" type="date"></label>
+        <label class="field"><span class="lbl">Uhrzeit (optional)</span><input data-r="time" type="time"></label>
+      </div>
+      <label class="field"><span class="lbl">Lernstart (optional, macht die Tempo-Prognose genauer)</span><input data-r="start" type="date"></label>
+      <p class="err" data-r="err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
+      </div>
+    </form>
+    <div class="wx-off" data-r="empty" hidden>
+      <h3>Wann ist die Prüfung?</h3>
+      <p>Trag das Datum ein und leg deine Themen an. Dann siehst du, wie weit du bist und ob dein Tempo bis zur Prüfung reicht.</p>
+      <div class="form-row"><button type="button" class="btn" data-r="empty-btn">Datum eintragen</button></div>
+    </div>
+    <div class="vac-hero" data-r="hero">
+      <div class="big"><b data-r="days">0</b><span data-r="days-lbl">Tage bis zur Prüfung</span></div>
+      <dl class="legend" data-r="dl"></dl>
+    </div>
+    <div class="stack" data-r="bar-wrap" role="img"><div class="seg-taken" data-r="bar"></div></div>
+    <p class="verdict" data-r="pace"></p>
+    <form class="ln-add" data-r="addform" novalidate>
+      <input data-r="new" type="text" maxlength="80" autocomplete="off" enterkeyhint="done" placeholder="Neues Thema, z. B. Subnetting" aria-label="Neues Thema">
+      <button type="submit" class="btn-ghost">+ Thema</button>
+    </form>
+    <ul class="topics" data-r="topics"></ul>
+    <div class="form-row" data-r="more-row"></div>
+    <p class="hint" data-r="tip">Tipp: Du kannst eine ganze Liste einfügen, ein Thema pro Zeile.</p>
   </section>
 </template>
 
@@ -1031,7 +1321,8 @@ const numTxt = n => numDe(n, n % 1 ? 1 : 0);
  * state.widgets  alle Widgets: { [id]: { type, title, cfg } }. Ein Widget kann auf mehreren Seiten liegen.
  *                Pendeln, Wetter und Urlaub gibt es genau einmal (ID = Typ), den Rest beliebig oft.
  * state.page     zuletzt geöffnete Seite
- * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern)
+ * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern), zuletzt gesehene Version
+ * state.flex     Gleitzeit: gestempelte Tage. state.pomo: erledigte Pomodoro-Runden pro Tag
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
@@ -1054,9 +1345,13 @@ const TYPES = {
   commute:  { name: 'Pendeln', multi: false, w: 1, desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
   weather:  { name: 'Wetter', multi: false, w: 2, desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
   links:    { name: 'Schnellzugriff', multi: true, w: 1, desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
-  notes:    { name: 'Notizen', multi: true, w: 1, desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' }
+  notes:    { name: 'Notizen', multi: true, w: 1, desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' },
+  pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
+  habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
+  learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
+  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' }
 };
-const SOON = [['pomodoro', 'Pomodoro-Timer'], ['habits', 'Gewohnheiten'], ['learn', 'Lernfortschritt'], ['flex', 'Gleitzeitkonto'], ['football', 'Fußball'], ['f1', 'Formel 1'], ['fuel', 'Spritpreise']];
+const SOON = [['football', 'Fußball'], ['f1', 'Formel 1'], ['fuel', 'Spritpreise']];
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -1130,9 +1425,46 @@ function normBars(list) {
 const normLinks = list => (Array.isArray(list) ? list : [])
   .map(l => l && { id: String(l.id || uid()).slice(0, 20), name: String(l.name || '').slice(0, 30), url: safeUrl(l.url) })
   .filter(l => l && l.url).slice(0, 40);
+const intIn = (x, lo, hi, d) => x !== null && x !== '' && Number.isFinite(+x) && +x >= lo && +x <= hi ? Math.round(+x) : d;
+const normDays = (list, d) => Array.isArray(list) ? [...new Set(list.map(Number).filter(x => Number.isInteger(x) && x >= 0 && x <= 6))] : d;
+const HB_RHYTHM = ['daily', 'workdays', 'weekly'];
+const normHabits = list => (Array.isArray(list) ? list : []).filter(h => h && String(h.name || '').trim()).slice(0, 20).map(h => ({
+  id: String(h.id || uid()).slice(0, 20),
+  name: String(h.name).trim().slice(0, 40),
+  rhythm: HB_RHYTHM.includes(h.rhythm) ? h.rhythm : 'daily',
+  n: intIn(h.n, 1, 7, 3),
+  log: [...new Set((Array.isArray(h.log) ? h.log : []).filter(validYmd))].sort().slice(-800)
+}));
+const normTopics = list => (Array.isArray(list) ? list : []).filter(t => t && String(t.name || '').trim()).slice(0, 300)
+  .map(t => ({ id: String(t.id || uid()).slice(0, 20), name: String(t.name).trim().slice(0, 80), done: validYmd(t.done) ? t.done : null }));
+function normFlexDays(o) {
+  const out = {};
+  if (!o || typeof o !== 'object') return out;
+  for (const k of Object.keys(o).filter(validYmd).sort().slice(-800)) {
+    const d = o[k];
+    if (!d || typeof d !== 'object') continue;
+    const e = { in: validHm(d.in) ? d.in : '', out: validHm(d.out) ? d.out : '', pause: intIn(d.pause, 0, 600, 0), kind: ['school', 'sick', 'flexday'].includes(d.kind) ? d.kind : '' };
+    if (!e.in) { e.out = ''; e.pause = 0; }
+    if (e.in || e.kind) out[k] = e;
+  }
+  return out;
+}
+function normPomoLog(o) {
+  const out = {};
+  if (!o || typeof o !== 'object') return out;
+  for (const k of Object.keys(o).filter(validYmd).sort().slice(-120)) {
+    const d = o[k] || {};
+    out[k] = { n: intIn(d.n, 0, 60, 0), min: intIn(d.min, 0, 1440, 0) };
+  }
+  return out;
+}
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
+    case 'pomodoro': return { focus: intIn(c.focus, 1, 120, 25), short: intIn(c.short, 1, 60, 5), long: intIn(c.long, 1, 90, 15), every: intIn(c.every, 2, 8, 4), sound: c.sound !== false, auto: !!c.auto };
+    case 'habits': return { items: normHabits(c.items) };
+    case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
+    case 'flex': return { soll: intIn(c.soll, 0, 720, 480), days: normDays(c.days, [1, 2, 3, 4, 5]), autoBreak: c.autoBreak !== false, carry: intIn(c.carry, -60000, 60000, 0), from: validYmd(c.from) ? c.from : ymd(new Date()) };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false };
@@ -1247,7 +1579,9 @@ function normalize(s) {
     widgets,
     loc: s.loc && s.loc.mode === 'fixed' && Number.isFinite(+s.loc.lat) && Number.isFinite(+s.loc.lon) ? { mode: 'fixed', name: String(s.loc.name || 'Ort'), lat: +s.loc.lat, lon: +s.loc.lon } : { mode: 'auto' },
     commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) },
-    meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze) }
+    flex: { days: normFlexDays(s.flex && s.flex.days) },
+    pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
+    meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
 }
 const DEFAULTS = () => normalize(null);
@@ -1286,13 +1620,14 @@ function persist() { lsSet(LS_KEY, state); }
 
 /* Toast mit Rückgängig */
 let toastTimer = null, undoFn = null;
-function toast(msg, undo) {
+function toast(msg, undo, opt) {
   $('#toast-msg').textContent = msg;
   undoFn = undo || null;
   $('#toast-undo').hidden = !undo;
+  $('#toast-undo').textContent = (opt && opt.label) || 'Rückgängig';
   $('#toast').hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { $('#toast').hidden = true; undoFn = null; }, 6000);
+  toastTimer = setTimeout(() => { $('#toast').hidden = true; undoFn = null; }, (opt && opt.ms) || 6000);
 }
 $('#toast-undo').addEventListener('click', () => { if (undoFn) undoFn(); undoFn = null; $('#toast').hidden = true; });
 
@@ -1403,6 +1738,13 @@ function calcBar(b, now) {
   switch (b.kind) {
     case 'day': {
       if (!validHm(b.start) || !validHm(b.end)) return { pct: 0, state: 'off', sub: 'Uhrzeit fehlt', left: '', right: '' };
+      const wb = workBar(), fxt = wb && wb.id === b.id ? flexToday(now) : null;
+      if (fxt) {
+        const fr = { left: hm(fxt.start), right: hm(fxt.end) };
+        if (!fxt.running) return { ...fr, pct: 1, state: 'done', sub: `Ausgestempelt um ${hm(fxt.end)}` };
+        if (now >= fxt.end) return { ...fr, pct: 1, state: 'done', sub: 'Soll erreicht, ab jetzt Plus' };
+        return { ...fr, pct: clamp01((now - fxt.start) / (fxt.end - fxt.start)), state: 'run', sub: `noch ${dur(fxt.end - now)} bis zum Soll` };
+      }
       const r = { left: b.start, right: b.end };
       const why = freeReason(b, now);
       if (why) return { ...r, pct: 0, state: 'off', sub: why === 'Urlaub' ? 'Heute Urlaub' : why === 'Wochenende' || why === 'Kein Arbeitstag' ? 'Heute frei' : `Heute frei, ${why}` };
@@ -2206,14 +2548,15 @@ function tdSetToken(v) {
   try { if (v) localStorage.setItem(TK_TOKEN, v); else localStorage.removeItem(TK_TOKEN); return true; } catch { return false; }
 }
 function tdErr(code, msg, extra) { const e = new Error(msg || code); e.code = code; Object.assign(e, extra || {}); return e; }
-async function tdFetch(path, method, token) {
+async function tdFetch(path, method, token, body) {
   const tok = token || tdToken();
   if (!tok) throw tdErr('no_token');
   let r;
   try {
     r = await fetch(TD_API + path, {
       method: method || 'GET',
-      headers: { Authorization: 'Bearer ' + tok },
+      headers: body ? { Authorization: 'Bearer ' + tok, 'Content-Type': 'application/json' } : { Authorization: 'Bearer ' + tok },
+      body: body ? JSON.stringify(body) : undefined,
       cache: 'no-store',
       signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined
     });
@@ -2359,6 +2702,57 @@ async function tdConnect(v) {
   }
 }
 
+/* Neue Aufgabe über Quick Add: Datum, Uhrzeit, p1 bis p4 und @Labels versteht Todoist selbst, wie in der App */
+const tkAddProjects = v => state.widgets[v.id].cfg.projects.map(n => [n.toLowerCase(), n]).filter(([k]) => tk.proj[k]);
+function renderTaskAdd(v) {
+  const f = v.q('[data-r="addform"]'), sel = v.q('[data-r="proj"]'), list = tkAddProjects(v);
+  f.hidden = !tdToken() || !!tk.ask || !list.length;
+  const sig = list.map(([k, n]) => `${k}|${n}`).join(',');
+  if (sel.dataset.sig !== sig) {
+    const cur = sel.value;
+    sel.textContent = '';
+    for (const [k, n] of list) sel.add(new Option(n, k));
+    if (list.some(([k]) => k === cur)) sel.value = cur;
+    sel.dataset.sig = sig;
+  }
+  sel.hidden = list.length < 2;
+}
+async function tdQuickAdd(v) {
+  const inp = v.q('[data-r="new"]'), sel = v.q('[data-r="proj"]'), btn = v.q('[data-r="addbtn"]');
+  const text = inp.value.trim();
+  if (!text || btn.disabled) return;
+  const key = sel.value || (tkAddProjects(v)[0] || [])[0];
+  const proj = key && tk.proj[key];
+  if (!proj) return;
+  const ownProj = /(^|\s)#\S/.test(text);
+  const full = ownProj ? text : `${text} #${String(proj.name).trim().replace(/ /g, '\\ ')}`;
+  btn.disabled = true;
+  inp.disabled = true;
+  try {
+    let t = await tdFetch('/tasks/quick', 'POST', null, { text: full });
+    // Falls Todoist das Projekt im Text nicht erkannt hat, die Aufgabe ins richtige Projekt schieben
+    if (t && t.id && !ownProj && String(t.project_id) !== String(proj.id)) {
+      try { t = (await tdFetch(`/tasks/${encodeURIComponent(t.id)}/move`, 'POST', null, { project_id: proj.id })) || t; } catch { /* bleibt, wo Todoist sie angelegt hat */ }
+    }
+    inp.value = '';
+    const name = t && t.content ? plain(t.content) : text;
+    if (t && t.id && tk.tasks[key] && String(t.project_id) === String(proj.id)) tk.tasks[key] = [...tk.tasks[key], tdTask(t)];
+    renderTasksAll();
+    toast(`„${name}“ angelegt`, t && t.id ? async () => {
+      try { await tdFetch(`/tasks/${encodeURIComponent(t.id)}`, 'DELETE'); } catch (err) { tdError(err); }
+      tdLoad();
+    } : null);
+    tdLoad();
+  } catch (err) {
+    if (err && ['bad_token', 'rate'].includes(err.code)) tdError(err);
+    else tkMsg(`Die Aufgabe konnte nicht angelegt werden.${err && err.code === 'network' ? ' Todoist ist gerade nicht erreichbar.' : ''}`);
+  } finally {
+    btn.disabled = false;
+    inp.disabled = false;
+    inp.focus();
+  }
+}
+
 function renderTaskView(v) {
   const q = v.q, w = state.widgets[v.id];
   if (!w) return;
@@ -2383,6 +2777,7 @@ function renderTaskView(v) {
   cols.hidden = !has || !!(ask && ask.err);
   if (!cols.hidden) renderTaskCols(v, cols, w.cfg.projects);
   q('[data-r="src"]').textContent = tk.stamp ? `Stand ${hm(new Date(tk.stamp))} Uhr` : '';
+  renderTaskAdd(v);
 }
 function renderTaskCols(v, wrap, projects) {
   wrap.textContent = '';
@@ -2495,6 +2890,7 @@ defineWidget('tasks', {
     q('[data-r="cancel"]').addEventListener('click', tdAskClose);
     q('[data-r="forget"]').addEventListener('click', () => { tdSetToken(''); tkReset(); tdAsk(); });
     q('[data-r="form"]').addEventListener('submit', e => { e.preventDefault(); tdConnect(v); });
+    q('[data-r="addform"]').addEventListener('submit', e => { e.preventDefault(); tdQuickAdd(v); });
     q('[data-r="cols"]').addEventListener('click', e => {
       const more = e.target.closest('[data-more]');
       if (more) { const k = `${v.id}:${more.dataset.more}`; tk.open[k] = !tk.open[k]; renderTaskView(v); return; }
@@ -2744,7 +3140,9 @@ function renderCommute() {
   const now = new Date();
   const dl = [['Jetzt los', `an ${hm(new Date(now.getTime() + mins * 6e4))} Uhr`], ['Strecke', `${numDe(km, 1)} km${R.refs.length ? ' über ' + R.refs.join(', ') : ''}`], ['Verzögerung', delay >= 1 ? `+${Math.round(delay)} Min` : 'keine']];
   const wb = workBar();
-  if (R.dir === 'home' && wb && !freeReason(wb, now) && now < at(now, wb.end)) dl.splice(1, 0, [`Ab ${wb.end}`, `an ${hm(new Date(at(now, wb.end).getTime() + mins * 6e4))} Uhr`]);
+  const fxt = flexToday(now);
+  const endT = fxt && fxt.running ? fxt.end : wb && !freeReason(wb, now) ? at(now, wb.end) : null;
+  if (R.dir === 'home' && endT && now < endT) dl.splice(1, 0, [`Ab ${hm(endT)}`, `an ${hm(new Date(endT.getTime() + mins * 6e4))} Uhr`]);
   $('#cm-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   $('#cm-route').textContent = `${R.from.label || R.from.text} → ${R.to.label || R.to.text}`;
   const closures = items.filter(i => i.k === 'closure').length, works = items.filter(i => i.k === 'works').length;
@@ -2937,8 +3335,14 @@ function setTile(id, val, sub, mode) {
 }
 function tickTiles(now) {
   const t = sod(now), wb = workBar();
-  // Feierabend
-  if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
+  // Feierabend (wenn heute in der Gleitzeit gestempelt: ab dann zählt das Soll)
+  const fxt = flexToday(now);
+  const way = cm.homeMins ? `, Heimweg ca. ${cm.homeMins} Min` : '';
+  if (fxt && fxt.running) {
+    if (now < fxt.end) setTile('#t-fa', `in ${dur(fxt.end - now, true)}`, `um ${hm(fxt.end)} Uhr ist dein Soll voll${way}`, 'hot');
+    else setTile('#t-fa', 'Soll erreicht', `seit ${hm(fxt.end)} Uhr, ab jetzt sammelst du Plus`, 'good');
+  } else if (fxt) setTile('#t-fa', 'Geschafft', `ausgestempelt um ${hm(fxt.end)} Uhr`, 'good');
+  else if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
   else {
     const why = freeReason(wb, now);
     const s = at(now, wb.start), e = at(now, wb.end);
@@ -3161,6 +3565,8 @@ function startTargets() {
 }
 /* Arbeitszeit aus dem Arbeitstag-Balken, ab einer Stunde vor Beginn. Feiertage und Urlaub zählen als frei. */
 function isWorkTime(now) {
+  const fxt = flexToday(now);
+  if (fxt) return fxt.running;
   const wb = workBar();
   if (!wb || freeReason(wb, now)) return false;
   const s = at(now, wb.start).getTime() - 36e5, e = at(now, wb.end).getTime();
@@ -3373,7 +3779,7 @@ function openGallery() {
     }
     const li = document.createElement('li');
     li.className = 'gal-item';
-    li.innerHTML = `<span class="gal-ico">${TICON[type]}</span><p class="gal-name">${esc(T.name)}</p><p class="gal-desc">${esc(T.desc)}</p><div class="gal-act">${act}</div>`;
+    li.innerHTML = `<span class="gal-ico">${TICON[type]}</span><p class="gal-name">${esc(T.name)}${T.since === VERSION ? ' <span class="chip">Neu</span>' : ''}</p><p class="gal-desc">${esc(T.desc)}</p><div class="gal-act">${act}</div>`;
     ul.appendChild(li);
   }
   body.appendChild(ul);
@@ -3743,15 +4149,798 @@ $('#dr-file').addEventListener('change', async e => {
 });
 $('#dr-reset').addEventListener('click', () => replaceState(DEFAULTS(), 'Alles auf Anfang gesetzt'));
 
+/* 30-pomodoro.js */
+/* Pomodoro (gibt es nur einmal). Der laufende Timer liegt extra im Browser, damit er Neuladen übersteht.
+ * Die geschafften Runden pro Tag liegen in state.pomo.log und kommen mit in die Sicherung. */
+const PO_KEY = 'jere-cockpit-pomodoro';
+const PO_NAME = { focus: 'Fokus', short: 'Pause', long: 'Lange Pause' };
+const PO_C = 2 * Math.PI * 52;
+const BASE_TITLE = document.title;
+const po = { mode: 'focus', running: false, endsAt: 0, left: 0, round: 1, task: '', taskId: '' };
+function poLoad() {
+  const r = lsGet(PO_KEY) || {};
+  po.mode = PO_NAME[r.mode] ? r.mode : 'focus';
+  po.running = !!r.running && Number.isFinite(+r.endsAt) && +r.endsAt > 0;
+  po.endsAt = po.running ? +r.endsAt : 0;
+  po.left = Number.isFinite(+r.left) && +r.left > 0 ? +r.left : 0;
+  po.round = intIn(r.round, 1, 8, 1);
+  po.task = typeof r.task === 'string' ? r.task.slice(0, 120) : '';
+  po.taskId = typeof r.taskId === 'string' ? r.taskId.slice(0, 40) : '';
+}
+poLoad();
+const poCfg = () => state.widgets.pomodoro.cfg;
+const poLen = m => poCfg()[m] * 6e4;
+const poSave = () => lsSet(PO_KEY, { ...po });
+/* Restzeit: läuft, angehalten (left) oder frisch (volle Länge der Phase) */
+const poRemain = t => po.running ? Math.max(0, po.endsAt - t) : Math.min(po.left || Infinity, poLen(po.mode));
+const mmss = ms => { const s = Math.ceil(ms / 1000); return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`; };
+
+let poAudio = null;
+function poUnlockAudio() {
+  try {
+    poAudio = poAudio || new (window.AudioContext || window.webkitAudioContext)();
+    if (poAudio.state === 'suspended') poAudio.resume();
+  } catch { poAudio = null; }
+}
+function poBeep() {
+  if (!poCfg().sound) return;
+  try {
+    poUnlockAudio();
+    const ctx = poAudio, t0 = ctx.currentTime + 0.02;
+    [0, 0.3, 0.6].forEach((d, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = i === 2 ? 1046.5 : 880;
+      g.gain.setValueAtTime(0.0001, t0 + d);
+      g.gain.exponentialRampToValueAtTime(0.22, t0 + d + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + 0.26);
+      o.connect(g).connect(ctx.destination);
+      o.start(t0 + d);
+      o.stop(t0 + d + 0.28);
+    });
+  } catch { /* Ton geht hier nicht */ }
+}
+function poNotify(title, body) {
+  try {
+    if ('Notification' in window && Notification.permission === 'granted' && document.visibilityState !== 'visible') new Notification(title, { body, tag: 'cockpit-pomodoro' });
+  } catch { /* Benachrichtigung geht hier nicht */ }
+}
+
+/* Phase vorbei (counted) oder übersprungen: Runde zählen, nächste Phase vorbereiten */
+function poFinish(t, counted) {
+  // Läuft das Cockpit in zwei Tabs, beendet nur einer die Phase
+  const cur = lsGet(PO_KEY);
+  if (counted && cur && (cur.endsAt !== po.endsAt || cur.mode !== po.mode)) { poLoad(); renderPomo(); return; }
+  const was = po.mode, c = poCfg();
+  if (was === 'focus' && counted) {
+    const k = ymd(new Date(po.endsAt || t)), log = state.pomo.log;
+    const e = log[k] || (log[k] = { n: 0, min: 0 });
+    e.n++;
+    e.min += c.focus;
+    persist();
+  }
+  if (was === 'focus') po.mode = po.round >= c.every ? 'long' : 'short';
+  else { po.mode = 'focus'; po.round = was === 'long' ? 1 : Math.min(c.every, po.round + 1); }
+  po.left = 0;
+  po.running = counted && c.auto;
+  po.endsAt = po.running ? t + poLen(po.mode) : 0;
+  poSave();
+  if (counted) {
+    poBeep();
+    const msg = was === 'focus' ? `Fokus geschafft, jetzt ${po.mode === 'long' ? c.long : c.short} Min Pause.` : 'Pause vorbei, weiter geht’s.';
+    poNotify(was === 'focus' ? 'Fokus geschafft' : 'Pause vorbei', msg);
+    toast(msg);
+  }
+  renderPomo();
+}
+function tickPomo(now) {
+  const t = now.getTime();
+  if (po.running && t >= po.endsAt) poFinish(t, true);
+  const want = po.running ? `${mmss(po.endsAt - t)} ${PO_NAME[po.mode]} · ${BASE_TITLE}` : BASE_TITLE;
+  if (document.title !== want) document.title = want;
+  const v = views.get('pomodoro');
+  if (v && !v.el.hidden) poDraw(t);
+}
+function poDraw(t) {
+  const rem = poRemain(t), len = poLen(po.mode), fresh = !po.running && rem >= len;
+  $('#po-time').textContent = mmss(rem);
+  $('#po-arc').style.strokeDashoffset = (PO_C * (1 - clamp01(rem / len))).toFixed(2);
+  $('#po-ring').dataset.mode = po.mode;
+  $('#po-mode').textContent = PO_NAME[po.mode] + (!po.running && !fresh ? ', angehalten' : '');
+  $('#po-round').textContent = `Runde ${po.round} von ${poCfg().every}`;
+  $('#po-start').textContent = po.running ? 'Anhalten' : fresh ? 'Start' : 'Weiter';
+}
+function poTasks() {
+  const out = [], seen = new Set();
+  for (const list of Object.values(tk.tasks)) for (const x of list || []) {
+    const n = plain(x.content);
+    if (n && !seen.has(x.id)) { seen.add(x.id); out.push({ id: x.id, name: n }); }
+  }
+  return out;
+}
+function renderPomo() {
+  const c = poCfg(), now = new Date(), log = state.pomo.log, e = log[ymd(now)] || { n: 0, min: 0 };
+  segSet($('#po-phase'), po.mode);
+  const dots = $('#po-dots');
+  dots.textContent = '';
+  const slots = Math.max(c.every, Math.ceil((e.n + 1) / c.every) * c.every);
+  for (let i = 0; i < Math.min(slots, 24); i++) { const d = document.createElement('i'); if (i >= e.n) d.className = 'e'; dots.appendChild(d); }
+  let wk = 0;
+  const mon = addDays(sod(now), -((now.getDay() + 6) % 7));
+  for (let i = 0; i < 7; i++) { const x = log[ymd(addDays(mon, i))]; if (x) wk += x.n; }
+  $('#po-today').textContent = (e.n ? `Heute ${e.n} ${e.n === 1 ? 'Runde' : 'Runden'}, ${hrsMin(e.min * 6e4)} Fokus.` : 'Heute noch keine Runde.') + (wk > e.n ? ` Diese Woche ${wk}.` : '');
+  const tasks = poTasks(), dl = $('#po-tasks');
+  dl.textContent = '';
+  for (const x of tasks.slice(0, 60)) { const o = document.createElement('option'); o.value = x.name; dl.appendChild(o); }
+  const inp = $('#po-task');
+  if (document.activeElement !== inp) inp.value = po.task;
+  $('#po-done').hidden = !(po.taskId && tasks.some(x => x.id === po.taskId));
+  $('#po-notify-row').hidden = !('Notification' in window) || Notification.permission !== 'default';
+  poDraw(now.getTime());
+}
+
+$('#po-start').addEventListener('click', () => {
+  poUnlockAudio();
+  const t = Date.now();
+  if (po.running) { po.left = Math.max(1000, po.endsAt - t); po.running = false; po.endsAt = 0; }
+  else { po.endsAt = t + poRemain(t); po.running = true; po.left = 0; }
+  poSave();
+  poDraw(t);
+  tickPomo(new Date(t));
+});
+$('#po-reset').addEventListener('click', () => { po.running = false; po.endsAt = 0; po.left = 0; poSave(); renderPomo(); tickPomo(new Date()); });
+$('#po-skip').addEventListener('click', () => poFinish(Date.now(), false));
+$('#po-phase').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b || !PO_NAME[b.dataset.v]) return;
+  po.mode = b.dataset.v;
+  po.running = false;
+  po.endsAt = 0;
+  po.left = 0;
+  poSave();
+  renderPomo();
+  tickPomo(new Date());
+});
+$('#po-task').addEventListener('input', e => {
+  po.task = e.target.value.slice(0, 120);
+  const hit = poTasks().find(x => x.name === po.task.trim());
+  po.taskId = hit ? hit.id : '';
+  poSave();
+  $('#po-done').hidden = !po.taskId;
+});
+$('#po-done').addEventListener('click', () => {
+  if (!po.taskId) return;
+  completeTask(po.taskId);
+  po.task = '';
+  po.taskId = '';
+  poSave();
+  renderPomo();
+});
+$('#po-notify').addEventListener('click', () => {
+  try { Promise.resolve(Notification.requestPermission()).then(renderPomo, renderPomo); } catch { renderPomo(); }
+});
+$('#po-set-btn').addEventListener('click', () => {
+  const f = $('#po-form');
+  if (!f.hidden) { f.hidden = true; return; }
+  const c = poCfg();
+  $('#po-focus').value = c.focus;
+  $('#po-short').value = c.short;
+  $('#po-long').value = c.long;
+  $('#po-every').value = c.every;
+  $('#po-sound').checked = c.sound;
+  $('#po-auto').checked = c.auto;
+  $('#po-err').hidden = true;
+  f.hidden = false;
+  $('#po-focus').focus();
+});
+$('#po-cancel').addEventListener('click', () => { $('#po-form').hidden = true; });
+$('#po-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const num = (id, lo, hi) => { const n = Math.round(+$(id).value); return Number.isFinite(n) && n >= lo && n <= hi ? n : null; };
+  const next = { focus: num('#po-focus', 1, 120), short: num('#po-short', 1, 60), long: num('#po-long', 1, 90), every: num('#po-every', 2, 8), sound: $('#po-sound').checked, auto: $('#po-auto').checked };
+  if ([next.focus, next.short, next.long, next.every].includes(null)) { $('#po-err').textContent = 'Fokus 1 bis 120, Pausen 1 bis 60 bzw. 90 Minuten, lange Pause nach 2 bis 8 Runden.'; $('#po-err').hidden = false; return; }
+  state.widgets.pomodoro.cfg = next;
+  if (po.round > next.every) po.round = next.every;
+  if (po.left > poLen(po.mode)) po.left = 0;
+  poSave();
+  $('#po-form').hidden = true;
+  commit();
+});
+/* Anderer Tab hat den Timer geändert */
+addEventListener('storage', e => { if (e.key === PO_KEY) { poLoad(); renderPomo(); } });
+
+defineWidget('pomodoro', { render: renderPomo });
+
+/* 31-gewohnheiten.js */
+/* Gewohnheiten: jede Kopie hat ihre eigene Liste (cfg.items). Pro Gewohnheit zählen die erledigten Tage (log). */
+const habitsOf = v => state.widgets[v.id].cfg.items;
+const weekStart = d => addDays(sod(d), -((d.getDay() + 6) % 7));
+/* An welchen Tagen die Gewohnheit dran ist. Werktags: ohne Feiertage und Urlaub. */
+function hbRequired(h, d) {
+  if (h.rhythm !== 'workdays') return true;
+  return d.getDay() >= 1 && d.getDay() <= 5 && !holidayName(d) && !vacationOn(d);
+}
+function hbStats(h, now) {
+  const set = new Set(h.log), t = sod(now), today = ymd(t), mon = weekStart(t);
+  const inWeek = m => { let c = 0; for (let i = 0; i < 7; i++) if (set.has(ymd(addDays(m, i)))) c++; return c; };
+  const week = inWeek(mon);
+  let goal = h.n, streak = 0;
+  if (h.rhythm === 'weekly') {
+    // Wochen in Folge mit erreichtem Ziel. Die laufende Woche zählt erst, wenn das Ziel geschafft ist.
+    if (week >= h.n) streak++;
+    for (let m = addDays(mon, -7), i = 0; i < 520; i++, m = addDays(m, -7)) { if (inWeek(m) >= h.n) streak++; else break; }
+  } else {
+    goal = 0;
+    for (let i = 0; i < 7; i++) if (hbRequired(h, addDays(mon, i))) goal++;
+    // Tage in Folge. Heute noch offen bricht die Serie nicht, Tage ohne Pflicht werden übersprungen.
+    let d = set.has(today) ? t : addDays(t, -1);
+    for (let i = 0; i < 1500; i++, d = addDays(d, -1)) {
+      if (!hbRequired(h, d)) continue;
+      if (set.has(ymd(d))) streak++; else break;
+    }
+  }
+  return { streak, week, goal, doneToday: set.has(today) };
+}
+function renderHabits(v) {
+  const ul = v.q('[data-r="list"]'), items = habitsOf(v), now = new Date(), t = sod(now), today = ymd(t);
+  const keep = document.activeElement && ul.contains(document.activeElement) ? document.activeElement : null;
+  const focusSel = keep ? (keep.dataset.day ? `[data-hid="${keep.closest('[data-hid]').dataset.hid}"] [data-day="${keep.dataset.day}"]` : keep.hasAttribute('data-hdone') ? `[data-hid="${keep.closest('[data-hid]').dataset.hid}"] [data-hdone]` : null) : null;
+  ul.textContent = '';
+  v.q('[data-r="legend"]').hidden = !items.length;
+  if (!items.length) {
+    const li = document.createElement('li');
+    li.className = 'habit empty';
+    li.innerHTML = '<p class="empty">Noch keine Gewohnheit. Leg mit „+ Gewohnheit“ eine an, zum Beispiel Sport, Lesen oder Vokabeln.</p>';
+    ul.appendChild(li);
+    return;
+  }
+  const mon = weekStart(t);
+  for (const h of items) {
+    const st = hbStats(h, now), set = new Set(h.log);
+    let weeks = '';
+    for (const w of [-2, -1, 0]) {
+      const m = addDays(mon, 7 * w);
+      let cells = '';
+      for (let i = 0; i < 7; i++) {
+        const d = addDays(m, i), k = ymd(d), fut = d > t, req = hbRequired(h, d);
+        cells += `<button type="button" class="hb-day${req ? '' : ' opt'}${k === today ? ' today' : ''}" data-day="${k}" aria-pressed="${set.has(k)}" title="${WD[d.getDay()]} ${dm(d)}${set.has(k) ? ', erledigt' : ''}"${fut ? ' disabled' : ''}></button>`;
+      }
+      weeks += `<div class="hb-week" role="group" aria-label="Woche ab ${dm(m)}">${cells}</div>`;
+    }
+    const rh = h.rhythm === 'daily' ? 'Jeden Tag' : h.rhythm === 'workdays' ? 'Werktags' : `${h.n}× pro Woche`;
+    const unit = h.rhythm === 'weekly' ? (st.streak === 1 ? 'Woche' : 'Wochen') : (st.streak === 1 ? 'Tag' : 'Tage');
+    const li = document.createElement('li');
+    li.className = 'habit';
+    li.dataset.hid = h.id;
+    li.innerHTML = `<button type="button" class="hb-check" data-hdone aria-pressed="${st.doneToday}">${CHECK}</button><div class="hb-main"><div class="hb-top"><span class="hb-name"></span>${st.streak ? `<span class="hb-streak">${st.streak} ${unit} in Folge</span>` : ''}<button type="button" class="icon-btn" data-hedit>${PENCIL}</button></div><div class="hb-meta">${esc(rh)} · diese Woche ${st.week} von ${st.goal}${st.week >= st.goal && st.goal ? ', Ziel geschafft' : ''}</div><div class="hb-days">${weeks}</div></div>`;
+    li.querySelector('.hb-name').textContent = h.name;
+    li.querySelector('[data-hdone]').setAttribute('aria-label', `${h.name}: heute erledigt`);
+    li.querySelector('[data-hedit]').setAttribute('aria-label', `${h.name} bearbeiten`);
+    ul.appendChild(li);
+  }
+  if (focusSel) { const el = ul.querySelector(focusSel); if (el) el.focus(); }
+}
+function hbToggle(v, hid, day) {
+  const h = habitsOf(v).find(x => x.id === hid);
+  if (!h || day > ymd(new Date())) return;
+  const i = h.log.indexOf(day);
+  if (i >= 0) h.log.splice(i, 1);
+  else { h.log.push(day); h.log.sort(); }
+  commit();
+}
+function openHabitForm(v, h) {
+  const q = v.q;
+  v.editing = h ? h.id : null;
+  q('[data-r="form-title"]').textContent = h ? `${h.name} bearbeiten` : 'Neue Gewohnheit';
+  q('[data-r="name"]').value = h ? h.name : '';
+  q('[data-r="rhythm"]').value = h ? h.rhythm : 'daily';
+  q('[data-r="n"]').value = h ? h.n : 3;
+  q('[data-r="n-wrap"]').hidden = q('[data-r="rhythm"]').value !== 'weekly';
+  q('[data-r="del"]').hidden = !h;
+  q('[data-r="err"]').hidden = true;
+  q('[data-r="form"]').hidden = false;
+  q('[data-r="name"]').focus();
+}
+function closeHabitForm(v) { v.q('[data-r="form"]').hidden = true; v.editing = null; }
+defineWidget('habits', {
+  mount(v) {
+    const q = v.q;
+    v.editing = null;
+    q('[data-r="add"]').addEventListener('click', () => { if (q('[data-r="form"]').hidden || v.editing) openHabitForm(v, null); else closeHabitForm(v); });
+    q('[data-r="cancel"]').addEventListener('click', () => closeHabitForm(v));
+    q('[data-r="rhythm"]').addEventListener('change', e => { q('[data-r="n-wrap"]').hidden = e.target.value !== 'weekly'; });
+    q('[data-r="list"]').addEventListener('click', e => {
+      const li = e.target.closest('[data-hid]');
+      if (!li) return;
+      const hid = li.dataset.hid;
+      if (e.target.closest('[data-hedit]')) { const h = habitsOf(v).find(x => x.id === hid); if (h) openHabitForm(v, h); return; }
+      if (e.target.closest('[data-hdone]')) return hbToggle(v, hid, ymd(new Date()));
+      const d = e.target.closest('[data-day]');
+      if (d && !d.disabled) hbToggle(v, hid, d.dataset.day);
+    });
+    q('[data-r="form"]').addEventListener('submit', e => {
+      e.preventDefault();
+      const fail = m => { q('[data-r="err"]').textContent = m; q('[data-r="err"]').hidden = false; };
+      const name = q('[data-r="name"]').value.trim().slice(0, 40);
+      if (!name) return fail('Gib der Gewohnheit einen Namen.');
+      const rhythm = q('[data-r="rhythm"]').value, n = Math.round(+q('[data-r="n"]').value);
+      if (rhythm === 'weekly' && !(n >= 1 && n <= 7)) return fail('Pro Woche geht 1 bis 7 Mal.');
+      const items = habitsOf(v), old = items.find(x => x.id === v.editing);
+      if (!old && items.length >= 20) return fail('Mehr als 20 Gewohnheiten passen nicht in ein Widget.');
+      const h = { id: old ? old.id : uid(), name, rhythm: HB_RHYTHM.includes(rhythm) ? rhythm : 'daily', n: rhythm === 'weekly' ? n : (old ? old.n : 3), log: old ? old.log : [] };
+      if (old) items[items.indexOf(old)] = h; else items.push(h);
+      closeHabitForm(v);
+      commit();
+    });
+    q('[data-r="del"]').addEventListener('click', () => {
+      const items = habitsOf(v), i = items.findIndex(x => x.id === v.editing);
+      if (i < 0) return;
+      const [removed] = items.splice(i, 1);
+      closeHabitForm(v);
+      commit();
+      toast(`„${removed.name}“ gelöscht`, () => { const w = state.widgets[v.id]; if (!w) return; w.cfg.items.splice(Math.min(i, w.cfg.items.length), 0, removed); commit(); });
+    });
+  },
+  render: renderHabits
+});
+
+/* 32-lernen.js */
+/* Lernfortschritt: Prüfungsdatum, Themen zum Abhaken und ob das Tempo bis zur Prüfung reicht */
+const learnOf = v => state.widgets[v.id].cfg;
+function learnCalc(c, now) {
+  const t = sod(now), topics = c.topics;
+  const total = topics.length, doneDates = topics.filter(x => x.done).map(x => x.done).sort(), done = doneDates.length, left = total - done;
+  const exam = c.date ? parseYmd(c.date) : null;
+  const daysLeft = exam ? dayDiff(t, exam) : null;
+  // Tempo: abgehakte Themen der letzten 4 Wochen, bzw. seit Lernstart oder dem ersten Haken (mindestens über eine Woche gemittelt)
+  const startK = c.start && c.start <= ymd(t) ? c.start : doneDates[0] || ymd(t);
+  const span = Math.max(7, Math.min(28, dayDiff(parseYmd(startK), t) + 1));
+  const from = ymd(addDays(t, -(span - 1)));
+  const recent = doneDates.filter(k => k >= from).length;
+  const rate = recent / span;
+  const finish = rate > 0 && left > 0 ? addDays(t, Math.ceil(left / rate)) : null;
+  return { total, done, left, exam, daysLeft, rate, finish };
+}
+function learnPace(L) {
+  const th = n => `${n} ${n === 1 ? 'Thema' : 'Themen'}`;
+  const dd = d => d.getFullYear() === new Date().getFullYear() ? dm(d) : dmy(d);
+  if (!L.total) return ['Leg deine Themen an. Dann siehst du hier, ob dein Tempo bis zur Prüfung reicht.', ''];
+  if (!L.left) return ['Alles abgehakt. Jetzt nur noch wiederholen.', 'ok'];
+  if (!L.exam) return [`Noch ${th(L.left)} offen. Trag das Prüfungsdatum ein, dann rechnet das Cockpit dein Tempo aus.`, ''];
+  if (L.daysLeft < 0) return ['Die Prüfung ist vorbei. Trag die nächste ein oder räum die Liste auf.', ''];
+  const d = Math.max(1, L.daysLeft);
+  const perWeek = L.left / (d / 7);
+  const need = d <= 21 ? `${numDe(L.left / d, 1)} pro Tag` : perWeek >= 1 ? `${numDe(perWeek, 1)} pro Woche` : `eins alle ${Math.round(1 / perWeek)} Wochen`;
+  const base = `Noch ${th(L.left)} in ${d} ${d === 1 ? 'Tag' : 'Tagen'}, also etwa ${need}.`;
+  if (!L.rate) return [`${base} Hak Themen ab, sobald du sie draufhast, dann siehst du hier dein Tempo.`, d <= 30 ? 'warn' : ''];
+  const buf = dayDiff(L.finish, L.exam);
+  if (buf >= 7) return [`${base} Bei deinem Tempo bist du am ${dd(L.finish)} durch, ${buf >= 14 ? `${Math.floor(buf / 7)} Wochen` : `${buf} Tage`} vor der Prüfung.`, 'ok'];
+  if (buf >= 0) return [`${base} Bei deinem Tempo wirst du am ${dd(L.finish)} fertig, das wird knapp.`, 'warn'];
+  return [`${base} Bei deinem jetzigen Tempo wärst du erst am ${dd(L.finish)} durch, ${-buf} ${buf === -1 ? 'Tag' : 'Tage'} zu spät. Leg einen Zahn zu.`, 'bad'];
+}
+function renderLearn(v) {
+  const c = learnOf(v), q = v.q, now = new Date(), L = learnCalc(c, now);
+  q('[data-r="empty"]').hidden = !!c.date;
+  q('[data-r="hero"]').hidden = !c.date;
+  if (c.date) {
+    const big = q('[data-r="days"]'), lbl = q('[data-r="days-lbl"]');
+    if (L.daysLeft > 0) { big.textContent = L.daysLeft; lbl.textContent = L.daysLeft === 1 ? 'Tag bis zur Prüfung' : 'Tage bis zur Prüfung'; }
+    else if (L.daysLeft === 0) { big.textContent = 'Heute'; lbl.textContent = 'ist Prüfung. Viel Erfolg!'; }
+    else { big.textContent = 'Vorbei'; lbl.textContent = `seit ${-L.daysLeft} ${L.daysLeft === -1 ? 'Tag' : 'Tagen'}`; }
+    const ex = L.exam;
+    q('[data-r="dl"]').innerHTML = [
+      ['Prüfung', `${WD[ex.getDay()]} ${dmy(ex)}${c.time ? `, ${c.time}` : ''}`],
+      ['Erledigt', `${L.done} von ${L.total}`],
+      ['Fortschritt', L.total ? `${Math.round(L.done / L.total * 100)} %` : '0 %']
+    ].map(([k, x]) => `<dt>${esc(k)}</dt><dd>${esc(x)}</dd>`).join('');
+  }
+  q('[data-r="bar-wrap"]').hidden = !L.total;
+  q('[data-r="bar"]').style.width = L.total ? (L.done / L.total * 100).toFixed(2) + '%' : '0';
+  q('[data-r="bar-wrap"]').setAttribute('aria-label', `${L.done} von ${L.total} Themen erledigt`);
+  const [txt, lv] = learnPace(L);
+  const pace = q('[data-r="pace"]');
+  pace.textContent = txt;
+  pace.dataset.lv = lv;
+  q('[data-r="tip"]').hidden = L.total > 3;
+
+  // Themen: offene zuerst, erledigte darunter (eingeklappt, wenn es viele sind)
+  const keep = document.activeElement && v.el.contains(document.activeElement) && document.activeElement.dataset.tid;
+  const ul = q('[data-r="topics"]'), open = c.topics.filter(x => !x.done), done = c.topics.filter(x => x.done).sort((a, b) => b.done.localeCompare(a.done));
+  ul.textContent = '';
+  const LIM = 10;
+  const row = x => {
+    const li = document.createElement('li');
+    li.className = 'tp' + (x.done ? ' done' : '');
+    li.innerHTML = `<label class="check-row"><input type="checkbox" data-tid="${esc(x.id)}"${x.done ? ' checked' : ''}><span></span></label>${x.done ? `<small>${dm(parseYmd(x.done))}</small>` : ''}<button type="button" class="icon-btn" data-tdel="${esc(x.id)}">${TRASH}</button>`;
+    li.querySelector('span').textContent = x.name;
+    li.querySelector('[data-tdel]').setAttribute('aria-label', `${x.name} löschen`);
+    ul.appendChild(li);
+  };
+  (v.allOpen ? open : open.slice(0, LIM)).forEach(row);
+  if (done.length && (v.showDone || !open.length)) {
+    const h = document.createElement('li');
+    h.className = 'tp-head';
+    h.textContent = `Erledigt (${done.length})`;
+    ul.appendChild(h);
+    done.forEach(row);
+  }
+  const more = q('[data-r="more-row"]');
+  more.textContent = '';
+  const btn = (label, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'more'; b.textContent = label; b.addEventListener('click', fn); more.appendChild(b); };
+  if (open.length > LIM) btn(v.allOpen ? 'Weniger anzeigen' : `${open.length - LIM} weitere offen`, () => { v.allOpen = !v.allOpen; renderLearn(v); });
+  if (done.length && open.length) btn(v.showDone ? 'Erledigte ausblenden' : `${done.length} erledigte zeigen`, () => { v.showDone = !v.showDone; renderLearn(v); });
+  more.hidden = !more.children.length;
+  if (keep) { const el = ul.querySelector(`[data-tid="${keep}"]`); if (el) el.focus(); }
+}
+function learnAdd(v, names) {
+  const c = learnOf(v);
+  const list = names.map(s => s.replace(/^\s*([-*•]|\d+[.)])\s+/, '').trim()).filter(Boolean);
+  if (!list.length) return 0;
+  const room = 300 - c.topics.length;
+  for (const n of list.slice(0, room)) c.topics.push({ id: uid(), name: n.slice(0, 80), done: null });
+  commit();
+  return Math.min(list.length, room);
+}
+defineWidget('learn', {
+  mount(v) {
+    const q = v.q;
+    v.allOpen = false;
+    v.showDone = false;
+    const openForm = () => {
+      const c = learnOf(v);
+      q('[data-r="date"]').value = c.date;
+      q('[data-r="time"]').value = c.time;
+      q('[data-r="start"]').value = c.start;
+      q('[data-r="err"]').hidden = true;
+      q('[data-r="form"]').hidden = false;
+      q('[data-r="date"]').focus();
+    };
+    q('[data-r="set"]').addEventListener('click', () => { if (q('[data-r="form"]').hidden) openForm(); else q('[data-r="form"]').hidden = true; });
+    q('[data-r="empty-btn"]').addEventListener('click', openForm);
+    q('[data-r="cancel"]').addEventListener('click', () => { q('[data-r="form"]').hidden = true; });
+    q('[data-r="form"]').addEventListener('submit', e => {
+      e.preventDefault();
+      const d = q('[data-r="date"]').value, tm = q('[data-r="time"]').value, st = q('[data-r="start"]').value;
+      if (!validYmd(d)) { q('[data-r="err"]').textContent = 'Trag das Datum der Prüfung ein.'; q('[data-r="err"]').hidden = false; return; }
+      if (validYmd(st) && st > d) { q('[data-r="err"]').textContent = 'Der Lernstart liegt nach der Prüfung.'; q('[data-r="err"]').hidden = false; return; }
+      Object.assign(learnOf(v), { date: d, time: validHm(tm) ? tm : '', start: validYmd(st) ? st : '' });
+      q('[data-r="form"]').hidden = true;
+      commit();
+    });
+    const inp = q('[data-r="new"]');
+    q('[data-r="addform"]').addEventListener('submit', e => {
+      e.preventDefault();
+      if (learnAdd(v, [inp.value])) inp.value = '';
+      inp.focus();
+    });
+    // Eingefügte Liste: ein Thema pro Zeile
+    inp.addEventListener('paste', e => {
+      const txt = (e.clipboardData || window.clipboardData).getData('text');
+      if (!/\n/.test(txt)) return;
+      e.preventDefault();
+      const n = learnAdd(v, txt.split(/\r?\n/));
+      if (n) toast(`${n} ${n === 1 ? 'Thema' : 'Themen'} eingefügt`);
+      inp.focus();
+    });
+    q('[data-r="topics"]').addEventListener('change', e => {
+      const id = e.target.dataset.tid;
+      const x = id && learnOf(v).topics.find(y => y.id === id);
+      if (!x) return;
+      x.done = e.target.checked ? ymd(new Date()) : null;
+      commit();
+    });
+    q('[data-r="topics"]').addEventListener('click', e => {
+      const b = e.target.closest('[data-tdel]');
+      if (!b) return;
+      const list = learnOf(v).topics, i = list.findIndex(y => y.id === b.dataset.tdel);
+      if (i < 0) return;
+      const [removed] = list.splice(i, 1);
+      commit();
+      toast(`„${removed.name}“ gelöscht`, () => { const w = state.widgets[v.id]; if (!w) return; w.cfg.topics.splice(Math.min(i, w.cfg.topics.length), 0, removed); commit(); });
+    });
+  },
+  render: renderLearn
+});
+
+/* 33-gleitzeit.js */
+/* Gleitzeit (gibt es nur einmal). Regeln in state.widgets.flex.cfg, gestempelte Tage in state.flex.days:
+ * { 'JJJJ-MM-TT': { in: 'HH:MM', out: 'HH:MM' oder leer, pause: Minuten, kind: '' | 'school' | 'sick' | 'flexday' } }
+ * Nicht gestempelte Arbeitstage zählen nicht ins Saldo, sie werden nur als fehlend angezeigt. */
+const fxCfg = () => state.widgets.flex.cfg;
+const fx = { week: 0, editing: null };
+const FX_KIND = { school: 'Berufsschule', sick: 'Krank', flexday: 'Gleittag' };
+const toMin = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
+const fmtDur = (min, sign) => { const a = Math.abs(Math.round(min)); return `${min < 0 && a ? '-' : sign && a ? '+' : ''}${Math.floor(a / 60)}:${pad(a % 60)}`; };
+const nowMin = d => d.getHours() * 60 + d.getMinutes();
+/* "8", "8:00", "7,5" oder "-1:15" in Minuten. Leer: 0. Unlesbar: null */
+function parseDur(str) {
+  const s = String(str || '').trim().replace(/\s/g, '').replace(/[−–]/g, '-');
+  if (!s) return 0;
+  let m = s.match(/^([+-]?)(\d{1,3}):(\d{2})$/);
+  if (m) return +m[3] > 59 ? null : (m[1] === '-' ? -1 : 1) * (+m[2] * 60 + +m[3]);
+  m = s.match(/^([+-]?)(\d{1,3})(?:[.,](\d{1,2}))?$/);
+  if (m) return (m[1] === '-' ? -1 : 1) * Math.round(parseFloat(`${m[2]}.${m[3] || 0}`) * 60);
+  return null;
+}
+/* Gesetzliche Pause: über 6 Std mindestens 30 Min, über 9 Std mindestens 45 Min. Nie unter die Grenze rutschen. */
+function legalNet(work, pause) {
+  if (work <= 360) return work;
+  let net = Math.max(360, work - Math.max(0, 30 - pause));
+  if (net > 540) net = Math.max(540, work - Math.max(0, 45 - pause));
+  return net;
+}
+/* Soll eines Tages: 0 an freien Tagen, Feiertagen und im Urlaub. Halbe Urlaubstage und 24.12./31.12. halbieren. */
+function fxSoll(d) {
+  const c = fxCfg();
+  if (!c.days.includes(d.getDay()) || holidayName(d)) return 0;
+  const xmas = state.vacation.halfXmas && isXmasHalf(d), v = vacationOn(d);
+  if (v) return v.half && !xmas ? Math.round(c.soll / 2) : 0;
+  return xmas ? Math.round(c.soll / 2) : c.soll;
+}
+/* Ist eines Tages in Minuten. upTo: aktuelle Minute, falls heute noch eingestempelt */
+function fxIst(k, e, upTo) {
+  if (!e) return null;
+  if (e.kind === 'school' || e.kind === 'sick') return fxSoll(parseYmd(k));
+  if (e.kind === 'flexday') return 0;
+  if (!e.in) return null;
+  const end = e.out ? toMin(e.out) : upTo;
+  if (end == null) return null;
+  const work = Math.max(0, end - toMin(e.in) - e.pause);
+  return fxCfg().autoBreak ? legalNet(work, e.pause) : work;
+}
+/* Wie lange man arbeiten muss (ohne gestempelte Pause), damit das Netto das Soll erreicht */
+function fxWorkFor(soll, pause) {
+  if (!fxCfg().autoBreak || soll <= 360) return soll;
+  return soll > 540 ? soll + Math.max(0, 45 - pause) : soll + Math.max(0, 30 - pause);
+}
+/* Für Kacheln, Arbeitstag-Balken und Startseite: heute eingestempelt? Start und (voraussichtliches) Ende */
+function flexToday(now) {
+  const k = ymd(now), e = state.flex.days[k];
+  if (!e || e.kind || !e.in) return null;
+  const base = sod(now).getTime(), start = toMin(e.in);
+  if (e.out) return { running: false, start: new Date(base + start * 6e4), end: new Date(base + toMin(e.out) * 6e4) };
+  const soll = fxSoll(now);
+  return { running: true, start: new Date(base + start * 6e4), end: new Date(base + (start + e.pause + fxWorkFor(soll, e.pause)) * 6e4) };
+}
+function fxBalance(now) {
+  const c = fxCfg(), today = ymd(now), mon = ymd(weekStart(now));
+  let bal = c.carry, week = 0;
+  for (const [k, e] of Object.entries(state.flex.days)) {
+    if (k < c.from || k > today) continue;
+    if (k === today && e.in && !e.out && !e.kind) continue; // laufender Tag zählt erst nach dem Ausstempeln
+    const ist = fxIst(k, e, null);
+    if (ist == null) continue;
+    const diff = ist - fxSoll(parseYmd(k));
+    bal += diff;
+    if (k >= mon) week += diff;
+  }
+  return { bal, week };
+}
+function fxMissing(now) {
+  const c = fxCfg(), out = [];
+  for (let i = 14; i >= 1; i--) {
+    const d = addDays(sod(now), -i), k = ymd(d);
+    if (k < c.from || state.flex.days[k]) continue;
+    if (fxSoll(d) > 0) out.push(d);
+  }
+  return out;
+}
+function fxStamp() {
+  const now = new Date(), k = ymd(now), t = hm(now), e = state.flex.days[k];
+  if (!e || e.kind || !e.in) state.flex.days[k] = { in: t, out: '', pause: 0, kind: '' };
+  else if (!e.out) {
+    if (toMin(t) <= toMin(e.in)) return;
+    e.out = t;
+    const ist = fxIst(k, e, null), soll = fxSoll(now);
+    toast(`Ausgestempelt. Heute ${fmtDur(ist)} Std, das sind ${fmtDur(ist - soll, true)}.`);
+  } else {
+    // wieder da: die Zeit dazwischen zählt als Pause
+    e.pause = Math.min(600, e.pause + Math.max(0, toMin(t) - toMin(e.out)));
+    e.out = '';
+  }
+  commit();
+}
+function fxDayLine(d, k, e, now) {
+  const today = k === ymd(now), soll = fxSoll(d), h = holidayName(d), v = vacationOn(d);
+  if (e && e.kind) return { t: FX_KIND[e.kind] + (e.kind === 'flexday' ? '' : ', zählt wie Soll'), i: fmtDur(fxIst(k, e, null)), x: fxIst(k, e, null) - soll };
+  if (e && e.in) {
+    const run = !e.out, ist = fxIst(k, e, run && today ? nowMin(now) : null);
+    const t = `${e.in} bis ${e.out || (today ? 'jetzt' : '?')}${e.pause ? `, ${e.pause} Min Pause` : ''}`;
+    if (ist == null) return { t, i: '', x: null };
+    return { t, i: fmtDur(ist), x: run ? null : ist - soll };
+  }
+  if (h) return { t: h, i: '', x: null, off: true };
+  if (v) return { t: soll ? 'Halber Urlaubstag' : 'Urlaub', i: '', x: null, off: true };
+  if (!soll) return { t: 'Frei', i: '', x: null, off: true };
+  if (d > sod(now) || today) return { t: `Soll ${fmtDur(soll)}`, i: '', x: null };
+  return { t: k < fxCfg().from ? 'vor dem Start' : 'nicht erfasst', i: '', x: null, miss: k >= fxCfg().from };
+}
+function renderFlex() {
+  const c = fxCfg(), now = new Date(), k = ymd(now), e = state.flex.days[k], soll = fxSoll(now);
+  const { bal, week } = fxBalance(now);
+  $('#fx-saldo').textContent = fmtDur(bal, true);
+  $('#fx-big').dataset.s = bal > 0 ? 'plus' : bal < 0 ? 'minus' : '';
+  const todayIst = e ? fxIst(k, e, nowMin(now)) : null;
+  $('#fx-dl').innerHTML = [
+    ['Diese Woche', fmtDur(week, true)],
+    ['Heute', todayIst == null ? `0:00 von ${fmtDur(soll)}` : `${fmtDur(todayIst)} von ${fmtDur(soll)}`],
+    ['Soll pro Tag', fmtDur(c.soll)]
+  ].map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join('');
+
+  // Jetzt-Zeile mit Stempel-Knopf
+  const box = $('#fx-now'), txt = $('#fx-now-txt'), btn = $('#fx-stamp');
+  const ft = flexToday(now);
+  let s = 'none';
+  if (e && e.kind) txt.innerHTML = `<b>Heute: ${esc(FX_KIND[e.kind])}.</b> ${e.kind === 'flexday' ? `Das Soll von ${fmtDur(soll)} geht vom Saldo ab.` : `Zählt wie ${fmtDur(soll)} Std.`}`;
+  else if (ft && ft.running) {
+    s = 'in';
+    const reached = now >= ft.end;
+    txt.innerHTML = `<b>Eingestempelt seit ${esc(e.in)}.</b> Bisher ${fmtDur(todayIst)} Std${soll ? (reached ? `, Soll erreicht um ${hm(ft.end)}. Alles ab jetzt ist Plus: ${fmtDur(todayIst - soll, true)}.` : `, Soll voll um <b>${hm(ft.end)}</b>.`) : ', heute ist eigentlich frei.'}`;
+  } else if (ft) {
+    s = 'out';
+    txt.innerHTML = `<b>Heute ${fmtDur(todayIst)} Std, ${fmtDur(todayIst - soll, true)}.</b> Ausgestempelt um ${esc(e.out)}${e.pause ? `, ${e.pause} Min Pause` : ''}.`;
+  } else {
+    const h = holidayName(now), v = vacationOn(now);
+    txt.innerHTML = soll ? `<b>Noch nicht eingestempelt.</b> Heute sind ${fmtDur(soll)} Std Soll.` : `<b>${esc(h ? `Heute ist ${h}.` : v ? 'Heute hast du Urlaub.' : 'Heute ist kein Arbeitstag.')}</b> Stempeln geht trotzdem.`;
+  }
+  box.dataset.s = s;
+  btn.textContent = s === 'in' ? 'Gehen' : 'Kommen';
+  btn.setAttribute('aria-label', s === 'in' ? `Ausstempeln, ${hm(now)} Uhr` : `Einstempeln, ${hm(now)} Uhr`);
+
+  const miss = fxMissing(now);
+  $('#fx-missing').hidden = !miss.length;
+  $('#fx-missing').textContent = miss.length ? `${miss.length === 1 ? 'Ein Arbeitstag ist' : `${miss.length} Arbeitstage sind`} noch nicht erfasst: ${miss.slice(-4).map(d => `${WD[d.getDay()]} ${dm(d)}`).join(', ')}${miss.length > 4 ? ' …' : ''}. Tipp auf den Tag in der Woche, um ihn nachzutragen.` : '';
+
+  // Woche
+  const mon = addDays(weekStart(now), 7 * fx.week), sun = addDays(mon, 6);
+  $('#fx-week-lbl').textContent = `KW ${isoWeek(mon)} · ${dm(mon)} bis ${dm(sun)}`;
+  $('#fx-prev').innerHTML = LEFT;
+  $('#fx-next').innerHTML = RIGHT;
+  $('#fx-next').disabled = fx.week >= 0;
+  const ul = $('#fx-week');
+  ul.textContent = '';
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(mon, i), dk = ymd(d), de = state.flex.days[dk];
+    if (!c.days.includes(d.getDay()) && !de) continue;
+    const L = fxDayLine(d, dk, de, now);
+    const li = document.createElement('li');
+    li.innerHTML = `<button type="button" class="fx-row${dk === k ? ' today' : ''}${L.off ? ' off' : ''}" data-fxd="${dk}"><span class="d">${WD[d.getDay()]} ${dm(d)}</span><span class="t"></span><span class="i">${esc(L.i)}</span><span class="x"${L.x == null ? '' : ` data-s="${L.x > 0 ? 'plus' : L.x < 0 ? 'minus' : ''}"`}>${L.x == null ? '' : esc(fmtDur(L.x, true))}</span></button>`;
+    li.querySelector('.t').textContent = L.t;
+    if (L.miss) li.querySelector('.t').style.color = 'var(--bad)';
+    li.querySelector('button').setAttribute('aria-label', `${WDL[d.getDay()]}, ${dm(d)}: ${L.t}${L.i ? `, ${L.i} Std` : ''}. Bearbeiten`);
+    ul.appendChild(li);
+  }
+}
+function fxTick(now) {
+  // Jede neue Minute auffrischen (auch wenn der Browser den Takt im Hintergrund drosselt)
+  const v = views.get('flex'), mk = Math.floor(now.getTime() / 6e4);
+  if (!v || v.el.hidden || mk === fx.minute) return;
+  const first = fx.minute === undefined;
+  fx.minute = mk;
+  if (!first) renderFlex();
+}
+
+/* Tag eintragen oder ändern */
+function fxPreview() {
+  const k = $('#fx-d-date').value, kind = $('#fx-d-kind').value, inT = $('#fx-d-in').value, outT = $('#fx-d-out').value, p = Math.max(0, Math.round(+$('#fx-d-pause').value || 0));
+  $('#fx-d-times').hidden = !!kind;
+  if (!validYmd(k)) { $('#fx-d-prev').textContent = ''; return; }
+  const soll = fxSoll(parseYmd(k));
+  if (kind) { const ist = fxIst(k, { kind }, null); $('#fx-d-prev').textContent = `Soll ${fmtDur(soll)}, zählt ${fmtDur(ist)}, also ${fmtDur(ist - soll, true)}.`; return; }
+  if (!validHm(inT) || !validHm(outT) || toMin(outT) <= toMin(inT)) { $('#fx-d-prev').textContent = soll ? `Soll an dem Tag: ${fmtDur(soll)} Std.` : 'An dem Tag ist kein Soll.'; return; }
+  const ist = fxIst(k, { in: inT, out: outT, pause: p, kind: '' }, null);
+  const gross = toMin(outT) - toMin(inT) - p;
+  $('#fx-d-prev').textContent = `Das sind ${fmtDur(ist)} Std${ist < gross ? ` (${gross - ist} Min Pause automatisch abgezogen)` : ''}, Soll ${fmtDur(soll)}, also ${fmtDur(ist - soll, true)}.`;
+}
+function openFxDay(k) {
+  const e = state.flex.days[k];
+  fx.editing = k;
+  $('#fx-set').hidden = true;
+  $('#fx-day-title').textContent = e ? `${WDL[parseYmd(k).getDay()]}, ${dm(parseYmd(k))} bearbeiten` : `${WDL[parseYmd(k).getDay()]}, ${dm(parseYmd(k))} eintragen`;
+  $('#fx-d-date').value = k;
+  $('#fx-d-kind').value = e ? e.kind : '';
+  $('#fx-d-in').value = e ? e.in : '';
+  $('#fx-d-out').value = e ? e.out : '';
+  $('#fx-d-pause').value = e ? e.pause : 0;
+  $('#fx-d-del').hidden = !e;
+  $('#fx-d-err').hidden = true;
+  $('#fx-day').hidden = false;
+  fxPreview();
+  $('#fx-day').scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+  $('#fx-d-in').focus({ preventScroll: true });
+}
+$('#fx-stamp').addEventListener('click', fxStamp);
+$('#fx-add-btn').addEventListener('click', () => { if ($('#fx-day').hidden) openFxDay(ymd(new Date())); else $('#fx-day').hidden = true; });
+$('#fx-week').addEventListener('click', e => { const b = e.target.closest('[data-fxd]'); if (b) openFxDay(b.dataset.fxd); });
+$('#fx-prev').addEventListener('click', () => { fx.week = Math.max(-104, fx.week - 1); renderFlex(); });
+$('#fx-next').addEventListener('click', () => { fx.week = Math.min(0, fx.week + 1); renderFlex(); });
+for (const id of ['#fx-d-date', '#fx-d-kind', '#fx-d-in', '#fx-d-out', '#fx-d-pause']) $(id).addEventListener('input', fxPreview);
+$('#fx-d-date').addEventListener('change', () => {
+  const k = $('#fx-d-date').value, e = validYmd(k) && state.flex.days[k];
+  if (e && k !== fx.editing) { fx.editing = k; $('#fx-d-kind').value = e.kind; $('#fx-d-in').value = e.in; $('#fx-d-out').value = e.out; $('#fx-d-pause').value = e.pause; $('#fx-d-del').hidden = false; fxPreview(); }
+});
+$('#fx-d-cancel').addEventListener('click', () => { $('#fx-day').hidden = true; fx.editing = null; });
+$('#fx-day').addEventListener('submit', ev => {
+  ev.preventDefault();
+  const fail = m => { $('#fx-d-err').textContent = m; $('#fx-d-err').hidden = false; };
+  const k = $('#fx-d-date').value, kind = $('#fx-d-kind').value, inT = $('#fx-d-in').value, outT = $('#fx-d-out').value;
+  const p = Math.round(+$('#fx-d-pause').value || 0);
+  if (!validYmd(k)) return fail('Wähl ein Datum.');
+  if (k > ymd(new Date())) return fail('Tage in der Zukunft kannst du noch nicht eintragen. Für Urlaub nimm das Urlaub-Widget.');
+  let entry;
+  if (kind) entry = { in: '', out: '', pause: 0, kind };
+  else {
+    if (!validHm(inT)) return fail('Trag ein, wann du gekommen bist.');
+    if (outT && toMin(outT) <= toMin(inT)) return fail('Gehen muss nach Kommen liegen.');
+    if (!(p >= 0 && p <= 600)) return fail('Pause geht von 0 bis 600 Minuten.');
+    if (!outT && k !== ymd(new Date())) return fail('Für vergangene Tage brauchst du auch die Zeit fürs Gehen.');
+    entry = { in: inT, out: validHm(outT) ? outT : '', pause: p, kind: '' };
+  }
+  const before = state.flex.days[k] ? { ...state.flex.days[k] } : null;
+  if (fx.editing && fx.editing !== k && state.flex.days[fx.editing] && !before) delete state.flex.days[fx.editing];
+  state.flex.days[k] = entry;
+  const c = fxCfg(), moved = k < c.from;
+  if (moved) c.from = k;
+  $('#fx-day').hidden = true;
+  fx.editing = null;
+  commit();
+  if (moved) toast(`Gezählt wird jetzt ab ${dm(parseYmd(k))}, fehlende Arbeitstage dazwischen siehst du in der Wochenliste.`);
+  else if (before) toast(`${dm(parseYmd(k))} geändert`, () => { state.flex.days[k] = before; commit(); });
+});
+$('#fx-d-del').addEventListener('click', () => {
+  const k = fx.editing, old = k && state.flex.days[k];
+  if (!old) return;
+  delete state.flex.days[k];
+  $('#fx-day').hidden = true;
+  fx.editing = null;
+  commit();
+  toast(`Eintrag vom ${dm(parseYmd(k))} gelöscht`, () => { state.flex.days[k] = old; commit(); });
+});
+
+/* Regeln */
+$('#fx-set-btn').addEventListener('click', () => {
+  const f = $('#fx-set');
+  if (!f.hidden) { f.hidden = true; return; }
+  const c = fxCfg();
+  $('#fx-day').hidden = true;
+  $('#fx-soll').value = fmtDur(c.soll);
+  $('#fx-carry').value = fmtDur(c.carry, true);
+  document.querySelectorAll('[data-fxday]').forEach(cb => { cb.checked = c.days.includes(+cb.dataset.fxday); });
+  $('#fx-from').value = c.from;
+  $('#fx-break').checked = c.autoBreak;
+  $('#fx-set-err').hidden = true;
+  f.hidden = false;
+  $('#fx-soll').focus();
+});
+$('#fx-set-cancel').addEventListener('click', () => { $('#fx-set').hidden = true; });
+$('#fx-set').addEventListener('submit', e => {
+  e.preventDefault();
+  const fail = m => { $('#fx-set-err').textContent = m; $('#fx-set-err').hidden = false; };
+  const soll = parseDur($('#fx-soll').value), carry = parseDur($('#fx-carry').value);
+  if (soll == null || soll <= 0 || soll > 720) return fail('Soll bitte als Stunden angeben, zum Beispiel 8:00 oder 7,8.');
+  if (carry == null || Math.abs(carry) > 60000) return fail('Den Startsaldo bitte als Stunden angeben, zum Beispiel 3:30 oder -1:15.');
+  const days = [...document.querySelectorAll('[data-fxday]')].filter(cb => cb.checked).map(cb => +cb.dataset.fxday);
+  if (!days.length) return fail('Wähl mindestens einen Arbeitstag.');
+  const from = $('#fx-from').value;
+  if (!validYmd(from)) return fail('Wähl ein Datum, ab dem gezählt wird.');
+  state.widgets.flex.cfg = { soll, carry, days, from, autoBreak: $('#fx-break').checked };
+  $('#fx-set').hidden = true;
+  commit();
+});
+
+defineWidget('flex', { render: renderFlex });
+
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.0';
+const VERSION = '2.1';
 function tick() {
   const now = new Date();
   tickHeader(now);
   tickBars(now);
   tickTiles(now);
   autoTick(now);
+  tickPomo(now);
+  fxTick(now);
   if (ymd(now) !== vacDayKey) renderVacation();
   if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
 }
@@ -3779,6 +4968,31 @@ document.addEventListener('visibilitychange', () => {
   if (cm.res && Date.now() - cm.res.at > 5 * 6e4) loadCommute();
   if (tdToken() && tkKeys().length && Date.now() - tk.stamp > 6e4) tdLoad();
 });
+/* Nach einem Update einmal zeigen, was neu ist. Mit Knopf, der eine Fokus-Seite einrichtet. */
+function announceNew() {
+  if (state.meta.seen === VERSION) return;
+  const known = state.edited;
+  state.meta.seen = VERSION;
+  persist();
+  if (known && VERSION === '2.1') setTimeout(() => toast('Neu: Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit. Soll ich dir eine Fokus-Seite damit einrichten?', setupFocusPage, { label: 'Einrichten', ms: 20000 }), 900);
+}
+function setupFocusPage() {
+  if (state.pages.length >= 12) return;
+  const cd = state.ui.countdowns.find(c => /prüfung|pruefung|klausur|exam/i.test(c.name));
+  const learn = newWidget('learn', { date: cd ? cd.date : '', time: cd ? cd.time : '' }, cd ? cd.name : '');
+  const habits = newWidget('habits', {});
+  let id;
+  do id = 'p' + uid(); while (pageById(id));
+  const name = state.pages.some(p => p.name === 'Fokus') ? 'Fokus 2' : 'Fokus';
+  state.pages.push({ id, name, tiles: false, items: [{ w: 'pomodoro', s: 1 }, { w: learn, s: 1 }, { w: habits, s: 1 }] });
+  const work = state.pages.find(p => pageSlug(p) === 'arbeit');
+  const addFlex = work && !work.items.some(x => x.w === 'flex');
+  if (addFlex) work.items.splice(Math.min(1, work.items.length), 0, { w: 'flex', s: 1 });
+  state.page = id;
+  commit();
+  layoutNow();
+  toast(addFlex ? `Seite „${name}“ ist fertig, und die Gleitzeit liegt jetzt auf „${work.name}“.` : `Seite „${name}“ ist fertig.`);
+}
 /* Änderungen aus einem anderen Tab übernehmen. Jeder Tab behält dabei seine eigene offene Seite. */
 addEventListener('storage', e => {
   if (e.key !== LS_KEY || !e.newValue) return;
@@ -3798,6 +5012,7 @@ for (const t of ['commute', 'weather', 'vacation']) ensureView(t);
 state.page = startPageId() || state.page;
 persist();
 renderAll();
+announceNew();
 setInterval(tick, 1000);
 startWeather();
 loadCommute();

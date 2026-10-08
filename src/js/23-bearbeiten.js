@@ -177,7 +177,7 @@ function openGallery() {
     }
     const li = document.createElement('li');
     li.className = 'gal-item';
-    li.innerHTML = `<span class="gal-ico">${TICON[type]}</span><p class="gal-name">${esc(T.name)}</p><p class="gal-desc">${esc(T.desc)}</p><div class="gal-act">${act}</div>`;
+    li.innerHTML = `<span class="gal-ico">${TICON[type]}</span><p class="gal-name">${esc(T.name)}${T.since === VERSION ? ' <span class="chip">Neu</span>' : ''}</p><p class="gal-desc">${esc(T.desc)}</p><div class="gal-act">${act}</div>`;
     ul.appendChild(li);
   }
   body.appendChild(ul);

@@ -24,6 +24,11 @@
         <button type="button" class="btn-danger" data-r="forget" hidden>Trennen</button>
       </div>
     </form>
+    <form class="tk-add" data-r="addform" hidden novalidate>
+      <input data-r="new" type="text" maxlength="400" autocomplete="off" enterkeyhint="done" placeholder="Neue Aufgabe, z. B. Ticket prüfen morgen p2" aria-label="Neue Aufgabe" title="Datum, Uhrzeit, p1 bis p4 und @Labels erkennt Todoist direkt, wie in der App.">
+      <select data-r="proj" aria-label="Projekt"></select>
+      <button type="submit" class="btn-ghost" data-r="addbtn">Anlegen</button>
+    </form>
     <div class="tk-cols" data-r="cols"></div>
     <div class="tk-foot">
       <a class="btn-ghost" href="https://app.todoist.com/app/today" target="_blank" rel="noopener">Todoist öffnen ↗</a>
@@ -111,5 +116,76 @@
       <span class="src" data-r="state"></span>
     </div>
     <textarea class="notes" data-r="text" maxlength="8000" placeholder="Schnell was notieren, wird automatisch gespeichert."></textarea>
+  </section>
+</template>
+
+<template id="tpl-habits">
+  <section class="card" data-type="habits">
+    <div class="card-head">
+      <h2 data-r="title">Gewohnheiten</h2>
+      <button type="button" class="btn-ghost" data-r="add">+ Gewohnheit</button>
+    </div>
+    <form class="panel" data-r="form" hidden novalidate>
+      <h3 data-r="form-title">Neue Gewohnheit</h3>
+      <label class="field"><span class="lbl">Name</span><input data-r="name" type="text" maxlength="40" autocomplete="off" placeholder="z. B. Sport, Lesen, Vokabeln"></label>
+      <div class="grid2">
+        <label class="field"><span class="lbl">Rhythmus</span>
+          <select data-r="rhythm">
+            <option value="daily">Jeden Tag</option>
+            <option value="workdays">Werktags (Mo bis Fr)</option>
+            <option value="weekly">Ein paar Mal pro Woche</option>
+          </select>
+        </label>
+        <label class="field" data-r="n-wrap"><span class="lbl">Wie oft pro Woche</span><input data-r="n" type="number" min="1" max="7" inputmode="numeric"></label>
+      </div>
+      <p class="err" data-r="err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" data-r="del" hidden>Löschen</button>
+      </div>
+    </form>
+    <ul class="habits" data-r="list"></ul>
+    <p class="hint" data-r="legend">Kreis antippen, wenn du es heute geschafft hast. Mit den Kästchen trägst du die letzten Wochen nach.</p>
+  </section>
+</template>
+
+<template id="tpl-learn">
+  <section class="card" data-type="learn">
+    <div class="card-head">
+      <h2 data-r="title">Lernfortschritt</h2>
+      <button type="button" class="btn-ghost" data-r="set">Prüfung</button>
+    </div>
+    <form class="panel" data-r="form" hidden novalidate>
+      <h3>Prüfung</h3>
+      <div class="grid2">
+        <label class="field"><span class="lbl">Datum</span><input data-r="date" type="date"></label>
+        <label class="field"><span class="lbl">Uhrzeit (optional)</span><input data-r="time" type="time"></label>
+      </div>
+      <label class="field"><span class="lbl">Lernstart (optional, macht die Tempo-Prognose genauer)</span><input data-r="start" type="date"></label>
+      <p class="err" data-r="err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
+      </div>
+    </form>
+    <div class="wx-off" data-r="empty" hidden>
+      <h3>Wann ist die Prüfung?</h3>
+      <p>Trag das Datum ein und leg deine Themen an. Dann siehst du, wie weit du bist und ob dein Tempo bis zur Prüfung reicht.</p>
+      <div class="form-row"><button type="button" class="btn" data-r="empty-btn">Datum eintragen</button></div>
+    </div>
+    <div class="vac-hero" data-r="hero">
+      <div class="big"><b data-r="days">0</b><span data-r="days-lbl">Tage bis zur Prüfung</span></div>
+      <dl class="legend" data-r="dl"></dl>
+    </div>
+    <div class="stack" data-r="bar-wrap" role="img"><div class="seg-taken" data-r="bar"></div></div>
+    <p class="verdict" data-r="pace"></p>
+    <form class="ln-add" data-r="addform" novalidate>
+      <input data-r="new" type="text" maxlength="80" autocomplete="off" enterkeyhint="done" placeholder="Neues Thema, z. B. Subnetting" aria-label="Neues Thema">
+      <button type="submit" class="btn-ghost">+ Thema</button>
+    </form>
+    <ul class="topics" data-r="topics"></ul>
+    <div class="form-row" data-r="more-row"></div>
+    <p class="hint" data-r="tip">Tipp: Du kannst eine ganze Liste einfügen, ein Thema pro Zeile.</p>
   </section>
 </template>
