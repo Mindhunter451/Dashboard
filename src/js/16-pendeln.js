@@ -207,7 +207,9 @@ function renderCommute() {
   const now = new Date();
   const dl = [['Jetzt los', `an ${hm(new Date(now.getTime() + mins * 6e4))} Uhr`], ['Strecke', `${numDe(km, 1)} km${R.refs.length ? ' über ' + R.refs.join(', ') : ''}`], ['Verzögerung', delay >= 1 ? `+${Math.round(delay)} Min` : 'keine']];
   const wb = workBar();
-  if (R.dir === 'home' && wb && !freeReason(wb, now) && now < at(now, wb.end)) dl.splice(1, 0, [`Ab ${wb.end}`, `an ${hm(new Date(at(now, wb.end).getTime() + mins * 6e4))} Uhr`]);
+  const fxt = flexToday(now);
+  const endT = fxt && fxt.running ? fxt.end : wb && !freeReason(wb, now) ? at(now, wb.end) : null;
+  if (R.dir === 'home' && endT && now < endT) dl.splice(1, 0, [`Ab ${hm(endT)}`, `an ${hm(new Date(endT.getTime() + mins * 6e4))} Uhr`]);
   $('#cm-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   $('#cm-route').textContent = `${R.from.label || R.from.text} → ${R.to.label || R.to.text}`;
   const closures = items.filter(i => i.k === 'closure').length, works = items.filter(i => i.k === 'works').length;

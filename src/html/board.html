@@ -201,6 +201,132 @@
     <p class="hint" id="vac-rule"></p>
   </section>
 
+  <!-- Pomodoro -->
+  <section class="card" id="pomodoro" data-type="pomodoro" aria-labelledby="po-h">
+    <div class="card-head">
+      <h2 id="po-h"><span data-r="title">Pomodoro</span></h2>
+      <button type="button" class="btn-ghost" id="po-set-btn">Zeiten</button>
+    </div>
+    <form class="panel" id="po-form" hidden novalidate>
+      <h3>Zeiten in Minuten</h3>
+      <div class="grid2">
+        <div class="field"><label for="po-focus">Fokus</label><input id="po-focus" type="number" min="1" max="120" inputmode="numeric"></div>
+        <div class="field"><label for="po-short">Kurze Pause</label><input id="po-short" type="number" min="1" max="60" inputmode="numeric"></div>
+        <div class="field"><label for="po-long">Lange Pause</label><input id="po-long" type="number" min="1" max="90" inputmode="numeric"></div>
+        <div class="field"><label for="po-every">Lange Pause nach Runden</label><input id="po-every" type="number" min="2" max="8" inputmode="numeric"></div>
+      </div>
+      <label class="check-row"><input type="checkbox" id="po-sound"> Ton am Ende einer Phase</label>
+      <label class="check-row"><input type="checkbox" id="po-auto"> Nächste Phase automatisch starten</label>
+      <p class="err" id="po-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="po-cancel">Abbrechen</button>
+      </div>
+    </form>
+    <div class="po-main">
+      <div class="po-ring" id="po-ring" data-mode="focus">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="po-track" cx="60" cy="60" r="52"/><circle class="po-arc" id="po-arc" cx="60" cy="60" r="52"/></svg>
+        <div class="po-center"><span class="po-mode" id="po-mode">Fokus</span><b class="po-time" id="po-time" role="timer" aria-live="off">25:00</b><span class="po-round" id="po-round"></span></div>
+      </div>
+      <div class="po-side">
+        <div class="seg sm" role="group" aria-label="Phase" id="po-phase">
+          <button type="button" data-v="focus">Fokus</button><button type="button" data-v="short">Pause</button><button type="button" data-v="long">Lange Pause</button>
+        </div>
+        <div class="form-row">
+          <button type="button" class="btn" id="po-start">Start</button>
+          <button type="button" class="btn-ghost" id="po-reset">Neu</button>
+          <button type="button" class="btn-ghost" id="po-skip">Weiter</button>
+        </div>
+        <div class="field"><label for="po-task">Woran arbeitest du?</label><input id="po-task" type="text" maxlength="120" list="po-tasks" autocomplete="off" placeholder="Aufgabe aus Todoist oder frei"><datalist id="po-tasks"></datalist></div>
+        <button type="button" class="btn-ghost" id="po-done" hidden>In Todoist abhaken</button>
+      </div>
+    </div>
+    <div class="po-stats">
+      <div class="po-dots" id="po-dots" aria-hidden="true"></div>
+      <p class="hint" id="po-today"></p>
+    </div>
+    <div class="form-row" id="po-notify-row" hidden><button type="button" class="btn-ghost" id="po-notify">Hinweis am Ende auch im Hintergrund</button></div>
+  </section>
+
+  <!-- Gleitzeit -->
+  <section class="card" id="flex" data-type="flex" aria-labelledby="fx-h">
+    <div class="card-head">
+      <h2 id="fx-h"><span data-r="title">Gleitzeit</span></h2>
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="fx-set-btn">Regeln</button>
+        <button type="button" class="btn-ghost" id="fx-add-btn">+ Tag</button>
+      </div>
+    </div>
+    <form class="panel" id="fx-set" hidden novalidate>
+      <h3>Deine Regeln</h3>
+      <div class="grid2">
+        <div class="field"><label for="fx-soll">Soll pro Arbeitstag (Std:Min)</label><input id="fx-soll" type="text" inputmode="decimal" maxlength="6" placeholder="8:00" autocomplete="off"></div>
+        <div class="field"><label for="fx-carry">Saldo zum Start (Std:Min, auch minus)</label><input id="fx-carry" type="text" inputmode="text" maxlength="8" placeholder="0:00" autocomplete="off"></div>
+      </div>
+      <fieldset class="days" id="fx-days">
+        <legend class="lbl">Arbeitstage</legend>
+        <label><input type="checkbox" data-fxday="1"><span>Mo</span></label>
+        <label><input type="checkbox" data-fxday="2"><span>Di</span></label>
+        <label><input type="checkbox" data-fxday="3"><span>Mi</span></label>
+        <label><input type="checkbox" data-fxday="4"><span>Do</span></label>
+        <label><input type="checkbox" data-fxday="5"><span>Fr</span></label>
+        <label><input type="checkbox" data-fxday="6"><span>Sa</span></label>
+        <label><input type="checkbox" data-fxday="0"><span>So</span></label>
+      </fieldset>
+      <div class="field"><label for="fx-from">Zählen ab</label><input id="fx-from" type="date"></div>
+      <label class="check-row"><input type="checkbox" id="fx-break"> Gesetzliche Pause abziehen, wenn du weniger gestempelt hast (über 6 Std 30 Min, über 9 Std 45 Min)</label>
+      <p class="hint">Feiertage und Urlaub aus dem Urlaub-Widget senken das Soll automatisch, halbe Urlaubstage zur Hälfte.</p>
+      <p class="err" id="fx-set-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="fx-set-cancel">Abbrechen</button>
+      </div>
+    </form>
+    <form class="panel" id="fx-day" hidden novalidate>
+      <h3 id="fx-day-title">Tag eintragen</h3>
+      <div class="grid2">
+        <div class="field"><label for="fx-d-date">Datum</label><input id="fx-d-date" type="date"></div>
+        <div class="field"><label for="fx-d-kind">Art</label>
+          <select id="fx-d-kind">
+            <option value="">Arbeit</option>
+            <option value="school">Berufsschule (zählt wie Soll)</option>
+            <option value="sick">Krank (zählt wie Soll)</option>
+            <option value="flexday">Gleittag (Soll geht vom Saldo ab)</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid3" id="fx-d-times">
+        <div class="field"><label for="fx-d-in">Kommen</label><input id="fx-d-in" type="time"></div>
+        <div class="field"><label for="fx-d-out">Gehen</label><input id="fx-d-out" type="time"></div>
+        <div class="field"><label for="fx-d-pause">Pause (Min)</label><input id="fx-d-pause" type="number" min="0" max="600" inputmode="numeric"></div>
+      </div>
+      <p class="preview" id="fx-d-prev"></p>
+      <p class="err" id="fx-d-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="fx-d-cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" id="fx-d-del" hidden>Eintrag löschen</button>
+      </div>
+    </form>
+    <div class="vac-hero">
+      <div class="big" id="fx-big"><b id="fx-saldo">0:00</b><span>Std auf dem Gleitzeitkonto</span></div>
+      <dl class="legend" id="fx-dl"></dl>
+    </div>
+    <div class="fx-now" id="fx-now">
+      <p id="fx-now-txt"></p>
+      <button type="button" class="btn fx-stamp" id="fx-stamp">Kommen</button>
+    </div>
+    <p class="hint" id="fx-missing" hidden></p>
+    <div>
+      <div class="fx-week-head">
+        <button type="button" class="icon-btn" id="fx-prev" aria-label="Woche davor"></button>
+        <p class="sub-h" id="fx-week-lbl"></p>
+        <button type="button" class="icon-btn" id="fx-next" aria-label="Woche danach"></button>
+      </div>
+      <ul class="fx-week" id="fx-week"></ul>
+    </div>
+  </section>
+
   <button type="button" class="card add-tile" id="add-tile" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Widget hinzufügen<span>Neu anlegen oder ein vorhandenes einfügen</span></button>
 </main>
 

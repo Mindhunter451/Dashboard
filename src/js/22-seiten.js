@@ -71,6 +71,8 @@ function startTargets() {
 }
 /* Arbeitszeit aus dem Arbeitstag-Balken, ab einer Stunde vor Beginn. Feiertage und Urlaub zählen als frei. */
 function isWorkTime(now) {
+  const fxt = flexToday(now);
+  if (fxt) return fxt.running;
   const wb = workBar();
   if (!wb || freeReason(wb, now)) return false;
   const s = at(now, wb.start).getTime() - 36e5, e = at(now, wb.end).getTime();

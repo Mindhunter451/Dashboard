@@ -1,6 +1,6 @@
 # Jeres Tagescockpit
 
-Persönliches Dashboard mit eigenen Seiten für Übersicht, Arbeit und Privat. Drin sind Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, Schnellzugriff und Notizen.
+Persönliches Dashboard mit eigenen Seiten, zum Beispiel für Übersicht, Arbeit, Privat und Fokus. Drin sind Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit.
 
 Live: https://mindhunter451.github.io/Dashboard/
 
@@ -36,6 +36,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**2.1** (Oktober 2026)
+Neue Widgets: Pomodoro (Timer mit Ton, Hinweis im Hintergrund, Aufgabe aus Todoist, Runden pro Tag), Gewohnheiten (Rhythmus täglich, werktags oder x pro Woche, Serie, die letzten drei Wochen zum Nachtragen), Lernfortschritt (Prüfungs-Countdown, Themenliste, Tempo-Prognose) und Gleitzeit (Kommen und Gehen, Soll, Saldo, gesetzliche Pause, Urlaub und Feiertage automatisch, Berufsschule, Krank, Gleittag). Wer eingestempelt ist, sieht in der Feierabend-Kachel und im Arbeitstag-Balken, wann das Soll voll ist. Aufgaben lassen sich direkt aus dem Cockpit in Todoist anlegen, mit Datum und Priorität wie in der App. Nach dem Update gibt es einmal einen Hinweis mit Knopf, der eine Fokus-Seite einrichtet.
 
 **2.0** (Oktober 2026)
 Seiten mit Tabs, Bearbeiten direkt auf dem Board, Widget-Galerie, Widgets mehrfach nutzbar (Aufgaben, Fortschritt, Schnellzugriff, Notizen), eigene Startseite oder automatisch nach Arbeitszeit, Erinnerung ans Sichern. Der Sonderweg für die Claude-Ansicht ist raus, die Seite läuft nur noch im Browser. Alte Einstellungen werden beim ersten Öffnen automatisch übernommen, der alte Stand bleibt zusätzlich unter `jere-cockpit-v1-vor-seiten` im Browser liegen.

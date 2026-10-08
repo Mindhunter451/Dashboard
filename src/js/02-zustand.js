@@ -4,7 +4,8 @@
  * state.widgets  alle Widgets: { [id]: { type, title, cfg } }. Ein Widget kann auf mehreren Seiten liegen.
  *                Pendeln, Wetter und Urlaub gibt es genau einmal (ID = Typ), den Rest beliebig oft.
  * state.page     zuletzt geöffnete Seite
- * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern)
+ * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern), zuletzt gesehene Version
+ * state.flex     Gleitzeit: gestempelte Tage. state.pomo: erledigte Pomodoro-Runden pro Tag
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
@@ -27,9 +28,13 @@ const TYPES = {
   commute:  { name: 'Pendeln', multi: false, w: 1, desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
   weather:  { name: 'Wetter', multi: false, w: 2, desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
   links:    { name: 'Schnellzugriff', multi: true, w: 1, desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
-  notes:    { name: 'Notizen', multi: true, w: 1, desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' }
+  notes:    { name: 'Notizen', multi: true, w: 1, desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' },
+  pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
+  habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
+  learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
+  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' }
 };
-const SOON = [['pomodoro', 'Pomodoro-Timer'], ['habits', 'Gewohnheiten'], ['learn', 'Lernfortschritt'], ['flex', 'Gleitzeitkonto'], ['football', 'Fußball'], ['f1', 'Formel 1'], ['fuel', 'Spritpreise']];
+const SOON = [['football', 'Fußball'], ['f1', 'Formel 1'], ['fuel', 'Spritpreise']];
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -103,9 +108,46 @@ function normBars(list) {
 const normLinks = list => (Array.isArray(list) ? list : [])
   .map(l => l && { id: String(l.id || uid()).slice(0, 20), name: String(l.name || '').slice(0, 30), url: safeUrl(l.url) })
   .filter(l => l && l.url).slice(0, 40);
+const intIn = (x, lo, hi, d) => x !== null && x !== '' && Number.isFinite(+x) && +x >= lo && +x <= hi ? Math.round(+x) : d;
+const normDays = (list, d) => Array.isArray(list) ? [...new Set(list.map(Number).filter(x => Number.isInteger(x) && x >= 0 && x <= 6))] : d;
+const HB_RHYTHM = ['daily', 'workdays', 'weekly'];
+const normHabits = list => (Array.isArray(list) ? list : []).filter(h => h && String(h.name || '').trim()).slice(0, 20).map(h => ({
+  id: String(h.id || uid()).slice(0, 20),
+  name: String(h.name).trim().slice(0, 40),
+  rhythm: HB_RHYTHM.includes(h.rhythm) ? h.rhythm : 'daily',
+  n: intIn(h.n, 1, 7, 3),
+  log: [...new Set((Array.isArray(h.log) ? h.log : []).filter(validYmd))].sort().slice(-800)
+}));
+const normTopics = list => (Array.isArray(list) ? list : []).filter(t => t && String(t.name || '').trim()).slice(0, 300)
+  .map(t => ({ id: String(t.id || uid()).slice(0, 20), name: String(t.name).trim().slice(0, 80), done: validYmd(t.done) ? t.done : null }));
+function normFlexDays(o) {
+  const out = {};
+  if (!o || typeof o !== 'object') return out;
+  for (const k of Object.keys(o).filter(validYmd).sort().slice(-800)) {
+    const d = o[k];
+    if (!d || typeof d !== 'object') continue;
+    const e = { in: validHm(d.in) ? d.in : '', out: validHm(d.out) ? d.out : '', pause: intIn(d.pause, 0, 600, 0), kind: ['school', 'sick', 'flexday'].includes(d.kind) ? d.kind : '' };
+    if (!e.in) { e.out = ''; e.pause = 0; }
+    if (e.in || e.kind) out[k] = e;
+  }
+  return out;
+}
+function normPomoLog(o) {
+  const out = {};
+  if (!o || typeof o !== 'object') return out;
+  for (const k of Object.keys(o).filter(validYmd).sort().slice(-120)) {
+    const d = o[k] || {};
+    out[k] = { n: intIn(d.n, 0, 60, 0), min: intIn(d.min, 0, 1440, 0) };
+  }
+  return out;
+}
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
+    case 'pomodoro': return { focus: intIn(c.focus, 1, 120, 25), short: intIn(c.short, 1, 60, 5), long: intIn(c.long, 1, 90, 15), every: intIn(c.every, 2, 8, 4), sound: c.sound !== false, auto: !!c.auto };
+    case 'habits': return { items: normHabits(c.items) };
+    case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
+    case 'flex': return { soll: intIn(c.soll, 0, 720, 480), days: normDays(c.days, [1, 2, 3, 4, 5]), autoBreak: c.autoBreak !== false, carry: intIn(c.carry, -60000, 60000, 0), from: validYmd(c.from) ? c.from : ymd(new Date()) };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false };
@@ -220,7 +262,9 @@ function normalize(s) {
     widgets,
     loc: s.loc && s.loc.mode === 'fixed' && Number.isFinite(+s.loc.lat) && Number.isFinite(+s.loc.lon) ? { mode: 'fixed', name: String(s.loc.name || 'Ort'), lat: +s.loc.lat, lon: +s.loc.lon } : { mode: 'auto' },
     commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) },
-    meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze) }
+    flex: { days: normFlexDays(s.flex && s.flex.days) },
+    pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
+    meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
 }
 const DEFAULTS = () => normalize(null);
@@ -259,12 +303,13 @@ function persist() { lsSet(LS_KEY, state); }
 
 /* Toast mit Rückgängig */
 let toastTimer = null, undoFn = null;
-function toast(msg, undo) {
+function toast(msg, undo, opt) {
   $('#toast-msg').textContent = msg;
   undoFn = undo || null;
   $('#toast-undo').hidden = !undo;
+  $('#toast-undo').textContent = (opt && opt.label) || 'Rückgängig';
   $('#toast').hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { $('#toast').hidden = true; undoFn = null; }, 6000);
+  toastTimer = setTimeout(() => { $('#toast').hidden = true; undoFn = null; }, (opt && opt.ms) || 6000);
 }
 $('#toast-undo').addEventListener('click', () => { if (undoFn) undoFn(); undoFn = null; $('#toast').hidden = true; });

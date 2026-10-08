@@ -15,6 +15,13 @@ function calcBar(b, now) {
   switch (b.kind) {
     case 'day': {
       if (!validHm(b.start) || !validHm(b.end)) return { pct: 0, state: 'off', sub: 'Uhrzeit fehlt', left: '', right: '' };
+      const wb = workBar(), fxt = wb && wb.id === b.id ? flexToday(now) : null;
+      if (fxt) {
+        const fr = { left: hm(fxt.start), right: hm(fxt.end) };
+        if (!fxt.running) return { ...fr, pct: 1, state: 'done', sub: `Ausgestempelt um ${hm(fxt.end)}` };
+        if (now >= fxt.end) return { ...fr, pct: 1, state: 'done', sub: 'Soll erreicht, ab jetzt Plus' };
+        return { ...fr, pct: clamp01((now - fxt.start) / (fxt.end - fxt.start)), state: 'run', sub: `noch ${dur(fxt.end - now)} bis zum Soll` };
+      }
       const r = { left: b.start, right: b.end };
       const why = freeReason(b, now);
       if (why) return { ...r, pct: 0, state: 'off', sub: why === 'Urlaub' ? 'Heute Urlaub' : why === 'Wochenende' || why === 'Kein Arbeitstag' ? 'Heute frei' : `Heute frei, ${why}` };

@@ -8,8 +8,14 @@ function setTile(id, val, sub, mode) {
 }
 function tickTiles(now) {
   const t = sod(now), wb = workBar();
-  // Feierabend
-  if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
+  // Feierabend (wenn heute in der Gleitzeit gestempelt: ab dann zählt das Soll)
+  const fxt = flexToday(now);
+  const way = cm.homeMins ? `, Heimweg ca. ${cm.homeMins} Min` : '';
+  if (fxt && fxt.running) {
+    if (now < fxt.end) setTile('#t-fa', `in ${dur(fxt.end - now, true)}`, `um ${hm(fxt.end)} Uhr ist dein Soll voll${way}`, 'hot');
+    else setTile('#t-fa', 'Soll erreicht', `seit ${hm(fxt.end)} Uhr, ab jetzt sammelst du Plus`, 'good');
+  } else if (fxt) setTile('#t-fa', 'Geschafft', `ausgestempelt um ${hm(fxt.end)} Uhr`, 'good');
+  else if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
   else {
     const why = freeReason(wb, now);
     const s = at(now, wb.start), e = at(now, wb.end);
