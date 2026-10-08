@@ -327,6 +327,68 @@
     </div>
   </section>
 
+  <!-- Formel 1 -->
+  <section class="card" id="f1" data-type="f1" aria-labelledby="f1-h">
+    <div class="card-head">
+      <h2 id="f1-h"><span data-r="title">Formel 1</span></h2>
+      <span class="src" id="f1-round"></span>
+    </div>
+    <div class="wx-off" id="f1-off" hidden>
+      <h3 id="f1-off-t">Formel 1 wird geladen</h3>
+      <p id="f1-off-p">Einen Moment, Kalender und WM-Stand kommen gleich.</p>
+      <div class="form-row"><button type="button" class="btn" id="f1-retry" hidden>Nochmal versuchen</button></div>
+    </div>
+    <div id="f1-live" hidden>
+      <div class="f1-next" id="f1-next"></div>
+      <div class="seg sm fb-tabs" role="group" aria-label="Ansicht" id="f1-tabs">
+        <button type="button" data-v="drivers">Fahrer</button><button type="button" data-v="teams">Teams</button><button type="button" data-v="last">Letztes Rennen</button>
+      </div>
+      <div class="fb-body" id="f1-body"></div>
+    </div>
+    <p class="src" id="f1-src"></p>
+  </section>
+
+  <!-- Spritpreise -->
+  <section class="card" id="fuel" data-type="fuel" aria-labelledby="fu-h">
+    <div class="card-head">
+      <h2 id="fu-h"><span data-r="title">Spritpreise</span></h2>
+      <div class="seg sm" role="group" aria-label="Sorte" id="fu-type">
+        <button type="button" data-v="e5">Super E5</button><button type="button" data-v="e10">E10</button><button type="button" data-v="diesel">Diesel</button>
+      </div>
+    </div>
+    <form class="panel" id="fu-form" hidden novalidate>
+      <h3>Tankerkönig verbinden</h3>
+      <p class="hint">Die Preise kommen von der Markttransparenzstelle über Tankerkönig. Dafür brauchst du einen kostenlosen API-Key. Den bekommst du per Mail, wenn du dich auf onboarding.tankerkoenig.de registrierst. Falls die Registrierung dort gerade pausiert ist, versuch es einfach später nochmal.</p>
+      <div class="field"><label for="fu-key">API-Key</label><input id="fu-key" type="password" maxlength="60" autocomplete="off" spellcheck="false" placeholder="z. B. 1234abcd-…"></div>
+      <p class="hint">Der Key bleibt nur in diesem Browser und kommt nicht mit in die Sicherung.</p>
+      <p class="err" id="fu-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn" id="fu-save">Speichern</button>
+        <a class="btn-ghost" href="https://onboarding.tankerkoenig.de/" target="_blank" rel="noopener">Key holen ↗</a>
+        <button type="button" class="btn-ghost" id="fu-cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" id="fu-forget" hidden>Key entfernen</button>
+      </div>
+    </form>
+    <div class="wx-off" id="fu-setup" hidden>
+      <h3>Spritpreise einrichten</h3>
+      <p>Mit einem kostenlosen Key von Tankerkönig siehst du hier die günstigsten Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.</p>
+      <div class="form-row"><button type="button" class="btn" id="fu-setup-btn">Key eintragen</button></div>
+    </div>
+    <div id="fu-live" hidden>
+      <div class="seg sm" role="group" aria-label="Wo" id="fu-mode">
+        <button type="button" data-v="route">Auf der Strecke</button><button type="button" data-v="home">Rund um Zuhause</button><button type="button" data-v="here">Hier</button>
+      </div>
+      <a class="fu-best" id="fu-best" target="_blank" rel="noopener"></a>
+      <ul class="fu-list" id="fu-list"></ul>
+      <p class="hint" id="fu-hint"></p>
+    </div>
+    <div class="tk-foot" id="fu-foot">
+      <button type="button" class="btn-ghost" id="fu-refresh">Aktualisieren</button>
+      <button type="button" class="btn-ghost" id="fu-key-btn">API-Key</button>
+    </div>
+    <p class="src" id="fu-src"></p>
+  </section>
+
   <button type="button" class="card add-tile" id="add-tile" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Widget hinzufügen<span>Neu anlegen oder ein vorhandenes einfügen</span></button>
 </main>
 
