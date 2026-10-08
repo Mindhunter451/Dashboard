@@ -1,0 +1,115 @@
+<!-- Vorlagen für Widgets, die es mehrfach geben kann. Jede Kopie bekommt ihre eigenen Daten,
+     deshalb hier keine IDs, sondern data-r zum Wiederfinden innerhalb der Karte. -->
+
+<template id="tpl-tasks">
+  <section class="card" data-type="tasks">
+    <div class="card-head">
+      <h2 data-r="title">Aufgaben</h2>
+      <span class="src" data-r="src"></span>
+    </div>
+    <div class="tk-state" data-r="state" hidden>
+      <p data-r="state-text"></p>
+      <div class="form-row"><button type="button" class="btn" data-r="action" hidden></button></div>
+    </div>
+    <form class="panel" data-r="form" hidden novalidate>
+      <h3>Todoist verbinden</h3>
+      <p class="hint">Damit deine Todoist-Projekte hier auftauchen, braucht das Cockpit deinen persönlichen API Token. Den findest du in Todoist unter Einstellungen, Integrationen, Entwickler.</p>
+      <label class="field"><span class="lbl">API Token</span><input data-r="token" type="password" maxlength="100" autocomplete="off" spellcheck="false" placeholder="Token aus Todoist einfügen"></label>
+      <p class="hint">Der Token bleibt nur in diesem Browser gespeichert und steckt nie in der Datei selbst. Er öffnet dein ganzes Todoist, also gib ihn sonst nirgends ein.</p>
+      <p class="err" data-r="err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn" data-r="save">Verbinden</button>
+        <a class="btn-ghost" href="https://app.todoist.com/app/settings/integrations/developer" target="_blank" rel="noopener">Token holen ↗</a>
+        <button type="button" class="btn-ghost" data-r="cancel" hidden>Abbrechen</button>
+        <button type="button" class="btn-danger" data-r="forget" hidden>Trennen</button>
+      </div>
+    </form>
+    <div class="tk-cols" data-r="cols"></div>
+    <div class="tk-foot">
+      <a class="btn-ghost" href="https://app.todoist.com/app/today" target="_blank" rel="noopener">Todoist öffnen ↗</a>
+      <button type="button" class="btn-ghost" data-r="conf">Verbindung</button>
+    </div>
+  </section>
+</template>
+
+<template id="tpl-progress">
+  <section class="card" data-type="progress">
+    <div class="card-head">
+      <h2 data-r="title">Fortschritt</h2>
+      <button type="button" class="btn-ghost" data-r="add">+ Balken</button>
+    </div>
+    <form class="panel" data-r="form" hidden novalidate>
+      <h3 data-r="form-title">Neuer Balken</h3>
+      <div class="grid2">
+        <label class="field"><span class="lbl">Kategorie</span>
+          <select data-r="kind">
+            <option value="day">Arbeitstag (Uhrzeit)</option>
+            <option value="workweek">Arbeitswoche</option>
+            <option value="month">Monat</option>
+            <option value="year">Jahr</option>
+            <option value="range">Zeitraum (Datum)</option>
+          </select>
+        </label>
+        <label class="field"><span class="lbl">Name</span><input data-r="name" type="text" maxlength="40" autocomplete="off"></label>
+      </div>
+      <div class="grid2" data-r="time">
+        <label class="field"><span class="lbl">Von</span><input data-r="start" type="time"></label>
+        <label class="field"><span class="lbl">Bis</span><input data-r="end" type="time"></label>
+      </div>
+      <fieldset class="days" data-r="days">
+        <legend class="lbl">An diesen Tagen</legend>
+        <label><input type="checkbox" data-day="1"><span>Mo</span></label>
+        <label><input type="checkbox" data-day="2"><span>Di</span></label>
+        <label><input type="checkbox" data-day="3"><span>Mi</span></label>
+        <label><input type="checkbox" data-day="4"><span>Do</span></label>
+        <label><input type="checkbox" data-day="5"><span>Fr</span></label>
+        <label><input type="checkbox" data-day="6"><span>Sa</span></label>
+        <label><input type="checkbox" data-day="0"><span>So</span></label>
+      </fieldset>
+      <div class="grid2" data-r="date">
+        <label class="field"><span class="lbl">Startdatum</span><input data-r="from" type="date"></label>
+        <label class="field"><span class="lbl">Enddatum</span><input data-r="to" type="date"></label>
+      </div>
+      <p class="err" data-r="err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" data-r="del">Löschen</button>
+      </div>
+    </form>
+    <ul class="bars" data-r="bars"></ul>
+  </section>
+</template>
+
+<template id="tpl-links">
+  <section class="card" data-type="links">
+    <div class="card-head">
+      <h2 data-r="title">Schnellzugriff</h2>
+      <button type="button" class="btn-ghost" data-r="add">+ Link</button>
+    </div>
+    <form class="panel" data-r="form" hidden novalidate>
+      <h3 data-r="form-title">Neuer Link</h3>
+      <div class="grid2">
+        <label class="field"><span class="lbl">Name</span><input data-r="name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Webmail"></label>
+        <label class="field"><span class="lbl">Adresse</span><input data-r="url" type="url" maxlength="500" autocomplete="off" spellcheck="false" placeholder="https://…"></label>
+      </div>
+      <p class="err" data-r="err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" data-r="del" hidden>Löschen</button>
+      </div>
+    </form>
+    <ul class="qlinks" data-r="list"></ul>
+  </section>
+</template>
+
+<template id="tpl-notes">
+  <section class="card" data-type="notes">
+    <div class="card-head">
+      <h2 data-r="title">Notizen</h2>
+      <span class="src" data-r="state"></span>
+    </div>
+    <textarea class="notes" data-r="text" maxlength="8000" placeholder="Schnell was notieren, wird automatisch gespeichert."></textarea>
+  </section>
+</template>

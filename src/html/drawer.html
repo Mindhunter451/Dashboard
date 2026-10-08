@@ -1,0 +1,79 @@
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-labelledby="dr-h" role="dialog" aria-modal="true">
+  <div class="dr-head">
+    <h2 id="dr-h">Anpassen</h2>
+    <button type="button" class="btn" id="dr-close">Fertig</button>
+  </div>
+  <div class="dr-body">
+    <section class="dr-sec">
+      <h3>Ansicht</h3>
+      <div class="field"><label for="dr-greet">Begrüßung</label><input id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
+      <div class="dr-row"><span class="lbl">Design</span>
+        <div class="seg sm" role="group" aria-label="Design" id="dr-theme">
+          <button type="button" data-v="auto">Automatisch</button><button type="button" data-v="light">Hell</button><button type="button" data-v="dark">Dunkel</button>
+        </div>
+      </div>
+      <div class="dr-row"><span class="lbl">Kartengröße</span>
+        <div class="seg sm" role="group" aria-label="Kartengröße" id="dr-size">
+          <button type="button" data-v="s">Kompakt</button><button type="button" data-v="m">Normal</button><button type="button" data-v="l">Groß</button>
+        </div>
+      </div>
+      <div class="field"><span class="lbl" id="dr-acc-l">Akzentfarbe</span><div class="swatches" id="dr-accent" role="radiogroup" aria-labelledby="dr-acc-l"></div></div>
+      <label class="check-row"><input type="checkbox" id="dr-secs"> Sekunden an der Uhr zeigen</label>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Seiten</h3>
+      <div class="field"><label for="dr-start">Beim Öffnen zeigen</label>
+        <select id="dr-start">
+          <option value="last">Die zuletzt geöffnete Seite</option>
+          <option value="fixed">Immer dieselbe Seite</option>
+          <option value="auto">Automatisch nach Arbeitszeit</option>
+        </select>
+      </div>
+      <div class="field" id="dr-start-fixed"><label for="dr-start-page">Seite</label><select id="dr-start-page"></select></div>
+      <div class="grid2" id="dr-start-auto">
+        <div class="field"><label for="dr-start-work">Während der Arbeitszeit</label><select id="dr-start-work"></select></div>
+        <div class="field"><label for="dr-start-free">Sonst</label><select id="dr-start-free"></select></div>
+      </div>
+      <p class="hint" id="dr-start-hint"></p>
+      <div class="form-row"><button type="button" class="btn-ghost" id="dr-edit">Seiten und Widgets bearbeiten</button></div>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Kacheln oben</h3>
+      <div id="dr-tiles" style="display:flex;flex-direction:column;gap:8px"></div>
+      <p class="lbl" style="margin:6px 0 0">Eigene Countdowns</p>
+      <ul class="cd-list" id="dr-cd-list"></ul>
+      <form id="dr-cd-form" novalidate style="display:flex;flex-direction:column;gap:8px">
+        <div class="grid3">
+          <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
+          <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
+          <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
+        </div>
+        <p class="err" id="cd-err" hidden></p>
+        <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
+      </form>
+      <p class="hint">Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Feiertage</h3>
+      <div class="field"><label for="dr-region">Bundesland</label><select id="dr-region"></select></div>
+      <p class="hint">Gilt für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</p>
+    </section>
+
+    <section class="dr-sec" id="dr-data">
+      <h3>Daten</h3>
+      <p class="hint">Deine Einstellungen liegen nur in diesem Browser. Sicher sie ab und zu als Datei. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token und TomTom-Key sind nicht mit drin.</p>
+      <p class="hint" id="dr-backup-at"></p>
+      <div class="form-row">
+        <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>
+        <button type="button" class="btn-ghost" id="dr-import">Sicherung laden</button>
+        <input type="file" id="dr-file" accept="application/json,.json" hidden>
+      </div>
+      <p class="err" id="dr-data-err" hidden></p>
+      <div class="form-row"><button type="button" class="btn-danger" id="dr-reset" style="margin-left:0">Alles zurücksetzen</button></div>
+    </section>
+  </div>
+</aside>

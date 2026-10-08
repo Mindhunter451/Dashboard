@@ -1,0 +1,41 @@
+/* Kopfzeile */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.eyebrow{margin:0 0 4px;font:500 12px/1.3 var(--f-data);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font:800 clamp(32px,5vw,48px)/1 var(--f-display);letter-spacing:-.025em;text-wrap:balance}
+.clock{display:flex;align-items:center;gap:14px}
+.time{font:500 clamp(32px,5vw,48px)/1 var(--f-data);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.time .sec{font-size:.42em;color:var(--muted);margin-left:3px;letter-spacing:0}
+.kw{display:flex;flex-direction:column;align-items:center;padding:6px 10px 5px;border:1.5px solid var(--ink);border-radius:8px;line-height:1}
+.kw span{font:600 10px/1 var(--f-data);letter-spacing:.14em}
+.kw b{font:800 22px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.cust-btn{align-self:center}
+.cust-btn svg{width:16px;height:16px}
+
+/* Instrumentenleiste */
+.next{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.tile{flex:1 1 160px;background:var(--surface);padding:14px 16px 15px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.t-label{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.t-val{margin:6px 0 0;font:700 clamp(19px,2.3vw,24px)/1.15 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+.tile[data-hot] .t-val{color:var(--accent-ink)}
+.tile[data-good] .t-val{color:var(--good)}
+.t-sub{margin:0;color:var(--muted);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+
+/* Seiten-Tabs und Bearbeiten */
+.pagebar{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
+.tabs{display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface);overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:0;background:transparent;padding:7px 16px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:var(--muted);white-space:nowrap}
+.tab:hover{color:var(--ink);background:var(--raise)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
+.edit-btn svg{width:15px;height:15px}
+.edit-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.editbar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 18px;padding:14px 16px;border:1.5px dashed var(--accent);border-radius:var(--r);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.editbar .field{flex:1 1 200px;max-width:320px}
+.eb-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.eb-tools .check-row{margin-right:4px}
+.eb-tools .btn-danger{margin-left:0}
+
+/* Hinweis zur Sicherung */
+.notice{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:12px 14px 12px 16px;border-radius:var(--r);background:var(--chip-bg);border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line))}
+.notice p{margin:0;font-size:14px;line-height:1.4;max-width:75ch}
+.notice b{font-weight:700}
