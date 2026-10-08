@@ -1,6 +1,6 @@
 # Jeres Tagescockpit
 
-Persönliches Dashboard mit eigenen Seiten, zum Beispiel für Übersicht, Arbeit, Privat und Fokus. Drin sind Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit.
+Persönliches Dashboard mit eigenen Seiten, zum Beispiel für Übersicht, Arbeit, Privat, Fokus und Sport. Drin sind Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Gleitzeit, Fußball, Formel 1 und Spritpreise.
 
 Live: https://mindhunter451.github.io/Dashboard/
 
@@ -12,7 +12,7 @@ Unter **Anpassen** sind Design, Akzentfarbe, Kacheln, Countdowns, Bundesland, di
 
 ## Daten
 
-Alles, was du einstellst, liegt nur im Browser (localStorage), getrennt für jede Adresse und jeden Browser. Der Todoist-Token und ein TomTom-Key stehen nie in der Datei und auch nicht in einer Sicherung.
+Alles, was du einstellst, liegt nur im Browser (localStorage), getrennt für jede Adresse und jeden Browser. Der Todoist-Token, ein TomTom-Key und der Tankerkönig-Key stehen nie in der Datei und auch nicht in einer Sicherung.
 Mit **Anpassen, Einstellungen sichern** bekommst du eine JSON-Datei, mit **Sicherung laden** holst du sie zurück, auch auf einem anderen Rechner. Das Cockpit erinnert dich, wenn die letzte Sicherung länger als zwei Wochen her ist.
 
 ## Aufbau
@@ -36,6 +36,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**2.2** (Oktober 2026)
+Neue Widgets: Fußball über OpenLigaDB (1., 2. oder 3. Liga, Lieblingsverein mit nächstem Spiel, Form und Live-Stand, Spieltag zum Durchblättern, Tabelle mit Zonen, Torjäger), Formel 1 über Jolpica (nächstes Rennen mit allen Sessions in deiner Ortszeit, WM-Stand Fahrer und Teams, letztes Rennen) und Spritpreise über Tankerkönig (eigener kostenloser Key, günstigste Tankstellen auf der Pendelstrecke, rund um Zuhause oder am Standort, mit Umweg und Preisänderung). Vereine, Fahrer und Teams lassen sich antippen und zeigen dann ein Infofenster mit Spielen, Ergebnissen und einer Kurzinfo aus Wikipedia. Nach dem Update gibt es einmal einen Hinweis mit Knopf, der eine Sport-Seite mit dem HSV einrichtet.
 
 **2.1** (Oktober 2026)
 Neue Widgets: Pomodoro (Timer mit Ton, Hinweis im Hintergrund, Aufgabe aus Todoist, Runden pro Tag), Gewohnheiten (Rhythmus täglich, werktags oder x pro Woche, Serie, die letzten drei Wochen zum Nachtragen), Lernfortschritt (Prüfungs-Countdown, Themenliste, Tempo-Prognose) und Gleitzeit (Kommen und Gehen, Soll, Saldo, gesetzliche Pause, Urlaub und Feiertage automatisch, Berufsschule, Krank, Gleittag). Wer eingestempelt ist, sieht in der Feierabend-Kachel und im Arbeitstag-Balken, wann das Soll voll ist. Aufgaben lassen sich direkt aus dem Cockpit in Todoist anlegen, mit Datum und Priorität wie in der App. Nach dem Update gibt es einmal einen Hinweis mit Knopf, der eine Fokus-Seite einrichtet.

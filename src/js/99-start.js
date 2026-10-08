@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '2.1';
+const VERSION = '2.2';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -8,6 +8,7 @@ function tick() {
   autoTick(now);
   tickPomo(now);
   fxTick(now);
+  f1Tick(now);
   if (ymd(now) !== vacDayKey) renderVacation();
   if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
 }
@@ -36,12 +37,31 @@ document.addEventListener('visibilitychange', () => {
   if (tdToken() && tkKeys().length && Date.now() - tk.stamp > 6e4) tdLoad();
 });
 /* Nach einem Update einmal zeigen, was neu ist. Mit Knopf, der eine Fokus-Seite einrichtet. */
+const NEWS = {
+  '2.1': ['Neu: Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
+  '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()]
+};
 function announceNew() {
   if (state.meta.seen === VERSION) return;
-  const known = state.edited;
+  const known = state.edited, news = NEWS[VERSION];
   state.meta.seen = VERSION;
   persist();
-  if (known && VERSION === '2.1') setTimeout(() => toast('Neu: Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit. Soll ich dir eine Fokus-Seite damit einrichten?', setupFocusPage, { label: 'Einrichten', ms: 20000 }), 900);
+  if (known && news) setTimeout(() => toast(news[0], news[1], { label: 'Einrichten', ms: 20000 }), 900);
+}
+function setupSportPage() {
+  if (state.pages.length >= 12) return;
+  const fb = newWidget('football', { league: 'bl1', team: 100, teamName: 'Hamburger SV' });
+  let id;
+  do id = 'p' + uid(); while (pageById(id));
+  const name = state.pages.some(p => p.name === 'Sport') ? 'Sport 2' : 'Sport';
+  state.pages.push({ id, name, tiles: false, items: [{ w: fb, s: 1 }, { w: 'f1', s: 1 }] });
+  const work = state.pages.find(p => pageSlug(p) === 'arbeit');
+  const addFuel = work && !work.items.some(x => x.w === 'fuel');
+  if (addFuel) { const i = work.items.findIndex(x => x.w === 'commute'); work.items.splice(i >= 0 ? i + 1 : work.items.length, 0, { w: 'fuel', s: 1 }); }
+  state.page = id;
+  commit();
+  layoutNow();
+  toast(addFuel ? `Seite „${name}“ ist fertig, und die Spritpreise liegen auf „${work.name}“ neben dem Pendeln.` : `Seite „${name}“ ist fertig.`);
 }
 function setupFocusPage() {
   if (state.pages.length >= 12) return;

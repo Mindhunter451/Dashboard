@@ -181,6 +181,7 @@ function openGallery() {
     ul.appendChild(li);
   }
   body.appendChild(ul);
+  if (!SOON.length) { $('#dlg-gallery').showModal(); return; }
   const sub = document.createElement('p');
   sub.className = 'gal-sub';
   sub.textContent = 'Kommt demnächst';

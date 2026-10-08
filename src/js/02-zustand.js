@@ -32,9 +32,13 @@ const TYPES = {
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
   habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' }
+  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' },
+  football: { name: 'Fußball', multi: true, w: 1, since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
+  f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
+  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' }
 };
-const SOON = [['football', 'Fußball'], ['f1', 'Formel 1'], ['fuel', 'Spritpreise']];
+const SOON = [];
+const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -147,6 +151,9 @@ function normCfg(type, c) {
     case 'pomodoro': return { focus: intIn(c.focus, 1, 120, 25), short: intIn(c.short, 1, 60, 5), long: intIn(c.long, 1, 90, 15), every: intIn(c.every, 2, 8, 4), sound: c.sound !== false, auto: !!c.auto };
     case 'habits': return { items: normHabits(c.items) };
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
+    case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '' };
+    case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
+    case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
     case 'flex': return { soll: intIn(c.soll, 0, 720, 480), days: normDays(c.days, [1, 2, 3, 4, 5]), autoBreak: c.autoBreak !== false, carry: intIn(c.carry, -60000, 60000, 0), from: validYmd(c.from) ? c.from : ymd(new Date()) };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };

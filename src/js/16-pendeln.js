@@ -267,6 +267,7 @@ function renderCommute() {
   cm.items = items;
   cmMap(R, items, tt);
   tickTiles(new Date());
+  if (views.has('fuel')) renderFuel();
 }
 const ICO = {
   home: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.2 2.8 10.6a1 1 0 0 0 1.25 1.56L5 11.4V20a1 1 0 0 0 1 1h4.2v-5.6h3.6V21H18a1 1 0 0 0 1-1v-8.6l.95.76a1 1 0 1 0 1.25-1.56z"/></svg>',

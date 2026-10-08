@@ -439,6 +439,142 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fx-row .x[data-s="minus"]{color:var(--bad)}
 .fx-row.off .d,.fx-row.off .i{color:var(--muted)}
 
+/* 32-sport.css */
+/* Fußball, Formel 1, Spritpreise und das Infofenster */
+.logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
+.logo.lg{width:42px;height:42px;flex-basis:42px}
+.logo.xl{width:60px;height:60px;flex-basis:60px}
+.logo.ini{display:inline-grid;place-items:center;border-radius:50%;background:var(--raise);border:1px solid var(--line);font:700 9px/1 var(--f-data);color:var(--muted);letter-spacing:0}
+.logo.lg.ini{font-size:13px}
+.logo.xl.ini{font-size:18px}
+.fb-tabs{align-self:flex-start;max-width:100%;overflow-x:auto}
+.fb-body{display:flex;flex-direction:column;gap:6px;min-width:0}
+.fb-fav{display:flex;flex-direction:column;gap:12px}
+.fb-fav:empty{display:none}
+.fb-head{display:flex;align-items:center;gap:12px;min-width:0;border:0;background:transparent;padding:0;text-align:left;color:inherit;font:inherit}
+.fb-head b{display:block;font:700 18px/1.2 var(--f-display)}
+.fb-head small{display:block;color:var(--muted);font-size:13px}
+.fb-head:hover b{text-decoration:underline}
+.fb-top{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap}
+.form{display:inline-flex;gap:4px}
+.form i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:700 11px/1 var(--f-data);font-style:normal;color:#fff}
+.form i[data-res="S"]{background:var(--good)}
+.form i[data-res="U"]{background:var(--muted)}
+.form i[data-res="N"]{background:var(--bad)}
+.fb-next{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;padding:12px;border-radius:12px;background:var(--raise)}
+.fb-side{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;min-width:0;border:0;background:transparent;color:inherit;font:inherit;padding:0}
+.fb-side span{font-weight:700;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+.fb-side:hover span{text-decoration:underline}
+.fb-mid{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.fb-mid b{font:700 26px/1 var(--f-data);font-variant-numeric:tabular-nums}
+.fb-mid small{font-size:12px;color:var(--muted);white-space:nowrap}
+.fb-label{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.live{display:inline-flex;align-items:center;gap:5px;font:700 11px/1.6 var(--f-data);letter-spacing:.06em;text-transform:uppercase;color:var(--bad)}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--bad);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){.live::before{animation:none}}
+.fb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.fb-day{font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:10px 0 4px}
+.fb-day:first-child{padding-top:0}
+.fb-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
+.fb-row.fav{background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:8px;padding-inline:6px}
+.fb-t{display:flex;align-items:center;gap:7px;min-width:0;border:0;background:transparent;padding:2px 0;color:inherit;font:inherit;font-size:13px;text-align:left}
+.fb-t span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fb-t.r{justify-content:flex-end;text-align:right}
+.fb-t:hover span{text-decoration:underline}
+.fb-sc{font:600 14px/1 var(--f-data);font-variant-numeric:tabular-nums;min-width:3.4em;text-align:center}
+.fb-sc.time{font-weight:500;color:var(--muted);font-size:12.5px}
+.fb-sc[data-live]{color:var(--bad)}
+.fb-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fb-nav .icon-btn:disabled{opacity:.3;cursor:default}
+.fb-table{width:100%;border-collapse:collapse;font-size:13px}
+.fb-table th{font:600 10px/1.3 var(--f-data);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right;padding:0 5px 6px}
+.fb-table th.n{text-align:left}
+.fb-table td{padding:4px 5px;border-top:1px solid var(--line);text-align:right;font:400 12.5px/1.3 var(--f-data);font-variant-numeric:tabular-nums}
+.fb-table td.n{text-align:left;font-family:var(--f-body);font-size:13px}
+.fb-table td.p{font-weight:700}
+.fb-table td.pos{width:2.4em;border-left:3px solid transparent;color:var(--muted)}
+.fb-table tr.fav td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.fb-table tr[data-z="up"] td.pos{border-left-color:var(--good)}
+.fb-table tr[data-z="eu"] td.pos{border-left-color:var(--sea)}
+.fb-table tr[data-z="rel"] td.pos{border-left-color:var(--warn)}
+.fb-table tr[data-z="down"] td.pos{border-left-color:var(--bad)}
+.fb-table .fb-t{font-size:13px;padding:0}
+@container (max-width:340px){.fb-table .hide-s{display:none}}
+.fb-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:6px 0 0;padding:0;list-style:none;font-size:11.5px;color:var(--muted)}
+.fb-legend li{display:flex;align-items:center;gap:5px}
+.fb-legend i{width:3px;height:12px;border-radius:2px;background:var(--c)}
+
+/* Formel 1 */
+.f1-next{display:flex;flex-direction:column;gap:10px}
+.f1-race{display:flex;align-items:flex-end;justify-content:space-between;gap:6px 14px;flex-wrap:wrap}
+.f1-race b{display:block;font:800 21px/1.15 var(--f-display);letter-spacing:-.01em}
+.f1-race small{display:block;color:var(--muted);font-size:13px}
+.f1-cd{font:600 15px/1.2 var(--f-data);color:var(--accent-ink);white-space:nowrap}
+.f1-sess{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr));gap:6px}
+.f1-sess li{padding:7px 10px;border-radius:10px;background:var(--raise);display:flex;flex-direction:column;gap:1px;min-width:0}
+.f1-sess li b{font-size:13px}
+.f1-sess li span{font:400 12px/1.3 var(--f-data);color:var(--muted)}
+.f1-sess li.next{box-shadow:inset 0 0 0 2px var(--accent)}
+.f1-sess li.done{opacity:.5}
+.f1-sess li.race{background:color-mix(in srgb,var(--accent) 16%,var(--raise))}
+.st-list{list-style:none;margin:0;padding:0}
+.st-row{display:grid;grid-template-columns:2.1em minmax(0,1fr) auto;gap:4px 10px;align-items:center;width:100%;padding:6px 4px;border:0;border-top:1px solid var(--line);background:transparent;color:inherit;font:inherit;text-align:left}
+.st-list li:first-child .st-row{border-top:0}
+.st-row:hover{background:var(--raise)}
+.st-row.fav{background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:8px}
+.st-pos{font:600 13px var(--f-data);color:var(--muted);text-align:right}
+.st-name{min-width:0;display:flex;align-items:center;gap:8px}
+.st-name b{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-name>span{display:flex;flex-direction:column;min-width:0}
+.st-name small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-pts{font:600 13px var(--f-data);font-variant-numeric:tabular-nums;text-align:right}
+.st-pts small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
+.tm{width:4px;height:24px;border-radius:2px;background:var(--c,var(--muted));flex:0 0 4px}
+
+/* Spritpreise */
+.fu-best{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap;padding:12px 14px;border-radius:12px;background:var(--raise);color:inherit;text-decoration:none}
+.fu-best:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.fu-best:empty{display:none}
+.pr{font-variant-numeric:tabular-nums;white-space:nowrap}
+.pr sup{font-size:.55em;vertical-align:.7em;margin-left:1px}
+.fu-best .pr{font:700 38px/1 var(--f-data);letter-spacing:-.03em;color:var(--good)}
+.fu-best b{display:block;font:700 16px/1.25 var(--f-display)}
+.fu-best small{display:block;color:var(--muted);font-size:13px;line-height:1.35}
+.fu-list{list-style:none;margin:0;padding:0}
+.fu-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1px 12px;align-items:center;padding:8px 6px;border-top:1px solid var(--line);color:inherit;text-decoration:none}
+.fu-row:hover{background:var(--raise)}
+.fu-row b{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fu-row small{color:var(--muted);font-size:12px;grid-column:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fu-row .pr{grid-row:1 / span 2;grid-column:2;font:600 18px/1.1 var(--f-data);text-align:right}
+.fu-row.closed{opacity:.5}
+.fu-diff{display:block;font:500 11px/1.2 var(--f-data);text-align:right;color:var(--muted)}
+.fu-diff[data-s="down"]{color:var(--good)}
+.fu-diff[data-s="up"]{color:var(--bad)}
+#fu-mode button:disabled{opacity:.4;cursor:default}
+
+/* Infofenster */
+.dlg-info .dlg-body{gap:16px}
+.in-head{display:flex;align-items:center;gap:14px}
+.in-head b{display:block;font:800 21px/1.15 var(--f-display)}
+.in-head small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.in-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.in-stats div{background:var(--raise);border-radius:10px;padding:8px 10px}
+.in-stats span{display:block;font-size:11.5px;color:var(--muted)}
+.in-stats b{font:600 16px/1.3 var(--f-data);font-variant-numeric:tabular-nums}
+.in-sec h3{margin:0 0 4px;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.in-wiki{font-size:14px;line-height:1.55}
+.in-wiki p{margin:0 0 10px}
+.in-wiki img{float:right;max-width:92px;max-height:120px;object-fit:contain;border-radius:8px;margin:0 0 8px 12px}
+.in-res{list-style:none;margin:0;padding:0}
+.in-res li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:13px}
+.in-res li:first-child{border-top:0}
+.in-res .d{color:var(--muted);font:400 12px var(--f-data);white-space:nowrap}
+.in-res .s{font:600 13px var(--f-data);font-variant-numeric:tabular-nums;text-align:right;min-width:3em}
+.in-res button{border:0;background:transparent;padding:0;color:inherit;font:inherit;text-align:left;display:flex;align-items:center;gap:7px;min-width:0}
+.in-res button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.in-res button:hover span{text-decoration:underline}
+
 /* 40-anpassen.css */
 /* Anpassen */
 .scrim{position:fixed;inset:0;background:rgba(6,12,18,.42);z-index:2900}
@@ -878,6 +1014,68 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
     </div>
   </section>
 
+  <!-- Formel 1 -->
+  <section class="card" id="f1" data-type="f1" aria-labelledby="f1-h">
+    <div class="card-head">
+      <h2 id="f1-h"><span data-r="title">Formel 1</span></h2>
+      <span class="src" id="f1-round"></span>
+    </div>
+    <div class="wx-off" id="f1-off" hidden>
+      <h3 id="f1-off-t">Formel 1 wird geladen</h3>
+      <p id="f1-off-p">Einen Moment, Kalender und WM-Stand kommen gleich.</p>
+      <div class="form-row"><button type="button" class="btn" id="f1-retry" hidden>Nochmal versuchen</button></div>
+    </div>
+    <div id="f1-live" hidden>
+      <div class="f1-next" id="f1-next"></div>
+      <div class="seg sm fb-tabs" role="group" aria-label="Ansicht" id="f1-tabs">
+        <button type="button" data-v="drivers">Fahrer</button><button type="button" data-v="teams">Teams</button><button type="button" data-v="last">Letztes Rennen</button>
+      </div>
+      <div class="fb-body" id="f1-body"></div>
+    </div>
+    <p class="src" id="f1-src"></p>
+  </section>
+
+  <!-- Spritpreise -->
+  <section class="card" id="fuel" data-type="fuel" aria-labelledby="fu-h">
+    <div class="card-head">
+      <h2 id="fu-h"><span data-r="title">Spritpreise</span></h2>
+      <div class="seg sm" role="group" aria-label="Sorte" id="fu-type">
+        <button type="button" data-v="e5">Super E5</button><button type="button" data-v="e10">E10</button><button type="button" data-v="diesel">Diesel</button>
+      </div>
+    </div>
+    <form class="panel" id="fu-form" hidden novalidate>
+      <h3>Tankerkönig verbinden</h3>
+      <p class="hint">Die Preise kommen von der Markttransparenzstelle über Tankerkönig. Dafür brauchst du einen kostenlosen API-Key. Den bekommst du per Mail, wenn du dich auf onboarding.tankerkoenig.de registrierst. Falls die Registrierung dort gerade pausiert ist, versuch es einfach später nochmal.</p>
+      <div class="field"><label for="fu-key">API-Key</label><input id="fu-key" type="password" maxlength="60" autocomplete="off" spellcheck="false" placeholder="z. B. 1234abcd-…"></div>
+      <p class="hint">Der Key bleibt nur in diesem Browser und kommt nicht mit in die Sicherung.</p>
+      <p class="err" id="fu-err" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn" id="fu-save">Speichern</button>
+        <a class="btn-ghost" href="https://onboarding.tankerkoenig.de/" target="_blank" rel="noopener">Key holen ↗</a>
+        <button type="button" class="btn-ghost" id="fu-cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" id="fu-forget" hidden>Key entfernen</button>
+      </div>
+    </form>
+    <div class="wx-off" id="fu-setup" hidden>
+      <h3>Spritpreise einrichten</h3>
+      <p>Mit einem kostenlosen Key von Tankerkönig siehst du hier die günstigsten Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.</p>
+      <div class="form-row"><button type="button" class="btn" id="fu-setup-btn">Key eintragen</button></div>
+    </div>
+    <div id="fu-live" hidden>
+      <div class="seg sm" role="group" aria-label="Wo" id="fu-mode">
+        <button type="button" data-v="route">Auf der Strecke</button><button type="button" data-v="home">Rund um Zuhause</button><button type="button" data-v="here">Hier</button>
+      </div>
+      <a class="fu-best" id="fu-best" target="_blank" rel="noopener"></a>
+      <ul class="fu-list" id="fu-list"></ul>
+      <p class="hint" id="fu-hint"></p>
+    </div>
+    <div class="tk-foot" id="fu-foot">
+      <button type="button" class="btn-ghost" id="fu-refresh">Aktualisieren</button>
+      <button type="button" class="btn-ghost" id="fu-key-btn">API-Key</button>
+    </div>
+    <p class="src" id="fu-src"></p>
+  </section>
+
   <button type="button" class="card add-tile" id="add-tile" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Widget hinzufügen<span>Neu anlegen oder ein vorhandenes einfügen</span></button>
 </main>
 
@@ -960,7 +1158,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 
     <section class="dr-sec" id="dr-data">
       <h3>Daten</h3>
-      <p class="hint">Deine Einstellungen liegen nur in diesem Browser. Sicher sie ab und zu als Datei. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token und TomTom-Key sind nicht mit drin.</p>
+      <p class="hint">Deine Einstellungen liegen nur in diesem Browser. Sicher sie ab und zu als Datei. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key und Tankerkönig-Key sind nicht mit drin.</p>
       <p class="hint" id="dr-backup-at"></p>
       <div class="form-row">
         <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>
@@ -999,6 +1197,14 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
       <button type="button" class="btn-danger" id="wd-del">Widget löschen</button>
     </div>
   </form>
+</dialog>
+
+<dialog class="dlg dlg-info" id="dlg-info" aria-labelledby="info-h">
+  <div class="dlg-head">
+    <h2 id="info-h">Info</h2>
+    <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="dlg-body" id="info-body"></div>
 </dialog>
 
 <!-- Vorlagen für Widgets, die es mehrfach geben kann. Jede Kopie bekommt ihre eigenen Daten,
@@ -1193,6 +1399,21 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
   </section>
 </template>
 
+<template id="tpl-football">
+  <section class="card" data-type="football">
+    <div class="card-head">
+      <h2 data-r="title">Bundesliga</h2>
+      <span class="src" data-r="md"></span>
+    </div>
+    <div class="fb-fav" data-r="fav"></div>
+    <div class="seg sm fb-tabs" role="group" aria-label="Ansicht" data-r="tabs">
+      <button type="button" data-v="day">Spieltag</button><button type="button" data-v="table">Tabelle</button><button type="button" data-v="scorers">Torjäger</button>
+    </div>
+    <div class="fb-body" data-r="body"></div>
+    <p class="src" data-r="src"></p>
+  </section>
+</template>
+
 <div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Rückgängig</button></div>
 
 <script>
@@ -1349,9 +1570,13 @@ const TYPES = {
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
   habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' }
+  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' },
+  football: { name: 'Fußball', multi: true, w: 1, since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
+  f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
+  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' }
 };
-const SOON = [['football', 'Fußball'], ['f1', 'Formel 1'], ['fuel', 'Spritpreise']];
+const SOON = [];
+const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -1464,6 +1689,9 @@ function normCfg(type, c) {
     case 'pomodoro': return { focus: intIn(c.focus, 1, 120, 25), short: intIn(c.short, 1, 60, 5), long: intIn(c.long, 1, 90, 15), every: intIn(c.every, 2, 8, 4), sound: c.sound !== false, auto: !!c.auto };
     case 'habits': return { items: normHabits(c.items) };
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
+    case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '' };
+    case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
+    case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
     case 'flex': return { soll: intIn(c.soll, 0, 720, 480), days: normDays(c.days, [1, 2, 3, 4, 5]), autoBreak: c.autoBreak !== false, carry: intIn(c.carry, -60000, 60000, 0), from: validYmd(c.from) ? c.from : ymd(new Date()) };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
@@ -1717,6 +1945,7 @@ function widgetLabel(id) {
   if (!w) return '';
   if (w.title) return w.title;
   if (w.type === 'tasks') return `Aufgaben: ${w.cfg.projects.join(', ')}`;
+  if (w.type === 'football') return FB_LEAGUES[w.cfg.league] + (w.cfg.teamName ? `, ${w.cfg.teamName}` : '');
   return TYPES[w.type].name;
 }
 
@@ -3200,6 +3429,7 @@ function renderCommute() {
   cm.items = items;
   cmMap(R, items, tt);
   tickTiles(new Date());
+  if (views.has('fuel')) renderFuel();
 }
 const ICO = {
   home: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.2 2.8 10.6a1 1 0 0 0 1.25 1.56L5 11.4V20a1 1 0 0 0 1 1h4.2v-5.6h3.6V21H18a1 1 0 0 0 1-1v-8.6l.95.76a1 1 0 1 0 1.25-1.56z"/></svg>',
@@ -3783,6 +4013,7 @@ function openGallery() {
     ul.appendChild(li);
   }
   body.appendChild(ul);
+  if (!SOON.length) { $('#dlg-gallery').showModal(); return; }
   const sub = document.createElement('p');
   sub.className = 'gal-sub';
   sub.textContent = 'Kommt demnächst';
@@ -4930,9 +5161,787 @@ $('#fx-set').addEventListener('submit', e => {
 
 defineWidget('flex', { render: renderFlex });
 
+/* 34-info.js */
+/* Infofenster für Vereine, Fahrer und Teams, mit Kurztext aus Wikipedia */
+const wikiCache = new Map();
+const info = { key: '' };
+async function wikiSummary(titles, lang = 'de') {
+  for (const t of titles.filter(Boolean)) {
+    const k = `${lang}:${t}`;
+    if (wikiCache.has(k)) { const c = wikiCache.get(k); if (c) return c; continue; }
+    let r = null;
+    try {
+      const j = await getJson(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(t.replace(/ /g, '_'))}`, 8000);
+      if (j && j.extract && j.type !== 'disambiguation') {
+        r = { title: j.title, text: j.extract, url: (j.content_urls && j.content_urls.desktop && j.content_urls.desktop.page) || '', img: (j.thumbnail && j.thumbnail.source) || '' };
+      }
+    } catch { r = null; }
+    wikiCache.set(k, r);
+    if (r) return r;
+  }
+  return null;
+}
+async function wikiSearch(q, lang = 'de') {
+  try {
+    const j = await getJson(`https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&srlimit=1&format=json&origin=*`, 8000);
+    const hit = j && j.query && j.query.search && j.query.search[0];
+    return hit ? hit.title : null;
+  } catch { return null; }
+}
+const safeImg = u => /^https:\/\//.test(String(u || '')) ? String(u) : '';
+/* Fenster öffnen. html enthält optional <div data-r="wiki"> und weitere Platzhalter, die später gefüllt werden. */
+function openInfo(key, title, html, wikiP) {
+  info.key = key;
+  $('#info-h').textContent = title;
+  const body = $('#info-body');
+  body.innerHTML = html;
+  body.scrollTop = 0;
+  const w = body.querySelector('[data-r="wiki"]');
+  if (w && wikiP) {
+    w.innerHTML = '<p class="hint">Kurzinfo von Wikipedia wird geladen …</p>';
+    Promise.resolve(wikiP).then(r => {
+      if (info.key !== key) return;
+      if (!r) { w.remove(); return; }
+      w.innerHTML = `${safeImg(r.img) ? `<img src="${esc(safeImg(r.img))}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<p></p><a class="btn-ghost" target="_blank" rel="noopener">Mehr auf Wikipedia ↗</a>`;
+      w.querySelector('p').textContent = r.text;
+      if (/^https:\/\//.test(r.url)) w.querySelector('a').href = r.url; else w.querySelector('a').remove();
+    }).catch(() => { if (info.key === key) w.remove(); });
+  }
+  if (!$('#dlg-info').open) $('#dlg-info').showModal();
+}
+/* Teil des offenen Fensters nachträglich füllen, falls es noch dasselbe ist */
+function fillInfo(key, sel, html) {
+  if (info.key !== key || !$('#dlg-info').open) return;
+  const el = $('#info-body').querySelector(sel);
+  if (el) el.innerHTML = html;
+}
+$('#dlg-info').addEventListener('close', () => { info.key = ''; });
+
+/* 35-fussball.js */
+/* Fußball über OpenLigaDB (kostenlos, ohne Key). Jede Kopie zeigt eine Liga, optional mit Lieblingsverein.
+ * Die ganze Saison wird alle 15 Minuten geladen, der laufende Spieltag öfter, während Spielen jede Minute. */
+const OLDB = 'https://api.openligadb.de';
+const fbs = {};
+const fbData = lg => fbs[lg] || (fbs[lg] = { season: 0, matches: null, table: null, scorers: null, cur: null, at: 0, busy: null, err: null, timer: null });
+const fbLeagues = () => [...new Set(widgetsOf('football').map(([, w]) => w.cfg.league))];
+const kick = m => Date.parse(m.matchDateTimeUTC || m.matchDateTime);
+const fbIsLive = (m, t) => !m.matchIsFinished && t >= kick(m) && t < kick(m) + 150 * 6e4;
+function fbScore(m) {
+  const res = m.matchResults || [];
+  const end = res.find(r => r.resultTypeID === 2);
+  if (m.matchIsFinished && end) return [end.pointsTeam1, end.pointsTeam2];
+  const g = (m.goals || []).filter(x => Number.isFinite(x.scoreTeam1) && Number.isFinite(x.scoreTeam2)).slice(-1)[0];
+  if (g) return [g.scoreTeam1, g.scoreTeam2];
+  const any = res.slice().sort((a, b) => b.resultOrderID - a.resultOrderID)[0];
+  if (any) return [any.pointsTeam1, any.pointsTeam2];
+  return Date.now() >= kick(m) ? [0, 0] : null;
+}
+function fbRes(m, id) {
+  const s = fbScore(m);
+  if (!s || !m.matchIsFinished) return null;
+  const [a, b] = m.team1.teamId === id ? s : [s[1], s[0]];
+  return a > b ? 'S' : a < b ? 'N' : 'U';
+}
+const fbTeamMatches = (D, id) => (D.matches || []).filter(m => m.team1.teamId === id || m.team2.teamId === id).sort((a, b) => kick(a) - kick(b));
+const fbIni = n => { n = String(n || '').trim(); return /^[A-ZÄÖÜ0-9]{2,4}$/.test(n) ? n : n.split(/\s+/).filter(w => /^\p{L}/u.test(w)).map(w => w[0]).join('').slice(0, 2).toUpperCase(); };
+/* Vereinslogo. Lädt es nicht, springt ein Kreis mit Kürzel ein (siehe Fehler-Listener unten) */
+const fbLogo = (url, cls, name) => `<img class="logo${cls ? ' ' + cls : ''}" src="${esc(safeImg(url))}" alt="" loading="lazy" referrerpolicy="no-referrer" data-ini="${esc(fbIni(name))}">`;
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (!(img instanceof HTMLImageElement) || !img.classList.contains('logo')) return;
+  const s = document.createElement('span');
+  s.className = `${img.className} ini`;
+  s.textContent = img.dataset.ini || '';
+  s.setAttribute('aria-hidden', 'true');
+  img.replaceWith(s);
+}, true);
+const fbTeamBtn = (t, lg, right) => `<button type="button" class="fb-t${right ? ' r' : ''}" data-fbteam="${t.teamId}" data-lg="${lg}">${right ? '' : fbLogo(t.teamIconUrl, '', t.shortName || t.teamName)}<span>${esc(t.shortName || t.teamName)}</span>${right ? fbLogo(t.teamIconUrl, '', t.shortName || t.teamName) : ''}</button>`;
+const fbFormHtml = list => `<span class="form" aria-label="Form: ${list.map(r => ({ S: 'Sieg', U: 'Unentschieden', N: 'Niederlage' }[r])).join(', ')}">${list.map(r => `<i data-res="${r}">${r}</i>`).join('')}</span>`;
+function fbZone(lg, pos, n) {
+  if (lg === 'bl1') return pos <= 4 ? 'up' : pos <= 6 ? 'eu' : pos === 16 ? 'rel' : pos >= 17 ? 'down' : '';
+  if (lg === 'bl2') return pos <= 2 ? 'up' : pos === 3 || pos === 16 ? 'rel' : pos >= 17 ? 'down' : '';
+  return pos <= 2 ? 'up' : pos === 3 ? 'rel' : pos > n - 4 ? 'down' : '';
+}
+const FB_ZONES = {
+  bl1: [['--good', 'Champions League'], ['--sea', 'Europa und Conference League'], ['--warn', 'Relegation'], ['--bad', 'Abstieg']],
+  bl2: [['--good', 'Aufstieg'], ['--warn', 'Relegation'], ['--bad', 'Abstieg']],
+  bl3: [['--good', 'Aufstieg'], ['--warn', 'Relegation'], ['--bad', 'Abstieg']]
+};
+
+function fbLoad(lg, full) {
+  const D = fbData(lg);
+  if (D.busy) return D.busy;
+  D.busy = (async () => {
+    try {
+      const cur = await getJson(`${OLDB}/getmatchdata/${lg}`, 12000);
+      const now = new Date();
+      const season = (Array.isArray(cur) && cur[0] && cur[0].leagueSeason) || D.season || (now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1);
+      if (Array.isArray(cur) && cur[0] && cur[0].group) D.cur = cur[0].group;
+      if (full || !D.matches || D.season !== season || Date.now() - D.at > 15 * 6e4) {
+        const [all, table, sc] = await Promise.all([
+          getJson(`${OLDB}/getmatchdata/${lg}/${season}`, 25000),
+          getJson(`${OLDB}/getbltable/${lg}/${season}`, 12000).catch(() => null),
+          getJson(`${OLDB}/getgoalgetters/${lg}/${season}`, 12000).catch(() => null)
+        ]);
+        D.matches = Array.isArray(all) ? all : [];
+        if (Array.isArray(table)) D.table = table;
+        if (Array.isArray(sc)) D.scorers = sc;
+        D.season = season;
+        D.at = Date.now();
+      } else if (Array.isArray(cur)) {
+        // Nur den laufenden Spieltag und die Tabelle auffrischen
+        const byId = new Map(cur.map(m => [m.matchID, m]));
+        D.matches = D.matches.map(m => byId.get(m.matchID) || m);
+        const table = await getJson(`${OLDB}/getbltable/${lg}/${season}`, 12000).catch(() => null);
+        if (Array.isArray(table)) D.table = table;
+      }
+      D.err = null;
+    } catch (e) { D.err = e || new Error('Fehler'); }
+    finally { D.busy = null; D.tried = Date.now(); renderFootballAll(); fbPlan(lg); }
+  })();
+  return D.busy;
+}
+function fbPlan(lg) {
+  const D = fbData(lg), t = Date.now();
+  clearTimeout(D.timer);
+  const ms = D.matches || [];
+  const live = ms.some(m => fbIsLive(m, t));
+  const soon = ms.some(m => !m.matchIsFinished && kick(m) > t && kick(m) - t < 15 * 6e4);
+  const wait = live ? 6e4 : soon ? 2 * 6e4 : D.err ? 3 * 6e4 : 10 * 6e4;
+  D.timer = setTimeout(() => {
+    if (!fbLeagues().includes(lg)) return;
+    if (document.visibilityState === 'visible') fbLoad(lg); else fbPlan(lg);
+  }, wait);
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  for (const lg of fbLeagues()) { const D = fbData(lg); if (D.tried && Date.now() - D.tried > 2 * 6e4) fbLoad(lg); }
+});
+const renderFootballAll = () => viewsOf('football').forEach(renderFootball);
+
+function fbMatchBox(m, lg, now) {
+  const live = fbIsLive(m, now), s = fbScore(m), d = new Date(kick(m));
+  const started = now >= kick(m);
+  let mid;
+  if (s && (m.matchIsFinished || started)) mid = `<b>${s[0]}:${s[1]}</b><small>${live ? `Anpfiff ${hm(d)}` : `${WD[d.getDay()]} ${dm(d)}`}</small>`;
+  else {
+    const n = dayDiff(new Date(now), d);
+    mid = `<b>${hm(d)}</b><small>${WD[d.getDay()]} ${dm(d)}</small><small>${n === 0 ? 'heute' : n === 1 ? 'morgen' : `in ${n} Tagen`}</small>`;
+  }
+  const side = t => `<button type="button" class="fb-side" data-fbteam="${t.teamId}" data-lg="${lg}">${fbLogo(t.teamIconUrl, 'lg', t.shortName || t.teamName)}<span>${esc(t.shortName || t.teamName)}</span></button>`;
+  return `<div class="fb-next">${side(m.team1)}<div class="fb-mid">${mid}</div>${side(m.team2)}</div>`;
+}
+function fbFavHtml(D, c, lg, now) {
+  const id = c.team;
+  if (!id) {
+    const opts = (D.table || []).map(r => `<option value="${r.teamInfoId}">${esc(r.teamName)}</option>`).join('');
+    return `<label class="field"><span class="lbl">Dein Verein</span><select data-fbpick><option value="0">Wähl deinen Verein</option>${opts}</select></label>`;
+  }
+  const row = (D.table || []).find(r => r.teamInfoId === id);
+  const ms = fbTeamMatches(D, id);
+  const t0 = ms[0] ? (ms[0].team1.teamId === id ? ms[0].team1 : ms[0].team2) : null;
+  if (!row && !t0) return `<p class="hint">${esc(c.teamName || 'Dein Verein')} spielt in dieser Saison nicht in der ${esc(FB_LEAGUES[lg])}. Stell unter Bearbeiten, Einstellungen eine andere Liga ein.</p>`;
+  const name = row ? row.teamName : t0.teamName, icon = row ? row.teamIconUrl : t0.teamIconUrl;
+  const pos = row ? D.table.indexOf(row) + 1 : null;
+  const form = ms.filter(m => m.matchIsFinished).slice(-5).map(m => fbRes(m, id)).filter(Boolean);
+  const live = ms.find(m => fbIsLive(m, now));
+  const next = live || ms.find(m => !m.matchIsFinished && kick(m) > now - 150 * 6e4);
+  const last = [...ms].reverse().find(m => m.matchIsFinished);
+  const show = live || next || last;
+  const lbl = live ? '<span class="live">Live</span>' : next ? 'Nächstes Spiel' : last ? 'Letztes Spiel' : '';
+  const sub = row ? `Platz ${pos} · ${row.points} ${row.points === 1 ? 'Punkt' : 'Punkte'} · ${row.matches} ${row.matches === 1 ? 'Spiel' : 'Spiele'}` : '';
+  return `<div class="fb-top"><button type="button" class="fb-head" data-fbteam="${id}" data-lg="${lg}">${fbLogo(icon, 'lg', row ? row.shortName : t0.shortName)}<span><b>${esc(name)}</b><small>${esc(sub)}</small></span></button>${form.length ? fbFormHtml(form) : ''}</div>`
+    + (show ? `<p class="fb-label">${lbl}</p>${fbMatchBox(show, lg, now)}` : '');
+}
+function fbDayHtml(v, D, lg, fav, now) {
+  const groups = [...new Set((D.matches || []).map(m => m.group.groupOrderID))].sort((a, b) => a - b);
+  if (!groups.length) return '<p class="empty">Noch keine Spiele angesetzt.</p>';
+  const curG = D.cur ? D.cur.groupOrderID : groups[0];
+  // Folgt dem aktuellen Spieltag, bis du selbst blätterst
+  if (!v.mdUser || !groups.includes(v.md)) v.md = groups.includes(curG) ? curG : groups[0];
+  const ms = D.matches.filter(m => m.group.groupOrderID === v.md).sort((a, b) => kick(a) - kick(b));
+  const name = ms[0] ? ms[0].group.groupName : `${v.md}. Spieltag`;
+  let html = `<div class="fb-nav"><button type="button" class="icon-btn" data-fbmd="-1" aria-label="Spieltag davor"${v.md === groups[0] ? ' disabled' : ''}>${LEFT}</button><p class="sub-h">${esc(name)}${v.md === curG ? ' · aktuell' : ''}</p><button type="button" class="icon-btn" data-fbmd="1" aria-label="Spieltag danach"${v.md === groups[groups.length - 1] ? ' disabled' : ''}>${RIGHT}</button></div><ul class="fb-list">`;
+  let day = '';
+  for (const m of ms) {
+    const d = new Date(kick(m)), k = ymd(d);
+    if (k !== day) { day = k; html += `<li class="fb-day">${WDL[d.getDay()]}, ${dm(d)}</li>`; }
+    const s = fbScore(m), live = fbIsLive(m, now), started = now >= kick(m);
+    const sc = s && (m.matchIsFinished || started) ? `<span class="fb-sc"${live ? ' data-live' : ''}${live ? ' title="Läuft gerade"' : ''}>${s[0]}:${s[1]}</span>` : `<span class="fb-sc time">${hm(d)}</span>`;
+    const isFav = fav && (m.team1.teamId === fav || m.team2.teamId === fav);
+    html += `<li class="fb-row${isFav ? ' fav' : ''}">${fbTeamBtn(m.team1, lg)}${sc}${fbTeamBtn(m.team2, lg, true)}</li>`;
+  }
+  return html + '</ul>';
+}
+function fbTableHtml(D, lg, fav) {
+  if (!D.table || !D.table.length) return '<p class="empty">Die Tabelle gibt es, sobald gespielt wurde.</p>';
+  const n = D.table.length;
+  const rows = D.table.map((r, i) => {
+    const t = { teamId: r.teamInfoId, teamName: r.teamName, shortName: r.shortName, teamIconUrl: r.teamIconUrl };
+    return `<tr${r.teamInfoId === fav ? ' class="fav"' : ''} data-z="${fbZone(lg, i + 1, n)}"><td class="pos">${i + 1}</td><td class="n">${fbTeamBtn(t, lg)}</td><td>${r.matches}</td><td class="hide-s">${r.goals}:${r.opponentGoals}</td><td>${r.goalDiff > 0 ? '+' : ''}${r.goalDiff}</td><td class="p">${r.points}</td></tr>`;
+  }).join('');
+  const leg = (FB_ZONES[lg] || []).map(([c, t]) => `<li><i style="--c:var(${c})"></i>${esc(t)}</li>`).join('');
+  return `<table class="fb-table"><thead><tr><th>#</th><th class="n">Verein</th><th title="Spiele">Sp</th><th class="hide-s">Tore</th><th title="Tordifferenz">Diff</th><th title="Punkte">Pkt</th></tr></thead><tbody>${rows}</tbody></table><ul class="fb-legend">${leg}</ul>`;
+}
+/* Torjäger mit Verein: der Verein kommt aus den Toren der Saison */
+function fbScorerTeams(D) {
+  const teams = new Map(), cnt = new Map();
+  for (const m of D.matches || []) {
+    teams.set(m.team1.teamId, m.team1); teams.set(m.team2.teamId, m.team2);
+    for (const g of m.goals || []) {
+      if (g.isOwnGoal || !g.goalGetterID) continue;
+      const k = `${g.goalGetterID}:${g.scoringTeamId}`;
+      cnt.set(k, (cnt.get(k) || 0) + 1);
+    }
+  }
+  const best = new Map();
+  for (const [k, n] of cnt) { const [p, t] = k.split(':').map(Number); if (!best.has(p) || best.get(p).n < n) best.set(p, { t, n }); }
+  return id => { const b = best.get(id); return b ? teams.get(b.t) : null; };
+}
+function fbScorersHtml(D, lg) {
+  const list = (D.scorers || []).slice().sort((a, b) => b.goalCount - a.goalCount).slice(0, 12);
+  if (!list.length) return '<p class="empty">Noch keine Tore.</p>';
+  const teamOf = fbScorerTeams(D);
+  let rank = 0, prev = -1;
+  return `<ul class="st-list">${list.map((s, i) => {
+    if (s.goalCount !== prev) { rank = i + 1; prev = s.goalCount; }
+    const t = teamOf(s.goalGetterId);
+    return `<li><div class="st-row"><span class="st-pos">${rank}.</span><span class="st-name">${t ? fbLogo(t.teamIconUrl, '', t.shortName || t.teamName) : ''}<span><b>${esc(s.goalGetterName)}</b>${t ? `<small>${esc(t.shortName || t.teamName)}</small>` : ''}</span></span><span class="st-pts">${s.goalCount} ${s.goalCount === 1 ? 'Tor' : 'Tore'}</span></div></li>`;
+  }).join('')}</ul>`;
+}
+function renderFootball(v) {
+  const w = state.widgets[v.id];
+  if (!w) return;
+  const c = w.cfg, lg = c.league, D = fbData(lg), q = v.q, now = Date.now();
+  q('[data-r="title"]').textContent = w.title || FB_LEAGUES[lg];
+  if (!D.matches && !D.busy && (!D.tried || now - D.tried > 6e4)) fbLoad(lg);
+  q('[data-r="md"]').textContent = D.cur ? D.cur.groupName : '';
+  const body = q('[data-r="body"]'), fav = q('[data-r="fav"]');
+  if (!D.matches) {
+    fav.innerHTML = '';
+    body.innerHTML = D.err && !D.busy ? '<div class="wx-off"><h3>Fußballdaten gerade nicht erreichbar</h3><p>OpenLigaDB antwortet nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.</p></div>' : '<p class="hint">Spiele und Tabelle werden geladen …</p>';
+    q('[data-r="tabs"]').hidden = true;
+    q('[data-r="src"]').textContent = '';
+    return;
+  }
+  q('[data-r="tabs"]').hidden = false;
+  fav.innerHTML = fbFavHtml(D, c, lg, now);
+  v.tab = v.tab || 'day';
+  segSet(q('[data-r="tabs"]'), v.tab);
+  body.innerHTML = v.tab === 'table' ? fbTableHtml(D, lg, c.team) : v.tab === 'scorers' ? fbScorersHtml(D, lg) : fbDayHtml(v, D, lg, c.team, now);
+  q('[data-r="src"]').textContent = `Stand ${hm(new Date(D.tried || D.at))} Uhr${D.err ? ', Aktualisieren hat gerade nicht geklappt' : ''} · Daten: OpenLigaDB`;
+}
+
+/* Infofenster zu einem Verein */
+function fbTeamInfo(lg, id) {
+  const D = fbData(lg), key = `fb:${lg}:${id}`, now = Date.now();
+  const row = (D.table || []).find(r => r.teamInfoId === id);
+  const ms = fbTeamMatches(D, id);
+  const t0 = ms[0] ? (ms[0].team1.teamId === id ? ms[0].team1 : ms[0].team2) : null;
+  if (!row && !t0) return;
+  const name = row ? row.teamName : t0.teamName, icon = row ? row.teamIconUrl : t0.teamIconUrl;
+  const pos = row ? D.table.indexOf(row) + 1 : null;
+  const done = ms.filter(m => m.matchIsFinished), open = ms.filter(m => !m.matchIsFinished);
+  const form = done.slice(-5).map(m => fbRes(m, id)).filter(Boolean);
+  const line = m => {
+    const home = m.team1.teamId === id, opp = home ? m.team2 : m.team1, d = new Date(kick(m)), s = fbScore(m);
+    const sc = s && (m.matchIsFinished || now >= kick(m)) ? (home ? `${s[0]}:${s[1]}` : `${s[1]}:${s[0]}`) : hm(d);
+    const res = fbRes(m, id);
+    return `<li><button type="button" data-fbteam="${opp.teamId}" data-lg="${lg}">${fbLogo(opp.teamIconUrl, '', opp.shortName || opp.teamName)}<span>${home ? 'gegen' : 'bei'} ${esc(opp.shortName || opp.teamName)}</span></button><span class="d">${WD[d.getDay()]} ${dmy(d)}</span><span class="s"${res ? ` style="color:var(${res === 'S' ? '--good' : res === 'N' ? '--bad' : '--muted'})"` : ''}>${sc}</span></li>`;
+  };
+  // Torschützen des Vereins aus den Toren der Saison
+  const sc = new Map();
+  for (const m of done) for (const g of m.goals || []) if (g.scoringTeamId === id && !g.isOwnGoal && g.goalGetterName) sc.set(g.goalGetterName, (sc.get(g.goalGetterName) || 0) + 1);
+  const scorers = [...sc].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const stat = (l, x) => `<div><span>${l}</span><b>${x}</b></div>`;
+  const html = `<div class="in-head">${fbLogo(icon, 'xl', row ? row.shortName : t0.shortName)}<div><b>${esc(name)}</b><small>${esc(FB_LEAGUES[lg])} ${D.season}/${String(D.season + 1).slice(2)}${pos ? ` · Platz ${pos}` : ''}</small></div></div>`
+    + (row ? `<div class="in-stats">${stat('Punkte', row.points)}${stat('Spiele', row.matches)}${stat('S / U / N', `${row.won} / ${row.draw} / ${row.lost}`)}${stat('Tore', `${row.goals}:${row.opponentGoals}`)}</div>` : '')
+    + (form.length ? `<div class="in-sec"><h3>Form, letzte ${form.length} Spiele</h3>${fbFormHtml(form)}</div>` : '')
+    + (open.length ? `<div class="in-sec"><h3>Nächste Spiele</h3><ul class="in-res">${open.slice(0, 3).map(line).join('')}</ul></div>` : '')
+    + (done.length ? `<div class="in-sec"><h3>Letzte Ergebnisse</h3><ul class="in-res">${done.slice(-5).reverse().map(line).join('')}</ul></div>` : '')
+    + (scorers.length ? `<div class="in-sec"><h3>Torschützen</h3><ul class="in-res">${scorers.map(([n, k]) => `<li><span>${esc(n)}</span><span></span><span class="s">${k}</span></li>`).join('')}</ul></div>` : '')
+    + '<div class="in-sec in-wiki" data-r="wiki"></div>';
+  openInfo(key, name, html, wikiSummary([name]).then(r => r || wikiSearch(`${name} Fußballverein`).then(t => t ? wikiSummary([t]) : null)));
+}
+$('#info-body').addEventListener('click', e => {
+  const b = e.target.closest('[data-fbteam]');
+  if (b && b.dataset.lg) fbTeamInfo(b.dataset.lg, +b.dataset.fbteam);
+});
+
+defineWidget('football', {
+  mount(v) {
+    v.tab = 'day';
+    v.md = null;
+    v.el.addEventListener('click', e => {
+      const t = e.target.closest('[data-fbteam]');
+      if (t) return fbTeamInfo(t.dataset.lg, +t.dataset.fbteam);
+      const tab = e.target.closest('[data-r="tabs"] [data-v]');
+      if (tab) { v.tab = tab.dataset.v; renderFootball(v); return; }
+      const nav = e.target.closest('[data-fbmd]');
+      if (nav && !nav.disabled) {
+        const D = fbData(state.widgets[v.id].cfg.league);
+        const groups = [...new Set((D.matches || []).map(m => m.group.groupOrderID))].sort((a, b) => a - b);
+        const i = groups.indexOf(v.md) + (+nav.dataset.fbmd);
+        if (i >= 0 && i < groups.length) { v.md = groups[i]; v.mdUser = true; renderFootball(v); const b = v.q(`[data-fbmd="${nav.dataset.fbmd}"]`); if (b && !b.disabled) b.focus(); }
+      }
+    });
+    v.el.addEventListener('change', e => {
+      if (!e.target.matches('[data-fbpick]')) return;
+      const id = +e.target.value, w = state.widgets[v.id];
+      if (!id || !w) return;
+      const row = (fbData(w.cfg.league).table || []).find(r => r.teamInfoId === id);
+      w.cfg.team = id;
+      w.cfg.teamName = row ? row.teamName : '';
+      commit();
+    });
+  },
+  render: renderFootball,
+  settings: {
+    render(box, w) {
+      box.innerHTML = `<label class="field"><span class="lbl">Liga</span><select data-s="lg">${Object.entries(FB_LEAGUES).map(([k, n]) => `<option value="${k}"${k === w.cfg.league ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label><label class="field"><span class="lbl">Lieblingsverein</span><select data-s="team"></select></label><p class="hint" data-s="hint"></p>`;
+      const sel = box.querySelector('[data-s="team"]');
+      const fill = (lg, keep) => {
+        const D = fbData(lg);
+        sel.textContent = '';
+        sel.add(new Option('Keiner', '0'));
+        for (const r of D.table || []) sel.add(new Option(r.teamName, String(r.teamInfoId)));
+        sel.value = String(keep || 0);
+        if (!sel.value) sel.value = '0';
+        box.querySelector('[data-s="hint"]').textContent = D.table ? '' : 'Vereine werden geladen …';
+        if (!D.table && !D.busy) fbLoad(lg).then(() => { if (box.isConnected && box.querySelector('[data-s="lg"]').value === lg) fill(lg, sel.value); });
+      };
+      fill(w.cfg.league, w.cfg.team);
+      box.querySelector('[data-s="lg"]').addEventListener('change', e => fill(e.target.value, 0));
+    },
+    save(box, w) {
+      const lg = box.querySelector('[data-s="lg"]').value, sel = box.querySelector('[data-s="team"]'), id = +sel.value || 0;
+      w.cfg.league = FB_LEAGUES[lg] ? lg : 'bl1';
+      w.cfg.team = id;
+      w.cfg.teamName = id && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : '';
+      queueMicrotask(() => fbLoad(w.cfg.league));
+      return null;
+    }
+  }
+});
+
+/* 36-formel1.js */
+/* Formel 1 über Jolpica (Nachfolger der Ergast API, kostenlos, ohne Key). Live-Zeiten gibt es dort nicht,
+ * Ergebnisse kommen kurz nach der Session. Alle Zeiten werden in deine Ortszeit umgerechnet. */
+const JOL = 'https://api.jolpi.ca/ergast/f1';
+const f1 = { races: null, drivers: [], teams: [], last: null, season: '', round: '', at: 0, tried: 0, busy: null, err: null, tab: 'drivers', all: false, timer: null, minute: -1 };
+const F1_SESS = [['FirstPractice', '1. Training', 60], ['SecondPractice', '2. Training', 60], ['ThirdPractice', '3. Training', 60], ['SprintQualifying', 'Sprint-Qualifying', 45], ['SprintShootout', 'Sprint-Shootout', 45], ['Sprint', 'Sprint', 60], ['Qualifying', 'Qualifying', 60]];
+const F1_COLOR = { mercedes: '#27F4D2', ferrari: '#E8002D', mclaren: '#FF8000', red_bull: '#3671C6', rb: '#6692FF', alpine: '#FF87BC', haas: '#B6BABD', audi: '#BB0A30', sauber: '#52E252', williams: '#64C4FF', aston_martin: '#229971', cadillac: '#A8A9AD' };
+const NAT_DE = { Argentine: 'Argentinien', Argentinian: 'Argentinien', Australian: 'Australien', Austrian: 'Österreich', Belgian: 'Belgien', Brazilian: 'Brasilien', British: 'Großbritannien', Canadian: 'Kanada', Chinese: 'China', Danish: 'Dänemark', Dutch: 'Niederlande', Finnish: 'Finnland', French: 'Frankreich', German: 'Deutschland', Indian: 'Indien', Irish: 'Irland', Italian: 'Italien', Japanese: 'Japan', Mexican: 'Mexiko', Monegasque: 'Monaco', 'New Zealander': 'Neuseeland', Polish: 'Polen', Russian: 'Russland', Spanish: 'Spanien', Swedish: 'Schweden', Swiss: 'Schweiz', Thai: 'Thailand', American: 'USA', Estonian: 'Estland', Israeli: 'Israel' };
+const COUNTRY_DE = { Australia: 'Australien', Austria: 'Österreich', Azerbaijan: 'Aserbaidschan', Bahrain: 'Bahrain', Belgium: 'Belgien', Brazil: 'Brasilien', Canada: 'Kanada', China: 'China', Hungary: 'Ungarn', Italy: 'Italien', Japan: 'Japan', Malaysia: 'Malaysia', Mexico: 'Mexiko', Monaco: 'Monaco', Netherlands: 'Niederlande', Portugal: 'Portugal', Qatar: 'Katar', 'Saudi Arabia': 'Saudi-Arabien', Singapore: 'Singapur', Spain: 'Spanien', UAE: 'Vereinigte Arabische Emirate', UK: 'Großbritannien', USA: 'USA', 'United States': 'USA', Germany: 'Deutschland', France: 'Frankreich', Turkey: 'Türkei', Argentina: 'Argentinien', 'South Africa': 'Südafrika', Korea: 'Südkorea', India: 'Indien', Russia: 'Russland', Vietnam: 'Vietnam', Thailand: 'Thailand' };
+const f1When = o => o && o.date ? new Date(`${o.date}T${o.time || '12:00:00Z'}`) : null;
+const f1Short = n => String(n || '').replace(/ Grand Prix/, ' GP');
+const f1Name = d => `${d.givenName} ${d.familyName}`;
+function f1Sessions(r) {
+  const out = F1_SESS.filter(([k]) => r[k]).map(([k, name, min]) => ({ name, at: f1When(r[k]), min }));
+  out.push({ name: 'Rennen', at: f1When(r), min: 120, race: true });
+  return out.filter(s => s.at).sort((a, b) => a.at - b.at);
+}
+/* Nächstes Rennen: das erste, das noch nicht seit drei Stunden vorbei ist */
+const f1Next = now => (f1.races || []).find(r => { const t = f1When(r); return t && t.getTime() + 3 * 36e5 > now; }) || null;
+
+function f1Load(force) {
+  if (f1.busy) return f1.busy;
+  f1.busy = (async () => {
+    try {
+      const s = await getJson(`${JOL}/current.json`, 15000);
+      const [d, t, l] = await Promise.all([
+        getJson(`${JOL}/current/driverStandings.json`, 15000).catch(() => null),
+        getJson(`${JOL}/current/constructorStandings.json`, 15000).catch(() => null),
+        getJson(`${JOL}/current/last/results.json`, 15000).catch(() => null)
+      ]);
+      const RT = s && s.MRData && s.MRData.RaceTable;
+      f1.races = RT && Array.isArray(RT.Races) ? RT.Races : [];
+      f1.season = RT ? RT.season : '';
+      const dl = d && d.MRData.StandingsTable.StandingsLists[0];
+      f1.drivers = dl ? dl.DriverStandings : [];
+      f1.round = dl ? dl.round : '';
+      const tl = t && t.MRData.StandingsTable.StandingsLists[0];
+      f1.teams = tl ? tl.ConstructorStandings : [];
+      const lr = l && l.MRData.RaceTable.Races[0];
+      f1.last = lr && lr.season === f1.season ? lr : null;
+      f1.at = Date.now();
+      f1.err = null;
+    } catch (e) { f1.err = e || new Error('Fehler'); }
+    finally { f1.busy = null; f1.tried = Date.now(); renderF1(); f1Plan(); }
+  })();
+  return f1.busy;
+}
+function f1Plan() {
+  clearTimeout(f1.timer);
+  const now = Date.now(), r = f1Next(now);
+  // Am Rennwochenende öfter nachsehen, damit Ergebnisse schnell auftauchen
+  const weekend = r && f1Sessions(r).some(s => now > s.at.getTime() - 36e5 && now < s.at.getTime() + 4 * 36e5);
+  f1.timer = setTimeout(() => {
+    if (!views.has('f1')) return;
+    if (document.visibilityState === 'visible') f1Load(); else f1Plan();
+  }, f1.err ? 3 * 6e4 : weekend ? 10 * 6e4 : 30 * 6e4);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && views.has('f1') && f1.tried && Date.now() - f1.tried > 10 * 6e4) f1Load(); });
+
+function f1NextHtml(now) {
+  const r = f1Next(now);
+  if (!r) return `<div class="f1-race"><div><b>Saison ${esc(f1.season)} ist vorbei</b><small>Der neue Kalender kommt, sobald er feststeht.</small></div></div>`;
+  const ss = f1Sessions(r), loc = r.Circuit.Location;
+  const live = ss.find(s => now >= s.at.getTime() && now < s.at.getTime() + s.min * 6e4);
+  const nx = ss.find(s => s.at.getTime() > now);
+  const raceAt = f1When(r);
+  let cd;
+  if (live) cd = `<span class="live">${esc(live.name)} läuft</span>`;
+  else if (nx && nx.at - now < 6 * DAY) cd = `${esc(nx.name)} in ${esc(dur(nx.at - now, true))}`;
+  else cd = `in ${esc(dur(raceAt - now, true))}`;
+  const items = ss.map(s => {
+    const done = now >= s.at.getTime() + s.min * 6e4, isLive = s === live, isNext = !live && s === nx;
+    return `<li class="${done ? 'done' : ''}${isNext ? ' next' : ''}${s.race ? ' race' : ''}"><b>${esc(s.name)}${isLive ? ' <span class="live">Live</span>' : ''}</b><span>${WD[s.at.getDay()]} ${dm(s.at)} ${hm(s.at)}</span></li>`;
+  }).join('');
+  return `<div class="f1-race"><div><b>${esc(r.raceName)}</b><small>${esc(r.Circuit.circuitName)}, ${esc(COUNTRY_DE[loc.country] || loc.country)}</small></div><span class="f1-cd">${cd}</span></div><ul class="f1-sess">${items}</ul>`;
+}
+function f1DriversHtml(fav) {
+  if (!f1.drivers.length) return '<p class="empty">Noch keine Punkte in dieser Saison.</p>';
+  const list = f1.all ? f1.drivers : f1.drivers.slice(0, 10);
+  const rows = list.map(x => {
+    const d = x.Driver, t = x.Constructors[x.Constructors.length - 1] || {};
+    return `<li><button type="button" class="st-row${d.driverId === fav ? ' fav' : ''}" data-f1d="${esc(d.driverId)}"><span class="st-pos">${esc(x.positionText)}</span><span class="st-name"><i class="tm" style="--c:${F1_COLOR[t.constructorId] || 'var(--muted)'}"></i><span><b>${esc(f1Name(d))}</b><small>${esc(t.name || '')}</small></span></span><span class="st-pts">${esc(x.points)}<small>${+x.wins ? `${x.wins} ${+x.wins === 1 ? 'Sieg' : 'Siege'}` : 'Punkte'}</small></span></button></li>`;
+  }).join('');
+  const more = f1.drivers.length > 10 ? `<button type="button" class="more" data-f1all>${f1.all ? 'Weniger anzeigen' : `Alle ${f1.drivers.length} Fahrer`}</button>` : '';
+  return `<ul class="st-list">${rows}</ul>${more}`;
+}
+function f1TeamsHtml() {
+  if (!f1.teams.length) return '<p class="empty">Noch keine Punkte in dieser Saison.</p>';
+  return `<ul class="st-list">${f1.teams.map(x => {
+    const c = x.Constructor, drv = f1.drivers.filter(d => (d.Constructors[d.Constructors.length - 1] || {}).constructorId === c.constructorId).map(d => d.Driver.familyName);
+    return `<li><button type="button" class="st-row" data-f1t="${esc(c.constructorId)}"><span class="st-pos">${esc(x.positionText)}</span><span class="st-name"><i class="tm" style="--c:${F1_COLOR[c.constructorId] || 'var(--muted)'}"></i><span><b>${esc(c.name)}</b><small>${esc(drv.join(', '))}</small></span></span><span class="st-pts">${esc(x.points)}<small>${+x.wins ? `${x.wins} ${+x.wins === 1 ? 'Sieg' : 'Siege'}` : 'Punkte'}</small></span></button></li>`;
+  }).join('')}</ul>`;
+}
+function f1LastHtml(fav) {
+  const r = f1.last;
+  if (!r) return '<p class="empty">In dieser Saison gab es noch kein Rennen.</p>';
+  const d = f1When(r);
+  const rows = r.Results.slice(0, f1.all ? 30 : 10).map(x => {
+    const dr = x.Driver, t = x.Constructor, fl = x.FastestLap && x.FastestLap.rank === '1';
+    const time = x.Time ? x.Time.time : x.status === 'Finished' ? '' : x.status === 'Retired' ? 'Ausfall' : x.status;
+    return `<li><button type="button" class="st-row${dr.driverId === fav ? ' fav' : ''}" data-f1d="${esc(dr.driverId)}"><span class="st-pos">${esc(x.positionText)}</span><span class="st-name"><i class="tm" style="--c:${F1_COLOR[t.constructorId] || 'var(--muted)'}"></i><span><b>${esc(f1Name(dr))}</b><small>${esc(t.name)}${fl ? ' · schnellste Runde' : ''}</small></span></span><span class="st-pts">${esc(time)}<small>${+x.points ? `${esc(x.points)} Pkt` : ''}</small></span></button></li>`;
+  }).join('');
+  const more = r.Results.length > 10 ? `<button type="button" class="more" data-f1all>${f1.all ? 'Weniger anzeigen' : `Alle ${r.Results.length} zeigen`}</button>` : '';
+  return `<p class="sub-h">${esc(r.raceName)} · ${WD[d.getDay()]} ${dm(d)}</p><ul class="st-list">${rows}</ul>${more}`;
+}
+function renderF1() {
+  const v = views.get('f1');
+  if (!v) return;
+  const now = Date.now(), fav = state.widgets.f1.cfg.fav;
+  if (!f1.races && !f1.busy && (!f1.tried || now - f1.tried > 6e4)) f1Load();
+  const ready = !!f1.races;
+  $('#f1-off').hidden = ready;
+  $('#f1-live').hidden = !ready;
+  if (!ready) {
+    const bad = f1.err && !f1.busy;
+    $('#f1-off-t').textContent = bad ? 'Formel-1-Daten gerade nicht erreichbar' : 'Formel 1 wird geladen';
+    $('#f1-off-p').textContent = bad ? 'Jolpica antwortet gerade nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.' : 'Einen Moment, Kalender und WM-Stand kommen gleich.';
+    $('#f1-retry').hidden = !bad;
+    $('#f1-src').textContent = '';
+    return;
+  }
+  const r = f1Next(now);
+  $('#f1-round').textContent = r ? `Runde ${r.round} von ${f1.races.length}` : `Saison ${f1.season}`;
+  $('#f1-next').innerHTML = f1NextHtml(now);
+  segSet($('#f1-tabs'), f1.tab);
+  $('#f1-body').innerHTML = f1.tab === 'teams' ? f1TeamsHtml() : f1.tab === 'last' ? f1LastHtml(fav) : f1DriversHtml(fav);
+  $('#f1-src').textContent = `Stand ${hm(new Date(f1.tried || f1.at))} Uhr${f1.err ? ', Aktualisieren hat gerade nicht geklappt' : ''}${f1.round ? ` · WM-Stand nach Runde ${f1.round}` : ''} · Daten: Jolpica`;
+  f1.minute = Math.floor(now / 6e4);
+}
+/* Countdown und Sessions jede Minute auffrischen */
+function f1Tick(now) {
+  const v = views.get('f1'), mk = Math.floor(now.getTime() / 6e4);
+  if (!v || v.el.hidden || !f1.races || mk === f1.minute) return;
+  f1.minute = mk;
+  $('#f1-next').innerHTML = f1NextHtml(now.getTime());
+}
+
+/* Infofenster: Fahrer */
+async function f1DriverInfo(id) {
+  const st = f1.drivers.find(x => x.Driver.driverId === id);
+  const res0 = f1.last && f1.last.Results.find(x => x.Driver.driverId === id);
+  const d = st ? st.Driver : res0 ? res0.Driver : null;
+  if (!d) return;
+  const t = st ? st.Constructors[st.Constructors.length - 1] : res0.Constructor;
+  const key = `f1d:${id}`, name = f1Name(d);
+  const born = validYmd(d.dateOfBirth) ? parseYmd(d.dateOfBirth) : null;
+  const age = born ? Math.floor((Date.now() - born) / (365.2425 * DAY)) : null;
+  const stat = (l, x) => `<div><span>${l}</span><b>${x}</b></div>`;
+  const html = `<div class="in-head"><span class="tm" style="--c:${F1_COLOR[t.constructorId] || 'var(--muted)'};height:56px;width:6px"></span><div><b>${esc(name)}${d.permanentNumber ? ` <span style="color:var(--muted);font-weight:600">#${esc(d.permanentNumber)}</span>` : ''}</b><small>${esc(t.name)} · ${esc(NAT_DE[d.nationality] || d.nationality)}${age ? ` · ${age} Jahre` : ''}</small></div></div>`
+    + (st ? `<div class="in-stats">${stat('WM-Platz', esc(st.positionText))}${stat('Punkte', esc(st.points))}${stat('Siege', esc(st.wins))}<div data-r="podium"><span>Podien</span><b>…</b></div></div>` : '')
+    + '<div class="in-sec"><h3>Rennen dieser Saison</h3><div data-r="res"><p class="hint">Ergebnisse werden geladen …</p></div></div>'
+    + '<div class="in-sec in-wiki" data-r="wiki"></div>';
+  const enTitle = decodeURIComponent(String(d.url || '').split('/wiki/')[1] || '').replace(/_/g, ' ');
+  openInfo(key, name, html, wikiSummary([name]).then(r => r || wikiSummary([enTitle], 'en')));
+  try {
+    const j = await getJson(`${JOL}/current/drivers/${encodeURIComponent(id)}/results.json?limit=100`, 15000);
+    const races = j.MRData.RaceTable.Races || [];
+    const pod = races.filter(r => +r.Results[0].position <= 3).length;
+    fillInfo(key, '[data-r="podium"]', `<span>Podien</span><b>${pod}</b>`);
+    fillInfo(key, '[data-r="res"]', races.length ? `<ul class="in-res">${races.slice().reverse().map(r => {
+      const x = r.Results[0], ok = /^(Finished|\+\d+ Laps?)$/.test(x.status);
+      return `<li><span>${esc(f1Short(r.raceName))}</span><span class="d">Start ${esc(x.grid === '0' ? 'Box' : x.grid)}${ok ? '' : ` · ${x.status === 'Retired' ? 'Ausfall' : esc(x.status)}`}</span><span class="s">P${esc(x.positionText)}${+x.points ? ` · ${esc(x.points)}` : ''}</span></li>`;
+    }).join('')}</ul>` : '<p class="empty">Noch keine Rennen gefahren.</p>');
+  } catch { fillInfo(key, '[data-r="res"]', '<p class="hint">Die Ergebnisse sind gerade nicht erreichbar.</p>'); }
+}
+/* Infofenster: Team */
+async function f1TeamInfo(id) {
+  const st = f1.teams.find(x => x.Constructor.constructorId === id);
+  if (!st) return;
+  const c = st.Constructor, key = `f1t:${id}`;
+  const drv = f1.drivers.filter(d => (d.Constructors[d.Constructors.length - 1] || {}).constructorId === id);
+  const stat = (l, x) => `<div><span>${l}</span><b>${x}</b></div>`;
+  const html = `<div class="in-head"><span class="tm" style="--c:${F1_COLOR[id] || 'var(--muted)'};height:56px;width:6px"></span><div><b>${esc(c.name)}</b><small>Konstrukteurs-WM ${esc(f1.season)} · ${esc(NAT_DE[c.nationality] || c.nationality)}</small></div></div>`
+    + `<div class="in-stats">${stat('WM-Platz', esc(st.positionText))}${stat('Punkte', esc(st.points))}${stat('Siege', esc(st.wins))}</div>`
+    + (drv.length ? `<div class="in-sec"><h3>Fahrer</h3><ul class="in-res">${drv.map(d => `<li><button type="button" data-f1d="${esc(d.Driver.driverId)}"><span>${esc(f1Name(d.Driver))}</span></button><span class="d">WM-Platz ${esc(d.positionText)}</span><span class="s">${esc(d.points)}</span></li>`).join('')}</ul></div>` : '')
+    + '<div class="in-sec"><h3>Punkte pro Rennen</h3><div data-r="res"><p class="hint">Ergebnisse werden geladen …</p></div></div>'
+    + '<div class="in-sec in-wiki" data-r="wiki"></div>';
+  const enTitle = decodeURIComponent(String(c.url || '').split('/wiki/')[1] || '').replace(/_/g, ' ');
+  openInfo(key, c.name, html, wikiSearch(`${c.name} Formel-1-Team`).then(tt => tt ? wikiSummary([tt]) : null).then(r => r || wikiSummary([enTitle], 'en')));
+  try {
+    const j = await getJson(`${JOL}/current/constructors/${encodeURIComponent(id)}/results.json?limit=100`, 15000);
+    const races = j.MRData.RaceTable.Races || [];
+    fillInfo(key, '[data-r="res"]', races.length ? `<ul class="in-res">${races.slice().reverse().map(r => {
+      const pts = r.Results.reduce((s, x) => s + (+x.points || 0), 0), best = Math.min(...r.Results.map(x => +x.position || 99));
+      return `<li><span>${esc(f1Short(r.raceName))}</span><span class="d">bester P${best}</span><span class="s">${pts}</span></li>`;
+    }).join('')}</ul>` : '<p class="empty">Noch keine Rennen gefahren.</p>');
+  } catch { fillInfo(key, '[data-r="res"]', '<p class="hint">Die Ergebnisse sind gerade nicht erreichbar.</p>'); }
+}
+$('#f1').addEventListener('click', e => {
+  const d = e.target.closest('[data-f1d]'), t = e.target.closest('[data-f1t]');
+  if (d) return f1DriverInfo(d.dataset.f1d);
+  if (t) return f1TeamInfo(t.dataset.f1t);
+  const tab = e.target.closest('#f1-tabs [data-v]');
+  if (tab) { f1.tab = tab.dataset.v; f1.all = false; renderF1(); return; }
+  if (e.target.closest('[data-f1all]')) { f1.all = !f1.all; renderF1(); }
+});
+$('#f1-retry').addEventListener('click', () => f1Load(true));
+$('#info-body').addEventListener('click', e => { const d = e.target.closest('[data-f1d]'); if (d) f1DriverInfo(d.dataset.f1d); });
+
+defineWidget('f1', {
+  render: renderF1,
+  settings: {
+    render(box, w) {
+      const opts = f1.drivers.map(x => `<option value="${esc(x.Driver.driverId)}"${x.Driver.driverId === w.cfg.fav ? ' selected' : ''}>${esc(f1Name(x.Driver))}</option>`).join('');
+      box.innerHTML = `<label class="field"><span class="lbl">Lieblingsfahrer (wird hervorgehoben)</span><select data-s="fav"><option value="">Keiner</option>${opts}</select></label>`;
+    },
+    save(box, w) { w.cfg.fav = box.querySelector('[data-s="fav"]').value; return null; }
+  }
+});
+
+/* 37-sprit.js */
+/* Spritpreise über Tankerkönig (Daten der Markttransparenzstelle, Lizenz CC BY 4.0). Braucht einen eigenen kostenlosen Key.
+ * Tankerkönig bittet um höchstens eine Abfrage pro Minute und keine Abfragen ohne Anlass. Deshalb wird nur geladen,
+ * wenn das Widget sichtbar ist und die Daten älter als 10 Minuten sind, oder auf Knopfdruck.
+ * Eine einzige Umkreissuche um die Streckenmitte deckt die ganze Pendelstrecke ab. */
+const FU_KEY = 'jere-cockpit-tankerkoenig', FU_CACHE = 'jere-cockpit-sprit';
+const TKG = 'https://creativecommons.tankerkoenig.de/json';
+const FU_TYPE = { e5: 'Super E5', e10: 'Super E10', diesel: 'Diesel' };
+const fu = { busy: false, err: '', last: 0, data: lsGet(FU_CACHE), here: null, wait: null };
+const fuKey = () => { try { return localStorage.getItem(FU_KEY) || ''; } catch { return ''; } };
+const fuCfg = () => state.widgets.fuel.cfg;
+const fuHasRoute = () => !!(state.commute.home && state.commute.work);
+const fuPrice = p => { const s = p.toFixed(3); return `${s.slice(0, -1).replace('.', ',')}<sup>${s.slice(-1)}</sup>`; };
+const fuNice = s => { const t = String(s || '').trim(); return t.length > 3 && t === t.toUpperCase() ? t.toLowerCase().replace(/(^|[\s\-/.(])(\p{L})/gu, (m, a, b) => a + b.toUpperCase()) : t; };
+
+/* Suchgebiet je nach Modus */
+function fuArea(mode) {
+  if (mode === 'route') {
+    const R = cm.res;
+    if (!R || !R.route || !R.route.geometry) return null;
+    const coords = R.route.geometry.coordinates, g = prepRoute(coords), total = g.cum[g.cum.length - 1];
+    let i = g.cum.findIndex(x => x >= total / 2);
+    if (i < 0) i = Math.floor(coords.length / 2);
+    return { lat: coords[i][1], lon: coords[i][0], rad: Math.min(25, Math.max(3, total / 2000 + 2)), g, total, dir: R.dir };
+  }
+  if (mode === 'home') {
+    const h = state.commute.home;
+    if (h && h.lat != null) return { lat: h.lat, lon: h.lon, rad: 5 };
+    return wx.loc ? { lat: +wx.loc.lat, lon: +wx.loc.lon, rad: 5 } : null;
+  }
+  return fu.here ? { lat: fu.here.lat, lon: fu.here.lon, rad: 4 } : null;
+}
+async function fuLoad(manual) {
+  const key = fuKey(), c = fuCfg();
+  if (!key || fu.busy) return;
+  // Automatisch nur, wenn die Daten wirklich fehlen oder alt sind
+  if (!manual && fu.data && fu.data.mode === c.mode && Date.now() - fu.data.at < 10 * 6e4) return;
+  const since = Date.now() - fu.last;
+  if (since < 61e3) {
+    // Erst nach einer Minute wieder fragen, dann automatisch
+    clearTimeout(fu.wait);
+    fu.wait = setTimeout(() => fuLoad(), 61e3 - since + 500);
+    if (manual) toast(`Tankerkönig erlaubt nur eine Abfrage pro Minute. Das Cockpit fragt in ${Math.ceil((61e3 - since) / 1000)} Sekunden von selbst.`);
+    return;
+  }
+  if (c.mode === 'here' && !fu.here) {
+    fu.busy = true;
+    renderFuel();
+    const p = await geo();
+    fu.busy = false;
+    if (!p) { fu.err = 'Dein Standort ist gerade nicht verfügbar. Erlaub den Zugriff im Browser oder nimm „Rund um Zuhause“.'; renderFuel(); return; }
+    fu.here = { lat: p.latitude, lon: p.longitude };
+  }
+  const A = fuArea(c.mode);
+  if (!A) { fu.err = c.mode === 'route' ? '' : 'Dafür fehlt deine Heimadresse. Trag sie im Pendeln-Widget unter „Adressen“ ein.'; renderFuel(); return; }
+  fu.busy = true;
+  fu.last = Date.now();
+  renderFuel();
+  try {
+    const j = await getJson(`${TKG}/list.php?lat=${A.lat.toFixed(5)}&lng=${A.lon.toFixed(5)}&rad=${A.rad.toFixed(1)}&sort=dist&type=all&apikey=${encodeURIComponent(key)}`, 15000);
+    if (!j || j.ok === false) throw Object.assign(new Error((j && j.message) || 'Unbekannter Fehler'), { api: true });
+    const prev = {};
+    for (const s of (fu.data && fu.data.stations) || []) prev[s.id] = { e5: s.e5, e10: s.e10, diesel: s.diesel, at: fu.data.at };
+    fu.data = {
+      at: Date.now(), mode: c.mode, rad: A.rad,
+      stations: (j.stations || []).slice(0, 500).map(s => ({ id: String(s.id), name: s.name, brand: s.brand, street: s.street, nr: s.houseNumber, place: s.place, lat: +s.lat, lng: +s.lng, dist: +s.dist, e5: s.e5, e10: s.e10, diesel: s.diesel, open: !!s.isOpen })),
+      prev
+    };
+    lsSet(FU_CACHE, fu.data);
+    fu.err = '';
+  } catch (e) {
+    fu.err = e && e.api ? (/key|schl/i.test(e.message) ? 'Tankerkönig kennt diesen Key nicht. Prüf ihn unter „API-Key“.' : `Tankerkönig meldet: ${e.message}`) : 'Tankerkönig ist gerade nicht erreichbar. Versuch es gleich nochmal.';
+  } finally {
+    fu.busy = false;
+    renderFuel();
+  }
+}
+/* Tankstellen für die gewählte Sorte, bei der Strecke nur die, die höchstens 1,5 km daneben liegen */
+function fuRows() {
+  const c = fuCfg(), D = fu.data;
+  if (!D || D.mode !== c.mode) return null;
+  let list = D.stations.map(s => ({ ...s, price: typeof s[c.type] === 'number' && s[c.type] > 0.5 ? s[c.type] : null })).filter(s => s.price);
+  let A = null;
+  if (D.mode === 'route') {
+    A = fuArea('route');
+    if (!A) return null;
+    list = list.map(s => { const n = nearestOn(A.g, s.lng, s.lat); return { ...s, off: n.d, along: n.along }; }).filter(s => s.off <= 1500);
+  }
+  list.sort((a, b) => (b.open - a.open) || (a.price - b.price) || ((a.off ?? a.dist * 1000) - (b.off ?? b.dist * 1000)));
+  return { list, A };
+}
+function fuWhere(s, A) {
+  if (A) {
+    const det = s.off < 300 ? 'direkt an der Strecke' : `ca. ${numDe(s.off * 2 / 1000, 1)} km Umweg`;
+    return s.along < 500 ? `${det}, gleich am Start` : `${det}, nach ${numDe(s.along / 1000, s.along < 10000 ? 1 : 0)} km`;
+  }
+  return `${numDe(s.dist, 1)} km entfernt`;
+}
+function fuDiff(s, type) {
+  const p = fu.data.prev[s.id], pv = p && p[type];
+  if (typeof pv !== 'number' || pv <= 0.5) return '';
+  const d = Math.round((s.price - pv) * 100);
+  if (!d) return '';
+  return `<span class="fu-diff" data-s="${d < 0 ? 'down' : 'up'}" title="seit ${hm(new Date(p.at))} Uhr">${d < 0 ? '▼' : '▲'} ${Math.abs(d)} ct</span>`;
+}
+const fuMaps = s => `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;
+function renderFuel() {
+  const v = views.get('fuel');
+  if (!v) return;
+  const c = fuCfg(), key = fuKey();
+  segSet($('#fu-type'), c.type);
+  segSet($('#fu-mode'), c.mode);
+  $('#fu-mode [data-v="route"]').disabled = !fuHasRoute();
+  $('#fu-mode [data-v="route"]').title = fuHasRoute() ? '' : 'Trag zuerst deine Adressen im Pendeln-Widget ein';
+  $('#fu-setup').hidden = !!key || !$('#fu-form').hidden;
+  $('#fu-live').hidden = !key;
+  $('#fu-foot').hidden = !key;
+  $('#fu-type').hidden = !key;
+  if (!key) { $('#fu-src').textContent = ''; return; }
+  // Strecke gewählt, aber keine Adressen: auf Zuhause ausweichen
+  if (c.mode === 'route' && !fuHasRoute()) { c.mode = 'home'; persist(); segSet($('#fu-mode'), c.mode); }
+  const R = fuRows(), best = $('#fu-best'), ul = $('#fu-list'), hint = $('#fu-hint');
+  // Automatisch laden: sichtbar, Daten fehlen oder sind älter als 10 Minuten, kein Fehler offen
+  const stale = !fu.data || fu.data.mode !== c.mode || Date.now() - fu.data.at > 10 * 6e4;
+  if (stale && !fu.busy && !fu.err && !v.el.hidden && document.visibilityState === 'visible' && Date.now() - fu.last > 61e3 && (c.mode !== 'route' || fuArea('route'))) {
+    setTimeout(() => fuLoad(), 400 + Math.random() * 1600);
+  }
+  $('#fu-refresh').disabled = fu.busy;
+  $('#fu-refresh').textContent = fu.busy ? 'Lädt …' : 'Aktualisieren';
+  if (!R) {
+    best.innerHTML = '';
+    ul.textContent = '';
+    hint.textContent = fu.err || (c.mode === 'route' && !fuArea('route') ? 'Die Pendelstrecke wird noch berechnet, danach kommen die Preise.' : fu.busy ? 'Preise werden geladen …' : 'Preise werden gleich geladen.');
+    $('#fu-src').textContent = '';
+    return;
+  }
+  const { list, A } = R, open = list.filter(s => s.open);
+  if (!list.length) {
+    best.innerHTML = '';
+    ul.textContent = '';
+    hint.textContent = fu.err || `Keine Tankstelle mit ${FU_TYPE[c.type]} ${A ? 'direkt an deiner Strecke' : 'im Umkreis'} gefunden.`;
+  } else {
+    const b = open[0] || list[0];
+    const avg = open.length > 2 ? open.reduce((s, x) => s + x.price, 0) / open.length : null;
+    const save = avg ? Math.round((avg - b.price) * 100) : 0;
+    best.setAttribute('href', fuMaps(b));
+    best.innerHTML = `<div><b>${esc(fuNice(b.brand || b.name))}</b><small>${esc(fuNice(`${b.street || ''} ${b.nr || ''}`.trim()))}, ${esc(fuNice(b.place))}</small><small>${esc(fuWhere(b, A))}${b.open ? '' : ', gerade geschlossen'}${save >= 2 ? `, ${save} Cent unter dem Schnitt` : ''}</small></div><span class="pr">${fuPrice(b.price)}</span>`;
+    ul.innerHTML = list.filter(s => s !== b).slice(0, 7).map(s => `<li><a class="fu-row${s.open ? '' : ' closed'}" href="${esc(fuMaps(s))}" target="_blank" rel="noopener"><b>${esc(fuNice(s.brand || s.name))}</b><small>${esc(fuNice(s.place))} · ${esc(fuWhere(s, A))}${s.open ? '' : ' · geschlossen'}</small><span class="pr">${fuPrice(s.price)}${fuDiff(s, c.type)}</span></a></li>`).join('');
+    const min = open.length ? Math.min(...open.map(s => s.price)) : null, max = open.length ? Math.max(...open.map(s => s.price)) : null;
+    hint.textContent = (fu.err ? fu.err + ' ' : '') + (open.length > 1 ? `${open.length} offene Tankstellen ${A ? 'an deiner Strecke' : 'im Umkreis'}, ${FU_TYPE[c.type]} zwischen ${numDe(min, 3)} und ${numDe(max, 3)} €.` : '');
+  }
+  $('#fu-src').innerHTML = `Stand ${hm(new Date(fu.data.at))} Uhr · Preise: <a href="https://www.tankerkoenig.de" target="_blank" rel="noopener">Tankerkönig</a>, Daten der MTS-K, CC BY 4.0`;
+}
+
+function fuOpenForm() {
+  const has = !!fuKey();
+  $('#fu-key').value = '';
+  $('#fu-key').placeholder = has ? 'Gespeichert. Für einen neuen hier einfügen' : 'z. B. 1234abcd-…';
+  $('#fu-forget').hidden = !has;
+  $('#fu-err').hidden = true;
+  $('#fu-form').hidden = false;
+  $('#fu-setup').hidden = true;
+  $('#fu-key').focus();
+}
+$('#fu-setup-btn').addEventListener('click', fuOpenForm);
+$('#fu-key-btn').addEventListener('click', () => { if ($('#fu-form').hidden) fuOpenForm(); else { $('#fu-form').hidden = true; renderFuel(); } });
+$('#fu-cancel').addEventListener('click', () => { $('#fu-form').hidden = true; renderFuel(); });
+$('#fu-forget').addEventListener('click', () => {
+  try { localStorage.removeItem(FU_KEY); } catch { /* egal */ }
+  fu.data = null;
+  try { localStorage.removeItem(FU_CACHE); } catch { /* egal */ }
+  $('#fu-form').hidden = true;
+  renderFuel();
+});
+$('#fu-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const k = $('#fu-key').value.trim();
+  const fail = m => { $('#fu-err').textContent = m; $('#fu-err').hidden = false; };
+  if (!k) { if (fuKey()) { $('#fu-form').hidden = true; renderFuel(); return; } return fail('Füg zuerst deinen Key ein.'); }
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(k)) return fail('Das sieht nicht nach einem Tankerkönig-Key aus. Er hat das Format 8-4-4-4-12 Zeichen.');
+  try { localStorage.setItem(FU_KEY, k); } catch { return fail('Dein Browser speichert hier nichts, zum Beispiel im privaten Fenster.'); }
+  $('#fu-form').hidden = true;
+  fu.err = '';
+  fu.last = 0;
+  renderFuel();
+  fuLoad(true);
+});
+$('#fu-refresh').addEventListener('click', () => { fu.err = ''; fuLoad(true); });
+$('#fu-type').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b || !FU_TYPE[b.dataset.v]) return;
+  fuCfg().type = b.dataset.v;
+  commit();
+});
+$('#fu-mode').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b || b.disabled || fuCfg().mode === b.dataset.v) return;
+  fuCfg().mode = b.dataset.v;
+  fu.err = '';
+  commit();
+  fuLoad(true);
+});
+
+defineWidget('fuel', { render: renderFuel });
+
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.1';
+const VERSION = '2.2';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -4941,6 +5950,7 @@ function tick() {
   autoTick(now);
   tickPomo(now);
   fxTick(now);
+  f1Tick(now);
   if (ymd(now) !== vacDayKey) renderVacation();
   if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
 }
@@ -4969,12 +5979,31 @@ document.addEventListener('visibilitychange', () => {
   if (tdToken() && tkKeys().length && Date.now() - tk.stamp > 6e4) tdLoad();
 });
 /* Nach einem Update einmal zeigen, was neu ist. Mit Knopf, der eine Fokus-Seite einrichtet. */
+const NEWS = {
+  '2.1': ['Neu: Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
+  '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()]
+};
 function announceNew() {
   if (state.meta.seen === VERSION) return;
-  const known = state.edited;
+  const known = state.edited, news = NEWS[VERSION];
   state.meta.seen = VERSION;
   persist();
-  if (known && VERSION === '2.1') setTimeout(() => toast('Neu: Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit. Soll ich dir eine Fokus-Seite damit einrichten?', setupFocusPage, { label: 'Einrichten', ms: 20000 }), 900);
+  if (known && news) setTimeout(() => toast(news[0], news[1], { label: 'Einrichten', ms: 20000 }), 900);
+}
+function setupSportPage() {
+  if (state.pages.length >= 12) return;
+  const fb = newWidget('football', { league: 'bl1', team: 100, teamName: 'Hamburger SV' });
+  let id;
+  do id = 'p' + uid(); while (pageById(id));
+  const name = state.pages.some(p => p.name === 'Sport') ? 'Sport 2' : 'Sport';
+  state.pages.push({ id, name, tiles: false, items: [{ w: fb, s: 1 }, { w: 'f1', s: 1 }] });
+  const work = state.pages.find(p => pageSlug(p) === 'arbeit');
+  const addFuel = work && !work.items.some(x => x.w === 'fuel');
+  if (addFuel) { const i = work.items.findIndex(x => x.w === 'commute'); work.items.splice(i >= 0 ? i + 1 : work.items.length, 0, { w: 'fuel', s: 1 }); }
+  state.page = id;
+  commit();
+  layoutNow();
+  toast(addFuel ? `Seite „${name}“ ist fertig, und die Spritpreise liegen auf „${work.name}“ neben dem Pendeln.` : `Seite „${name}“ ist fertig.`);
 }
 function setupFocusPage() {
   if (state.pages.length >= 12) return;
