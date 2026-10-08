@@ -1,0 +1,3061 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Jeres Tagescockpit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: Leitstand. Kopfzeile mit Uhr und KW-Stempel, darunter eine Instrumentenleiste mit Countdowns,
+   dann ein Raster aus Widgets, das sich an jede Fensterbreite anpasst (Masonry, Spaltenzahl per JS). Mobil einspaltig. */
+:root{
+  --bg:#E7ECF0;
+  --surface:#FAFBFC;
+  --raise:#EFF3F6;
+  --ink:#13202C;
+  --muted:#5A6977;
+  --line:#D1DAE2;
+  --accent:#E8A126;
+  --accent-ink:#8A5604;
+  --on-accent:#1D1404;
+  --chip-bg:#FCEFD3;
+  --sea:#2B66A0;
+  --rain:#3A86CF;
+  --good:#2F8458;
+  --bad:#B3392C;
+  --warn:#C9700E;
+  --f-display:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-data:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r:14px;
+  --gap:clamp(14px,2vw,20px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D141B; --surface:#141E28; --raise:#1A2632; --ink:#E3E9EF; --muted:#8D9CAA; --line:#26333F;
+    --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
+    --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D141B; --surface:#141E28; --raise:#1A2632; --ink:#E3E9EF; --muted:#8D9CAA; --line:#26333F;
+  --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
+  --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(18px,3vw,30px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+
+/* Kopfzeile */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.eyebrow{margin:0 0 4px;font:500 12px/1.3 var(--f-data);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+h1{margin:0;font:800 clamp(32px,5vw,48px)/1 var(--f-display);letter-spacing:-.025em;text-wrap:balance}
+.clock{display:flex;align-items:center;gap:14px}
+.time{font:500 clamp(32px,5vw,48px)/1 var(--f-data);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.time .sec{font-size:.42em;color:var(--muted);margin-left:3px;letter-spacing:0}
+.kw{display:flex;flex-direction:column;align-items:center;padding:6px 10px 5px;border:1.5px solid var(--ink);border-radius:8px;line-height:1}
+.kw span{font:600 10px/1 var(--f-data);letter-spacing:.14em}
+.kw b{font:800 22px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.cust-btn{align-self:center}
+.cust-btn svg{width:16px;height:16px}
+
+/* Instrumentenleiste */
+.next{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.tile{flex:1 1 160px;background:var(--surface);padding:14px 16px 15px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.t-label{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.t-val{margin:6px 0 0;font:700 clamp(19px,2.3vw,24px)/1.15 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+.tile[data-hot] .t-val{color:var(--accent-ink)}
+.tile[data-good] .t-val{color:var(--good)}
+.t-sub{margin:0;color:var(--muted);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+
+/* Widget-Raster: ohne JS normaler Fluss, mit JS absolut positioniert in Spalten */
+.board{position:relative;display:flex;flex-direction:column;gap:var(--gap)}
+.board:not(.flow)>.card{position:absolute;top:0;left:0}
+.board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
+@media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px clamp(16px,2vw,22px) 20px;display:flex;flex-direction:column;gap:16px;min-width:0;container-type:inline-size}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h2{margin:0;font:700 21px/1.2 var(--f-display);letter-spacing:-.015em}
+h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-spacing:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;background:var(--ink);color:var(--surface);padding:8px 15px;border-radius:999px;font-weight:600;font-size:14px}
+.btn:hover{opacity:.9}
+.btn-ghost{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:999px;font-weight:600;font-size:13px;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-ghost:hover{background:var(--raise)}
+.btn-danger{border:1px solid var(--line);background:transparent;padding:7px 12px;border-radius:999px;font-weight:600;font-size:13px;color:var(--bad);margin-left:auto}
+.icon-btn{border:0;background:transparent;width:32px;height:32px;flex:0 0 32px;border-radius:8px;display:inline-grid;place-items:center;color:var(--muted)}
+.icon-btn:hover{background:var(--raise);color:var(--ink)}
+.chip{display:inline-block;padding:0 7px;border-radius:999px;background:var(--chip-bg);color:var(--accent-ink);font:600 11px/1.7 var(--f-body);white-space:nowrap}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
+
+/* Fortschrittsbalken */
+.bars{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+.bar-top{display:flex;align-items:center;gap:8px;min-width:0}
+.bar-name{font-weight:700;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-meta{color:var(--muted);font-size:13px;white-space:nowrap}
+.bar-pct{margin-left:auto;font:500 15px/1 var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
+.track{position:relative;height:14px;border-radius:7px;background:var(--raise);border:1px solid var(--line);overflow:hidden;margin-top:6px}
+.fill{position:absolute;top:0;bottom:0;left:0;width:0;background:var(--accent);transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.tick{position:absolute;top:3px;bottom:3px;width:1px;background:color-mix(in srgb,var(--ink) 20%,transparent)}
+.bar[data-state="done"] .fill{background:var(--good)}
+.bar[data-state="off"] .fill{background:var(--muted);opacity:.35}
+.bar-foot{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;margin-top:6px;font:400 12px/1.35 var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
+.bar-sub{color:var(--ink);font:500 13px/1.35 var(--f-body);text-align:center}
+
+/* Formulare */
+.panel{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.panel h3{margin:0;font:700 16px/1.2 var(--f-display)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@container (max-width:400px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.check-row{display:flex;align-items:center;gap:9px;font-size:14px;cursor:pointer;line-height:1.35}
+.check-row input{width:17px;height:17px;margin:0;flex:0 0 auto;accent-color:var(--accent-ink)}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label,.lbl{font-size:12px;font-weight:600;color:var(--muted)}
+.field input,.field select,.searchrow input{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+.days{display:flex;flex-wrap:wrap;gap:6px;border:0;padding:0;margin:0;min-width:0}
+.days legend{padding:0;margin-bottom:6px}
+.days label{position:relative}
+.days input{position:absolute;opacity:0;width:1px;height:1px}
+.days span{display:inline-block;padding:4px 11px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:600;background:var(--surface);cursor:pointer;user-select:none}
+.days input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.days input:focus-visible + span{outline:2px solid var(--sea);outline-offset:2px}
+.form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.err{margin:0;color:var(--bad);font-size:13px;font-weight:600}
+.hint{margin:0;color:var(--muted);font-size:13px}
+.preview{margin:0;font-weight:600;font-size:14px}
+
+/* Urlaub */
+.vac-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 20px;flex-wrap:wrap}
+.big{display:flex;align-items:flex-end;gap:10px}
+.big b{font:800 68px/.85 var(--f-display);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.big span{color:var(--muted);font-size:14px;line-height:1.25;max-width:11ch;padding-bottom:4px}
+.big[data-over] b{color:var(--bad)}
+.legend{display:grid;grid-template-columns:auto auto;gap:3px 16px;margin:0;font-size:13px}
+.legend dt{color:var(--muted);display:flex;align-items:center;gap:7px}
+.legend dd{margin:0;text-align:right;font:500 13px var(--f-data);font-variant-numeric:tabular-nums}
+.sw{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 10px}
+.sw-taken{background:var(--ink)}
+.sw-planned,.seg-planned{background:repeating-linear-gradient(-45deg,var(--accent) 0 4px,color-mix(in srgb,var(--accent) 50%,var(--surface)) 4px 7px)}
+.sw-free{background:var(--raise);border:1px solid var(--line)}
+.stack{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--raise);border:1px solid var(--line)}
+.seg-taken{background:var(--ink)}
+.vac-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.vac-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:"label days edit del" "dates days edit del";align-items:center;gap:2px 8px;padding:10px 0;border-top:1px solid var(--line)}
+.vac-list li.editing{background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:8px;padding-inline:8px}
+.vac-list .icon-btn[data-vedit]{grid-area:edit}
+.v-half{color:var(--accent-ink)}
+.v-label{grid-area:label;min-width:0;font-weight:600;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;overflow-wrap:anywhere}
+.v-dates{grid-area:dates;font:400 13px var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
+.v-days{grid-area:days;font:500 14px var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.vac-list .icon-btn[data-del]{grid-area:del}
+.status{font:600 10px/1.8 var(--f-data);padding:0 7px;border-radius:999px;border:1px solid var(--line);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.status[data-s="läuft"]{border-color:var(--good);color:var(--good)}
+.status[data-s="geplant"]{border-color:var(--accent);color:var(--accent-ink)}
+
+/* Wetter */
+.loc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.loc-name{font-weight:600;font-size:14px}
+.wx-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@container (max-width:540px){.wx-top{grid-template-columns:minmax(0,1fr)}}
+.wx-now{display:flex;flex-direction:column;gap:8px;min-width:0}
+.wx-main{display:flex;align-items:center;gap:12px}
+.wx-icon svg{width:58px;height:58px;color:var(--ink);display:block}
+.wx-temp{font:800 58px/.9 var(--f-display);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.wx-desc{font-weight:700;font-size:15px}
+.wx-feel{color:var(--muted);font-size:13px}
+.wx-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;margin:0;font-size:13px}
+.wx-dl dt{color:var(--muted)}
+.wx-dl dd{margin:0;font-family:var(--f-data);font-variant-numeric:tabular-nums}
+.wx-rain{background:var(--raise);border-radius:12px;padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.sub-h{margin:0;font:600 11px/1.3 var(--f-data);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.rainbars{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;height:72px;align-items:end;border-bottom:1px solid var(--line)}
+.rb{height:var(--h);min-height:2px;background:var(--line);border-radius:3px 3px 0 0}
+.rb.wet{background:var(--rain)}
+.rainlbl{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;font:400 10px/1 var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
+.rain-txt{margin:0;font-weight:700;font-size:14px;line-height:1.35}
+.hours{display:flex;gap:2px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.hr{flex:0 0 auto;min-width:54px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:10px;font-size:12px;color:var(--muted)}
+.hr:first-child{background:var(--raise)}
+.hr svg{width:26px;height:26px;color:var(--ink)}
+.hr b{font:600 14px var(--f-data);color:var(--ink);font-variant-numeric:tabular-nums}
+.hr .pp{color:var(--rain);font:500 11px var(--f-data)}
+.radar-box{display:flex;flex-direction:column;gap:8px}
+.radar{height:clamp(250px,58cqi,540px);border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--raise);max-width:100%;isolation:isolate}
+#radar.leaflet-container{background:var(--raise);font:12px var(--f-body)}
+.radar-ctl{display:flex;align-items:center;gap:10px}
+.radar-ctl input[type=range]{flex:1;min-width:0;accent-color:var(--rain)}
+.rd-time{font:500 13px var(--f-data);font-variant-numeric:tabular-nums;min-width:12ch;text-align:right}
+.wx-off{background:var(--raise);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.wx-off h3{margin:0;font:700 17px/1.25 var(--f-display)}
+.wx-off p{margin:0;max-width:60ch}
+.links{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.src{margin:0;color:var(--muted);font-size:12px}
+
+/* Aufgaben (Todoist) */
+.tk-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px 22px}
+.tk-col{min-width:0}
+.tk-col h3{margin:0 0 4px;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tk-col h3 a{color:inherit;text-decoration:none}
+.tk-col h3 a:hover{color:var(--ink)}
+.tasks{list-style:none;margin:0;padding:0}
+.task{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px solid var(--line);--prio:var(--muted)}
+.task.sub{padding-left:28px}
+.task[data-p="p1"]{--prio:var(--bad)}
+.task[data-p="p2"]{--prio:var(--accent)}
+.task[data-p="p3"]{--prio:var(--sea)}
+.check{flex:0 0 20px;width:20px;height:20px;margin-top:1px;border-radius:50%;border:1.6px solid var(--prio);background:transparent;padding:0;display:grid;place-items:center;color:transparent}
+.check:hover{background:color-mix(in srgb,var(--prio) 16%,transparent);color:var(--prio)}
+.check svg{width:12px;height:12px}
+.task.done .check{background:var(--good);border-color:var(--good);color:var(--surface)}
+.task.done .t-title{text-decoration:line-through;color:var(--muted)}
+.t-body{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}
+.t-title{color:var(--ink);text-decoration:none;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.t-title:hover{text-decoration:underline}
+.due{font:500 11px/1.5 var(--f-data);color:var(--muted)}
+.due[data-s="today"]{color:var(--accent-ink)}
+.due[data-s="over"]{color:var(--bad)}
+.more{background:none;border:0;color:var(--sea);font-weight:600;font-size:13px;padding:8px 0 0}
+.tk-state{background:var(--raise);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.tk-state p{margin:0;font-size:14px}
+.tk-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+
+/* Pendeln */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--raise)}
+.seg button{border:0;background:transparent;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.cm-route{margin:0;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.verdict{margin:0;font-weight:700;font-size:15px;line-height:1.35}
+.verdict[data-lv="bad"]{color:var(--bad)}
+.verdict[data-lv="warn"]{color:var(--accent-ink)}
+.verdict[data-lv="ok"]{color:var(--good)}
+.incidents{list-style:none;margin:0;padding:0}
+.inc{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
+.inc-type{font:600 10px/1.8 var(--f-data);text-transform:uppercase;letter-spacing:.06em;padding:0 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;margin-top:1px}
+.inc[data-k="closure"] .inc-type{color:var(--bad)}
+.inc[data-k="jam"] .inc-type,.inc[data-k="slow"] .inc-type,.inc[data-k="warn"] .inc-type{color:var(--accent-ink)}
+.inc[data-k="works"] .inc-type{color:var(--muted)}
+.inc-main{min-width:0}
+.inc-title{font-weight:600;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.inc-sub{color:var(--muted);font-size:12px;line-height:1.4}
+.inc-delay{font:600 13px var(--f-data);white-space:nowrap;color:var(--accent-ink)}
+.inc details{font-size:13px;color:var(--muted);margin-top:4px}
+.inc summary{cursor:pointer;font-weight:600;color:var(--sea);font-size:12px}
+.inc details p{margin:3px 0 0}
+.cm-wrap{position:relative;isolation:isolate;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--raise)}
+.cm-wrap .cm-map{height:clamp(260px,64cqi,560px);border:0;border-radius:0}
+.cm-wrap:fullscreen{border:0;border-radius:0}
+.cm-wrap:fullscreen .cm-map{height:100vh}
+#cm-map.leaflet-container{background:var(--raise);font:12px var(--f-body)}
+.cm-ov{position:absolute;top:10px;left:10px;z-index:1000;pointer-events:none;max-width:calc(100% - 64px);display:flex;flex-direction:column;gap:2px;padding:8px 12px 9px;border-radius:12px;background:color-mix(in srgb,var(--surface) 90%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.14)}
+.cm-ov b{font:700 15px/1.2 var(--f-display);display:flex;align-items:center;gap:7px}
+.cm-ov b::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--good);flex:0 0 9px;box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 25%,transparent)}
+.cm-ov[data-lv="warn"] b::before{background:var(--warn);box-shadow:0 0 0 3px color-mix(in srgb,var(--warn) 25%,transparent)}
+.cm-ov[data-lv="bad"] b::before{background:var(--bad);box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 25%,transparent)}
+.cm-ov span{font:500 12px/1.35 var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
+.map-tools{position:absolute;top:10px;right:10px;z-index:1000;display:flex;flex-direction:column;gap:6px}
+.map-btn{width:34px;height:34px;padding:0;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.map-btn:hover{background:var(--raise)}
+.map-btn svg{width:17px;height:17px}
+.cm-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0;padding:0;list-style:none;font-size:12px;color:var(--muted)}
+.cm-legend li{display:flex;align-items:center;gap:6px}
+.cm-legend i{display:inline-block;width:18px;height:5px;border-radius:3px;background:var(--c)}
+.cm-legend i.dash{background:repeating-linear-gradient(90deg,var(--c) 0 5px,transparent 5px 8px)}
+.pin{background:none;border:0}
+.pin-start{width:28px;height:28px;border-radius:50%;background:var(--surface);border:3px solid var(--sea);color:var(--sea);display:grid;place-items:center;box-shadow:0 3px 10px rgba(0,0,0,.28)}
+.pin-start svg{width:14px;height:14px}
+.pin-end{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent);border:2.5px solid #fff;display:grid;place-items:center;box-shadow:-2px 3px 10px rgba(0,0,0,.3)}
+.pin-end svg{width:16px;height:16px;transform:rotate(45deg);color:var(--on-accent)}
+.pin-inc{width:24px;height:24px;border-radius:50%;background:var(--c);border:2px solid #fff;display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.pin-inc svg{width:14px;height:14px}
+.cm-flow{animation:cmflow 1.1s linear infinite}
+@keyframes cmflow{to{stroke-dashoffset:-18}}
+@media (prefers-reduced-motion: reduce){.cm-flow{animation:none}}
+.card .leaflet-bar{border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.card .leaflet-bar a{background:var(--surface);color:var(--ink);border-bottom-color:var(--line)}
+.card .leaflet-bar a:hover{background:var(--raise)}
+.card .leaflet-control-attribution{background:color-mix(in srgb,var(--surface) 82%,transparent);color:var(--muted)}
+.card .leaflet-control-attribution a{color:var(--sea)}
+.card .leaflet-tooltip{background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.18);font:500 12px/1.35 var(--f-body);border-radius:8px;padding:5px 8px}
+.card .leaflet-tooltip-top::before{border-top-color:var(--surface)}
+details.tt{border-top:1px solid var(--line);padding-top:10px}
+details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
+
+/* Notizen und Schnellzugriff */
+.notes{display:block;width:100%;min-height:150px;max-height:560px;resize:vertical;font:inherit;font-size:15px;line-height:1.55;color:var(--ink);background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.notes::placeholder{color:var(--muted)}
+.qlinks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:8px}
+.ql{position:relative;min-width:0}
+.ql a{display:flex;align-items:center;gap:10px;padding:9px 38px 9px 9px;border:1px solid var(--line);border-radius:12px;background:var(--raise);color:var(--ink);text-decoration:none;min-width:0}
+.ql a:hover{border-color:var(--accent)}
+.ql .av{flex:0 0 30px;height:30px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 15px/1 var(--f-display);text-transform:uppercase}
+.ql .tx{min-width:0;display:flex;flex-direction:column}
+.ql .nm{font-weight:600;font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ql .dom{font:400 11px/1.3 var(--f-data);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ql .icon-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:30px;height:30px}
+
+/* Anpassen */
+.scrim{position:fixed;inset:0;background:rgba(6,12,18,.42);z-index:2900}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:-14px 0 44px rgba(0,0,0,.22);z-index:3000;display:flex;flex-direction:column}
+.dr-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dr-head h2{font-size:22px}
+.dr-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 20px 32px}
+.dr-sec{padding:18px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.dr-sec:last-child{border-bottom:0}
+.dr-sec>h3{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.dr-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dr-row>.lbl{font-size:14px;color:var(--ink);font-weight:600}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.swatch{position:relative;display:block}
+.swatch input{position:absolute;opacity:0;width:1px;height:1px}
+.swatch span{display:block;width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14);cursor:pointer}
+.swatch input:checked+span{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
+.swatch input:focus-visible+span{outline:2px solid var(--sea);outline-offset:5px}
+.seg.sm button{padding:4px 9px;font-size:12px}
+.wl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.wl li{display:flex;align-items:center;gap:6px;padding:7px 6px 7px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.wl li[data-off]{background:var(--raise)}
+.wl li[data-off] .check-row{color:var(--muted)}
+.wl .check-row{flex:1;min-width:0;font-weight:600}
+.wl .icon-btn{width:30px;height:30px;flex-basis:30px}
+.wl .icon-btn:disabled{opacity:.3;cursor:default;background:transparent}
+.cd-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.cd-list li{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--line)}
+.cd-list .tx{flex:1;min-width:0;font-size:14px}
+.cd-list .tx b{font-weight:600}
+.cd-list .tx span{color:var(--muted);font:400 12px var(--f-data);margin-left:6px}
+.grid3{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.8fr);gap:8px}
+@media (max-width:420px){.grid3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid3>:first-child{grid-column:1/-1}}
+.drawer .field input,.drawer .field select{font-size:14px;padding:7px 9px}
+
+/* Fuß und Toast */
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:12px;padding-top:4px}
+.sync::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:7px;vertical-align:1px}
+.sync[data-mode="cloud"]::before{background:var(--good)}
+.sync[data-mode="error"]::before,.sync[data-mode="none"]::before{background:var(--bad)}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 10px 9px 18px;border-radius:999px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 28px rgba(0,0,0,.22);z-index:3100;max-width:calc(100% - 32px);font-size:14px}
+.toast button{background:transparent;border:0;color:var(--accent);font-weight:700;padding:4px 8px;border-radius:999px}
+@media (prefers-reduced-motion: reduce){.fill{transition:none}}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow" id="h-date">&nbsp;</p>
+      <h1 id="h-greet">Moin Jere</h1>
+    </div>
+    <div class="clock">
+      <div class="time" id="h-time" aria-live="off">00:00</div>
+      <div class="kw" title="Kalenderwoche"><span>KW</span><b id="h-kw">00</b></div>
+      <button type="button" class="btn-ghost cust-btn" id="cust-btn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Anpassen</button>
+    </div>
+  </header>
+
+  <section class="next" id="tiles" aria-label="Als Nächstes">
+    <div class="tile" id="t-fa"><p class="t-label">Feierabend</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-we"><p class="t-label">Wochenende</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-ft"><p class="t-label">Nächster Feiertag</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-ur"><p class="t-label">Nächster Urlaub</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+  </section>
+
+  <main class="board flow" id="board">
+      <!-- Aufgaben -->
+      <section class="card" id="tasks" aria-labelledby="tk-h">
+        <div class="card-head">
+          <h2 id="tk-h">Aufgaben</h2>
+          <span class="src" id="tk-src"></span>
+        </div>
+        <div class="tk-state" id="tk-state" hidden>
+          <p id="tk-state-text"></p>
+          <div class="form-row"><button type="button" class="btn" id="tk-action" hidden></button></div>
+        </div>
+        <form class="panel" id="tk-form" hidden novalidate>
+          <h3>Todoist verbinden</h3>
+          <p class="hint">Damit deine Todoist-Projekte hier auftauchen, braucht das Cockpit deinen persönlichen API Token. Den findest du in Todoist unter Einstellungen, Integrationen, Entwickler.</p>
+          <div class="field"><label for="tk-token">API Token</label><input id="tk-token" type="password" maxlength="100" autocomplete="off" spellcheck="false" placeholder="Token aus Todoist einfügen"></div>
+          <p class="hint">Der Token bleibt nur in diesem Browser gespeichert und steckt nie in der Datei selbst. Er öffnet dein ganzes Todoist, also gib ihn sonst nirgends ein.</p>
+          <p class="err" id="tk-err" hidden></p>
+          <div class="form-row">
+            <button type="submit" class="btn" id="tk-save">Verbinden</button>
+            <a class="btn-ghost" href="https://app.todoist.com/app/settings/integrations/developer" target="_blank" rel="noopener">Token holen ↗</a>
+            <button type="button" class="btn-ghost" id="tk-cancel" hidden>Abbrechen</button>
+            <button type="button" class="btn-danger" id="tk-forget" hidden>Trennen</button>
+          </div>
+        </form>
+        <div class="tk-cols" id="tk-cols"></div>
+        <div class="tk-foot">
+          <a class="btn-ghost" href="https://app.todoist.com/app/today" target="_blank" rel="noopener">Todoist öffnen ↗</a>
+          <button type="button" class="btn-ghost" id="tk-conf" hidden>Verbindung</button>
+        </div>
+      </section>
+
+      <!-- Fortschritt -->
+      <section class="card" id="progress" aria-labelledby="pr-h">
+        <div class="card-head">
+          <h2 id="pr-h">Fortschritt</h2>
+          <button type="button" class="btn-ghost" id="bar-add">+ Balken</button>
+        </div>
+        <form class="panel" id="bar-form" hidden novalidate>
+          <h3 id="bf-title">Neuer Balken</h3>
+          <div class="grid2">
+            <div class="field">
+              <label for="bf-kind">Kategorie</label>
+              <select id="bf-kind">
+                <option value="day">Arbeitstag (Uhrzeit)</option>
+                <option value="workweek">Arbeitswoche</option>
+                <option value="month">Monat</option>
+                <option value="year">Jahr</option>
+                <option value="range">Zeitraum (Datum)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="bf-name">Name</label>
+              <input id="bf-name" type="text" maxlength="40" autocomplete="off">
+            </div>
+          </div>
+          <div id="bf-time" class="grid2">
+            <div class="field"><label for="bf-start">Von</label><input id="bf-start" type="time"></div>
+            <div class="field"><label for="bf-end">Bis</label><input id="bf-end" type="time"></div>
+          </div>
+          <fieldset class="days" id="bf-days">
+            <legend class="lbl">An diesen Tagen</legend>
+            <label><input type="checkbox" id="bf-d1" value="1"><span>Mo</span></label>
+            <label><input type="checkbox" id="bf-d2" value="2"><span>Di</span></label>
+            <label><input type="checkbox" id="bf-d3" value="3"><span>Mi</span></label>
+            <label><input type="checkbox" id="bf-d4" value="4"><span>Do</span></label>
+            <label><input type="checkbox" id="bf-d5" value="5"><span>Fr</span></label>
+            <label><input type="checkbox" id="bf-d6" value="6"><span>Sa</span></label>
+            <label><input type="checkbox" id="bf-d0" value="0"><span>So</span></label>
+          </fieldset>
+          <div id="bf-date" class="grid2">
+            <div class="field"><label for="bf-from">Startdatum</label><input id="bf-from" type="date"></div>
+            <div class="field"><label for="bf-to">Enddatum</label><input id="bf-to" type="date"></div>
+          </div>
+          <p class="err" id="bf-err" hidden></p>
+          <div class="form-row">
+            <button type="submit" class="btn">Speichern</button>
+            <button type="button" class="btn-ghost" id="bf-cancel">Abbrechen</button>
+            <button type="button" class="btn-danger" id="bf-del">Löschen</button>
+          </div>
+        </form>
+        <ul class="bars" id="bars"></ul>
+      </section>
+
+      <!-- Urlaub -->
+      <section class="card" id="vacation" aria-labelledby="va-h">
+        <div class="card-head">
+          <h2 id="va-h">Urlaub <small id="va-year"></small></h2>
+          <div class="actions">
+            <button type="button" class="btn-ghost" id="vac-set-btn">Anspruch</button>
+            <button type="button" class="btn-ghost" id="vac-add">+ Urlaub</button>
+          </div>
+        </div>
+        <div class="vac-hero">
+          <div class="big" id="vac-big"><b id="vac-free">0</b><span id="vac-free-lbl">Tage noch frei zu verplanen</span></div>
+          <dl class="legend">
+            <dt><i class="sw sw-taken"></i>Genommen</dt><dd id="vac-taken">0</dd>
+            <dt><i class="sw sw-planned"></i>Geplant</dt><dd id="vac-planned">0</dd>
+            <dt><i class="sw sw-free"></i>Anspruch</dt><dd id="vac-total">0</dd>
+          </dl>
+        </div>
+        <div class="stack" role="img" id="vac-stack" aria-label="Urlaubsverteilung"><div class="seg-taken" id="seg-t"></div><div class="seg-planned" id="seg-p"></div></div>
+        <p class="hint" id="vac-ex-hint" hidden>Der Anspruch von 30 Tagen ist ein Beispielwert. Tipp auf „Anspruch" und trag deinen echten ein.</p>
+
+        <form class="panel" id="vac-set" hidden novalidate>
+          <h3>Urlaubsanspruch</h3>
+          <div class="grid2">
+            <div class="field"><label for="vs-allow">Tage pro Jahr</label><input id="vs-allow" type="number" min="0" max="60" step="0.5" inputmode="decimal"></div>
+            <div class="field"><label for="vs-carry">Resturlaub aus dem Vorjahr</label><input id="vs-carry" type="number" min="0" max="60" step="0.5" inputmode="decimal"></div>
+          </div>
+          <label class="check-row"><input type="checkbox" id="vs-xmas"> 24.12. und 31.12. zählen als halbe Urlaubstage</label>
+          <div class="form-row">
+            <button type="submit" class="btn">Speichern</button>
+            <button type="button" class="btn-ghost" id="vs-cancel">Abbrechen</button>
+          </div>
+        </form>
+
+        <form class="panel" id="vac-form" hidden novalidate>
+          <h3 id="vf-title">Urlaub eintragen</h3>
+          <div class="grid2">
+            <div class="field"><label for="vf-from">Erster Urlaubstag</label><input id="vf-from" type="date"></div>
+            <div class="field"><label for="vf-to">Letzter Urlaubstag</label><input id="vf-to" type="date"></div>
+          </div>
+          <label class="check-row" id="vf-half-row" hidden><input type="checkbox" id="vf-half"> Nur ein halber Tag</label>
+          <div class="field"><label for="vf-label">Bezeichnung (optional)</label><input id="vf-label" type="text" maxlength="40" placeholder="z. B. Mallorca" autocomplete="off"></div>
+          <p class="preview" id="vf-preview"></p>
+          <p class="err" id="vf-err" hidden></p>
+          <div class="form-row">
+            <button type="submit" class="btn" id="vf-submit">Eintragen</button>
+            <button type="button" class="btn-ghost" id="vf-cancel">Abbrechen</button>
+            <button type="button" class="btn-danger" id="vf-del" hidden>Löschen</button>
+          </div>
+        </form>
+
+        <ul class="vac-list" id="vac-list"></ul>
+        <p class="hint" id="vac-rule"></p>
+      </section>
+
+      <!-- Pendeln -->
+      <section class="card" id="commute" aria-labelledby="cm-h">
+        <div class="card-head">
+          <h2 id="cm-h">Pendeln</h2>
+          <div class="actions">
+            <div class="seg" role="group" aria-label="Richtung">
+              <button type="button" id="cm-dir-home" aria-pressed="true">Nach Hause</button>
+              <button type="button" id="cm-dir-work" aria-pressed="false">Zur Arbeit</button>
+            </div>
+            <button type="button" class="btn-ghost" id="cm-set-btn">Adressen</button>
+          </div>
+        </div>
+
+        <form class="panel" id="cm-form" hidden novalidate>
+          <h3>Deine Strecke</h3>
+          <div class="field"><label for="cm-home">Zuhause</label><input id="cm-home" type="text" maxlength="120" placeholder="Straße Hausnummer, Ort" autocomplete="off"></div>
+          <div class="field"><label for="cm-work">Arbeit</label><input id="cm-work" type="text" maxlength="120" placeholder="Straße Hausnummer, Ort" autocomplete="off"></div>
+          <details class="tt" id="cm-tt">
+            <summary>Live-Fahrzeit mit Stadtverkehr (optional)</summary>
+            <p class="hint" style="margin-top:8px">Ohne Key rechnet das Dashboard mit normaler Fahrzeit plus gemeldeten Staus auf der Autobahn. Mit einem kostenlosen Key von developer.tomtom.com kommt die echte Live-Fahrzeit dazu, inklusive Stau in der Stadt. Der Key bleibt nur in diesem Browser.</p>
+            <div class="field" style="margin-top:8px"><label for="cm-key">TomTom API-Key</label><input id="cm-key" type="password" maxlength="80" autocomplete="off" spellcheck="false"></div>
+          </details>
+          <p class="err" id="cm-err" hidden></p>
+          <div class="form-row">
+            <button type="submit" class="btn">Speichern</button>
+            <button type="button" class="btn-ghost" id="cm-cancel">Abbrechen</button>
+          </div>
+        </form>
+
+        <div class="wx-off" id="cm-empty" hidden>
+          <h3>Strecke einrichten</h3>
+          <p>Trag ein, wo du wohnst und wo du arbeitest. Dann siehst du hier, wie lange du gerade brauchst und ob Staus, Baustellen oder Sperrungen auf dem Weg liegen.</p>
+          <div class="form-row"><button type="button" class="btn" id="cm-empty-btn">Adressen eintragen</button></div>
+        </div>
+
+        <div class="wx-off" id="cm-off" hidden>
+          <h3 id="cm-off-title"></h3>
+          <p id="cm-off-text"></p>
+        </div>
+
+        <div id="cm-live" hidden style="display:flex;flex-direction:column;gap:14px">
+          <div class="vac-hero">
+            <div class="big"><b id="cm-time">0</b><span id="cm-time-lbl">Min</span></div>
+            <dl class="legend" id="cm-dl"></dl>
+          </div>
+          <p class="cm-route" id="cm-route"></p>
+          <p class="verdict" id="cm-verdict"></p>
+          <ul class="incidents" id="cm-inc"></ul>
+          <div class="cm-wrap" id="cm-wrap">
+            <div class="cm-map" id="cm-map"></div>
+            <div class="cm-ov" id="cm-ov" data-lv="ok"><b id="cm-ov-t"></b><span id="cm-ov-s"></span></div>
+            <div class="map-tools">
+              <button type="button" class="map-btn" id="cm-fit" title="Ganze Strecke zeigen" aria-label="Ganze Strecke zeigen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/><circle cx="12" cy="12" r="7.2"/></svg></button>
+              <button type="button" class="map-btn" id="cm-full" title="Vollbild" aria-label="Karte im Vollbild" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+            </div>
+          </div>
+          <ul class="cm-legend" id="cm-legend"></ul>
+          <p class="hint" id="cm-hint"></p>
+        </div>
+
+        <div class="links">
+          <a class="btn-ghost" id="cm-gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener" hidden>Live-Verkehr in Google Maps ↗</a>
+        </div>
+        <p class="src" id="cm-src"></p>
+      </section>
+
+      <!-- Wetter -->
+      <section class="card" id="weather" aria-labelledby="wx-h">
+        <div class="card-head">
+          <h2 id="wx-h">Wetter</h2>
+          <div class="loc">
+            <span class="loc-name" id="wx-loc">Hamburg</span>
+            <button type="button" class="btn-ghost" id="wx-loc-btn" hidden>Ort ändern</button>
+          </div>
+        </div>
+
+        <form class="panel" id="wx-loc-form" hidden novalidate>
+          <h3>Ort fürs Wetter</h3>
+          <div class="field">
+            <label for="loc-q">Ort suchen</label>
+            <div class="form-row searchrow" style="flex-wrap:nowrap">
+              <input id="loc-q" type="search" placeholder="z. B. Pinneberg" autocomplete="off">
+              <button type="submit" class="btn">Suchen</button>
+            </div>
+          </div>
+          <div class="links" id="loc-res"></div>
+          <p class="err" id="loc-err" hidden></p>
+          <div class="form-row">
+            <button type="button" class="btn-ghost" id="loc-auto">Automatisch per Standort</button>
+            <button type="button" class="btn-ghost" id="loc-hh">Hamburg</button>
+            <button type="button" class="btn-ghost" id="loc-cancel">Schließen</button>
+          </div>
+        </form>
+
+        <div id="wx-live" hidden>
+          <div class="wx-top">
+            <div class="wx-now">
+              <div class="wx-main">
+                <div class="wx-icon" id="wx-icon"></div>
+                <div>
+                  <div class="wx-temp" id="wx-temp"></div>
+                  <div class="wx-desc" id="wx-desc"></div>
+                  <div class="wx-feel" id="wx-feel"></div>
+                </div>
+              </div>
+              <dl class="wx-dl" id="wx-dl"></dl>
+            </div>
+            <div class="wx-rain">
+              <p class="sub-h">Regen, nächste 2 Stunden</p>
+              <div class="rainbars" id="wx-rainbars"></div>
+              <div class="rainlbl" id="wx-rainlbl"></div>
+              <p class="rain-txt" id="wx-rain-txt"></p>
+            </div>
+          </div>
+          <div style="margin-top:16px" id="wx-hours-box">
+            <p class="sub-h" style="margin-bottom:6px">Nächste 12 Stunden</p>
+            <div class="hours" id="wx-hours"></div>
+          </div>
+          <div class="radar-box" style="margin-top:16px" id="radar-box">
+            <p class="sub-h">Regenradar, letzte 2 Stunden</p>
+            <div class="radar" id="radar"></div>
+            <div class="radar-ctl">
+              <button type="button" class="btn-ghost" id="rd-play" aria-pressed="false">Abspielen</button>
+              <label for="rd-slider" class="lbl" style="position:absolute;left:-9999px">Radarbild wählen</label>
+              <input type="range" id="rd-slider" min="0" max="0" value="0">
+              <span class="rd-time" id="rd-time"></span>
+            </div>
+            <p class="hint" id="radar-msg" hidden></p>
+          </div>
+        </div>
+
+        <div class="wx-off" id="wx-off">
+          <h3 id="wx-off-title">Wetter wird geladen</h3>
+          <p id="wx-off-text">Einen Moment, die Daten für deinen Ort kommen gleich.</p>
+          <div class="form-row"><button type="button" class="btn" id="wx-retry" hidden>Nochmal versuchen</button></div>
+        </div>
+
+        <div>
+          <p class="sub-h" style="margin-bottom:8px">Regenradar öffnen</p>
+          <div class="links">
+            <a class="btn-ghost" id="lk-rv" href="https://www.rainviewer.com/map.html?loc=53.5511,9.9937,8&layer=radar" target="_blank" rel="noopener">RainViewer ↗</a>
+            <a class="btn-ghost" href="https://www.wetteronline.de/regenradar/hamburg" target="_blank" rel="noopener">wetteronline ↗</a>
+            <a class="btn-ghost" href="https://www.dwd.de/DE/leistungen/radarbild_film/radarbild_film.html" target="_blank" rel="noopener">DWD Radarfilm ↗</a>
+          </div>
+        </div>
+        <p class="src" id="wx-src"></p>
+      </section>
+
+      <!-- Schnellzugriff -->
+      <section class="card" id="links" aria-labelledby="ln-h">
+        <div class="card-head">
+          <h2 id="ln-h">Schnellzugriff</h2>
+          <button type="button" class="btn-ghost" id="ln-add">+ Link</button>
+        </div>
+        <form class="panel" id="ln-form" hidden novalidate>
+          <h3 id="ln-title">Neuer Link</h3>
+          <div class="grid2">
+            <div class="field"><label for="ln-name">Name</label><input id="ln-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Berichtsheft"></div>
+            <div class="field"><label for="ln-url">Adresse</label><input id="ln-url" type="url" maxlength="500" autocomplete="off" spellcheck="false" placeholder="https://…"></div>
+          </div>
+          <p class="err" id="ln-err" hidden></p>
+          <div class="form-row">
+            <button type="submit" class="btn">Speichern</button>
+            <button type="button" class="btn-ghost" id="ln-cancel">Abbrechen</button>
+            <button type="button" class="btn-danger" id="ln-del" hidden>Löschen</button>
+          </div>
+        </form>
+        <ul class="qlinks" id="ln-list"></ul>
+      </section>
+
+      <!-- Notizen -->
+      <section class="card" id="notes" aria-labelledby="nt-h">
+        <div class="card-head">
+          <h2 id="nt-h">Notizen</h2>
+          <span class="src" id="nt-state"></span>
+        </div>
+        <label for="nt-text" class="lbl" style="position:absolute;left:-9999px">Notizen</label>
+        <textarea id="nt-text" class="notes" maxlength="8000" placeholder="Schnell was notieren, wird automatisch gespeichert."></textarea>
+      </section>
+  </main>
+
+  <footer class="foot">
+    <span class="sync" id="sync" data-mode="local">Gespeichert in diesem Browser.</span>
+    <span id="foot-region">Feiertage: Hamburg</span>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-labelledby="dr-h" role="dialog" aria-modal="true">
+  <div class="dr-head">
+    <h2 id="dr-h">Anpassen</h2>
+    <button type="button" class="btn" id="dr-close">Fertig</button>
+  </div>
+  <div class="dr-body">
+    <section class="dr-sec">
+      <h3>Ansicht</h3>
+      <div class="field"><label for="dr-greet">Begrüßung</label><input id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
+      <div class="dr-row"><span class="lbl">Design</span>
+        <div class="seg sm" role="group" aria-label="Design" id="dr-theme">
+          <button type="button" data-v="auto">Automatisch</button><button type="button" data-v="light">Hell</button><button type="button" data-v="dark">Dunkel</button>
+        </div>
+      </div>
+      <div class="dr-row"><span class="lbl">Kartengröße</span>
+        <div class="seg sm" role="group" aria-label="Kartengröße" id="dr-size">
+          <button type="button" data-v="s">Kompakt</button><button type="button" data-v="m">Normal</button><button type="button" data-v="l">Groß</button>
+        </div>
+      </div>
+      <div class="field"><span class="lbl" id="dr-acc-l">Akzentfarbe</span><div class="swatches" id="dr-accent" role="radiogroup" aria-labelledby="dr-acc-l"></div></div>
+      <label class="check-row"><input type="checkbox" id="dr-secs"> Sekunden an der Uhr zeigen</label>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Widgets</h3>
+      <p class="hint">Haken setzen zum Einblenden, Pfeile zum Sortieren, Breite in Spalten.</p>
+      <ul class="wl" id="dr-widgets"></ul>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Kacheln oben</h3>
+      <div id="dr-tiles" style="display:flex;flex-direction:column;gap:8px"></div>
+      <p class="lbl" style="margin:6px 0 0">Eigene Countdowns</p>
+      <ul class="cd-list" id="dr-cd-list"></ul>
+      <form id="dr-cd-form" novalidate style="display:flex;flex-direction:column;gap:8px">
+        <div class="grid3">
+          <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
+          <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
+          <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
+        </div>
+        <p class="err" id="cd-err" hidden></p>
+        <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
+      </form>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Aufgaben</h3>
+      <div class="field"><label for="dr-projects">Todoist-Projekte, mit Komma getrennt</label><input id="dr-projects" type="text" maxlength="120" autocomplete="off" placeholder="Arbeit, Privat"></div>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Wetter</h3>
+      <label class="check-row"><input type="checkbox" id="dr-hours"> Stundenleiste zeigen</label>
+      <label class="check-row"><input type="checkbox" id="dr-radar"> Regenradar zeigen</label>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Feiertage</h3>
+      <div class="field"><label for="dr-region">Bundesland</label><select id="dr-region"></select></div>
+      <p class="hint">Gilt für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</p>
+    </section>
+
+    <section class="dr-sec" id="dr-data">
+      <h3>Daten</h3>
+      <p class="hint" id="dr-data-hint"></p>
+      <div class="form-row" id="dr-data-btns">
+        <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>
+        <button type="button" class="btn-ghost" id="dr-import">Sicherung laden</button>
+        <input type="file" id="dr-file" accept="application/json,.json" hidden>
+      </div>
+      <p class="err" id="dr-data-err" hidden></p>
+      <div class="form-row"><button type="button" class="btn-danger" id="dr-reset" style="margin-left:0">Alles zurücksetzen</button></div>
+    </section>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Rückgängig</button></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const DAY = 864e5;
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, m - 1, d); };
+const validYmd = s => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
+const validHm = s => /^\d{2}:\d{2}$/.test(s || '');
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const sod = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const at = (d, t) => { const [h, m] = t.split(':').map(Number); return new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m); };
+const dayDiff = (a, b) => Math.round((sod(b) - sod(a)) / DAY);
+const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const WDL = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+const MS = ['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const ML = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+const clamp01 = x => Math.max(0, Math.min(1, x));
+const dm = d => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.`;
+const dmy = d => `${dm(d)}${String(d.getFullYear()).slice(2)}`;
+const hm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const pctTxt = p => (p * 100).toFixed(1).replace('.', ',') + ' %';
+const numDe = (x, dec = 0) => (Math.round(x * 10 ** dec) / 10 ** dec).toFixed(dec).replace('.', ',');
+const daysTxt = n => n === 0.5 ? 'halber Tag' : `${numDe(n, n % 1 ? 1 : 0)} ${n === 1 ? 'Tag' : 'Tage'}`;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function dur(ms, dat) {
+  ms = Math.max(0, ms);
+  const min = Math.floor(ms / 6e4);
+  const d = Math.floor(min / 1440), h = Math.floor((min % 1440) / 60), m = min % 60;
+  if (d >= 2) return `${d} ${dat ? 'Tagen' : 'Tage'}`;
+  if (d === 1) return h ? `1 Tag ${h} Std` : '1 Tag';
+  if (h) return m ? `${h} Std ${m} Min` : `${h} Std`;
+  if (m) return `${m} Min`;
+  return 'unter 1 Min';
+}
+const hrsMin = ms => { const min = Math.max(0, Math.floor(ms / 6e4)); const h = Math.floor(min / 60), m = min % 60; return h ? (m ? `${h} Std ${m} Min` : `${h} Std`) : `${m} Min`; };
+const inDays = n => n === 0 ? 'Heute' : n === 1 ? 'Morgen' : `in ${n} Tagen`;
+
+function isoWeek(d) {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const wd = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - wd);
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.ceil(((t - y0) / DAY + 1) / 7);
+}
+
+/* Gesetzliche Feiertage je Bundesland (landesweite, ohne rein kommunale) */
+const REGIONS = { BW: 'Baden-Württemberg', BY: 'Bayern', BE: 'Berlin', BB: 'Brandenburg', HB: 'Bremen', HH: 'Hamburg', HE: 'Hessen', MV: 'Mecklenburg-Vorpommern', NI: 'Niedersachsen', NW: 'Nordrhein-Westfalen', RP: 'Rheinland-Pfalz', SL: 'Saarland', SN: 'Sachsen', ST: 'Sachsen-Anhalt', SH: 'Schleswig-Holstein', TH: 'Thüringen' };
+const holCache = {};
+function holidays(y) {
+  const R = (state && state.ui && REGIONS[state.ui.region]) ? state.ui.region : 'HH';
+  const ck = R + y;
+  if (holCache[ck]) return holCache[ck];
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4,
+    f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30,
+    i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451),
+    mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+  const E = new Date(y, mo - 1, da);
+  const list = [
+    [new Date(y, 0, 1), 'Neujahr'], [addDays(E, -2), 'Karfreitag'], [addDays(E, 1), 'Ostermontag'],
+    [new Date(y, 4, 1), 'Tag der Arbeit'], [addDays(E, 39), 'Christi Himmelfahrt'], [addDays(E, 50), 'Pfingstmontag'],
+    [new Date(y, 9, 3), 'Tag der Deutschen Einheit'],
+    [new Date(y, 11, 25), '1. Weihnachtstag'], [new Date(y, 11, 26), '2. Weihnachtstag']
+  ];
+  const has = (...rs) => rs.includes(R);
+  if (has('BW', 'BY', 'ST')) list.push([new Date(y, 0, 6), 'Heilige Drei Könige']);
+  if ((has('BE') && y >= 2019) || (has('MV') && y >= 2023)) list.push([new Date(y, 2, 8), 'Internationaler Frauentag']);
+  if (has('BW', 'BY', 'HE', 'NW', 'RP', 'SL')) list.push([addDays(E, 60), 'Fronleichnam']);
+  if (has('SL')) list.push([new Date(y, 7, 15), 'Mariä Himmelfahrt']);
+  if (has('TH') && y >= 2019) list.push([new Date(y, 8, 20), 'Weltkindertag']);
+  if (has('BB', 'MV', 'SN', 'ST', 'TH') || (has('HB', 'HH', 'NI', 'SH') && y >= 2018)) list.push([new Date(y, 9, 31), 'Reformationstag']);
+  if (has('BW', 'BY', 'NW', 'RP', 'SL')) list.push([new Date(y, 10, 1), 'Allerheiligen']);
+  if (has('SN')) { let d = new Date(y, 10, 22); while (d.getDay() !== 3) d = addDays(d, -1); list.push([d, 'Buß- und Bettag']); }
+  list.sort((p, q) => p[0] - q[0]);
+  return (holCache[ck] = { list, map: new Map(list.map(([dt, n]) => [ymd(dt), n])) });
+}
+const holidayName = d => holidays(d.getFullYear()).map.get(ymd(d));
+const isWorkday = d => d.getDay() >= 1 && d.getDay() <= 5 && !holidayName(d);
+const isXmasHalf = d => d.getMonth() === 11 && (d.getDate() === 24 || d.getDate() === 31);
+/* Wie viel Urlaub ein Tag kostet: 0 an freien Tagen, 0,5 an halben Tagen, sonst 1 */
+function vacWeight(d, half) {
+  if (!isWorkday(d)) return 0;
+  if (half || (state.vacation.halfXmas && isXmasHalf(d))) return 0.5;
+  return 1;
+}
+function vacDays(from, to, half) {
+  let n = 0;
+  const halves = [];
+  for (let d = from; d <= to; d = addDays(d, 1)) { const w = vacWeight(d, half); n += w; if (w === 0.5 && !half) halves.push(dm(d)); }
+  return { n, halves };
+}
+const numTxt = n => numDe(n, n % 1 ? 1 : 0);
+
+/* Zustand */
+const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
+const WIDGETS = { tasks: 'Aufgaben', commute: 'Pendeln', weather: 'Wetter', progress: 'Fortschritt', vacation: 'Urlaub', links: 'Schnellzugriff', notes: 'Notizen' };
+const DEF_WIDGETS = [['tasks', 1], ['commute', 1], ['weather', 2], ['progress', 1], ['vacation', 1], ['links', 1], ['notes', 1]];
+const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
+const ACCENTS = {
+  amber:  { name: 'Bernstein', l: ['#E8A126', '#8A5604', '#FCEFD3', '#1D1404'], d: ['#F0B040', '#F3C266', '#3A2B0E', '#1D1404'] },
+  coral:  { name: 'Koralle',   l: ['#E5654B', '#A3361F', '#FBE1DA', '#2A0B05'], d: ['#F08068', '#F6A08C', '#3D1D16', '#2A0B05'] },
+  pink:   { name: 'Pink',      l: ['#D9488A', '#9C2059', '#FADDEA', '#2B0716'], d: ['#EE6FA6', '#F49CC2', '#401629', '#2B0716'] },
+  violet: { name: 'Violett',   l: ['#8A5CD8', '#5B3399', '#EAE0FA', '#FFFFFF'], d: ['#A987EE', '#C4ABF4', '#2B1E46', '#170C2B'] },
+  blue:   { name: 'Blau',      l: ['#3D7BE0', '#1E4F9E', '#DDE8FB', '#06142C'], d: ['#6A9CF0', '#9BBDF5', '#172A4A', '#06142C'] },
+  teal:   { name: 'Petrol',    l: ['#1A9AA0', '#0E6267', '#D4EFF0', '#03191A'], d: ['#3CC0C6', '#7AD6DA', '#0E2F31', '#03191A'] },
+  green:  { name: 'Grün',      l: ['#2FA36B', '#1C6B45', '#D9F1E4', '#04180D'], d: ['#4CC48A', '#7FD8AA', '#12301F', '#04180D'] }
+};
+const SIZES = { s: 320, m: 380, l: 470 };
+const DEF_UI = () => ({
+  greet: 'Moin Jere', theme: 'auto', accent: 'amber', size: 'm', seconds: true, region: 'HH',
+  tiles: { fa: true, we: true, ft: true, ur: true }, countdowns: [],
+  widgets: DEF_WIDGETS.map(([id, w]) => ({ id, on: true, w })),
+  projects: ['Arbeit', 'Privat'], wxHours: true, wxRadar: true
+});
+const DEFAULTS = () => ({
+  v: 1,
+  edited: false,
+  vacation: {
+    allowance: 30, carry: 0, allowanceExample: true, halfXmas: true,
+    entries: [{ id: 'ex1', from: '2026-10-19', to: '2026-10-23', label: 'Herbsturlaub', example: true }]
+  },
+  ui: DEF_UI(), notes: '', links: [],
+  bars: [
+    { id: 'b1', kind: 'day', name: 'Arbeitstag', start: '07:30', end: '16:00', days: [1, 2, 3, 4, 5], example: true },
+    { id: 'b2', kind: 'workweek', name: 'Arbeitswoche', start: '07:30', end: '16:00', days: [1, 2, 3, 4, 5], example: true },
+    { id: 'b3', kind: 'month', name: 'Monat' },
+    { id: 'b4', kind: 'year', name: 'Jahr' },
+    { id: 'b5', kind: 'range', name: 'Ausbildung', from: '2024-08-01', to: '2027-07-31', example: true }
+  ],
+  loc: { mode: 'auto' },
+  commute: { home: null, work: null }
+});
+function normPlace(p) {
+  if (!p || typeof p.text !== 'string' || !p.text.trim()) return null;
+  const ok = v => v !== null && v !== undefined && v !== '' && Number.isFinite(+v);
+  return { text: p.text.trim(), label: String(p.label || ''), lat: ok(p.lat) ? +p.lat : null, lon: ok(p.lon) ? +p.lon : null };
+}
+function safeUrl(u) {
+  let s = String(u || '').trim();
+  if (!s) return null;
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(s)) s = 'https://' + s;
+  try { const x = new URL(s); return /^https?:$/.test(x.protocol) && x.hostname ? x.href : null; } catch { return null; }
+}
+function normProjects(list) {
+  const out = [], seen = new Set();
+  for (const p of Array.isArray(list) ? list : []) {
+    const n = String(p || '').trim().slice(0, 40);
+    if (n && !seen.has(n.toLowerCase())) { seen.add(n.toLowerCase()); out.push(n); }
+  }
+  return out.length ? out.slice(0, 4) : ['Arbeit', 'Privat'];
+}
+function normUi(u) {
+  const d = DEF_UI();
+  if (!u || typeof u !== 'object') return d;
+  const seen = new Set(), widgets = [];
+  for (const w of Array.isArray(u.widgets) ? u.widgets : []) {
+    if (!w || !WIDGETS[w.id] || seen.has(w.id)) continue;
+    seen.add(w.id);
+    widgets.push({ id: w.id, on: w.on !== false, w: [1, 2, 3].includes(+w.w) ? +w.w : 1 });
+  }
+  for (const [id, w] of DEF_WIDGETS) if (!seen.has(id)) widgets.push({ id, on: true, w });
+  const t = u.tiles && typeof u.tiles === 'object' ? u.tiles : {};
+  return {
+    greet: typeof u.greet === 'string' ? u.greet.slice(0, 40) : d.greet,
+    theme: ['auto', 'light', 'dark'].includes(u.theme) ? u.theme : 'auto',
+    accent: ACCENTS[u.accent] ? u.accent : 'amber',
+    size: SIZES[u.size] ? u.size : 'm',
+    seconds: u.seconds !== false,
+    region: REGIONS[u.region] ? u.region : 'HH',
+    tiles: { fa: t.fa !== false, we: t.we !== false, ft: t.ft !== false, ur: t.ur !== false },
+    countdowns: (Array.isArray(u.countdowns) ? u.countdowns : []).filter(c => c && validYmd(c.date)).slice(0, 6)
+      .map(c => ({ id: String(c.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(), name: String(c.name || 'Countdown').slice(0, 30), date: c.date, time: validHm(c.time) ? c.time : '' })),
+    widgets,
+    projects: normProjects(u.projects),
+    wxHours: u.wxHours !== false,
+    wxRadar: u.wxRadar !== false
+  };
+}
+function normalize(s) {
+  const d = DEFAULTS();
+  if (!s || typeof s !== 'object') return d;
+  const v = s.vacation && typeof s.vacation === 'object' ? s.vacation : {};
+  const bars = Array.isArray(s.bars) ? s.bars.filter(b => b && KIND_NAME[b.kind]).map(b => ({ ...b, days: Array.isArray(b.days) ? b.days.map(Number) : [1, 2, 3, 4, 5] })) : d.bars;
+  const loc = s.loc && s.loc.mode === 'fixed' && Number.isFinite(+s.loc.lat) && Number.isFinite(+s.loc.lon) ? { mode: 'fixed', name: String(s.loc.name || 'Ort'), lat: +s.loc.lat, lon: +s.loc.lon } : { mode: 'auto' };
+  return {
+    v: 1,
+    edited: !!s.edited,
+    vacation: {
+      allowance: Number.isFinite(+v.allowance) ? +v.allowance : d.vacation.allowance,
+      carry: Number.isFinite(+v.carry) ? +v.carry : 0,
+      allowanceExample: v.allowanceExample !== undefined ? !!v.allowanceExample : d.vacation.allowanceExample,
+      halfXmas: v.halfXmas !== false,
+      entries: Array.isArray(v.entries)
+        ? v.entries.filter(e => e && validYmd(e.from) && validYmd(e.to)).map(e => ({ ...e, id: String(e.id || uid()), label: String(e.label || ''), half: !!e.half && e.from === e.to }))
+        : d.vacation.entries
+    },
+    ui: normUi(s.ui),
+    notes: typeof s.notes === 'string' ? s.notes.slice(0, 8000) : '',
+    links: (Array.isArray(s.links) ? s.links : []).map(l => l && { id: String(l.id || uid()), name: String(l.name || '').slice(0, 30), url: safeUrl(l.url) }).filter(l => l && l.url).slice(0, 40),
+    bars, loc,
+    commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) }
+  };
+}
+
+const LS_KEY = 'jere-cockpit-v1', GEO_KEY = 'jere-cockpit-geo';
+let lsOk = true;
+function lsGet(k) { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) : null; } catch { lsOk = false; return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { lsOk = false; } }
+let state = normalize(lsGet(LS_KEY));
+
+/* Speichern: Claude-Account (db) wenn verfügbar, sonst Browser */
+let docRef = null, saveTimer = null, saving = false, saveAgain = false;
+const SYNC_TXT = {
+  cloud: 'Gespeichert in deinem Claude-Account, auf allen Geräten gleich.',
+  local: 'Gespeichert in diesem Browser.',
+  none: 'Dieses Fenster speichert nichts, Änderungen sind nach dem Neuladen weg.',
+  error: 'Speichern hat gerade nicht geklappt. Nächster Versuch bei der nächsten Änderung.'
+};
+function setSync(m) { const el = $('#sync'); el.dataset.mode = m; el.textContent = SYNC_TXT[m]; }
+function commit() {
+  state.edited = true;
+  lsSet(LS_KEY, state);
+  renderAll();
+  queueSave();
+  if (!docRef) setSync(lsOk ? 'local' : 'none');
+}
+function queueSave() { if (!docRef) return; clearTimeout(saveTimer); saveTimer = setTimeout(flush, 700); }
+async function flush() {
+  saveTimer = null;
+  if (!docRef) return;
+  if (saving) { saveAgain = true; return; }
+  saving = true;
+  try { await docRef.set({ state: JSON.parse(JSON.stringify(state)) }); setSync('cloud'); }
+  catch (e) {
+    if (e && (e.code === 'invalid_argument' || e.code === 'revoked' || e.code === 'not_granted')) { docRef = null; setSync(lsOk ? 'local' : 'none'); }
+    else setSync('error');
+  }
+  saving = false;
+  if (saveAgain) { saveAgain = false; flush(); }
+}
+async function initCloud() {
+  if (!window.claude || typeof window.claude.use !== 'function') return;
+  let db = null, user = null;
+  try { [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]); } catch { return; }
+  if (!db || !user) return;
+  let id = null;
+  try { id = await user.id(); } catch { id = null; }
+  if (!id) return;
+  try { docRef = db.doc(`data/users/${id}/dashboard`); } catch { docRef = null; return; }
+  docRef.onSnapshot(snap => {
+    if (snap.metadata && snap.metadata.hasPendingWrites) return;
+    if (!snap.exists) {
+      setSync('cloud');
+      if (state.edited) queueSave();
+      return;
+    }
+    const body = snap.data() || {};
+    const incoming = normalize(body.state);
+    if (saveTimer || saving) return;
+    if (JSON.stringify(incoming) !== JSON.stringify(state)) {
+      const old = state;
+      state = incoming;
+      lsSet(LS_KEY, state);
+      renderAll();
+      afterStateSwap(old);
+      if (dr.open && !$('#drawer').contains(document.activeElement)) renderDrawer();
+    }
+    setSync('cloud');
+  }, () => { docRef = null; setSync(lsOk ? 'local' : 'none'); });
+}
+
+/* Toast mit Rückgängig */
+let toastTimer = null, undoFn = null;
+function toast(msg, undo) {
+  $('#toast-msg').textContent = msg;
+  undoFn = undo || null;
+  $('#toast-undo').hidden = !undo;
+  $('#toast').hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { $('#toast').hidden = true; undoFn = null; }, 6000);
+}
+$('#toast-undo').addEventListener('click', () => { if (undoFn) undoFn(); undoFn = null; $('#toast').hidden = true; });
+
+/* Hilfen für Arbeitszeit */
+const vacationOn = d => { const k = ymd(d); return state.vacation.entries.find(e => e.from <= k && k <= e.to); };
+const workBar = () => state.bars.find(b => (b.kind === 'day' || b.kind === 'workweek') && validHm(b.start) && validHm(b.end));
+function freeReason(b, d) {
+  if (!(b.days || []).includes(d.getDay())) return d.getDay() === 0 || d.getDay() === 6 ? 'Wochenende' : 'Kein Arbeitstag';
+  const h = holidayName(d); if (h) return `Feiertag: ${h}`;
+  if (vacationOn(d)) return 'Urlaub';
+  return null;
+}
+
+/* Fortschrittsbalken berechnen */
+function calcBar(b, now) {
+  const y = now.getFullYear();
+  switch (b.kind) {
+    case 'day': {
+      if (!validHm(b.start) || !validHm(b.end)) return { pct: 0, state: 'off', sub: 'Uhrzeit fehlt', left: '', right: '' };
+      const r = { left: b.start, right: b.end };
+      const why = freeReason(b, now);
+      if (why) return { ...r, pct: 0, state: 'off', sub: why === 'Urlaub' ? 'Heute Urlaub' : why === 'Wochenende' || why === 'Kein Arbeitstag' ? 'Heute frei' : `Heute frei, ${why}` };
+      const s = at(now, b.start), e = at(now, b.end);
+      if (e <= s) return { ...r, pct: 0, state: 'off', sub: 'Ende liegt vor dem Start' };
+      if (now < s) return { ...r, pct: 0, state: 'wait', sub: `beginnt in ${dur(s - now, true)}` };
+      if (now >= e) return { ...r, pct: 1, state: 'done', sub: 'Geschafft, Feierabend' };
+      return { ...r, pct: (now - s) / (e - s), state: 'run', sub: `noch ${dur(e - now)}` };
+    }
+    case 'workweek': {
+      if (!validHm(b.start) || !validHm(b.end)) return { pct: 0, state: 'off', sub: 'Uhrzeit fehlt', left: '', right: '' };
+      const mon = addDays(sod(now), -((now.getDay() + 6) % 7));
+      let total = 0, done = 0, first = null, last = null;
+      for (let i = 0; i < 7; i++) {
+        const d = addDays(mon, i);
+        if (!(b.days || []).includes(d.getDay())) continue;
+        if (!first) first = d; last = d;
+        if (freeReason(b, d)) continue;
+        const s = at(d, b.start), e = at(d, b.end);
+        if (e <= s) continue;
+        total += e - s;
+        done += Math.max(0, Math.min(e - s, now - s));
+      }
+      const r = { left: first ? WD[first.getDay()] : '', right: last ? WD[last.getDay()] : '' };
+      if (!total) return { ...r, pct: 0, state: 'off', sub: 'Diese Woche keine Arbeitszeit' };
+      if (done >= total) return { ...r, pct: 1, state: 'done', sub: 'Woche geschafft' };
+      if (done <= 0) return { ...r, pct: 0, state: 'wait', sub: `${hrsMin(total)} Arbeitszeit vor dir` };
+      return { ...r, pct: done / total, state: 'run', sub: `noch ${hrsMin(total - done)} Arbeitszeit` };
+    }
+    case 'month': {
+      const s = new Date(y, now.getMonth(), 1), e = new Date(y, now.getMonth() + 1, 1), last = addDays(e, -1);
+      return { pct: (now - s) / (e - s), state: 'run', sub: `noch ${dur(e - now)}`, left: `1. ${MS[s.getMonth()]}`, right: `${last.getDate()}. ${MS[s.getMonth()]}`, meta: ML[now.getMonth()] };
+    }
+    case 'year': {
+      const s = new Date(y, 0, 1), e = new Date(y + 1, 0, 1);
+      return { pct: (now - s) / (e - s), state: 'run', sub: `noch ${dur(e - now)}`, left: '1. Jan', right: '31. Dez', meta: String(y) };
+    }
+    case 'range': {
+      if (!validYmd(b.from) || !validYmd(b.to)) return { pct: 0, state: 'off', sub: 'Datum fehlt', left: '', right: '' };
+      const s = parseYmd(b.from), e = addDays(parseYmd(b.to), 1);
+      const r = { left: dmy(s), right: dmy(parseYmd(b.to)) };
+      if (e <= s) return { ...r, pct: 0, state: 'off', sub: 'Ende liegt vor dem Start' };
+      if (now < s) return { ...r, pct: 0, state: 'wait', sub: `startet ${inDays(dayDiff(now, s)).toLowerCase()}` };
+      if (now >= e) return { ...r, pct: 1, state: 'done', sub: 'Abgeschlossen' };
+      const totalDays = Math.round((e - s) / DAY), dayNo = dayDiff(s, now) + 1, left = totalDays - dayNo;
+      return { ...r, pct: (now - s) / (e - s), state: 'run', sub: left > 0 ? `noch ${left} ${left === 1 ? 'Tag' : 'Tage'} · Tag ${dayNo} von ${totalDays}` : 'Letzter Tag' };
+    }
+  }
+  return { pct: 0, state: 'off', sub: '', left: '', right: '' };
+}
+
+const PENCIL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>';
+const TRASH = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6.5 7l1 13h9l1-13"/></svg>';
+
+const barRefs = new Map();
+function renderBars() {
+  const ul = $('#bars');
+  ul.textContent = '';
+  barRefs.clear();
+  if (!state.bars.length) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.textContent = 'Noch keine Balken. Leg mit „+ Balken" deinen ersten an.';
+    ul.appendChild(li);
+    return;
+  }
+  for (const b of state.bars) {
+    const li = document.createElement('li');
+    li.className = 'bar';
+    li.innerHTML = `<div class="bar-top"><span class="bar-name"></span><span class="bar-meta"></span>${b.example ? '<span class="chip" title="Tipp auf den Stift und trag deine echten Werte ein">Beispiel</span>' : ''}<span class="bar-pct"></span><button type="button" class="icon-btn" data-edit="${esc(b.id)}">${PENCIL}</button></div><div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><i class="tick" style="left:25%"></i><i class="tick" style="left:50%"></i><i class="tick" style="left:75%"></i></div><div class="bar-foot"><span class="l"></span><span class="bar-sub"></span><span class="r"></span></div>`;
+    li.querySelector('.bar-name').textContent = b.name;
+    li.querySelector('[data-edit]').setAttribute('aria-label', `${b.name} bearbeiten`);
+    li.querySelector('.track').setAttribute('aria-label', b.name);
+    ul.appendChild(li);
+    barRefs.set(b.id, { b, li, meta: li.querySelector('.bar-meta'), pct: li.querySelector('.bar-pct'), fill: li.querySelector('.fill'), track: li.querySelector('.track'), sub: li.querySelector('.bar-sub'), l: li.querySelector('.l'), r: li.querySelector('.r') });
+  }
+}
+function tickBars(now) {
+  for (const ref of barRefs.values()) {
+    const c = calcBar(ref.b, now), p = clamp01(c.pct);
+    ref.fill.style.width = (p * 100).toFixed(3) + '%';
+    ref.pct.textContent = pctTxt(p);
+    ref.sub.textContent = c.sub;
+    ref.l.textContent = c.left;
+    ref.r.textContent = c.right;
+    ref.meta.textContent = c.meta || '';
+    ref.li.dataset.state = c.state;
+    ref.track.setAttribute('aria-valuenow', (p * 100).toFixed(0));
+  }
+}
+
+/* Balken-Formular */
+let editingBar = null;
+const dayBoxes = [0, 1, 2, 3, 4, 5, 6].map(i => $('#bf-d' + i));
+function syncKind() {
+  const k = $('#bf-kind').value;
+  $('#bf-time').hidden = !(k === 'day' || k === 'workweek');
+  $('#bf-days').hidden = !(k === 'day' || k === 'workweek');
+  $('#bf-date').hidden = k !== 'range';
+  $('#bf-name').placeholder = KIND_NAME[k];
+}
+function openBarForm(b) {
+  editingBar = b ? b.id : null;
+  const wb = workBar();
+  const t = sod(new Date());
+  $('#bf-title').textContent = b ? `${b.name} bearbeiten` : 'Neuer Balken';
+  $('#bf-kind').value = b ? b.kind : 'range';
+  $('#bf-name').value = b ? b.name : '';
+  $('#bf-start').value = (b && b.start) || (wb && wb.start) || '08:00';
+  $('#bf-end').value = (b && b.end) || (wb && wb.end) || '16:30';
+  const days = (b && b.days) || [1, 2, 3, 4, 5];
+  dayBoxes.forEach((cb, i) => { cb.checked = days.includes(i); });
+  $('#bf-from').value = (b && b.from) || ymd(t);
+  $('#bf-to').value = (b && b.to) || ymd(addDays(t, 30));
+  $('#bf-del').hidden = !b;
+  $('#bf-err').hidden = true;
+  syncKind();
+  $('#bar-form').hidden = false;
+  $('#bf-kind').focus();
+}
+function closeBarForm() { $('#bar-form').hidden = true; editingBar = null; }
+$('#bf-kind').addEventListener('change', syncKind);
+$('#bar-add').addEventListener('click', () => openBarForm(null));
+$('#bf-cancel').addEventListener('click', closeBarForm);
+$('#bars').addEventListener('click', e => {
+  const btn = e.target.closest('[data-edit]');
+  if (!btn) return;
+  const b = state.bars.find(x => x.id === btn.dataset.edit);
+  if (b) { openBarForm(b); $('#bar-form').scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' }); }
+});
+$('#bar-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const k = $('#bf-kind').value;
+  const err = msg => { $('#bf-err').textContent = msg; $('#bf-err').hidden = false; };
+  const bar = { id: editingBar || uid(), kind: k, name: $('#bf-name').value.trim() || KIND_NAME[k] };
+  if (k === 'day' || k === 'workweek') {
+    const s = $('#bf-start').value, en = $('#bf-end').value;
+    if (!validHm(s) || !validHm(en)) return err('Trag eine Start- und eine Endzeit ein.');
+    if (en <= s) return err('Die Endzeit muss nach der Startzeit liegen.');
+    const days = dayBoxes.map((cb, i) => cb.checked ? i : -1).filter(i => i >= 0);
+    if (!days.length) return err('Wähl mindestens einen Tag aus.');
+    Object.assign(bar, { start: s, end: en, days });
+  }
+  if (k === 'range') {
+    const f = $('#bf-from').value, t = $('#bf-to').value;
+    if (!validYmd(f) || !validYmd(t)) return err('Trag ein Start- und ein Enddatum ein.');
+    if (t < f) return err('Das Enddatum liegt vor dem Startdatum.');
+    Object.assign(bar, { from: f, to: t });
+  }
+  const i = state.bars.findIndex(x => x.id === bar.id);
+  if (i >= 0) state.bars[i] = bar; else state.bars.push(bar);
+  closeBarForm();
+  commit();
+});
+$('#bf-del').addEventListener('click', () => {
+  const i = state.bars.findIndex(x => x.id === editingBar);
+  if (i < 0) return;
+  const [removed] = state.bars.splice(i, 1);
+  closeBarForm();
+  commit();
+  toast(`„${removed.name}" gelöscht`, () => { state.bars.splice(Math.min(i, state.bars.length), 0, removed); commit(); });
+});
+
+/* Urlaub */
+function vacCalc(now) {
+  const y = now.getFullYear(), tk = ymd(now);
+  let taken = 0, planned = 0;
+  const rows = [];
+  for (const e of [...state.vacation.entries].sort((a, b) => a.from.localeCompare(b.from))) {
+    const from = parseYmd(e.from), to = parseYmd(e.to);
+    let days = 0, inYear = 0;
+    const halves = [];
+    for (let d = from; d <= to; d = addDays(d, 1)) {
+      const w = vacWeight(d, e.half);
+      if (!w) continue;
+      days += w;
+      if (w === 0.5 && !e.half) halves.push(dm(d));
+      if (d.getFullYear() === y) { inYear += w; if (ymd(d) <= tk) taken += w; else planned += w; }
+    }
+    const status = e.to < tk ? 'genommen' : e.from <= tk ? 'läuft' : 'geplant';
+    if (to.getFullYear() >= y) rows.push({ e, days, inYear, status, from, to, halves });
+  }
+  const total = state.vacation.allowance + state.vacation.carry;
+  return { y, taken, planned, total, free: total - taken - planned, rows };
+}
+let vacDayKey = '';
+function renderVacation() {
+  const now = new Date();
+  vacDayKey = ymd(now);
+  const v = vacCalc(now);
+  $('#va-year').textContent = v.y;
+  $('#vac-free').textContent = numDe(v.free, v.free % 1 ? 1 : 0);
+  $('#vac-free-lbl').textContent = v.free < 0 ? 'Tage zu viel verplant' : v.free === 1 ? 'Tag noch frei zu verplanen' : 'Tage noch frei zu verplanen';
+  $('#vac-big').toggleAttribute('data-over', v.free < 0);
+  $('#vac-taken').textContent = numTxt(v.taken);
+  $('#vac-planned').textContent = numTxt(v.planned);
+  $('#vac-total').textContent = numTxt(v.total);
+  const base = Math.max(v.total, v.taken + v.planned, 1);
+  $('#seg-t').style.width = (v.taken / base * 100) + '%';
+  $('#seg-p').style.width = (v.planned / base * 100) + '%';
+  $('#vac-stack').setAttribute('aria-label', `${numTxt(v.taken)} genommen, ${numTxt(v.planned)} geplant, ${numTxt(v.free)} frei von ${numTxt(v.total)} Tagen`);
+  $('#vac-ex-hint').hidden = !state.vacation.allowanceExample;
+  $('#vac-rule').textContent = `Gezählt werden Montag bis Freitag, Feiertage in ${REGIONS[state.ui.region]} sind schon abgezogen.${state.vacation.halfXmas ? ' Der 24.12. und der 31.12. zählen jeweils als halber Tag.' : ''}`;
+
+  const ul = $('#vac-list');
+  ul.textContent = '';
+  if (!v.rows.length) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.style.display = 'block';
+    li.textContent = 'Noch kein Urlaub eingetragen.';
+    ul.appendChild(li);
+  }
+  for (const r of v.rows) {
+    const li = document.createElement('li');
+    const same = r.e.from === r.e.to;
+    const dates = same ? `${WD[r.from.getDay()]} ${dm(r.from)}${r.from.getFullYear() !== v.y ? r.from.getFullYear() : ''}` : `${WD[r.from.getDay()]} ${dm(r.from)} bis ${WD[r.to.getDay()]} ${dm(r.to)}${r.to.getFullYear() !== v.y ? r.to.getFullYear() : ''}`;
+    const dayStr = r.inYear !== r.days ? `${numTxt(r.inYear)} von ${numTxt(r.days)}` : daysTxt(r.days);
+    const halfTxt = !r.e.half && r.halves.length ? `${r.halves.join(' und ')} halb` : '';
+    li.innerHTML = `<div class="v-label"><span class="lab"></span>${r.e.example ? '<span class="chip">Beispiel</span>' : ''}<span class="status" data-s="${r.status}">${r.status}</span></div><div class="v-dates">${esc(dates)}${halfTxt ? ` · <span class="v-half">${esc(halfTxt)}</span>` : ''}</div><div class="v-days">${esc(dayStr)}</div><button type="button" class="icon-btn" data-vedit="${esc(r.e.id)}">${PENCIL}</button><button type="button" class="icon-btn" data-del="${esc(r.e.id)}">${TRASH}</button>`;
+    li.querySelector('.lab').textContent = r.e.label || 'Urlaub';
+    li.querySelector('[data-vedit]').setAttribute('aria-label', `${r.e.label || 'Urlaub'} bearbeiten`);
+    li.querySelector('[data-del]').setAttribute('aria-label', `${r.e.label || 'Urlaub'} löschen`);
+    if (editingVac === r.e.id && !$('#vac-form').hidden) li.classList.add('editing');
+    ul.appendChild(li);
+  }
+}
+function deleteVac(id) {
+  const i = state.vacation.entries.findIndex(x => x.id === id);
+  if (i < 0) return;
+  const [removed] = state.vacation.entries.splice(i, 1);
+  if (editingVac === id) closeVacForm();
+  commit();
+  toast(`„${removed.label || 'Urlaub'}" gelöscht`, () => { state.vacation.entries.push(removed); commit(); });
+}
+$('#vac-list').addEventListener('click', e => {
+  const del = e.target.closest('[data-del]');
+  if (del) return deleteVac(del.dataset.del);
+  const ed = e.target.closest('[data-vedit]');
+  if (!ed) return;
+  const entry = state.vacation.entries.find(x => x.id === ed.dataset.vedit);
+  if (entry) openVacForm(entry);
+});
+$('#vac-set-btn').addEventListener('click', () => {
+  $('#vs-allow').value = state.vacation.allowance;
+  $('#vs-carry').value = state.vacation.carry;
+  $('#vs-xmas').checked = state.vacation.halfXmas;
+  closeVacForm();
+  $('#vac-set').hidden = false;
+  $('#vs-allow').focus();
+});
+$('#vs-cancel').addEventListener('click', () => { $('#vac-set').hidden = true; });
+$('#vac-set').addEventListener('submit', e => {
+  e.preventDefault();
+  const a = parseFloat(String($('#vs-allow').value).replace(',', '.'));
+  const c = parseFloat(String($('#vs-carry').value).replace(',', '.'));
+  state.vacation.allowance = Number.isFinite(a) && a >= 0 ? Math.min(a, 99) : state.vacation.allowance;
+  state.vacation.carry = Number.isFinite(c) && c >= 0 ? Math.min(c, 99) : 0;
+  state.vacation.allowanceExample = false;
+  state.vacation.halfXmas = $('#vs-xmas').checked;
+  $('#vac-set').hidden = true;
+  commit();
+});
+let editingVac = null;
+function vfSingle() {
+  const f = $('#vf-from').value, t = $('#vf-to').value || f;
+  return validYmd(f) && f === t && isWorkday(parseYmd(f)) && !(state.vacation.halfXmas && isXmasHalf(parseYmd(f)));
+}
+function vfPreview() {
+  const f = $('#vf-from').value, t = $('#vf-to').value || f;
+  const single = vfSingle();
+  $('#vf-half-row').hidden = !single;
+  if (!validYmd(f) || t < f) { $('#vf-preview').textContent = ''; return; }
+  const { n, halves } = vacDays(parseYmd(f), parseYmd(t), single && $('#vf-half').checked);
+  const why = halves.length ? `, der ${halves.join(' und der ')} ${halves.length === 1 ? 'zählt' : 'zählen'} halb` : '';
+  let txt;
+  if (!n) txt = 'In dem Zeitraum liegt kein Arbeitstag.';
+  else if (n === 0.5) txt = `Das ist ein halber Urlaubstag${why ? `, der ${halves[0]} zählt halb` : ''}.`;
+  else txt = `Das sind ${numTxt(n)} ${n === 1 ? 'Urlaubstag' : 'Urlaubstage'}${why}.`;
+  $('#vf-preview').textContent = txt;
+}
+function openVacForm(entry) {
+  editingVac = entry ? entry.id : null;
+  if (entry) {
+    $('#vf-from').value = entry.from;
+    $('#vf-to').value = entry.to;
+    $('#vf-label').value = entry.label || '';
+    $('#vf-half').checked = !!entry.half;
+  } else {
+    const t = sod(new Date());
+    const mon = addDays(t, ((8 - t.getDay()) % 7) || 7);
+    $('#vf-from').value = ymd(mon);
+    $('#vf-to').value = ymd(addDays(mon, 4));
+    $('#vf-label').value = '';
+    $('#vf-half').checked = false;
+  }
+  $('#vf-title').textContent = entry ? `${entry.label || 'Urlaub'} bearbeiten` : 'Urlaub eintragen';
+  $('#vf-submit').textContent = entry ? 'Speichern' : 'Eintragen';
+  $('#vf-del').hidden = !entry;
+  $('#vf-err').hidden = true;
+  $('#vac-set').hidden = true;
+  $('#vac-form').hidden = false;
+  vfPreview();
+  renderVacation();
+  $('#vac-form').scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+  $('#vf-from').focus({ preventScroll: true });
+}
+function closeVacForm() {
+  $('#vac-form').hidden = true;
+  if (editingVac) { editingVac = null; renderVacation(); }
+}
+$('#vac-add').addEventListener('click', () => openVacForm(null));
+$('#vf-from').addEventListener('input', () => {
+  if ($('#vf-to').value && $('#vf-to').value < $('#vf-from').value) $('#vf-to').value = $('#vf-from').value;
+  vfPreview();
+});
+$('#vf-to').addEventListener('input', vfPreview);
+$('#vf-half').addEventListener('change', vfPreview);
+$('#vf-cancel').addEventListener('click', closeVacForm);
+$('#vf-del').addEventListener('click', () => { if (editingVac) deleteVac(editingVac); });
+$('#vac-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const err = msg => { $('#vf-err').textContent = msg; $('#vf-err').hidden = false; };
+  const f = $('#vf-from').value, t = $('#vf-to').value || f;
+  if (!validYmd(f)) return err('Trag den ersten Urlaubstag ein.');
+  if (t < f) return err('Der letzte Tag liegt vor dem ersten.');
+  if (dayDiff(parseYmd(f), parseYmd(t)) > 366) return err('Maximal ein Jahr am Stück.');
+  const entry = { id: editingVac || uid(), from: f, to: t, label: $('#vf-label').value.trim(), half: vfSingle() && $('#vf-half').checked };
+  const clash = state.vacation.entries.find(x => x.id !== entry.id && x.from <= t && f <= x.to);
+  if (clash) return err(`Überschneidet sich mit „${clash.label || 'Urlaub'}" (${dm(parseYmd(clash.from))} bis ${dm(parseYmd(clash.to))}).`);
+  const i = state.vacation.entries.findIndex(x => x.id === entry.id);
+  const before = i >= 0 ? state.vacation.entries[i] : null;
+  if (i >= 0) state.vacation.entries[i] = entry; else state.vacation.entries.push(entry);
+  editingVac = null;
+  $('#vac-form').hidden = true;
+  commit();
+  if (before) toast(`„${entry.label || 'Urlaub'}" geändert`, () => { const k = state.vacation.entries.findIndex(x => x.id === entry.id); if (k >= 0) { state.vacation.entries[k] = before; commit(); } });
+});
+
+/* Notizen: speichern automatisch kurz nach dem Tippen */
+let noteTimer = null;
+function sizeNotes() { const t = $('#nt-text'); t.style.height = 'auto'; t.style.height = Math.min(560, Math.max(150, t.scrollHeight + 2)) + 'px'; }
+function renderNotes() {
+  const t = $('#nt-text');
+  if (document.activeElement !== t && t.value !== state.notes) { t.value = state.notes; sizeNotes(); }
+}
+$('#nt-text').addEventListener('input', () => {
+  sizeNotes();
+  $('#nt-state').textContent = 'Wird gespeichert …';
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(() => {
+    state.notes = $('#nt-text').value;
+    commit();
+    $('#nt-state').textContent = `Gespeichert ${hm(new Date())} Uhr`;
+  }, 700);
+});
+
+/* Schnellzugriff */
+let editingLink = null;
+function renderLinks() {
+  const ul = $('#ln-list');
+  ul.textContent = '';
+  if (!state.links.length) {
+    const li = document.createElement('li');
+    li.className = 'empty';
+    li.style.gridColumn = '1 / -1';
+    li.textContent = 'Leg hier deine wichtigsten Seiten ab, zum Beispiel Berichtsheft, Webmail oder das Ticketsystem.';
+    ul.appendChild(li);
+    return;
+  }
+  for (const l of state.links) {
+    let host = '';
+    try { host = new URL(l.url).hostname.replace(/^www\./, ''); } catch { host = l.url; }
+    const name = l.name || host;
+    const li = document.createElement('li');
+    li.className = 'ql';
+    li.innerHTML = `<a target="_blank" rel="noopener noreferrer"><span class="av"></span><span class="tx"><span class="nm"></span><span class="dom"></span></span></a><button type="button" class="icon-btn" data-ledit="${esc(l.id)}">${PENCIL}</button>`;
+    const a = li.querySelector('a');
+    a.href = l.url;
+    li.querySelector('.av').textContent = (name.match(/[\p{L}\p{N}]/u) || ['•'])[0];
+    li.querySelector('.nm').textContent = name;
+    li.querySelector('.dom').textContent = host;
+    li.querySelector('[data-ledit]').setAttribute('aria-label', `${name} bearbeiten`);
+    ul.appendChild(li);
+  }
+}
+function openLinkForm(l) {
+  editingLink = l ? l.id : null;
+  $('#ln-title').textContent = l ? `${l.name || 'Link'} bearbeiten` : 'Neuer Link';
+  $('#ln-name').value = l ? l.name : '';
+  $('#ln-url').value = l ? l.url : '';
+  $('#ln-del').hidden = !l;
+  $('#ln-err').hidden = true;
+  $('#ln-form').hidden = false;
+  (l ? $('#ln-name') : $('#ln-url')).focus();
+}
+function closeLinkForm() { $('#ln-form').hidden = true; editingLink = null; }
+$('#ln-add').addEventListener('click', () => { if ($('#ln-form').hidden || editingLink) openLinkForm(null); else closeLinkForm(); });
+$('#ln-cancel').addEventListener('click', closeLinkForm);
+$('#ln-list').addEventListener('click', e => {
+  const b = e.target.closest('[data-ledit]');
+  if (!b) return;
+  const l = state.links.find(x => x.id === b.dataset.ledit);
+  if (l) openLinkForm(l);
+});
+$('#ln-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const url = safeUrl($('#ln-url').value);
+  if (!url) { $('#ln-err').textContent = 'Das sieht nicht nach einer Webadresse aus.'; $('#ln-err').hidden = false; return; }
+  if (!editingLink && state.links.length >= 40) { $('#ln-err').textContent = 'Mehr als 40 Links gehen nicht.'; $('#ln-err').hidden = false; return; }
+  const link = { id: editingLink || uid(), name: $('#ln-name').value.trim(), url };
+  const i = state.links.findIndex(x => x.id === link.id);
+  if (i >= 0) state.links[i] = link; else state.links.push(link);
+  closeLinkForm();
+  commit();
+});
+$('#ln-del').addEventListener('click', () => {
+  const i = state.links.findIndex(x => x.id === editingLink);
+  if (i < 0) return;
+  const [removed] = state.links.splice(i, 1);
+  closeLinkForm();
+  commit();
+  toast(`„${removed.name || 'Link'}" gelöscht`, () => { state.links.splice(Math.min(i, state.links.length), 0, removed); commit(); });
+});
+
+/* Kacheln oben */
+function setTile(id, val, sub, mode) {
+  const el = typeof id === 'string' ? $(id) : id;
+  el.querySelector('.t-val').textContent = val;
+  el.querySelector('.t-sub').textContent = sub;
+  el.toggleAttribute('data-hot', mode === 'hot');
+  el.toggleAttribute('data-good', mode === 'good');
+}
+function tickTiles(now) {
+  const t = sod(now), wb = workBar();
+  // Feierabend
+  if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
+  else {
+    const why = freeReason(wb, now);
+    const s = at(now, wb.start), e = at(now, wb.end);
+    if (why) setTile('#t-fa', 'Heute frei', why === 'Kein Arbeitstag' ? 'Kein Arbeitstag laut Balken' : why, 'good');
+    else if (now >= e) setTile('#t-fa', 'Geschafft', `seit ${wb.end} Uhr`, 'good');
+    else setTile('#t-fa', `in ${dur(e - now, true)}`, `um ${wb.end} Uhr${wb.example ? ' (Beispielzeit)' : ''}${cm.homeMins ? `, Heimweg ca. ${cm.homeMins} Min` : ''}`, now >= s ? 'hot' : null);
+  }
+  // Wochenende
+  const mon = addDays(t, -((now.getDay() + 6) % 7));
+  const wStart = wb ? at(addDays(mon, 4), wb.end) : addDays(mon, 5);
+  const wEnd = addDays(mon, 7);
+  if (now >= wStart && now < wEnd) setTile('#t-we', 'Jetzt', `noch ${dur(wEnd - now)} bis Montag`, 'good');
+  else setTile('#t-we', `in ${dur(wStart - now, true)}`, `ab Freitag ${hm(wStart)} Uhr`);
+  // Feiertag
+  let next = null;
+  for (const yy of [t.getFullYear(), t.getFullYear() + 1]) {
+    for (const h of holidays(yy).list) if (h[0] >= t) { next = h; break; }
+    if (next) break;
+  }
+  if (next) {
+    const n = dayDiff(t, next[0]), wknd = next[0].getDay() === 0 || next[0].getDay() === 6;
+    setTile('#t-ft', inDays(n), `${next[1]}, ${WD[next[0].getDay()]} ${dm(next[0])}${wknd ? ' (fällt aufs Wochenende)' : ''}`, n === 0 ? 'good' : null);
+  }
+  // Urlaub
+  const tk = ymd(t);
+  const running = vacationOn(t);
+  const upcoming = state.vacation.entries.filter(e => e.from > tk).sort((a, b) => a.from.localeCompare(b.from))[0];
+  if (running) setTile('#t-ur', 'Läuft gerade', `${running.label || 'Urlaub'} bis ${WD[parseYmd(running.to).getDay()]} ${dm(parseYmd(running.to))}`, 'good');
+  else if (upcoming) {
+    const f = parseYmd(upcoming.from);
+    setTile('#t-ur', inDays(dayDiff(t, f)), `${upcoming.label || 'Urlaub'}${upcoming.example ? ' (Beispiel)' : ''}, ab ${WD[f.getDay()]} ${dm(f)}`, 'hot');
+  } else setTile('#t-ur', 'Nix geplant', 'Trag deinen nächsten Urlaub ein');
+  // Eigene Countdowns
+  for (const el of document.querySelectorAll('[data-cd]')) {
+    const c = state.ui.countdowns.find(x => x.id === el.dataset.cd);
+    if (!c) continue;
+    const day = parseYmd(c.date), n = dayDiff(t, day), target = c.time ? at(day, c.time) : day;
+    const sub = `${WDL[day.getDay()]}, ${dm(day)}${day.getFullYear() !== t.getFullYear() ? day.getFullYear() : ''}${c.time ? ` um ${c.time} Uhr` : ''}`;
+    if (n > 1 && !(c.time && target - now < 36e5 * 36)) setTile(el, `in ${n} Tagen`, sub, n <= 7 ? 'hot' : null);
+    else if (c.time && target > now) setTile(el, `in ${dur(target - now, true)}`, sub, 'hot');
+    else if (n === 1) setTile(el, 'Morgen', sub, 'hot');
+    else if (n === 0) setTile(el, c.time ? 'Läuft' : 'Heute', sub, 'good');
+    else setTile(el, `vor ${-n} ${n === -1 ? 'Tag' : 'Tagen'}`, sub);
+  }
+}
+function renderTiles() {
+  const box = $('#tiles');
+  for (const k of Object.keys(TILES)) $('#t-' + k).hidden = !state.ui.tiles[k];
+  box.querySelectorAll('[data-cd]').forEach(el => el.remove());
+  for (const c of state.ui.countdowns) {
+    const el = document.createElement('div');
+    el.className = 'tile';
+    el.id = 'cd-' + c.id;
+    el.dataset.cd = c.id;
+    el.innerHTML = '<p class="t-label"></p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p>';
+    el.querySelector('.t-label').textContent = c.name;
+    box.appendChild(el);
+  }
+  box.hidden = !box.querySelector('.tile:not([hidden])');
+}
+
+/* Kopfzeile + Takt */
+function tickHeader(now) {
+  $('#h-time').innerHTML = state.ui.seconds ? `${hm(now)}<span class="sec">:${pad(now.getSeconds())}</span>` : hm(now);
+  $('#h-date').textContent = `${WDL[now.getDay()]}, ${now.getDate()}. ${ML[now.getMonth()]} ${now.getFullYear()}`;
+  $('#h-kw').textContent = pad(isoWeek(now));
+}
+function tick() {
+  const now = new Date();
+  tickHeader(now);
+  tickBars(now);
+  tickTiles(now);
+  if (ymd(now) !== vacDayKey) renderVacation();
+}
+function renderAll() { applyUi(); renderTiles(); renderBars(); renderVacation(); renderLinks(); renderNotes(); tick(); schedLayout(); }
+
+/* Ansicht: Design, Akzentfarbe, Begrüßung, Reihenfolge und Sichtbarkeit der Widgets */
+const themeStyle = document.createElement('style');
+document.head.appendChild(themeStyle);
+let lastLook = '';
+function applyUi() {
+  const u = state.ui, root = document.documentElement;
+  if (u.theme === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', u.theme);
+  const p = ACCENTS[u.accent] || ACCENTS.amber;
+  const vars = a => `--accent:${a[0]};--accent-ink:${a[1]};--chip-bg:${a[2]};--on-accent:${a[3]};`;
+  themeStyle.textContent = `:root{${vars(p.l)}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${vars(p.d)}}}:root[data-theme="dark"]{${vars(p.d)}}`;
+  $('#h-greet').textContent = u.greet.trim() || 'Moin';
+  $('#foot-region').textContent = `Feiertage: ${REGIONS[u.region]}`;
+  const board = $('#board');
+  const want = u.widgets.map(w => w.id);
+  const have = [...board.children].filter(el => el.classList.contains('card')).map(el => el.id);
+  if (want.join() !== have.join()) for (const id of want) board.appendChild($('#' + id));
+  for (const w of u.widgets) { const el = $('#' + w.id); el.hidden = !w.on; el.dataset.span = String(w.w); }
+  $('#wx-hours-box').hidden = !u.wxHours;
+  $('#radar-box').hidden = !u.wxRadar;
+  if (!u.wxRadar && typeof stopPlay === 'function' && rd.timer) stopPlay();
+  const look = `${isDark()}|${u.accent}`;
+  if (look !== lastLook) { lastLook = look; refreshMapLook(); }
+}
+
+/* Raster: Spaltenzahl aus der Fensterbreite, Karten wandern in die jeweils kürzeste Spalte */
+const lay = { raf: 0, cols: 0, first: true };
+function schedLayout() { if (!lay.raf) lay.raf = requestAnimationFrame(layout); }
+function layout() {
+  lay.raf = 0;
+  const board = $('#board');
+  const cards = [...board.children].filter(el => el.classList.contains('card') && !el.hidden);
+  const W = board.clientWidth;
+  if (!W) return;
+  const gap = parseFloat(getComputedStyle(board).rowGap) || 20;
+  const minW = SIZES[state.ui.size] || 380;
+  const spanOf = el => Math.max(1, +el.dataset.span || 1);
+  const units = cards.reduce((s, el) => s + spanOf(el), 0) || 1;
+  const cols = Math.max(1, Math.min(Math.floor((W + gap) / (minW + gap)), units, 8));
+  lay.cols = cols;
+  if (cols === 1) {
+    board.classList.add('flow');
+    board.style.height = '';
+    cards.forEach(el => { el.style.width = ''; el.style.transform = ''; });
+    return;
+  }
+  board.classList.remove('flow');
+  const colW = (W - gap * (cols - 1)) / cols;
+  for (const el of cards) { const s = Math.min(spanOf(el), cols); el.style.width = (colW * s + gap * (s - 1)).toFixed(2) + 'px'; }
+  const heights = new Array(cols).fill(0);
+  const holes = []; // Lücken unter breiten Karten, die schmale Karten später füllen dürfen
+  const place = (el, c, top) => { el.style.transform = `translate(${(c * (colW + gap)).toFixed(2)}px,${top.toFixed(2)}px)`; };
+  for (const el of cards) {
+    const s = Math.min(spanOf(el), cols);
+    const h = el.offsetHeight;
+    let best = 0, bestTop = Infinity, bestWaste = Infinity;
+    for (let i = 0; i + s <= cols; i++) {
+      const seg = heights.slice(i, i + s), top = Math.max(...seg);
+      const waste = seg.reduce((w, x) => w + top - x, 0);
+      if (top < bestTop - 1 || (Math.abs(top - bestTop) <= 1 && waste < bestWaste)) { bestTop = top; best = i; bestWaste = waste; }
+    }
+    if (s === 1) {
+      let hi = -1;
+      holes.forEach((ho, k) => { if (ho.bottom - ho.top >= h + gap - 0.5 && ho.top < bestTop - 1 && (hi < 0 || ho.top < holes[hi].top)) hi = k; });
+      if (hi >= 0) { const ho = holes[hi]; place(el, ho.c, ho.top); ho.top += h + gap; continue; }
+    }
+    for (let i = best; i < best + s; i++) if (bestTop - heights[i] > 80) holes.push({ c: i, top: heights[i], bottom: bestTop });
+    place(el, best, bestTop);
+    for (let i = best; i < best + s; i++) heights[i] = bestTop + h + gap;
+  }
+  board.style.height = Math.max(0, Math.max(...heights) - gap) + 'px';
+  if (lay.first) { lay.first = false; setTimeout(() => board.classList.add('anim'), 450); }
+}
+if (typeof ResizeObserver === 'function') {
+  const ro = new ResizeObserver(schedLayout);
+  ro.observe($('#board'));
+  document.querySelectorAll('#board > .card').forEach(el => ro.observe(el));
+} else addEventListener('resize', schedLayout);
+
+/* Wetter */
+const HH = { name: 'Hamburg', lat: 53.5511, lon: 9.9937 };
+const wx = { live: false, loc: null, data: null, at: 0, timer: null, retry: null, seq: 0 };
+const WMO = { 0: ['Klar', 'sun'], 1: ['Überwiegend klar', 'partly'], 2: ['Teils bewölkt', 'partly'], 3: ['Bedeckt', 'cloud'], 45: ['Nebel', 'fog'], 48: ['Reifnebel', 'fog'], 51: ['Leichter Nieselregen', 'drizzle'], 53: ['Nieselregen', 'drizzle'], 55: ['Starker Nieselregen', 'drizzle'], 56: ['Gefrierender Niesel', 'drizzle'], 57: ['Gefrierender Niesel', 'drizzle'], 61: ['Leichter Regen', 'rain'], 63: ['Regen', 'rain'], 65: ['Starker Regen', 'rain'], 66: ['Gefrierender Regen', 'rain'], 67: ['Gefrierender Regen', 'rain'], 71: ['Leichter Schneefall', 'snow'], 73: ['Schneefall', 'snow'], 75: ['Starker Schneefall', 'snow'], 77: ['Schneegriesel', 'snow'], 80: ['Leichte Schauer', 'rain'], 81: ['Regenschauer', 'rain'], 82: ['Heftige Schauer', 'rain'], 85: ['Schneeschauer', 'snow'], 86: ['Starke Schneeschauer', 'snow'], 95: ['Gewitter', 'storm'], 96: ['Gewitter mit Hagel', 'storm'], 99: ['Gewitter mit Hagel', 'storm'] };
+const CLOUD = 'M6.5 15.5h11a3.5 3.5 0 0 0 .3-6.99 5 5 0 0 0-9.6-1.3A4 4 0 0 0 6.5 15.5z';
+function sunSvg(cx, cy, r) {
+  let rays = '';
+  for (let a = 0; a < 360; a += 45) {
+    const rad = a * Math.PI / 180;
+    rays += `<line x1="${(cx + Math.cos(rad) * (r + 2)).toFixed(1)}" y1="${(cy + Math.sin(rad) * (r + 2)).toFixed(1)}" x2="${(cx + Math.cos(rad) * (r + 3.8)).toFixed(1)}" y2="${(cy + Math.sin(rad) * (r + 3.8)).toFixed(1)}"/>`;
+  }
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--accent)"/><g stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round">${rays}</g>`;
+}
+const moonSvg = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--muted)"/><circle cx="${cx + r * .55}" cy="${cy - r * .45}" r="${r * .85}" fill="var(--surface)"/>`;
+const cloudSvg = (tx = 0, ty = 0) => `<path transform="translate(${tx} ${ty})" d="${CLOUD}" fill="var(--surface)" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`;
+function icon(kind, day) {
+  let s = '';
+  switch (kind) {
+    case 'sun': s = day ? sunSvg(12, 12, 4.5) : moonSvg(12, 12, 6); break;
+    case 'partly': s = (day ? sunSvg(8.5, 7.5, 3) : moonSvg(9, 7.5, 4)) + cloudSvg(1.5, 4.5); break;
+    case 'cloud': s = cloudSvg(0, 3); break;
+    case 'fog': s = '<g stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="8" x2="20" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="16" x2="20" y2="16"/></g>'; break;
+    case 'drizzle': s = cloudSvg() + '<g fill="var(--rain)"><circle cx="8.5" cy="19" r="1"/><circle cx="12.5" cy="20.5" r="1"/><circle cx="16.5" cy="19" r="1"/></g>'; break;
+    case 'rain': s = cloudSvg() + '<g stroke="var(--rain)" stroke-width="1.8" stroke-linecap="round"><line x1="8.5" y1="18" x2="7.5" y2="21"/><line x1="12.5" y1="18" x2="11.5" y2="21"/><line x1="16.5" y1="18" x2="15.5" y2="21"/></g>'; break;
+    case 'snow': s = cloudSvg() + '<g fill="var(--sea)"><circle cx="8.5" cy="19" r="1.2"/><circle cx="12.5" cy="21" r="1.2"/><circle cx="16.5" cy="19" r="1.2"/></g>'; break;
+    case 'storm': s = cloudSvg() + '<polygon points="12.5,15.5 9.5,20 12,20 10.5,23.5 15.5,18 12.8,18 14.2,15.5" fill="var(--accent)"/>'; break;
+    default: s = cloudSvg(0, 3);
+  }
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${s}</svg>`;
+}
+async function getJson(url, ms = 9000) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
+function geo() {
+  return new Promise(res => {
+    if (!navigator.geolocation) return res(null);
+    try { navigator.geolocation.getCurrentPosition(p => res(p.coords), () => res(null), { timeout: 10000, maximumAge: 15 * 6e4 }); }
+    catch { res(null); }
+  });
+}
+const fmtT = s => hm(new Date(s * 1000));
+const near = (a, b) => Math.abs(a.lat - b.lat) < 0.02 && Math.abs(a.lon - b.lon) < 0.02;
+
+async function startWeather() {
+  clearTimeout(wx.retry);
+  const fixed = state.loc && state.loc.mode === 'fixed';
+  const first = fixed ? { name: state.loc.name, lat: state.loc.lat, lon: state.loc.lon, how: 'fixed' } : (lsGet(GEO_KEY) || { ...HH, how: 'default' });
+  const seq = ++wx.seq;
+  const ok = await loadWeather(first, seq);
+  if (!ok || fixed || seq !== wx.seq) return;
+  const c = await geo();
+  if (!c || seq !== wx.seq) return;
+  const g = { name: 'Dein Standort', lat: c.latitude, lon: c.longitude, how: 'geo' };
+  if (first.how === 'geo' && near(first, g)) return;
+  try {
+    const r = await getJson(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${g.lat}&longitude=${g.lon}&localityLanguage=de`, 5000);
+    g.name = r.city || r.locality || g.name;
+  } catch {}
+  lsSet(GEO_KEY, g);
+  if (seq === wx.seq) loadWeather(g, seq);
+}
+async function loadWeather(loc, seq) {
+  const q = `latitude=${(+loc.lat).toFixed(4)}&longitude=${(+loc.lon).toFixed(4)}`;
+  const url = `https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,is_day&minutely_15=precipitation&hourly=temperature_2m,precipitation_probability,weather_code,is_day&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&timezone=auto&timeformat=unixtime&forecast_days=2&wind_speed_unit=kmh`;
+  try {
+    const d = await getJson(url);
+    if (seq !== undefined && seq !== wx.seq) return true;
+    wx.live = true; wx.loc = loc; wx.data = d; wx.at = Date.now();
+    renderWeather();
+    ensureRadar(loc);
+    clearTimeout(wx.timer);
+    wx.timer = setTimeout(() => loadWeather(wx.loc), 10 * 6e4);
+    return true;
+  } catch {
+    if (!wx.live) showWxOff();
+    else { $('#wx-src').textContent = `Stand ${hm(new Date(wx.at))}. Aktualisieren hat gerade nicht geklappt.`; clearTimeout(wx.timer); wx.timer = setTimeout(() => loadWeather(wx.loc), 3 * 6e4); }
+    return false;
+  }
+}
+function showWxOff() {
+  const inClaude = !!(window.claude && typeof window.claude.use === 'function');
+  $('#wx-live').hidden = true;
+  $('#wx-off').hidden = false;
+  $('#wx-loc-btn').hidden = true;
+  if (inClaude) {
+    $('#wx-off-title').textContent = 'Live-Wetter läuft in dieser Ansicht nicht';
+    $('#wx-off-text').textContent = 'Claude sperrt hier alle externen Datenquellen. Öffne die Dashboard-Datei direkt in Safari, Chrome oder Edge, dann laufen Temperatur, Regen der nächsten 2 Stunden und das Regenradar live. Bis dahin bringen dich die Links unten direkt zum Radar.';
+    $('#wx-retry').hidden = true;
+  } else {
+    $('#wx-off-title').textContent = 'Wetterdienst gerade nicht erreichbar';
+    $('#wx-off-text').textContent = 'Keine Verbindung zu den Wetterdaten. In ein paar Minuten gibt es automatisch einen neuen Versuch.';
+    $('#wx-retry').hidden = false;
+    clearTimeout(wx.retry);
+    wx.retry = setTimeout(startWeather, 3 * 6e4);
+  }
+  $('#wx-src').textContent = '';
+}
+$('#wx-retry').addEventListener('click', () => { $('#wx-off-title').textContent = 'Wetter wird geladen'; startWeather(); });
+
+function renderWeather() {
+  const d = wx.data, c = d.current || {}, loc = wx.loc;
+  $('#wx-off').hidden = true;
+  $('#wx-live').hidden = false;
+  $('#wx-loc-btn').hidden = false;
+  $('#wx-loc').textContent = loc.name;
+  $('#lk-rv').href = `https://www.rainviewer.com/map.html?loc=${(+loc.lat).toFixed(4)},${(+loc.lon).toFixed(4)},8&layer=radar`;
+  const w = WMO[c.weather_code] || ['Wetter', 'cloud'];
+  $('#wx-icon').innerHTML = icon(w[1], c.is_day !== 0);
+  $('#wx-temp').textContent = Number.isFinite(c.temperature_2m) ? `${Math.round(c.temperature_2m)}°` : '';
+  $('#wx-desc').textContent = w[0];
+  $('#wx-feel').textContent = Number.isFinite(c.apparent_temperature) ? `gefühlt ${Math.round(c.apparent_temperature)}°` : '';
+  const dl = [];
+  if (d.daily && d.daily.temperature_2m_max) dl.push(['Heute', `${Math.round(d.daily.temperature_2m_min[0])}° bis ${Math.round(d.daily.temperature_2m_max[0])}°`]);
+  if (Number.isFinite(c.wind_speed_10m)) dl.push(['Wind', `${Math.round(c.wind_speed_10m)} km/h${Number.isFinite(c.wind_gusts_10m) ? `, Böen ${Math.round(c.wind_gusts_10m)}` : ''}`]);
+  if (Number.isFinite(c.relative_humidity_2m)) dl.push(['Feuchte', `${Math.round(c.relative_humidity_2m)} %`]);
+  if (d.daily && d.daily.sunrise) dl.push(['Sonne', `${fmtT(d.daily.sunrise[0])} bis ${fmtT(d.daily.sunset[0])}`]);
+  $('#wx-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+
+  // Regen in den nächsten 2 Stunden (15-Minuten-Schritte)
+  const m = d.minutely_15, now = Date.now();
+  const bars = $('#wx-rainbars'), lbl = $('#wx-rainlbl');
+  bars.textContent = ''; lbl.textContent = '';
+  if (m && Array.isArray(m.time) && Array.isArray(m.precipitation)) {
+    let i = m.time.findIndex(t => t * 1000 + 15 * 6e4 > now);
+    if (i < 0) i = m.time.length;
+    const slots = m.time.slice(i, i + 8).map((t, k) => ({ t: t * 1000, v: +(m.precipitation[i + k] || 0) }));
+    const max = Math.max(0.6, ...slots.map(s => s.v));
+    slots.forEach((s, k) => {
+      const wet = s.v >= 0.05;
+      const b = document.createElement('div');
+      b.className = 'rb' + (wet ? ' wet' : '');
+      b.style.setProperty('--h', wet ? Math.max(8, s.v / max * 100) + '%' : '2px');
+      b.title = `${hm(new Date(s.t))} Uhr: ${numDe(s.v, 1)} mm`;
+      bars.appendChild(b);
+      const l = document.createElement('span');
+      l.textContent = k % 2 === 0 ? (k === 0 ? 'jetzt' : hm(new Date(s.t))) : '';
+      lbl.appendChild(l);
+    });
+    const wetIdx = slots.findIndex(s => s.v >= 0.05);
+    let txt;
+    if (!slots.length) txt = 'Keine Kurzfrist-Daten für diesen Ort.';
+    else if (wetIdx < 0) txt = 'Bleibt trocken in den nächsten 2 Stunden.';
+    else if (wetIdx === 0) {
+      const dry = slots.findIndex(s => s.v < 0.05);
+      txt = dry < 0 ? 'Regnet die nächsten 2 Stunden durch. Schirm einpacken.' : `Regnet gerade, trocken ab etwa ${hm(new Date(slots[dry].t))} Uhr.`;
+    } else txt = `Regen ab etwa ${hm(new Date(slots[wetIdx].t))} Uhr.`;
+    $('#wx-rain-txt').textContent = txt;
+  } else $('#wx-rain-txt').textContent = 'Keine Kurzfrist-Daten für diesen Ort.';
+
+  // Stundenleiste
+  const h = d.hourly, hours = $('#wx-hours');
+  hours.textContent = '';
+  if (h && Array.isArray(h.time)) {
+    let i = h.time.findIndex(t => t * 1000 + 36e5 > now);
+    if (i < 0) i = 0;
+    for (let k = i; k < Math.min(i + 12, h.time.length); k++) {
+      const ww = WMO[h.weather_code[k]] || ['', 'cloud'];
+      const el = document.createElement('div');
+      el.className = 'hr';
+      const pp = h.precipitation_probability ? h.precipitation_probability[k] : null;
+      el.innerHTML = `<span>${k === i ? 'Jetzt' : new Date(h.time[k] * 1000).getHours() + ' Uhr'}</span>${icon(ww[1], h.is_day ? h.is_day[k] !== 0 : true)}<b>${Math.round(h.temperature_2m[k])}°</b><span class="pp">${pp == null ? '' : pp + ' %'}</span>`;
+      el.title = ww[0];
+      hours.appendChild(el);
+    }
+  }
+  $('#wx-src').textContent = `Stand ${hm(new Date(wx.at))} Uhr · Wetterdaten: Open-Meteo · Radar: RainViewer`;
+}
+
+/* Ort ändern */
+$('#wx-loc-btn').addEventListener('click', () => {
+  const f = $('#wx-loc-form');
+  f.hidden = !f.hidden;
+  if (!f.hidden) { $('#loc-res').textContent = ''; $('#loc-err').hidden = true; $('#loc-q').value = ''; $('#loc-q').focus(); }
+});
+$('#loc-cancel').addEventListener('click', () => { $('#wx-loc-form').hidden = true; });
+$('#wx-loc-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const q = $('#loc-q').value.trim();
+  const res = $('#loc-res'), errEl = $('#loc-err');
+  res.textContent = ''; errEl.hidden = true;
+  if (q.length < 2) { errEl.textContent = 'Gib mindestens zwei Buchstaben ein.'; errEl.hidden = false; return; }
+  try {
+    const j = await getJson(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=de&format=json`);
+    const list = (j && j.results) || [];
+    if (!list.length) { errEl.textContent = `Kein Ort namens „${q}" gefunden.`; errEl.hidden = false; return; }
+    for (const r of list) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn-ghost';
+      b.textContent = [r.name, r.admin1, r.country_code].filter(Boolean).join(', ');
+      b.addEventListener('click', () => setLoc({ mode: 'fixed', name: r.name, lat: r.latitude, lon: r.longitude }));
+      res.appendChild(b);
+    }
+  } catch { errEl.textContent = 'Ortssuche gerade nicht erreichbar.'; errEl.hidden = false; }
+});
+function setLoc(loc) { state.loc = loc; $('#wx-loc-form').hidden = true; commit(); startWeather(); }
+$('#loc-hh').addEventListener('click', () => setLoc({ mode: 'fixed', ...HH }));
+$('#loc-auto').addEventListener('click', () => setLoc({ mode: 'auto' }));
+
+/* Regenradar (Leaflet + RainViewer), nur wenn externe Daten erreichbar sind */
+const rd = { map: null, base: null, ref: null, marker: null, layers: [], times: [], idx: 0, timer: null, userPaused: false, loading: null };
+function isDark() {
+  const t = document.documentElement.getAttribute('data-theme');
+  if (t === 'dark') return true;
+  if (t === 'light') return false;
+  return matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function loadLeaflet() {
+  if (window.L) return Promise.resolve(window.L);
+  if (rd.loading) return rd.loading;
+  rd.loading = new Promise((res, rej) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';
+    css.integrity = 'sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==';
+    css.crossOrigin = 'anonymous';
+    document.head.appendChild(css);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
+    s.integrity = 'sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==';
+    s.crossOrigin = 'anonymous';
+    s.onload = () => res(window.L);
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+  return rd.loading;
+}
+async function ensureRadar(loc) {
+  let L;
+  try { L = await loadLeaflet(); } catch { radarMsg('Karte konnte nicht geladen werden.'); return; }
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#E8A126';
+  if (!rd.map) {
+    rd.map = L.map('radar', { scrollWheelZoom: false, minZoom: 4, maxZoom: 10, zoomControl: false });
+    L.control.zoom({ position: 'bottomright' }).addTo(rd.map);
+    rd.map.createPane('labels');
+    rd.map.getPane('labels').style.zIndex = 450;
+    rd.map.getPane('labels').style.pointerEvents = 'none';
+    rd.base = L.tileLayer(esriUrl('Base'), { maxNativeZoom: 16, maxZoom: 19, attribution: 'Karte &copy; Esri' }).addTo(rd.map);
+    rd.ref = L.tileLayer(esriUrl('Reference'), { pane: 'labels', maxNativeZoom: 16, maxZoom: 19, opacity: 0.85 }).addTo(rd.map);
+    rd.marker = L.circleMarker([loc.lat, loc.lon], { radius: 6, weight: 2, color: '#ffffff', fillColor: accent, fillOpacity: 1, pane: 'markerPane' }).addTo(rd.map);
+    if (typeof ResizeObserver === 'function') new ResizeObserver(() => rd.map && rd.map.invalidateSize()).observe($('#radar'));
+  }
+  rd.map.setView([loc.lat, loc.lon], 7);
+  rd.marker.setLatLng([loc.lat, loc.lon]);
+  setTimeout(() => rd.map.invalidateSize(), 60);
+  await refreshRadar();
+}
+function radarMsg(t) { const el = $('#radar-msg'); el.textContent = t || ''; el.hidden = !t; }
+async function refreshRadar() {
+  const L = window.L;
+  try {
+    const j = await getJson('https://api.rainviewer.com/public/weather-maps.json');
+    const past = (j.radar && j.radar.past) || [];
+    if (!past.length) throw new Error('leer');
+    rd.layers.forEach(l => rd.map.removeLayer(l));
+    rd.layers = past.map(f => L.tileLayer(`${j.host}${f.path}/256/{z}/{x}/{y}/2/1_1.png`, { opacity: 0, zIndex: 5, maxNativeZoom: 7, maxZoom: 10, attribution: 'Radar &copy; RainViewer' }).addTo(rd.map));
+    rd.times = past.map(f => f.time * 1000);
+    $('#rd-slider').max = String(rd.layers.length - 1);
+    showFrame(rd.layers.length - 1);
+    radarMsg('');
+    if (!reduceMotion && !rd.userPaused) play(); else stopPlay();
+  } catch { radarMsg('Radarbilder gerade nicht erreichbar.'); }
+}
+function showFrame(i) {
+  rd.idx = i;
+  rd.layers.forEach((l, k) => l.setOpacity(k === i ? 0.8 : 0));
+  $('#rd-slider').value = String(i);
+  const t = rd.times[i];
+  $('#rd-time').textContent = t ? `${hm(new Date(t))} Uhr${i === rd.layers.length - 1 ? ', neuestes' : ''}` : '';
+}
+function play() {
+  clearInterval(rd.timer);
+  let hold = 0;
+  rd.timer = setInterval(() => {
+    if (!rd.layers.length) return;
+    if (rd.idx === rd.layers.length - 1 && hold < 3) { hold++; return; }
+    hold = 0;
+    showFrame((rd.idx + 1) % rd.layers.length);
+  }, 550);
+  $('#rd-play').textContent = 'Pause';
+  $('#rd-play').setAttribute('aria-pressed', 'true');
+}
+function stopPlay() {
+  clearInterval(rd.timer); rd.timer = null;
+  $('#rd-play').textContent = 'Abspielen';
+  $('#rd-play').setAttribute('aria-pressed', 'false');
+}
+$('#rd-play').addEventListener('click', () => { if (rd.timer) { rd.userPaused = true; stopPlay(); } else { rd.userPaused = false; play(); } });
+$('#rd-slider').addEventListener('input', e => { rd.userPaused = true; stopPlay(); showFrame(+e.target.value); });
+
+/* Aufgaben: in der Claude-Ansicht über den Connector, als Datei im Browser direkt über die Todoist API mit eigenem Token */
+const TD = 'Todoist';
+const tkKeys = () => state.ui.projects.map(n => [n.toLowerCase(), n]);
+const AUTHZ = ['needs_reauth', 'server_not_connected', 'server_not_found', 'selection_required', 'blocked_by_policy', 'not_in_manifest', 'approval_required'];
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const tk = { mode: null, mcp: null, proj: {}, tasks: {}, stamp: 0, unsub: [], pending: new Set(), open: {}, busy: null, projAt: 0, memTok: '' };
+function tkReset() {
+  tk.unsub.forEach(u => u());
+  tk.unsub = [];
+  tk.proj = {}; tk.tasks = {}; tk.open = {};
+  for (const [k] of tkKeys()) { tk.proj[k] = null; tk.tasks[k] = null; }
+  tk.projAt = 0;
+  tk.stamp = 0;
+}
+tkReset();
+const tkNoProj = () => tkKeys().every(([k]) => !tk.proj[k]);
+const tkAllNull = () => tkKeys().every(([k]) => tk.tasks[k] == null);
+function tkSetAll(v) { for (const [k] of tkKeys()) tk.tasks[k] = v === null ? null : []; }
+function tkNamesTxt() { const n = state.ui.projects.map(p => `„${p}"`); return n.length > 1 ? `${n.slice(0, -1).join(', ')} oder ${n[n.length - 1]}` : n[0]; }
+function tkPick(list) { for (const [k] of tkKeys()) tk.proj[k] = list.find(p => String(p.name || '').trim().toLowerCase() === k) || null; }
+function tasksReconfigure() {
+  tkReset();
+  renderTasks();
+  if (tk.mode === 'mcp' && tk.mcp) loadProjects();
+  else if (tk.mode === 'api' && tdToken()) tdLoad();
+}
+const inClaudeView = () => !!(window.claude && typeof window.claude.use === 'function');
+
+function tkMsg(text, btnLabel, fn) {
+  $('#tk-state').hidden = !text;
+  $('#tk-state-text').textContent = text || '';
+  const b = $('#tk-action');
+  b.hidden = !btnLabel;
+  b.textContent = btnLabel || '';
+  b.onclick = fn ? () => { b.disabled = true; Promise.resolve(fn()).finally(() => { b.disabled = false; }); } : null;
+}
+function tkError(e, retry) {
+  switch (e && e.code) {
+    case 'server_not_connected': case 'server_not_found':
+      return tkMsg('Todoist ist in deinem Claude-Account nicht verbunden. Verbinde es in claude.ai unter Einstellungen, Connectors und lad die Seite neu.');
+    case 'needs_reauth':
+      return tkMsg('Die Verbindung zu Todoist ist abgelaufen. Verbinde Todoist in claude.ai unter Einstellungen, Connectors neu.');
+    case 'selection_required':
+      return tkMsg('Todoist ist bei dir mehrfach verbunden. Wähl in der Abfrage aus, welche Verbindung diese Seite nutzen soll, und lad dann neu.');
+    case 'blocked_by_policy':
+      return tkMsg('Deine Organisation erlaubt Todoist auf dieser Seite nicht.');
+    case 'not_in_manifest':
+      return tkMsg('Todoist ist für diese Seite noch nicht freigegeben.', 'Freigeben', async () => {
+        const perms = await window.claude.use('permissions').catch(() => null);
+        if (!perms) return tkMsg('Gib Todoist im Berechtigungen-Menü dieser Seite frei.');
+        const st = await perms.request(['mcp:' + TD]).catch(() => ({}));
+        if (st['mcp:' + TD] === 'denied') {
+          tkMsg('Todoist ist für diese Seite gesperrt.', 'Berechtigungen öffnen', () => perms.manage().then(retry).catch(() => tkMsg('Gib Todoist im Berechtigungen-Menü dieser Seite frei.')));
+        } else return retry();
+      });
+    case 'approval_required':
+      return tkMsg('Todoist braucht noch dein OK, bevor deine Aufgaben hier erscheinen.', 'Aufgaben laden', retry);
+    case 'tool_error':
+      return tkMsg(`Todoist meldet einen Fehler: ${(e && e.message) || 'unbekannt'}`, 'Nochmal', retry);
+    case 'not_granted': case 'capability_disabled': case 'capability_removed':
+      return tkMsg('Todoist kann in dieser Ansicht nicht geladen werden.');
+    default:
+      if (e && e.retryable && !tk.retried) { tk.retried = true; setTimeout(() => { tk.retried = false; retry(); }, (e.retryAfterMs || 2000) + Math.random() * 1500); }
+      return tkMsg('Todoist ist gerade nicht erreichbar.', 'Nochmal', retry);
+  }
+}
+async function initTasks() {
+  if (!inClaudeView()) {
+    tk.mode = 'api';
+    $('#tk-conf').hidden = false;
+    setInterval(() => { if (document.visibilityState === 'visible') tdLoad(); }, 120000);
+    if (!tdToken()) return tdAsk();
+    renderTasks();
+    return tdLoad();
+  }
+  tk.mode = 'mcp';
+  renderTasks();
+  const mcp = await window.claude.use('mcp').catch(() => null);
+  if (!mcp) { tkMsg('Todoist kann in dieser Ansicht nicht geladen werden.'); return; }
+  tk.mcp = mcp;
+  loadProjects();
+}
+async function loadProjects() {
+  try {
+    const r = await tk.mcp.callTool(TD, 'find-projects', { limit: 200 }, { cache: { staleTime: 300000, gcTime: 86400000 } });
+    const list = r && r.payload && Array.isArray(r.payload.projects) ? r.payload.projects : [];
+    tkPick(list);
+    if (tkNoProj()) { tkSetAll([]); renderTasks(); tkMsg(`In deinem Todoist gibt es kein Projekt namens ${tkNamesTxt()}.`); return; }
+    tkMsg('');
+    startWatches();
+  } catch (e) { tkError(e, loadProjects); }
+}
+function startWatches() {
+  tk.unsub.forEach(u => u());
+  tk.unsub = [];
+  for (const [key] of tkKeys()) {
+    const p = tk.proj[key];
+    if (!p) { tk.tasks[key] = []; continue; }
+    tk.unsub.push(tk.mcp.watchTool(TD, 'find-tasks', { projectId: p.id, limit: 100 }, ev => {
+      if (ev.type === 'data') {
+        const pl = ev.result && ev.result.payload;
+        tk.tasks[key] = pl && Array.isArray(pl.tasks) ? pl.tasks : [];
+        tk.stamp = (ev.result.cache && ev.result.cache.storedAt) || Date.now();
+        tkMsg('');
+        renderTasks();
+      } else {
+        const e = ev.error || {};
+        if (AUTHZ.includes(e.code)) { tkSetAll(null); renderTasks(); }
+        tkError(e, fetchTasksOnce);
+      }
+    }, { cache: { staleTime: 60000, gcTime: 86400000 }, refetchInterval: 120000 }));
+  }
+  renderTasks();
+}
+async function fetchTasksOnce() {
+  try {
+    if (tkNoProj()) return loadProjects();
+    for (const [key] of tkKeys()) {
+      const p = tk.proj[key];
+      if (!p) continue;
+      const r = await tk.mcp.callTool(TD, 'find-tasks', { projectId: p.id, limit: 100 }, { cache: { staleTime: 0, gcTime: 86400000 } });
+      tk.tasks[key] = r && r.payload && Array.isArray(r.payload.tasks) ? r.payload.tasks : [];
+    }
+    tk.stamp = Date.now();
+    tkMsg('');
+    renderTasks();
+  } catch (e) { tkError(e, fetchTasksOnce); }
+}
+
+/* Todoist API direkt (nur außerhalb der Claude-Ansicht) */
+const TK_TOKEN = 'jere-cockpit-todoist';
+const TD_API = 'https://api.todoist.com/api/v1';
+function tdToken() {
+  try { return localStorage.getItem(TK_TOKEN) || tk.memTok; } catch { return tk.memTok; }
+}
+function tdSetToken(v) {
+  tk.memTok = v || '';
+  try { if (v) localStorage.setItem(TK_TOKEN, v); else localStorage.removeItem(TK_TOKEN); return true; } catch { return false; }
+}
+function tdErr(code, msg, extra) { const e = new Error(msg || code); e.code = code; Object.assign(e, extra || {}); return e; }
+async function tdFetch(path, method, token) {
+  const tok = token || tdToken();
+  if (!tok) throw tdErr('no_token');
+  let r;
+  try {
+    r = await fetch(TD_API + path, {
+      method: method || 'GET',
+      headers: { Authorization: 'Bearer ' + tok },
+      cache: 'no-store',
+      signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(15000) : undefined
+    });
+  } catch (e) { throw tdErr('network', e && e.message); }
+  if (r.status === 401) throw tdErr('bad_token', 'Unauthorized', { status: 401 });
+  if (r.status === 429) {
+    let wait = +r.headers.get('retry-after');
+    if (!Number.isFinite(wait) || wait <= 0) wait = 30;
+    throw tdErr('rate', 'Too many requests', { status: 429, retryAfter: Math.min(wait, 900) });
+  }
+  if (r.status === 404) throw tdErr('not_found', 'Not found', { status: 404 });
+  if (!r.ok) {
+    let m = '';
+    try { const j = await r.json(); m = j && (j.error || j.error_tag) || ''; } catch { /* kein JSON */ }
+    throw tdErr('http', m, { status: r.status });
+  }
+  const txt = await r.text();
+  if (!txt) return null;
+  try { return JSON.parse(txt); } catch { return null; }
+}
+async function tdAll(path, token) {
+  const out = [];
+  let cursor = null, pages = 0;
+  do {
+    const sep = path.includes('?') ? '&' : '?';
+    const j = await tdFetch(`${path}${sep}limit=200${cursor ? '&cursor=' + encodeURIComponent(cursor) : ''}`, 'GET', token);
+    if (j && Array.isArray(j.results)) out.push(...j.results);
+    cursor = j && j.next_cursor;
+    pages++;
+  } while (cursor && pages < 10);
+  return out;
+}
+const tdTask = t => ({
+  id: String(t.id),
+  content: t.content,
+  priority: 'p' + (5 - Math.min(4, Math.max(1, Math.round(+t.priority) || 1))),
+  parentId: t.parent_id ? String(t.parent_id) : null,
+  checked: !!t.checked,
+  due: t.due || null
+});
+function tdLoad(again) {
+  if (tk.mode !== 'api' || !tdToken()) return Promise.resolve();
+  if (tk.busy) return tk.busy;
+  tk.busy = (async () => {
+    try {
+      if (tkNoProj() || Date.now() - tk.projAt > 30 * 6e4) {
+        const ps = (await tdAll('/projects')).filter(p => p && !p.is_deleted && !p.is_archived);
+        tkPick(ps);
+        tk.projAt = Date.now();
+        if (tkNoProj()) {
+          tkSetAll([]);
+          renderTasks();
+          tkMsg(`In deinem Todoist gibt es kein Projekt namens ${tkNamesTxt()}.`, 'Nochmal', () => { tk.projAt = 0; return tdLoad(); });
+          return;
+        }
+      }
+      const next = {};
+      for (const [key] of tkKeys()) {
+        const p = tk.proj[key];
+        next[key] = p
+          ? (await tdAll('/tasks?project_id=' + encodeURIComponent(p.id)))
+              .filter(t => t && !t.checked && !t.is_deleted)
+              .sort((a, b) => (+a.child_order || 0) - (+b.child_order || 0))
+              .map(tdTask)
+          : [];
+      }
+      tk.tasks = next;
+      tk.stamp = Date.now();
+      tk.retried = false;
+      $('#tk-cols').hidden = false;
+      tkMsg('');
+      renderTasks();
+    } catch (e) {
+      if (e.code === 'not_found' && !again) { tk.projAt = 0; tk.busy = null; return tdLoad(true); }
+      tdError(e);
+    }
+  })().finally(() => { tk.busy = null; });
+  return tk.busy;
+}
+function tdError(e) {
+  const c = e && e.code;
+  if (c === 'no_token') return tdAsk();
+  if (c === 'bad_token') {
+    tkSetAll(null);
+    tk.stamp = 0;
+    renderTasks();
+    return tdAsk('Todoist nimmt deinen Token nicht mehr an. Wahrscheinlich wurde er neu erzeugt. Füg den aktuellen hier ein.');
+  }
+  if (c === 'rate') {
+    setTimeout(() => tdLoad(), e.retryAfter * 1000);
+    return tkMsg('Todoist bremst gerade, weil zu viele Anfragen kamen. Das Cockpit versucht es gleich von selbst nochmal.');
+  }
+  const since = tk.stamp ? ` Du siehst den Stand von ${hm(new Date(tk.stamp))} Uhr.` : '';
+  if (c === 'network') {
+    if (!tk.retried) { tk.retried = true; setTimeout(() => tdLoad(), 5000 + Math.random() * 2000); }
+    return tkMsg(`Todoist ist gerade nicht erreichbar.${since}`, 'Nochmal', () => tdLoad());
+  }
+  return tkMsg(`Todoist meldet einen Fehler${e && e.status ? ` (Status ${e.status})` : ''}.${since}`, 'Nochmal', () => tdLoad());
+}
+function tdAsk(err) {
+  const has = !!tdToken();
+  tkMsg('');
+  $('#tk-cols').hidden = !has || (tkAllNull() && !!err);
+  $('#tk-token').value = '';
+  $('#tk-token').placeholder = has && !err ? 'Gespeichert. Für einen neuen hier einfügen' : 'Token aus Todoist einfügen';
+  $('#tk-cancel').hidden = !has || !!err;
+  $('#tk-forget').hidden = !has;
+  $('#tk-err').textContent = err || '';
+  $('#tk-err').hidden = !err;
+  $('#tk-form').hidden = false;
+}
+$('#tk-conf').addEventListener('click', () => {
+  if ($('#tk-form').hidden) { tdAsk(); $('#tk-token').focus(); }
+  else if (tdToken()) $('#tk-form').hidden = true;
+});
+$('#tk-cancel').addEventListener('click', () => { $('#tk-form').hidden = true; });
+$('#tk-forget').addEventListener('click', () => {
+  tdSetToken('');
+  tkReset();
+  renderTasks();
+  tdAsk();
+});
+$('#tk-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const v = $('#tk-token').value.replace(/\s+/g, '');
+  const fail = m => { $('#tk-err').textContent = m; $('#tk-err').hidden = false; };
+  if (!v) { if (tdToken() && $('#tk-err').hidden) { $('#tk-form').hidden = true; return; } return fail('Füg zuerst deinen Token ein.'); }
+  const btn = $('#tk-save');
+  btn.disabled = true;
+  btn.textContent = 'Prüfe …';
+  try {
+    await tdFetch('/projects?limit=1', 'GET', v);
+    const saved = tdSetToken(v);
+    $('#tk-form').hidden = true;
+    tkReset();
+    $('#tk-cols').hidden = false;
+    renderTasks();
+    await tdLoad();
+    if (!saved) tkMsg('Dein Browser speichert hier nichts dauerhaft, zum Beispiel im privaten Fenster. Der Token gilt deshalb nur, bis du die Seite schließt.');
+  } catch (err) {
+    const c = err && err.code;
+    fail(c === 'bad_token' ? 'Der Token passt nicht. Kopier ihn nochmal komplett aus Todoist.'
+      : c === 'network' ? 'Todoist ist gerade nicht erreichbar. Prüf deine Verbindung und versuch es nochmal.'
+      : c === 'rate' ? 'Todoist bremst gerade. Versuch es in einer Minute nochmal.'
+      : `Das hat nicht geklappt${err && err.status ? ` (Status ${err.status})` : ''}.`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verbinden';
+  }
+});
+
+const plain = s => String(s || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|__|`/g, '').trim();
+function dueInfo(t) {
+  const raw = t.dueDate || (t.due && (t.due.datetime || t.due.date)) || null;
+  if (!raw) return null;
+  const s = String(raw);
+  let date, time = '';
+  if (/Z$|[+-]\d\d:\d\d$/.test(s)) { const dt = new Date(s); date = sod(dt); time = hm(dt); }
+  else { if (!validYmd(s.slice(0, 10))) return null; date = parseYmd(s.slice(0, 10)); if (s.length > 10) time = s.slice(11, 16); }
+  const now = new Date(), dd = dayDiff(now, date);
+  const over = dd < 0 || (dd === 0 && time && at(date, time) < now);
+  let label = dd === 0 ? 'Heute' : dd === 1 ? 'Morgen' : dd === -1 ? 'Gestern' : dd > 1 && dd < 7 ? WDL[date.getDay()] : `${WD[date.getDay()]} ${dm(date)}`;
+  if (time) label += ` ${time}`;
+  return { label: over && dd < 0 ? `${label}, überfällig` : label, s: over ? 'over' : dd === 0 ? 'today' : 'later', key: (time ? at(date, time) : addDays(date, 1)).getTime() - 1 };
+}
+function renderTasks() {
+  if (!tk.mode) return;
+  const now = Date.now();
+  const wrap = $('#tk-cols');
+  wrap.textContent = '';
+  for (const [key, title] of tkKeys()) {
+    const col = document.createElement('div');
+    col.className = 'tk-col';
+    wrap.appendChild(col);
+    const proj = tk.proj[key];
+    const list = tk.tasks[key];
+    const h = document.createElement('h3');
+    const a = document.createElement('a');
+    a.textContent = title;
+    a.href = proj ? `https://app.todoist.com/app/project/${encodeURIComponent(proj.id)}` : 'https://app.todoist.com/app';
+    a.target = '_blank'; a.rel = 'noopener';
+    h.appendChild(a);
+    col.appendChild(h);
+    if (list == null) {
+      const p = document.createElement('p');
+      p.className = 'hint';
+      p.textContent = tk.mcp || (tk.mode === 'api' && tdToken()) ? 'Wird geladen …' : 'Noch nicht geladen.';
+      col.appendChild(p);
+      continue;
+    }
+    const open = list.filter(t => t && !t.checked).map((t, i) => ({ t, i, due: dueInfo(t), id: t.id, parentId: t.parentId }));
+    const ids = new Set(open.map(x => x.id));
+    const kids = new Map();
+    const tops = [];
+    for (const x of open) {
+      if (x.parentId && ids.has(x.parentId)) { if (!kids.has(x.parentId)) kids.set(x.parentId, []); kids.get(x.parentId).push(x); }
+      else tops.push(x);
+    }
+    tops.sort((x, y) => ((x.due ? x.due.key : Infinity) - (y.due ? y.due.key : Infinity)) || x.i - y.i);
+    const urgent = open.filter(x => x.due && x.due.s !== 'later').length;
+    const cnt = document.createElement('span');
+    cnt.textContent = String(open.length);
+    h.appendChild(cnt);
+    if (urgent) { const c = document.createElement('span'); c.className = 'chip'; c.textContent = `${urgent} heute`; h.appendChild(c); }
+    if (!proj) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = `Kein Projekt „${title}" gefunden.`; col.appendChild(p); continue; }
+    if (!open.length) { const p = document.createElement('p'); p.className = 'hint'; p.textContent = 'Alles erledigt. Nice.'; col.appendChild(p); continue; }
+    const ul = document.createElement('ul');
+    ul.className = 'tasks';
+    const LIMIT = 7;
+    const shown = tk.open[key] ? tops : tops.slice(0, LIMIT);
+    const add = (x, sub) => {
+      const t = x.t, due = x.due;
+      const li = document.createElement('li');
+      li.className = 'task' + (sub ? ' sub' : '') + (tk.pending.has(t.id) ? ' done' : '');
+      li.dataset.p = ['p1', 'p2', 'p3'].includes(t.priority) ? t.priority : 'p4';
+      li.innerHTML = `<button type="button" class="check" data-done="${esc(t.id)}">${CHECK}</button><div class="t-body"><a class="t-title" target="_blank" rel="noopener"></a>${due ? `<span class="due" data-s="${due.s}">${esc(due.label)}</span>` : ''}</div>`;
+      const link = li.querySelector('.t-title');
+      link.textContent = plain(t.content) || 'Ohne Titel';
+      link.href = `https://app.todoist.com/app/task/${encodeURIComponent(t.id)}`;
+      li.querySelector('.check').setAttribute('aria-label', `„${plain(t.content)}" erledigen`);
+      ul.appendChild(li);
+    };
+    for (const t of shown) { add(t, false); (kids.get(t.id) || []).forEach(k => add(k, true)); }
+    col.appendChild(ul);
+    if (tops.length > LIMIT) {
+      const more = document.createElement('button');
+      more.type = 'button';
+      more.className = 'more';
+      more.textContent = tk.open[key] ? 'Weniger anzeigen' : `${tops.length - LIMIT} weitere anzeigen`;
+      more.addEventListener('click', () => { tk.open[key] = !tk.open[key]; renderTasks(); });
+      col.appendChild(more);
+    }
+  }
+  $('#tk-src').textContent = tk.stamp ? `Stand ${hm(new Date(tk.stamp))} Uhr` : '';
+}
+function findTask(id) {
+  for (const [key] of tkKeys()) { const t = (tk.tasks[key] || []).find(x => x.id === id); if (t) return { key, t }; }
+  return null;
+}
+$('#tk-cols').addEventListener('click', async e => {
+  const b = e.target.closest('[data-done]');
+  const api = tk.mode === 'api';
+  if (!b || (!api && !tk.mcp)) return;
+  const id = b.dataset.done;
+  if (tk.pending.has(id)) return;
+  const hit = findTask(id);
+  const name = hit ? plain(hit.t.content) : 'Aufgabe';
+  const path = verb => `/tasks/${encodeURIComponent(id)}/${verb}`;
+  tk.pending.add(id);
+  renderTasks();
+  try {
+    if (api) await tdFetch(path('close'), 'POST');
+    else await tk.mcp.callTool(TD, 'complete-tasks', { ids: [id] }, { cache: false });
+    if (hit) tk.tasks[hit.key] = tk.tasks[hit.key].filter(x => x.id !== id && x.parentId !== id);
+    tk.pending.delete(id);
+    renderTasks();
+    toast(`„${name}" erledigt`, async () => {
+      if (api) {
+        try { await tdFetch(path('reopen'), 'POST'); } catch (err) { tdError(err); }
+        tdLoad();
+        return;
+      }
+      try { await tk.mcp.callTool(TD, 'uncomplete-tasks', { ids: [id] }, { cache: false }); }
+      catch (err) { tkError(err, fetchTasksOnce); }
+      tk.mcp.invalidate(TD, 'find-tasks').catch(() => fetchTasksOnce());
+    });
+    if (!api) tk.mcp.invalidate(TD, 'find-tasks').catch(() => {});
+  } catch (err) {
+    tk.pending.delete(id);
+    renderTasks();
+    if (api) {
+      if (err && err.code === 'not_found') { tkMsg(`„${name}" gibt es in Todoist nicht mehr.`); tdLoad(); }
+      else if (err && ['bad_token', 'rate'].includes(err.code)) tdError(err);
+      else tkMsg(`„${name}" konnte nicht abgehakt werden.${err && err.code === 'network' ? ' Todoist ist gerade nicht erreichbar.' : ''}`, 'Liste neu laden', () => tdLoad());
+      return;
+    }
+    if (AUTHZ.includes(err && err.code)) tkError(err, fetchTasksOnce);
+    else tkMsg(`„${name}" konnte nicht abgehakt werden.${err && err.code === 'tool_error' && err.message ? ' ' + err.message : ''}`, 'Liste neu laden', fetchTasksOnce);
+    tk.mcp.invalidate(TD, 'find-tasks').catch(() => {});
+  }
+});
+
+/* Pendeln: Route (OSRM), Meldungen der Autobahn GmbH, optional Live-Fahrzeit von TomTom */
+const TT_KEY = 'jere-cockpit-tomtom';
+const cm = { dir: new Date().getHours() < 11 ? 'work' : 'home', seq: 0, timer: null, res: null, homeMins: null, map: null, layer: null, abCache: new Map() };
+const ORDER = { closure: 0, jam: 1, slow: 2, warn: 3, works: 4 };
+const cmPlaces = () => cm.dir === 'home' ? [state.commute.work, state.commute.home] : [state.commute.home, state.commute.work];
+function cmPane(which) { for (const p of ['empty', 'off', 'live']) $('#cm-' + p).hidden = p !== which; }
+function cmOff(title, text) { cmPane('off'); $('#cm-off-title').textContent = title; $('#cm-off-text').textContent = text; }
+function cmDirUi() {
+  $('#cm-dir-home').setAttribute('aria-pressed', String(cm.dir === 'home'));
+  $('#cm-dir-work').setAttribute('aria-pressed', String(cm.dir === 'work'));
+}
+function cmLink() {
+  const [a, b] = cmPlaces(), link = $('#cm-gmaps');
+  link.hidden = !(a && b);
+  if (a && b) link.href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(a.text)}&destination=${encodeURIComponent(b.text)}&travelmode=driving`;
+}
+async function geocode(text) {
+  const j = await getJson(`https://photon.komoot.io/api/?q=${encodeURIComponent(text)}&limit=1&lang=de&lat=53.55&lon=9.99`, 9000);
+  const f = j && Array.isArray(j.features) ? j.features[0] : null;
+  if (!f || !f.geometry) return null;
+  const p = f.properties || {};
+  const street = p.street ? `${p.street}${p.housenumber ? ' ' + p.housenumber : ''}` : (p.name || '');
+  const town = p.city || p.town || p.village || p.district || '';
+  const label = [street, [p.postcode, town !== street ? town : ''].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  return { lat: +f.geometry.coordinates[1], lon: +f.geometry.coordinates[0], label: label || text };
+}
+function prepRoute(coords) {
+  const lat0 = coords[0][1] * Math.PI / 180, kx = 111320 * Math.cos(lat0), ky = 110540;
+  const pts = coords.map(([lo, la]) => [lo * kx, la * ky]);
+  const cum = [0];
+  let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
+  coords.forEach(([lo, la], i) => {
+    if (i) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    a = Math.min(a, la); b = Math.min(b, lo); c = Math.max(c, la); d = Math.max(d, lo);
+  });
+  return { kx, ky, pts, cum, bbox: [a, b, c, d] };
+}
+function nearestOn(g, lon, lat) {
+  const x = lon * g.kx, y = lat * g.ky;
+  let best = { d: Infinity, along: 0 };
+  for (let i = 0; i < g.pts.length - 1; i++) {
+    const [ax, ay] = g.pts[i], [bx, by] = g.pts[i + 1];
+    const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+    const t = L2 ? Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L2)) : 0;
+    const dd = Math.hypot(x - (ax + t * dx), y - (ay + t * dy));
+    if (dd < best.d) best = { d: dd, along: g.cum[i] + t * Math.sqrt(L2) };
+  }
+  return best;
+}
+async function abFetch(road, svc) {
+  const key = road + '/' + svc, hit = cm.abCache.get(key);
+  if (hit && Date.now() - hit.at < 4 * 6e4) return hit.items;
+  const j = await getJson(`https://verkehr.autobahn.de/o/autobahn/${road}/services/${svc}`, 15000);
+  const items = j && Array.isArray(j[svc]) ? j[svc] : [];
+  cm.abCache.set(key, { at: Date.now(), items });
+  return items;
+}
+function toIncident(it, svc, road, along, lat, lon) {
+  const blocked = String(it.isBlocked) === 'true';
+  let k, label;
+  if (svc === 'closure' || blocked) { k = 'closure'; label = 'Sperrung'; }
+  else if (svc === 'roadworks') { k = 'works'; label = 'Baustelle'; }
+  else {
+    const t = String(it.abnormalTrafficType || '');
+    if (/STATIONARY|QUEUING/.test(t)) { k = 'jam'; label = 'Stau'; }
+    else if (/SLOW/.test(t)) { k = 'slow'; label = 'Zähfließend'; }
+    else { k = 'warn'; label = 'Meldung'; }
+  }
+  const m = String(it.subtitle || '').match(/->\s*(.+)$/);
+  return {
+    k, label, road, along, lat, lon, src: 'ab',
+    delay: Number.parseInt(it.delayTimeValue, 10) || 0,
+    title: String(it.title || '').replace(/^\s*A\s?\d+\s*\|\s*/, '').replace(/\s+-\s+/g, ' bis ').trim() || road,
+    dir: m ? `Richtung ${m[1].trim()}` : '',
+    desc: (Array.isArray(it.description) ? it.description : []).map(s => String(s).trim()).filter(Boolean).slice(0, 12)
+  };
+}
+async function autobahnItems(roads, g, skipWarnings) {
+  const jobs = [];
+  for (const r of roads) for (const svc of ['closure', 'warning', 'roadworks']) {
+    if (skipWarnings && svc === 'warning') continue;
+    jobs.push(abFetch(r, svc).then(items => ({ r, svc, items })).catch(() => ({ r, svc, items: [], failed: true })));
+  }
+  const res = await Promise.all(jobs);
+  const out = [], seen = new Set();
+  const [aLat, aLon, bLat, bLon] = g.bbox, pad = 0.03;
+  let failed = 0;
+  for (const { r, svc, items, failed: f } of res) {
+    if (f) failed++;
+    for (const it of items) {
+      if (it.future === true || it.future === 'true') continue;
+      const c = it.coordinate || {}, la = +c.lat, lo = +c.long;
+      if (!(la > aLat - pad && la < bLat + pad && lo > aLon - pad && lo < bLon + pad)) continue;
+      let line = it.geometry && Array.isArray(it.geometry.coordinates) ? it.geometry.coordinates : null;
+      if (line && it.geometry.type === 'MultiLineString') line = line.flat();
+      if (!line || !line.length || !Array.isArray(line[0])) line = [[lo, la]];
+      const n = line.length, S = 60;
+      const idx = n <= S ? line.map((_, i) => i) : Array.from({ length: S }, (_, q) => Math.round(q * (n - 1) / (S - 1)));
+      const near = idx.map(i => ({ i, ...nearestOn(g, +line[i][0], +line[i][1]) })).filter(x => x.d < 200);
+      if (!near.length) continue;
+      if (near.length >= 2) {
+        if (near[near.length - 1].along < near[0].along - 50) continue; // Gegenrichtung
+      } else if (n > 1) {
+        // nur ein Treffer: Fahrtrichtung über die direkten Nachbarpunkte der Meldung prüfen
+        const j = near[0].i, a = line[Math.max(0, j - 1)], b = line[Math.min(n - 1, j + 1)];
+        const na = nearestOn(g, +a[0], +a[1]), nb = nearestOn(g, +b[0], +b[1]);
+        if (na.d < 300 && nb.d < 300 && nb.along < na.along - 5) continue;
+      }
+      const id = it.identifier || `${r}${svc}${la}${lo}`;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const inc = toIncident(it, svc, r, near[0].along, la, lo);
+      // Abschnitt der Meldung, der auf der eigenen Strecke liegt (für die farbige Linie auf der Karte)
+      if (n > 1) {
+        const step = Math.max(1, Math.ceil(n / 160)), seg = [];
+        for (let i = 0; i < n; i += step) { const p = line[i]; if (nearestOn(g, +p[0], +p[1]).d < 250) seg.push([+p[1], +p[0]]); }
+        const lastP = line[n - 1];
+        if ((n - 1) % step && nearestOn(g, +lastP[0], +lastP[1]).d < 250) seg.push([+lastP[1], +lastP[0]]);
+        if (seg.length > 1) inc.seg = seg;
+      }
+      out.push(inc);
+    }
+  }
+  return { list: out, failed };
+}
+async function tomtom(from, to) {
+  let key = null;
+  try { key = localStorage.getItem(TT_KEY); } catch { key = null; }
+  if (!key) return null;
+  const j = await getJson(`https://api.tomtom.com/routing/1/calculateRoute/${from.lat},${from.lon}:${to.lat},${to.lon}/json?key=${encodeURIComponent(key)}&traffic=true&travelMode=car&routeType=fastest&sectionType=traffic&computeTravelTimeFor=all&language=de-DE`, 12000);
+  const r = j && Array.isArray(j.routes) ? j.routes[0] : null;
+  if (!r || !r.summary || !Number.isFinite(+r.summary.travelTimeInSeconds)) throw new Error('tomtom');
+  const points = (r.legs || []).flatMap(l => (l.points || []).map(p => [+p.longitude, +p.latitude]));
+  const g = points.length > 1 ? prepRoute(points) : null;
+  const CAT = { JAM: ['jam', 'Stau'], ROAD_WORK: ['works', 'Baustelle'], ROAD_CLOSURE: ['closure', 'Sperrung'] };
+  const secs = (r.sections || []).filter(s => s.sectionType === 'TRAFFIC').map(s => {
+    const [k, label] = CAT[s.simpleCategory] || ['warn', 'Behinderung'];
+    const si = Math.min(+s.startPointIndex || 0, points.length - 1), ei = Math.min(+s.endPointIndex || si, points.length - 1);
+    const p = points[si] || [0, 0];
+    const along = g ? g.cum[si] : 0, len = g ? g.cum[ei] - along : 0;
+    const seg = ei > si ? points.slice(si, ei + 1).map(([lo, la]) => [la, lo]) : null;
+    const kk = k === 'jam' && Number.isFinite(+s.effectiveSpeedInKmh) && +s.effectiveSpeedInKmh > 25 ? 'slow' : k;
+    return { k: kk, label: kk === 'slow' ? 'Zähfließend' : label, road: '', along, lat: p[1], lon: p[0], src: 'tt', seg, delay: Math.round((+s.delayInSeconds || 0) / 60), title: len > 50 ? `${kk === 'slow' ? 'Zähfließend' : label} auf ${numDe(len / 1000, 1)} km` : label, dir: Number.isFinite(+s.effectiveSpeedInKmh) && s.effectiveSpeedInKmh ? `etwa ${Math.round(s.effectiveSpeedInKmh)} km/h` : '', desc: [] };
+  });
+  const sm = r.summary;
+  return { time: +sm.travelTimeInSeconds, delay: +sm.trafficDelayInSeconds || 0, length: +sm.lengthInMeters || 0, secs, points };
+}
+async function loadCommute() {
+  clearTimeout(cm.timer);
+  cmDirUi();
+  cmLink();
+  const c = state.commute;
+  if (!c.home || !c.work) { cmPane('empty'); $('#cm-src').textContent = ''; return; }
+  const seq = ++cm.seq;
+  if (!cm.res) cmOff('Strecke wird berechnet', 'Einen Moment, Route und Verkehrsmeldungen kommen gleich.');
+  try {
+    let changed = false;
+    for (const k of ['home', 'work']) {
+      const p = state.commute[k];
+      if (p.lat !== null && p.lon !== null) continue;
+      const g = await geocode(p.text);
+      if (seq !== cm.seq) return;
+      if (!g) { cmOff('Adresse nicht gefunden', `„${p.text}" findet die Kartensuche nicht. Tipp auf „Adressen" und schreib sie genauer, am besten mit Ort.`); return; }
+      Object.assign(p, g);
+      changed = true;
+    }
+    if (changed) commit();
+    const [from, to] = cmPlaces();
+    const q = `${from.lon},${from.lat};${to.lon},${to.lat}?overview=full&geometries=geojson&steps=true`;
+    let o;
+    try { o = await getJson(`https://routing.openstreetmap.de/routed-car/route/v1/driving/${q}`, 12000); }
+    catch { o = await getJson(`https://router.project-osrm.org/route/v1/driving/${q}`, 12000); }
+    const route = o && Array.isArray(o.routes) ? o.routes[0] : null;
+    if (!route) { cmOff('Keine Route gefunden', 'Zwischen den beiden Adressen findet der Routenplaner keine Autostrecke. Check die Adressen.'); return; }
+    const refs = new Set();
+    for (const leg of route.legs || []) for (const s of leg.steps || []) for (const part of String(s.ref || '').split(';')) {
+      const m = part.trim().match(/^A\s?(\d+)$/);
+      if (m) refs.add('A' + m[1]);
+    }
+    const g = prepRoute(route.geometry.coordinates);
+    const tt = await tomtom(from, to).catch(() => ({ error: true }));
+    const ab = await autobahnItems([...refs], g, !!(tt && !tt.error));
+    if (seq !== cm.seq) return;
+    cm.res = { dir: cm.dir, from, to, route, refs: [...refs], ab, tt, at: Date.now() };
+    renderCommute();
+    cm.timer = setTimeout(loadCommute, 5 * 6e4);
+  } catch (e) {
+    if (seq !== cm.seq) return;
+    if (inClaudeView()) cmOff('Live-Verkehr läuft in dieser Ansicht nicht', 'Claude sperrt hier externe Datenquellen. In der Dashboard-Datei im Browser siehst du Fahrzeit, Staus, Baustellen und Sperrungen auf deiner Strecke. Bis dahin zeigt dir Google Maps die Live-Lage.');
+    else if (cm.res && cm.res.dir === cm.dir) { $('#cm-src').textContent = `Stand ${hm(new Date(cm.res.at))} Uhr. Aktualisieren hat gerade nicht geklappt.`; cm.timer = setTimeout(loadCommute, 2 * 6e4); }
+    else { cmOff('Verkehrsdaten gerade nicht erreichbar', 'In ein paar Minuten gibt es automatisch einen neuen Versuch.'); cm.timer = setTimeout(loadCommute, 3 * 6e4); }
+  }
+}
+function renderCommute() {
+  const R = cm.res;
+  if (!R) return;
+  cmPane('live');
+  const tt = R.tt && !R.tt.error ? R.tt : null;
+  const items = [...(tt ? tt.secs : []), ...R.ab.list].sort((x, y) => (ORDER[x.k] - ORDER[y.k]) || x.along - y.along);
+  const abDelay = R.ab.list.filter(i => i.k !== 'works').reduce((s, i) => s + i.delay, 0);
+  const mins = tt ? tt.time / 60 : R.route.duration / 60 + abDelay;
+  const delay = tt ? tt.delay / 60 : abDelay;
+  const km = (tt && tt.length ? tt.length : R.route.distance) / 1000;
+  const rmins = Math.max(1, Math.round(mins));
+  if (R.dir === 'home') cm.homeMins = rmins;
+  $('#cm-time').textContent = rmins;
+  $('#cm-time-lbl').textContent = `Min ${R.dir === 'home' ? 'nach Hause' : 'zur Arbeit'}${tt ? ', live' : ''}`;
+  const now = new Date();
+  const dl = [['Jetzt los', `an ${hm(new Date(now.getTime() + mins * 6e4))} Uhr`], ['Strecke', `${numDe(km, 1)} km${R.refs.length ? ' über ' + R.refs.join(', ') : ''}`], ['Verzögerung', delay >= 1 ? `+${Math.round(delay)} Min` : 'keine']];
+  const wb = workBar();
+  if (R.dir === 'home' && wb && !freeReason(wb, now) && now < at(now, wb.end)) dl.splice(1, 0, [`Ab ${wb.end}`, `an ${hm(new Date(at(now, wb.end).getTime() + mins * 6e4))} Uhr`]);
+  $('#cm-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  $('#cm-route').textContent = `${R.from.label || R.from.text} → ${R.to.label || R.to.text}`;
+  const closures = items.filter(i => i.k === 'closure').length, works = items.filter(i => i.k === 'works').length;
+  let v, lv;
+  if (closures) { v = `Achtung, ${closures === 1 ? 'eine Sperrung' : closures + ' Sperrungen'} auf deiner Strecke.`; lv = 'bad'; }
+  else if (delay >= 10) { v = `Stau auf der Strecke, plan etwa ${Math.round(delay)} Min mehr ein.`; lv = 'warn'; }
+  else if (delay >= 3) { v = `Etwas zäh, etwa ${Math.round(delay)} Min länger als sonst.`; lv = 'warn'; }
+  else { v = tt ? 'Freie Fahrt, kein Stau auf deiner Strecke.' : (R.refs.length ? 'Freie Fahrt, auf der Autobahn ist kein Stau gemeldet.' : 'Keine Meldungen. Deine Strecke läuft ohne Autobahn, Stadtverkehr zeigt Google Maps.'); lv = 'ok'; }
+  if (works) v += ` ${works === 1 ? 'Eine Baustelle' : works + ' Baustellen'} unterwegs.`;
+  const ve = $('#cm-verdict');
+  ve.textContent = v;
+  ve.dataset.lv = lv;
+  const jam = items.filter(i => i.k === 'jam' || i.k === 'slow').length;
+  $('#cm-ov').dataset.lv = lv;
+  $('#cm-ov-t').textContent = closures ? (closures === 1 ? 'Sperrung auf der Strecke' : `${closures} Sperrungen`) : delay >= 1 ? `+${Math.round(delay)} Min durch Stau` : jam ? 'Leicht zäh' : 'Freie Fahrt';
+  $('#cm-ov-s').textContent = `${rmins} Min · ${numDe(km, 1)} km · an ${hm(new Date(now.getTime() + mins * 6e4))}`;
+  const LEG = [['jam', 'Stau', '--bad'], ['slow', 'Zähfließend', '--warn'], ['closure', 'Sperrung', '--bad', 'dash'], ['works', 'Baustelle', '--muted', 'dash']];
+  $('#cm-legend').innerHTML = LEG.filter(([k]) => items.some(i => i.k === k || (k === 'slow' && i.k === 'warn'))).map(([, n, c, d]) => `<li><i class="${d || ''}" style="--c:var(${c})"></i>${n}</li>`).join('');
+
+  const ul = $('#cm-inc');
+  ul.textContent = '';
+  const LIMIT = 6;
+  const shown = cm.allInc ? items : items.slice(0, LIMIT);
+  for (const it of shown) {
+    const li = document.createElement('li');
+    li.className = 'inc';
+    li.dataset.k = it.k;
+    li.innerHTML = `<span class="inc-type">${esc(it.label)}</span><div class="inc-main"><div class="inc-title"></div><div class="inc-sub"></div></div><span class="inc-delay">${it.delay ? '+' + it.delay + ' Min' : ''}</span>`;
+    li.querySelector('.inc-title').textContent = it.title;
+    li.querySelector('.inc-sub').textContent = [it.road, it.dir, `nach ${numDe(it.along / 1000, it.along < 10000 ? 1 : 0)} km`].filter(Boolean).join(' · ');
+    if (it.desc.length) {
+      const d = document.createElement('details');
+      d.innerHTML = '<summary>Details</summary>';
+      it.desc.forEach(line => { const p = document.createElement('p'); p.textContent = line; d.appendChild(p); });
+      li.querySelector('.inc-main').appendChild(d);
+    }
+    ul.appendChild(li);
+  }
+  if (items.length > LIMIT) {
+    const li = document.createElement('li');
+    const more = document.createElement('button');
+    more.type = 'button';
+    more.className = 'more';
+    more.textContent = cm.allInc ? 'Weniger anzeigen' : `${items.length - LIMIT} weitere Meldungen`;
+    more.addEventListener('click', () => { cm.allInc = !cm.allInc; renderCommute(); });
+    li.appendChild(more);
+    ul.appendChild(li);
+  }
+  const hints = [];
+  if (!tt) hints.push(R.tt && R.tt.error ? 'Der TomTom-Key funktioniert gerade nicht, deshalb ohne Live-Stadtverkehr.' : 'Fahrzeit = normale Fahrzeit plus gemeldete Autobahn-Staus. Stau in der Stadt zeigt Google Maps, oder du hinterlegst unter „Adressen" einen TomTom-Key.');
+  if (R.ab.failed) hints.push('Ein Teil der Autobahn-Meldungen fehlt gerade.');
+  $('#cm-hint').textContent = hints.join(' ');
+  $('#cm-hint').hidden = !hints.length;
+  $('#cm-src').textContent = `Stand ${hm(new Date(R.at))} Uhr · Route: OpenStreetMap · Meldungen: Autobahn GmbH${tt ? ' · Live-Fahrzeit: TomTom' : ''}`;
+  cm.items = items;
+  cmMap(R, items, tt);
+  tickTiles(new Date());
+}
+const esriUrl = layer => `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${isDark() ? 'Dark' : 'Light'}_Gray_${layer}/MapServer/tile/{z}/{y}/{x}`;
+const ICO = {
+  home: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.2 2.8 10.6a1 1 0 0 0 1.25 1.56L5 11.4V20a1 1 0 0 0 1 1h4.2v-5.6h3.6V21H18a1 1 0 0 0 1-1v-8.6l.95.76a1 1 0 1 0 1.25-1.56z"/></svg>',
+  work: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 4.5A1.5 1.5 0 0 0 7.5 6v1H4.5A1.5 1.5 0 0 0 3 8.5v3.2h18V8.5A1.5 1.5 0 0 0 19.5 7h-3V6A1.5 1.5 0 0 0 15 4.5zm.5 2h5V7h-5zM3 13.2v5.3A1.5 1.5 0 0 0 4.5 20h15a1.5 1.5 0 0 0 1.5-1.5v-5.3h-7.5v1.3h-3v-1.3z"/></svg>',
+  closure: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="4" rx="1.2" fill="#fff"/></svg>',
+  jam: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="10.5" y="4.5" width="3" height="10" rx="1.5" fill="#fff"/><circle cx="12" cy="18.4" r="1.9" fill="#fff"/></svg>',
+  works: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.4 3.5h3.2l4.7 14.5H5.7z" fill="#fff"/><path d="M8.3 12.2h7.4M9.4 8.4h5.2" style="stroke:var(--c);stroke-width:1.8"/><rect x="4" y="18" width="16" height="2.5" rx="1" fill="#fff"/></svg>'
+};
+const incColor = k => ({ closure: '--bad', jam: '--bad', slow: '--warn', warn: '--warn', works: '--muted' }[k]);
+function refreshMapLook() {
+  if (rd.base) rd.base.setUrl(esriUrl('Base'));
+  if (rd.ref) rd.ref.setUrl(esriUrl('Reference'));
+  if (rd.marker) rd.marker.setStyle({ fillColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() });
+  if (cm.base) cm.base.setUrl(esriUrl('Base'));
+  if (cm.ref) cm.ref.setUrl(esriUrl('Reference'));
+  if (cm.map && cm.res && cm.items) cmMap(cm.res, cm.items, cm.res.tt && !cm.res.tt.error ? cm.res.tt : null, true);
+}
+function cmFit(anim) {
+  if (!cm.map || !cm.layer) return;
+  cm.map.invalidateSize();
+  const tl = $('#cm-ov').offsetHeight + 16;
+  cm.map.fitBounds(cm.bounds || cm.layer.getBounds(), { paddingTopLeft: [28, Math.min(tl, 90)], paddingBottomRight: [56, 28], animate: !!anim && !reduceMotion });
+}
+async function cmMap(R, items, tt, keepView) {
+  let L;
+  try { L = await loadLeaflet(); } catch { $('#cm-wrap').hidden = true; return; }
+  if (cm.res !== R) return;
+  const css = getComputedStyle(document.documentElement), col = n => css.getPropertyValue(n).trim();
+  if (!cm.map) {
+    cm.map = L.map('cm-map', { scrollWheelZoom: false, zoomControl: false });
+    L.control.zoom({ position: 'bottomright' }).addTo(cm.map);
+    cm.map.createPane('labels');
+    cm.map.getPane('labels').style.zIndex = 450;
+    cm.map.getPane('labels').style.pointerEvents = 'none';
+    cm.base = L.tileLayer(esriUrl('Base'), { maxNativeZoom: 16, maxZoom: 18, attribution: 'Karte &copy; Esri · Meldungen &copy; Autobahn GmbH' }).addTo(cm.map);
+    cm.ref = L.tileLayer(esriUrl('Reference'), { pane: 'labels', maxNativeZoom: 16, maxZoom: 18 }).addTo(cm.map);
+    $('#cm-full').hidden = !document.fullscreenEnabled;
+    if (typeof ResizeObserver === 'function') new ResizeObserver(() => cm.map && cm.map.invalidateSize()).observe($('#cm-map'));
+  }
+  if (cm.layer) cm.map.removeLayer(cm.layer);
+  const line = (tt && tt.points.length > 1 ? tt.points : R.route.geometry.coordinates).map(([lo, la]) => [la, lo]);
+  const grp = L.featureGroup();
+  const round = { lineCap: 'round', lineJoin: 'round', interactive: false };
+  // Route: Schatten, Kontur, Linie, laufende Richtungspunkte
+  L.polyline(line, { ...round, color: '#000', opacity: 0.16, weight: 13 }).addTo(grp);
+  L.polyline(line, { ...round, color: col('--surface'), opacity: 1, weight: 10 }).addTo(grp);
+  L.polyline(line, { ...round, color: col('--sea'), opacity: 1, weight: 6 }).addTo(grp);
+  // Verkehr: betroffene Abschnitte farbig über der Route
+  const order = ['works', 'warn', 'slow', 'jam', 'closure'];
+  for (const it of [...items].sort((a, b) => order.indexOf(a.k) - order.indexOf(b.k))) {
+    if (!it.seg || it.seg.length < 2) continue;
+    const c = col(incColor(it.k)), dashed = it.k === 'works' || it.k === 'closure';
+    if (dashed) L.polyline(it.seg, { ...round, color: col('--surface'), opacity: 1, weight: 7 }).addTo(grp);
+    L.polyline(it.seg, { ...round, color: c, opacity: 1, weight: dashed ? 5 : 6, dashArray: dashed ? '2 9' : null }).addTo(grp);
+  }
+  if (!reduceMotion) L.polyline(line, { ...round, color: '#ffffff', opacity: 0.9, weight: 2.2, dashArray: '1 17', className: 'cm-flow' }).addTo(grp);
+  // Start und Ziel
+  const startIco = R.dir === 'home' ? ICO.work : ICO.home, endIco = R.dir === 'home' ? ICO.home : ICO.work;
+  L.marker(line[0], { icon: L.divIcon({ className: 'pin', html: `<div class="pin-start">${startIco}</div>`, iconSize: [28, 28], iconAnchor: [14, 14] }), keyboard: false })
+    .bindTooltip(esc(`Start: ${R.from.label || R.from.text}`), { direction: 'top', offset: [0, -14] }).addTo(grp);
+  L.marker(line[line.length - 1], { icon: L.divIcon({ className: 'pin', html: `<div class="pin-end">${endIco}</div>`, iconSize: [34, 34], iconAnchor: [17, 41] }), keyboard: false, zIndexOffset: 500 })
+    .bindTooltip(esc(`Ziel: ${R.to.label || R.to.text}`), { direction: 'top', offset: [0, -40] }).addTo(grp);
+  // Meldungen als Symbole
+  for (const it of items) {
+    if (!Number.isFinite(it.lat) || !Number.isFinite(it.lon)) continue;
+    const glyph = it.k === 'closure' ? ICO.closure : it.k === 'works' ? ICO.works : ICO.jam;
+    L.marker([it.lat, it.lon], { icon: L.divIcon({ className: 'pin', html: `<div class="pin-inc" style="--c:var(${incColor(it.k)})">${glyph}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] }), keyboard: false, zIndexOffset: it.k === 'closure' ? 300 : it.k === 'works' ? 0 : 200 })
+      .bindTooltip(esc(`${it.label}${it.delay ? ` (+${it.delay} Min)` : ''}: ${it.title}`), { direction: 'top', offset: [0, -12] }).addTo(grp);
+  }
+  grp.addTo(cm.map);
+  cm.layer = grp;
+  cm.bounds = L.latLngBounds(line);
+  if (!keepView) setTimeout(() => cmFit(false), 60);
+}
+$('#cm-fit').addEventListener('click', () => cmFit(true));
+$('#cm-full').addEventListener('click', () => {
+  const w = $('#cm-wrap');
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  else if (w.requestFullscreen) w.requestFullscreen().catch(() => {});
+});
+document.addEventListener('fullscreenchange', () => {
+  const on = document.fullscreenElement === $('#cm-wrap');
+  if (cm.map) { cm.map.scrollWheelZoom[on ? 'enable' : 'disable'](); setTimeout(() => cmFit(false), 120); }
+});
+function setDir(d) { if (cm.dir === d) return; cm.dir = d; cm.allInc = false; cm.res = null; loadCommute(); }
+$('#cm-dir-home').addEventListener('click', () => setDir('home'));
+$('#cm-dir-work').addEventListener('click', () => setDir('work'));
+function openCmForm() {
+  $('#cm-home').value = state.commute.home ? state.commute.home.text : '';
+  $('#cm-work').value = state.commute.work ? state.commute.work.text : '';
+  let key = '';
+  try { key = localStorage.getItem(TT_KEY) || ''; } catch { key = ''; }
+  $('#cm-key').value = key;
+  $('#cm-tt').hidden = inClaudeView();
+  $('#cm-err').hidden = true;
+  $('#cm-form').hidden = false;
+  $('#cm-home').focus();
+}
+$('#cm-set-btn').addEventListener('click', () => { if ($('#cm-form').hidden) openCmForm(); else $('#cm-form').hidden = true; });
+$('#cm-empty-btn').addEventListener('click', openCmForm);
+$('#cm-cancel').addEventListener('click', () => { $('#cm-form').hidden = true; });
+$('#cm-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const h = $('#cm-home').value.trim(), w = $('#cm-work').value.trim();
+  if (!h || !w) { $('#cm-err').textContent = 'Trag beide Adressen ein, Zuhause und Arbeit.'; $('#cm-err').hidden = false; return; }
+  const keep = (old, text) => old && old.text === text ? old : { text, label: '', lat: null, lon: null };
+  state.commute = { home: keep(state.commute.home, h), work: keep(state.commute.work, w) };
+  if (!inClaudeView()) {
+    const k = $('#cm-key').value.trim();
+    try { if (k) localStorage.setItem(TT_KEY, k); else localStorage.removeItem(TT_KEY); } catch { /* Browser speichert nicht */ }
+  }
+  $('#cm-form').hidden = true;
+  cm.res = null;
+  cm.homeMins = null;
+  commit();
+  loadCommute();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    tick();
+    if (wx.live && Date.now() - wx.at > 10 * 6e4) loadWeather(wx.loc);
+    if (cm.res && Date.now() - cm.res.at > 5 * 6e4) loadCommute();
+    if (tk.mode === 'api' && tdToken() && Date.now() - tk.stamp > 6e4) tdLoad();
+  }
+});
+
+/* Anpassen */
+const UP = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>';
+const DOWN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+const dr = { open: false };
+let editingCd = null, greetTimer = null;
+function afterStateSwap(old) {
+  if (JSON.stringify(old.loc) !== JSON.stringify(state.loc) && (wx.live || state.loc.mode === 'fixed')) startWeather();
+  if (JSON.stringify(old.commute) !== JSON.stringify(state.commute)) { cm.res = null; loadCommute(); }
+  if (old.ui.projects.join('|') !== state.ui.projects.join('|')) tasksReconfigure();
+}
+function segSet(box, v) { box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
+function renderSwatches() {
+  const box = $('#dr-accent'), dark = isDark();
+  box.textContent = '';
+  for (const [k, p] of Object.entries(ACCENTS)) {
+    const lab = document.createElement('label');
+    lab.className = 'swatch';
+    lab.title = p.name;
+    lab.innerHTML = `<input type="radio" name="dr-acc" value="${k}"${k === state.ui.accent ? ' checked' : ''}><span style="--c:${dark ? p.d[0] : p.l[0]}"></span>`;
+    lab.querySelector('input').setAttribute('aria-label', p.name);
+    box.appendChild(lab);
+  }
+}
+function renderWidgetList(focusSel) {
+  const ul = $('#dr-widgets'), ws = state.ui.widgets;
+  ul.textContent = '';
+  ws.forEach((w, i) => {
+    const n = WIDGETS[w.id];
+    const li = document.createElement('li');
+    if (!w.on) li.dataset.off = '';
+    li.innerHTML = `<label class="check-row"><input type="checkbox" data-wvis="${w.id}"${w.on ? ' checked' : ''}> ${esc(n)}</label>`
+      + `<div class="seg sm" role="group" aria-label="Breite von ${esc(n)}">${[1, 2, 3].map(k => `<button type="button" data-wspan="${w.id}" data-v="${k}" aria-pressed="${w.w === k}" title="${k} ${k === 1 ? 'Spalte' : 'Spalten'} breit">${k}×</button>`).join('')}</div>`
+      + `<button type="button" class="icon-btn" data-wmove="${w.id}" data-d="-1" aria-label="${esc(n)} nach vorne"${i === 0 ? ' disabled' : ''}>${UP}</button>`
+      + `<button type="button" class="icon-btn" data-wmove="${w.id}" data-d="1" aria-label="${esc(n)} nach hinten"${i === ws.length - 1 ? ' disabled' : ''}>${DOWN}</button>`;
+    ul.appendChild(li);
+  });
+  if (focusSel) {
+    const el = ul.querySelector(focusSel);
+    if (el && !el.disabled) el.focus();
+    else if (el) { const other = el.parentElement.querySelector('[data-wmove]:not([disabled])'); if (other) other.focus(); }
+  }
+}
+function renderCdList() {
+  const ul = $('#dr-cd-list');
+  ul.textContent = '';
+  for (const c of state.ui.countdowns) {
+    const d = parseYmd(c.date);
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="tx"><b></b><span>${esc(`${dm(d)}${d.getFullYear()}${c.time ? ', ' + c.time : ''}`)}</span></div><button type="button" class="icon-btn" data-cdedit="${c.id}">${PENCIL}</button><button type="button" class="icon-btn" data-cddel="${c.id}">${TRASH}</button>`;
+    li.querySelector('b').textContent = c.name;
+    li.querySelector('[data-cdedit]').setAttribute('aria-label', `${c.name} bearbeiten`);
+    li.querySelector('[data-cddel]').setAttribute('aria-label', `${c.name} löschen`);
+    ul.appendChild(li);
+  }
+  const full = state.ui.countdowns.length >= 6 && !editingCd;
+  $('#cd-save').disabled = full;
+  $('#cd-save').textContent = editingCd ? 'Speichern' : full ? 'Maximal 6 Countdowns' : '+ Countdown';
+  $('#cd-cancel').hidden = !editingCd;
+}
+function resetCdForm() { editingCd = null; $('#cd-name').value = ''; $('#cd-date').value = ''; $('#cd-time').value = ''; $('#cd-err').hidden = true; }
+function renderDrawer() {
+  const u = state.ui;
+  $('#dr-greet').value = u.greet;
+  segSet($('#dr-theme'), u.theme);
+  segSet($('#dr-size'), u.size);
+  renderSwatches();
+  $('#dr-secs').checked = u.seconds;
+  renderWidgetList();
+  const tl = $('#dr-tiles');
+  tl.textContent = '';
+  for (const [k, n] of Object.entries(TILES)) {
+    const lab = document.createElement('label');
+    lab.className = 'check-row';
+    lab.innerHTML = `<input type="checkbox" data-tile="${k}"${u.tiles[k] ? ' checked' : ''}> ${esc(n)}`;
+    tl.appendChild(lab);
+  }
+  renderCdList();
+  $('#dr-projects').value = u.projects.join(', ');
+  $('#dr-hours').checked = u.wxHours;
+  $('#dr-radar').checked = u.wxRadar;
+  const sel = $('#dr-region');
+  if (!sel.options.length) for (const [k, n] of Object.entries(REGIONS)) sel.add(new Option(n, k));
+  sel.value = u.region;
+  const inC = inClaudeView();
+  $('#dr-data-btns').hidden = inC;
+  $('#dr-data-err').hidden = true;
+  $('#dr-data-hint').textContent = inC
+    ? 'In der Claude-Ansicht liegt alles in deinem Claude-Account und ist auf allen Geräten gleich.'
+    : 'Deine Einstellungen liegen nur in diesem Browser. Sicher sie als Datei und lad sie auf dem anderen Rechner, dann sieht dort alles genauso aus. Todoist-Token und TomTom-Key sind nicht mit drin.';
+}
+function openDrawer() {
+  renderDrawer();
+  $('#drawer').hidden = false;
+  $('#scrim').hidden = false;
+  $('#cust-btn').setAttribute('aria-expanded', 'true');
+  dr.open = true;
+  $('#dr-close').focus();
+}
+function closeDrawer() {
+  if (!dr.open) return;
+  if (greetTimer) { clearTimeout(greetTimer); greetTimer = null; commit(); }
+  $('#drawer').hidden = true;
+  $('#scrim').hidden = true;
+  $('#cust-btn').setAttribute('aria-expanded', 'false');
+  dr.open = false;
+  resetCdForm();
+  $('#cust-btn').focus();
+}
+$('#cust-btn').addEventListener('click', () => (dr.open ? closeDrawer() : openDrawer()));
+$('#dr-close').addEventListener('click', closeDrawer);
+$('#scrim').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e => {
+  if (!dr.open) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeDrawer(); return; }
+  if (e.key !== 'Tab') return;
+  const f = [...$('#drawer').querySelectorAll('button:not([disabled]),input:not([type=hidden]):not([hidden]),select,textarea,a[href]')].filter(el => el.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+$('#dr-greet').addEventListener('input', e => {
+  state.ui.greet = e.target.value.slice(0, 40);
+  $('#h-greet').textContent = state.ui.greet.trim() || 'Moin';
+  clearTimeout(greetTimer);
+  greetTimer = setTimeout(() => { greetTimer = null; commit(); }, 600);
+});
+$('#dr-theme').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b) return;
+  state.ui.theme = b.dataset.v;
+  commit();
+  segSet($('#dr-theme'), state.ui.theme);
+  renderSwatches();
+});
+$('#dr-size').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b) return;
+  state.ui.size = b.dataset.v;
+  commit();
+  segSet($('#dr-size'), state.ui.size);
+});
+$('#dr-accent').addEventListener('change', e => { if (e.target.name === 'dr-acc') { state.ui.accent = e.target.value; commit(); } });
+$('#dr-secs').addEventListener('change', e => { state.ui.seconds = e.target.checked; commit(); });
+$('#dr-widgets').addEventListener('change', e => {
+  const id = e.target.dataset.wvis;
+  if (!id) return;
+  const w = state.ui.widgets.find(x => x.id === id);
+  w.on = e.target.checked;
+  commit();
+  renderWidgetList(`[data-wvis="${id}"]`);
+});
+$('#dr-widgets').addEventListener('click', e => {
+  const sp = e.target.closest('[data-wspan]');
+  if (sp) {
+    const w = state.ui.widgets.find(x => x.id === sp.dataset.wspan);
+    w.w = +sp.dataset.v;
+    commit();
+    renderWidgetList(`[data-wspan="${w.id}"][data-v="${w.w}"]`);
+    return;
+  }
+  const mv = e.target.closest('[data-wmove]');
+  if (!mv || mv.disabled) return;
+  const ws = state.ui.widgets, i = ws.findIndex(x => x.id === mv.dataset.wmove), j = i + (+mv.dataset.d);
+  if (i < 0 || j < 0 || j >= ws.length) return;
+  [ws[i], ws[j]] = [ws[j], ws[i]];
+  commit();
+  renderWidgetList(`[data-wmove="${mv.dataset.wmove}"][data-d="${mv.dataset.d}"]`);
+});
+$('#dr-tiles').addEventListener('change', e => {
+  const k = e.target.dataset.tile;
+  if (!k) return;
+  state.ui.tiles[k] = e.target.checked;
+  commit();
+});
+$('#dr-cd-list').addEventListener('click', e => {
+  const del = e.target.closest('[data-cddel]');
+  if (del) {
+    const i = state.ui.countdowns.findIndex(c => c.id === del.dataset.cddel);
+    if (i < 0) return;
+    const [removed] = state.ui.countdowns.splice(i, 1);
+    if (editingCd === removed.id) resetCdForm();
+    commit();
+    renderCdList();
+    toast(`„${removed.name}" gelöscht`, () => { state.ui.countdowns.splice(Math.min(i, state.ui.countdowns.length), 0, removed); commit(); renderCdList(); });
+    return;
+  }
+  const ed = e.target.closest('[data-cdedit]');
+  if (!ed) return;
+  const c = state.ui.countdowns.find(x => x.id === ed.dataset.cdedit);
+  if (!c) return;
+  editingCd = c.id;
+  $('#cd-name').value = c.name;
+  $('#cd-date').value = c.date;
+  $('#cd-time').value = c.time || '';
+  $('#cd-err').hidden = true;
+  renderCdList();
+  $('#cd-name').focus();
+});
+$('#cd-cancel').addEventListener('click', () => { resetCdForm(); renderCdList(); });
+$('#dr-cd-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#cd-name').value.trim(), date = $('#cd-date').value, time = $('#cd-time').value;
+  const fail = m => { $('#cd-err').textContent = m; $('#cd-err').hidden = false; };
+  if (!name) return fail('Gib dem Countdown einen Namen.');
+  if (!validYmd(date)) return fail('Wähl ein Datum.');
+  const c = { id: editingCd || uid(), name: name.slice(0, 30), date, time: validHm(time) ? time : '' };
+  const i = state.ui.countdowns.findIndex(x => x.id === c.id);
+  if (i >= 0) state.ui.countdowns[i] = c;
+  else if (state.ui.countdowns.length < 6) state.ui.countdowns.push(c);
+  resetCdForm();
+  commit();
+  renderCdList();
+});
+$('#dr-projects').addEventListener('change', e => {
+  const next = normProjects(e.target.value.split(','));
+  e.target.value = next.join(', ');
+  if (next.join('|') === state.ui.projects.join('|')) return;
+  state.ui.projects = next;
+  commit();
+  tasksReconfigure();
+});
+$('#dr-hours').addEventListener('change', e => { state.ui.wxHours = e.target.checked; commit(); });
+$('#dr-radar').addEventListener('change', e => {
+  state.ui.wxRadar = e.target.checked;
+  commit();
+  if (state.ui.wxRadar && rd.map) setTimeout(() => rd.map.invalidateSize(), 80);
+});
+$('#dr-region').addEventListener('change', e => { if (REGIONS[e.target.value]) { state.ui.region = e.target.value; commit(); } });
+function replaceState(next, msg) {
+  const prev = state;
+  state = next;
+  commit();
+  afterStateSwap(prev);
+  if (dr.open) renderDrawer();
+  toast(msg, () => { const cur = state; state = prev; commit(); afterStateSwap(cur); if (dr.open) renderDrawer(); });
+}
+$('#dr-export').addEventListener('click', () => {
+  const body = JSON.stringify({ app: 'jere-cockpit', exported: new Date().toISOString(), state }, null, 2);
+  const url = URL.createObjectURL(new Blob([body], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cockpit-einstellungen-${ymd(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+});
+$('#dr-import').addEventListener('click', () => { $('#dr-file').value = ''; $('#dr-file').click(); });
+$('#dr-file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0];
+  const fail = m => { $('#dr-data-err').textContent = m; $('#dr-data-err').hidden = false; };
+  $('#dr-data-err').hidden = true;
+  if (!f) return;
+  if (f.size > 2e6) return fail('Die Datei ist zu groß für eine Cockpit-Sicherung.');
+  try {
+    const j = JSON.parse(await f.text());
+    const raw = j && j.app === 'jere-cockpit' ? j.state : j;
+    if (!raw || typeof raw !== 'object' || !(raw.vacation || raw.bars || raw.ui)) return fail('Das ist keine Sicherung von diesem Cockpit.');
+    replaceState(normalize(raw), 'Sicherung geladen');
+  } catch { fail('Die Datei konnte nicht gelesen werden.'); }
+});
+$('#dr-reset').addEventListener('click', () => {
+  const d = DEFAULTS();
+  replaceState(d, 'Alles auf Anfang gesetzt');
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { applyUi(); if (dr.open) renderSwatches(); });
+
+/* Start */
+if (!lsOk) setSync('none');
+renderAll();
+setInterval(tick, 1000);
+startWeather();
+loadCommute();
+initTasks();
+initCloud();
+})();
+</script>
+
+</body></html>
