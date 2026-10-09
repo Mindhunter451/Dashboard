@@ -42,13 +42,13 @@ function renderBday() {
   $('#bd-src').textContent = list.length ? `${list.length} ${list.length === 1 ? 'Geburtstag' : 'Geburtstage'} gespeichert${c.cal && caSec().feeds.length ? ', dazu die aus deinem Kalender' : ''}.` : '';
   if (formOpen) { bdRenderAll(); return; }
   if (!all.length) return;
-  const n = bd.more ? Math.min(all.length, 40) : c.n;
+  const base = isNarrow() ? Math.min(c.n, 4) : c.n, n = bd.more ? Math.min(all.length, 40) : base;
   $('#bd-list').innerHTML = all.slice(0, n).map(x => {
     const dd = dayDiff(today, x.d), soon = dd <= 1;
     const sub = [`${WD[x.d.getDay()]} ${x.d.getDate()}. ${MS[x.d.getMonth()]}`, x.age != null ? (dd === 0 ? `wird heute ${x.age}` : `wird ${x.age}`) : '', x.cal ? 'aus dem Kalender' : ''].filter(Boolean).join(' · ');
     return `<li class="bd-row${dd === 0 ? ' today' : ''}"${x.cal ? ` style="--c:${x.color}"` : ''}><span class="bd-cal" aria-hidden="true"><b>${x.d.getDate()}</b><small>${MS[x.d.getMonth()]}</small></span><span class="bd-main"><b>${esc(x.name)}</b><small>${esc(sub)}</small></span><span class="bd-in${soon ? ' soon' : ''}">${bdWhen(dd)}</span></li>`;
   }).join('');
-  $('#bd-more').hidden = all.length <= c.n;
+  $('#bd-more').hidden = all.length <= base;
   $('#bd-more').textContent = bd.more ? 'Weniger zeigen' : `Mehr zeigen`;
 }
 /* Für den Spiegel: Geburtstage heute und morgen */

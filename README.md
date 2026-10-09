@@ -7,6 +7,7 @@ Live: https://mindhunter451.github.io/Dashboard/
 ## Bedienen
 
 Oben wechselst du die Seiten, per Klick, mit den Tasten 1 bis 9 oder über die Adresse, zum Beispiel `…/Dashboard/#arbeit`.
+Ein Tipp auf den Titel einer Karte klappt sie ein. Dann bleibt nur der Kopf mit dem Wichtigsten stehen, zum Beispiel die nächste Abfahrt oder der nächste Termin. Welche Karten zu sind, merkt sich jedes Gerät selbst. Beim Scrollen erscheint oben eine schmale Leiste mit Uhrzeit und Seiten.
 Mit **Bearbeiten** legst du Seiten an, benennst sie um und sortierst sie. Auf jeder Karte kannst du dann verschieben, die Breite ändern, Einstellungen öffnen oder sie von der Seite nehmen. Über **Widget hinzufügen** legst du neue Widgets an oder holst vorhandene auf die Seite.
 Unter **Anpassen** sind Design, Akzentfarbe, Himmel an oder aus, Kacheln, Countdowns, Bundesland, die Startseite und die Sicherung.
 **Spiegel** (oder die Taste S) zeigt Uhr, Wetter, Termine, Abfahrten, Geburtstage, Müllabfuhr, Countdowns und den Vers auf Schwarz, im Vollbild. Mit `…/Dashboard/#spiegel` startet die Seite direkt so, praktisch für einen Kiosk-Browser am Smart Mirror. Raus geht es mit Esc.
@@ -61,6 +62,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**2.5** (Oktober 2026)
+Feinschliff am Design: Jede Karte hat jetzt denselben Kopf mit Symbol, Titel und Status links und den Knöpfen rechts, als ruhige Symbole statt Text. Wetter, Abfahrten, Kalender und Pendeln schweben etwas höher, Schnellzugriff, Notizen und Vers liegen flacher. Die Akzentfarbe gibt es nur noch für jetzt, heute und Aktionen, der Rest ist ruhiger. Karten lassen sich per Tipp auf den Titel einklappen und zeigen dann eine Kurzinfo. Beim Scrollen bleibt oben eine schmale Leiste mit Uhrzeit und Seiten. Statt „wird geladen“ zeigen die Karten graue Platzhalter, beim Seitenwechsel kommen die Karten kurz nacheinander rein. Einrichten-Hinweise sind kompakt, Todoist zeigt ohne Token nur noch eine Zeile. Auf dem Handy ist das Regenradar erst zu und Kalender und Geburtstage zeigen weniger, die Übersicht ist dadurch rund ein Fünftel kürzer. Der nächste Termin von heute bekommt ein „in 19 Min“, die Farbe vom Horizont schimmert unter dem Himmel nach, der dunkle Modus hat etwas mehr Kontrast.
 
 **2.4** (Oktober 2026)
 Neue Widgets: Abfahrten über Transitous (Haltestelle suchen oder in der Nähe finden, live mit Verspätung, Gleiswechsel, Ausfällen und Hinweisen der Verkehrsbetriebe, Filter für Verkehrsmittel, Linien und Richtung, „Los in 3 Min“ mit deinem Fußweg, gerne mehrfach für mehrere Haltestellen), Geburtstage (selbst eintragen oder als vCard aus den Kontakten übernehmen, mit Alter, Countdown und Geburtstagen aus dem Kalender) und Müllabfuhr (ICS-Datei vom Entsorger oder eigener Rhythmus, Farbe pro Tonne, Erinnerung am Vorabend). Der Spiegel zeigt jetzt auch Abfahrten, Geburtstage und Abholtermine. Das Cockpit lässt sich als App installieren, mit eigenem Icon, und startet auch ohne Netz.

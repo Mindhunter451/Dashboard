@@ -112,6 +112,7 @@ function renderF1() {
   $('#f1-live').hidden = !ready;
   if (!ready) {
     const bad = f1.err && !f1.busy;
+    $('#f1-off').classList.toggle('is-loading', !bad);
     $('#f1-off-t').textContent = bad ? 'Formel-1-Daten gerade nicht erreichbar' : 'Formel 1 wird geladen';
     $('#f1-off-p').textContent = bad ? 'Jolpica antwortet gerade nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.' : 'Einen Moment, Kalender und WM-Stand kommen gleich.';
     $('#f1-retry').hidden = !bad;

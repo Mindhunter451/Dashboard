@@ -16,7 +16,15 @@ function tasksReconfigure() { tk.projAt = 0; renderTasksAll(); if (tdToken()) td
 const renderTasksAll = () => viewsOf('tasks').forEach(renderTaskView);
 function tkMsg(text, btnLabel, fn) { tk.msg = text ? { text, btnLabel, fn } : null; renderTasksAll(); }
 function tdAsk(err) { tk.msg = null; tk.ask = { err: err || '', fail: '' }; tk.askSeq++; renderTasksAll(); }
-function tdAskClose() { tk.ask = null; renderTasksAll(); }
+function tdAskClose() { tk.ask = null; if (!tdToken()) tkIdle(); else renderTasksAll(); }
+/* Ohne Token: kompakter Hinweis statt großem Formular. Das Formular kommt erst nach „Verbinden“. */
+function tkIdle() {
+  tkMsg('Noch nicht mit Todoist verbunden.', 'Verbinden', () => {
+    tdAsk();
+    const t = $('#board [data-type="tasks"]:not([hidden]) [data-r="token"]');
+    if (t) t.focus();
+  });
+}
 
 function tdToken() {
   try { return localStorage.getItem(TK_TOKEN) || tk.memTok; } catch { return tk.memTok; }
@@ -241,11 +249,13 @@ function renderTaskView(v) {
   act.hidden = !(m && m.btnLabel);
   act.textContent = m && m.btnLabel ? m.btnLabel : '';
   const has = !!tdToken(), ask = tk.ask;
+  q('[data-r="state"]').classList.toggle('setup', !has && !ask);
+  q('[data-r="foot"]').hidden = !has;
   q('[data-r="form"]').hidden = !ask;
   if (ask) {
     if (v.askSeq !== tk.askSeq) { v.askSeq = tk.askSeq; q('[data-r="token"]').value = ''; }
     q('[data-r="token"]').placeholder = has && !ask.err ? 'Gespeichert. Für einen neuen hier einfügen' : 'Token aus Todoist einfügen';
-    q('[data-r="cancel"]').hidden = !has || !!ask.err;
+    q('[data-r="cancel"]').hidden = has && !!ask.err;
     q('[data-r="forget"]').hidden = !has;
     const e = ask.fail || ask.err;
     q('[data-r="err"]').textContent = e;
@@ -273,7 +283,10 @@ function renderTaskCols(v, wrap, projects) {
     h.appendChild(a);
     col.appendChild(h);
     const note = txt => { const p = document.createElement('p'); p.className = 'hint'; p.textContent = txt; col.appendChild(p); };
-    if (list == null) { note(tdToken() ? 'Wird geladen …' : 'Noch nicht geladen.'); continue; }
+    if (list == null) {
+      if (tdToken()) { const ul = document.createElement('ul'); ul.className = 'tasks'; ul.innerHTML = skelRows(3, 'Aufgaben werden geladen'); col.appendChild(ul); } else note('Noch nicht geladen.');
+      continue;
+    }
     const open = list.filter(t => t && !t.checked).map((t, i) => ({ t, i, due: dueInfo(t), id: t.id, parentId: t.parentId }));
     const ids = new Set(open.map(x => x.id));
     const kids = new Map(), tops = [];
@@ -291,7 +304,7 @@ function renderTaskCols(v, wrap, projects) {
     if (!open.length) { note('Alles erledigt. Nice.'); continue; }
     const ul = document.createElement('ul');
     ul.className = 'tasks';
-    const LIMIT = 7;
+    const LIMIT = isNarrow() ? 5 : 7;
     const shown = tk.open[okey] ? tops : tops.slice(0, LIMIT);
     const add = (x, sub) => {
       const t = x.t, due = x.due;
@@ -347,7 +360,7 @@ async function completeTask(id) {
 }
 function initTasks() {
   setInterval(() => { if (document.visibilityState === 'visible' && tdToken() && tkKeys().length) tdLoad(); }, 120000);
-  if (!tdToken()) return tdAsk();
+  if (!tdToken()) return tkIdle();
   renderTasksAll();
   return tdLoad();
 }
@@ -363,7 +376,7 @@ defineWidget('tasks', {
     });
     q('[data-r="conf"]').addEventListener('click', () => {
       if (!tk.ask) { tdAsk(); q('[data-r="token"]').focus(); }
-      else if (tdToken()) tdAskClose();
+      else tdAskClose();
     });
     q('[data-r="cancel"]').addEventListener('click', tdAskClose);
     q('[data-r="forget"]').addEventListener('click', () => { tdSetToken(''); tkReset(); tdAsk(); });

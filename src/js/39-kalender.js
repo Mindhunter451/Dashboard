@@ -188,7 +188,7 @@ function renderCal() {
   $('#ca-live').hidden = formOpen || !sec.feeds.length;
   $('#ca-refresh').hidden = formOpen || !sec.feeds.length;
   $('#ca-refresh').disabled = ca.busy;
-  $('#ca-refresh').textContent = ca.busy ? 'Lädt …' : 'Aktualisieren';
+  $('#ca-refresh').classList.toggle('spin', ca.busy);
   if (!sec.feeds.length || formOpen) return;
   // Automatisch aktualisieren, wenn die Daten älter als 15 Minuten sind
   if (!ca.busy && (!ca.data || Date.now() - ca.data.at > 15 * 6e4) && Date.now() - ca.last > 6e4) setTimeout(caLoad, 300);
@@ -197,8 +197,10 @@ function renderCal() {
   const errs = sec.feeds.filter(f => ca.feedErr[f.id]).map(f => `${f.name}: ${ca.feedErr[f.id]}`);
   $('#ca-err').textContent = ca.err || errs.join(' ');
   $('#ca-err').hidden = !ca.err && !errs.length;
-  if (!ca.data) { ul.innerHTML = `<li class="empty">${ca.busy ? 'Termine werden geladen …' : 'Noch keine Termine geladen.'}</li>`; $('#ca-more').hidden = true; $('#ca-src').textContent = ''; return; }
-  const LIMIT = 9;
+  if (!ca.data) { ul.innerHTML = ca.busy || !ca.err ? skelRows(4, 'Termine werden geladen') : '<li class="empty">Noch keine Termine geladen.</li>'; $('#ca-more').hidden = true; $('#ca-src').textContent = ''; return; }
+  // Auf dem Handy erst mal nur die nächsten fünf, der Rest steckt hinter „Alle zeigen“
+  const LIMIT = isNarrow() ? 5 : 9;
+  const nx = caNext(now), nxIn = nx && nx.e.s > +now ? nx.e.s - now : 0;
   let html = '', shown = 0, total = 0, past = 0;
   for (let i = 0; i < c.days; i++) {
     const d = addDays(t0, i);
@@ -211,7 +213,7 @@ function renderCal() {
     for (const e of list) {
       if (!ca.more && shown >= LIMIT) break;
       shown++;
-      const s = new Date(e.s), en = new Date(e.e), live = !e.a && e.s <= +now && e.e > +now;
+      const s = new Date(e.s), en = new Date(e.e), live = !e.a && e.s <= +now && e.e > +now, next = !live && nx && nx.e === e && i === 0;
       let tm, sub = '';
       if (e.a) {
         const span = dayDiff(s, en);
@@ -223,7 +225,8 @@ function renderCal() {
         sub = endsToday ? (e.e > e.s ? `bis ${hm(en)}` : '') : `bis ${WD[en.getDay()]} ${hm(en)}`;
       }
       const where = c.loc && e.l ? e.l : '';
-      html += `<li class="ca-ev${live ? ' is-now' : ''}" style="--c:${caFeedColor(e.f)}"><span class="ca-t">${esc(tm)}${!e.a && sub ? `<small>${esc(sub)}</small>` : ''}</span><span class="ca-main"><b>${esc(e.t)}</b>${e.a && sub ? `<small>${esc(sub)}</small>` : ''}${where ? `<small>${esc(where)}</small>` : ''}</span>${live ? '<span class="ca-now">Jetzt</span>' : ''}</li>`;
+      const tag = live ? '<span class="ca-now">Jetzt</span>' : next && nxIn < 3 * 36e5 ? `<span class="ca-in">in ${esc(dur(nxIn))}</span>` : '';
+      html += `<li class="ca-ev${live ? ' is-now' : ''}${next ? ' is-next' : ''}" style="--c:${caFeedColor(e.f)}"><span class="ca-t">${esc(tm)}${!e.a && sub ? `<small>${esc(sub)}</small>` : ''}</span><span class="ca-main"><b>${esc(e.t)}</b>${e.a && sub ? `<small>${esc(sub)}</small>` : ''}${where ? `<small>${esc(where)}</small>` : ''}</span>${tag}</li>`;
     }
   }
   if (!total) html = `<li class="empty">Keine Termine in den nächsten ${c.days} Tagen${past ? ', die von heute sind schon vorbei' : ''}.</li>`;

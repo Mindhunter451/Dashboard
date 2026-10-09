@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '2.4';
+const VERSION = '2.5';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -15,6 +15,7 @@ function tick() {
   wsTick(now);
   mirrorTick(now);
   f1Tick(now);
+  if (now.getSeconds() % 10 === 3) peekAll();
   if (ymd(now) !== vacDayKey) renderVacation();
   if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
 }
@@ -48,14 +49,19 @@ const NEWS = {
   '2.1': ['Neu: Pomodoro, Gewohnheiten und Lernfortschritt. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
   '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()],
   '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()],
-  '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()]
+  '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
+  '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null]
 };
+const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {
   if (state.meta.seen === VERSION) return;
-  const known = state.edited, news = NEWS[VERSION];
+  const known = state.edited, from = verNum(state.meta.seen);
+  // Wer eine Version übersprungen hat, bekommt das neueste Angebot mit Knopf, sonst den neuesten Hinweis
+  const fresh = Object.keys(NEWS).filter(k => verNum(k) > from && verNum(k) <= verNum(VERSION)).sort((a, b) => verNum(b) - verNum(a));
+  const news = NEWS[fresh.find(k => NEWS[k][1]) || fresh[0]];
   state.meta.seen = VERSION;
   persist();
-  if (known && news) setTimeout(() => toast(news[0], news[1], { label: 'Einrichten', ms: 20000 }), 900);
+  if (known && news) setTimeout(() => toast(news[0], news[1], { label: 'Einrichten', ms: news[1] ? 20000 : 12000 }), 900);
 }
 function setupSportPage() {
   if (state.pages.length >= 12) return;
@@ -133,6 +139,8 @@ renderAll();
 announceNew();
 if (mirrorFromHash()) mirrorOpen(false);
 setInterval(tick, 1000);
+/* Handy quer oder Fenster schmaler: Listen kürzen oder wieder verlängern */
+narrowMq.addEventListener('change', () => { renderViews(); renderRadarTg(); schedLayout(); });
 startWeather();
 loadCommute();
 initTasks();

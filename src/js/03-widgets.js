@@ -26,6 +26,7 @@ function ensureView(id) {
   v = { id, type: w.type, el, q: s => el.querySelector(s) };
   views.set(id, v);
   if (WT[w.type] && WT[w.type].mount) WT[w.type].mount(v);
+  decorateCard(v);
   if (cardRO) cardRO.observe(el);
   return v;
 }
@@ -70,6 +71,7 @@ function renderViews() {
     if (TYPES[w.type].multi) v.el.setAttribute('aria-label', widgetTitle(v.id));
     if (WT[w.type] && WT[w.type].render) WT[w.type].render(v);
   }
+  peekAll();
 }
 function newWidget(type, cfg, title) {
   let id;

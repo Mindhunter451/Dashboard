@@ -118,6 +118,8 @@ function renderSky(now) {
   for (const k of ['--sky-top', '--sky-mid', '--sky-low', '--sky-ink', '--sky-ink-low', '--sky-glow', '--sky-stars']) {
     if (v[k] !== undefined) el.style.setProperty(k, v[k]); else el.style.removeProperty(k);
   }
+  // Die Farbe am Horizont schimmert unter dem Himmel noch ein Stück auf der Seite nach
+  if (on) document.documentElement.style.setProperty('--horizon', rgb2hex(low)); else document.documentElement.style.removeProperty('--horizon');
   el.style.setProperty('--sun-x', (xNow * 100).toFixed(2) + '%');
   el.style.setProperty('--sun-f', yNow.toFixed(3));
   el.dataset.night = alt < -6 ? '1' : '0';

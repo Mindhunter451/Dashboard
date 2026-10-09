@@ -40,7 +40,8 @@ function tickTiles(now) {
   if (running) setTile('#t-ur', 'Läuft gerade', `${running.label || 'Urlaub'} bis ${WD[parseYmd(running.to).getDay()]} ${dm(parseYmd(running.to))}`, 'good');
   else if (upcoming) {
     const f = parseYmd(upcoming.from);
-    setTile('#t-ur', inDays(dayDiff(t, f)), `${upcoming.label || 'Urlaub'}${upcoming.example ? ' (Beispiel)' : ''}, ab ${WD[f.getDay()]} ${dm(f)}`, 'hot');
+    const n = dayDiff(t, f);
+    setTile('#t-ur', inDays(n), `${upcoming.label || 'Urlaub'}${upcoming.example ? ' (Beispiel)' : ''}, ab ${WD[f.getDay()]} ${dm(f)}`, n <= 1 ? 'hot' : null);
   } else setTile('#t-ur', 'Nix geplant', 'Trag deinen nächsten Urlaub ein');
   // Eigene Countdowns
   for (const el of document.querySelectorAll('[data-cd]')) {
@@ -48,7 +49,7 @@ function tickTiles(now) {
     if (!c) continue;
     const day = parseYmd(c.date), n = dayDiff(t, day), target = c.time ? at(day, c.time) : day;
     const sub = `${WDL[day.getDay()]}, ${dm(day)}${day.getFullYear() !== t.getFullYear() ? day.getFullYear() : ''}${c.time ? ` um ${c.time} Uhr` : ''}`;
-    if (n > 1 && !(c.time && target - now < 36e5 * 36)) setTile(el, `in ${n} Tagen`, sub, n <= 7 ? 'hot' : null);
+    if (n > 1 && !(c.time && target - now < 36e5 * 36)) setTile(el, `in ${n} Tagen`, sub, null);
     else if (c.time && target > now) setTile(el, `in ${dur(target - now, true)}`, sub, 'hot');
     else if (n === 1) setTile(el, 'Morgen', sub, 'hot');
     else if (n === 0) setTile(el, c.time ? 'Läuft' : 'Heute', sub, 'good');
@@ -80,6 +81,7 @@ function tickHeader(now) {
     $('#h-day').textContent = WDL[now.getDay()];
     $('#h-date').textContent = `${now.getDate()}. ${ML[now.getMonth()]} ${now.getFullYear()}`;
     $('#h-kw').textContent = isoWeek(now);
+    $('#mb-time').textContent = hm(now);
   }
   const s = $('#h-time .sec');
   if (s) s.textContent = pad(now.getSeconds());

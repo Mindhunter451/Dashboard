@@ -45,32 +45,58 @@
   --r:18px;
   --gap:clamp(14px,1.8vw,22px);
   --arc-h:96px;
+  /* Ebenen: ruhige Karten liegen flach, normale leicht erhaben, wichtige Karten schweben etwas höher */
+  --card-line:rgba(15,27,43,.075);
+  --shadow-1:0 1px 2px rgba(15,27,43,.04),0 3px 12px -4px rgba(15,27,43,.07);
+  --shadow-2:0 1px 2px rgba(15,27,43,.05),0 12px 30px -10px rgba(15,27,43,.2);
+  --surface-hi:var(--surface);
+  --quiet:color-mix(in srgb,var(--surface) 48%,var(--bg));
+  /* Füllung für Balken, die nicht „jetzt“ sind. Die Akzentfarbe bleibt für jetzt, heute und Aktionen. */
+  --fill-n:color-mix(in srgb,var(--ink) 52%,var(--surface));
+  --ease:cubic-bezier(.2,.7,.2,1);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
+    --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
     --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
     --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+    --card-line:rgba(255,255,255,.065);
+    --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
+    --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
+    --surface-hi:#142039;
+    --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
+    --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
+  --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
   --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
   --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+  --card-line:rgba(255,255,255,.065);
+  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
+  --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
+  --surface-hi:#142039;
+  --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
+  --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
   color-scheme:dark;
 }
 @media (max-width:720px){:root{--arc-h:70px}}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
-.wrap{max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+/* Unter dem Horizont schimmert die Farbe des Himmels noch ein Stück nach */
+.wrap{position:relative;isolation:isolate;max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
+.wrap::before{content:"";position:absolute;z-index:-1;top:0;left:calc(50% - 50vw);width:100vw;height:clamp(200px,24vw,340px);pointer-events:none;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--horizon,var(--bg)) 20%,transparent),transparent)}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* Knöpfe, Chips */
-.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .btn{border:0;background:var(--ink);color:var(--surface);padding:8px 15px;border-radius:999px;font-weight:600;font-size:14px}
 .btn:hover{opacity:.9}
 .btn-ghost{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:999px;font-weight:600;font-size:13px;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
@@ -80,6 +106,36 @@ button{font:inherit;color:inherit;cursor:pointer}
 .icon-btn:hover{background:var(--raise);color:var(--ink)}
 .chip{display:inline-block;padding:0 7px;border-radius:999px;background:var(--chip-bg);color:var(--accent-ink);font:600 11px/1.7 var(--f-body);white-space:nowrap}
 .empty{color:var(--muted);font-size:14px;padding:6px 0}
+.icon-btn.spin svg{animation:spin 1s linear infinite}
+.icon-btn:disabled{cursor:default}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Platzhalter beim Laden: graue Zeilen mit einem Schimmer, statt „wird geladen“ */
+.sk-row{display:grid;grid-template-columns:2.6em minmax(0,1fr) 2.4em;gap:12px;align-items:center;padding:9px 0;list-style:none}
+.sk-row span{display:flex;flex-direction:column;gap:7px}
+.sk-row i,.sk-lines i,.is-loading::before{display:block;border-radius:6px;background:linear-gradient(100deg,var(--raise) 30%,color-mix(in srgb,var(--raise) 35%,var(--surface)) 50%,var(--raise) 70%) 0 0/300% 100%;animation:skel 1.5s ease-in-out infinite}
+.sk-row i{height:11px}
+.sk-row .sk-a{height:2.1em;border-radius:8px}
+.sk-row .sk-b{height:1.3em}
+.sk-row i.s{height:9px;opacity:.7}
+.sk-lines{display:flex;flex-direction:column;gap:12px;padding:4px 0}
+.sk-lines i{height:15px;width:100%}
+.is-loading{background:none!important;border:0!important;padding:0!important}
+.is-loading>*{display:none!important}
+.is-loading::before{content:"";height:var(--sk-h,118px);border-radius:0;
+  -webkit-mask:linear-gradient(#000 0 0) 0 0/100% 34px no-repeat,repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 25px) 0 50px/100% 100% no-repeat;
+  mask:linear-gradient(#000 0 0) 0 0/100% 34px no-repeat,repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 25px) 0 50px/100% 100% no-repeat}
+.sk-list{list-style:none;margin:0;padding:0}
+@keyframes skel{from{background-position:100% 0}to{background-position:0 0}}
+@media (prefers-reduced-motion: reduce){.sk-row i,.sk-lines i,.is-loading::before{animation:none}.icon-btn.spin svg{animation-duration:3s}}
+
+/* Einrichten-Hinweis in einer Karte: kompakt, eine Zeile Text und ein Knopf */
+.setup{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;padding:12px 12px 12px 14px;border-radius:12px;background:var(--raise);border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent)}
+.setup h3{margin:0;font:650 15px/1.3 var(--f-display);font-variation-settings:'wdth' 92;grid-column:1}
+.setup p{margin:0;grid-column:1;font-size:13px;line-height:1.45;color:var(--muted);max-width:none}
+.setup .form-row{grid-column:2;grid-row:1/span 2;flex-wrap:nowrap}
+.setup .btn{padding:7px 14px;font-size:13px;white-space:nowrap}
+@container (max-width:330px){.setup{grid-template-columns:minmax(0,1fr)}.setup .form-row{grid-column:1;grid-row:auto;margin-top:8px}}
 
 /* Formulare */
 .panel{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
@@ -124,7 +180,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:0 0 auto;border:0;background:transparent;padding:6px 15px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:color-mix(in srgb,var(--sky-ink) 76%,transparent);white-space:nowrap}
 .tab:hover{color:var(--sky-ink);background:color-mix(in srgb,var(--sky-ink) 12%,transparent)}
-.tab[aria-selected="true"]{background:var(--sky-ink);color:var(--sky-top)}
+.tab[aria-selected="true"],.tab[aria-current="page"]{background:var(--sky-ink);color:var(--sky-top)}
 .sky.plain .tab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
 .sky-tools{display:flex;gap:8px;margin-left:auto;flex:0 0 auto}
 .sky-btn{position:relative;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;font:600 13px/1.2 var(--f-body);color:var(--sky-ink);
@@ -141,6 +197,19 @@ button{font:inherit;color:inherit;cursor:pointer}
   .sky-btn{padding:8px}
   .sky-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 }
+
+/* Mini-Leiste beim Scrollen: Uhrzeit, Seiten, nach oben */
+.minibar{position:fixed;top:0;left:0;right:0;z-index:150;padding-top:env(safe-area-inset-top,0px);
+  background:color-mix(in srgb,var(--surface) 82%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.5);backdrop-filter:blur(16px) saturate(1.5);
+  border-bottom:1px solid var(--card-line);box-shadow:0 8px 24px -16px rgba(15,27,43,.5);
+  transform:translateY(-110%);transition:transform .3s var(--ease);--sky-ink:var(--ink);--sky-top:var(--surface)}
+.minibar.on{transform:none}
+.mb-in{max-width:3200px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:7px max(clamp(16px,2.6vw,44px),env(safe-area-inset-right,0px)) 7px max(clamp(16px,2.6vw,44px),env(safe-area-inset-left,0px))}
+.mb-time{flex:0 0 auto;font:620 18px/1 var(--f-display);font-variation-settings:'wdth' 84;letter-spacing:-.01em}
+.mb-tabs{flex:0 1 auto;background:color-mix(in srgb,var(--ink) 6%,transparent);border-color:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.mb-tabs .tab{padding:5px 13px;font-size:13px}
+.mb-up{margin-left:auto}
+@media (prefers-reduced-motion: reduce){.minibar{transition:none}}
 
 /* Uhr und Tagesinfos */
 .sky-main{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 40px;flex-wrap:wrap}
@@ -200,17 +269,56 @@ button{font:inherit;color:inherit;cursor:pointer}
 .board:not(.flow)>.card{position:absolute;top:0;left:0}
 .board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
 @media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px clamp(16px,2vw,24px) 22px;display:flex;flex-direction:column;gap:16px;min-width:0;container-type:inline-size}
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-h2{margin:0;font:680 21px/1.15 var(--f-display);font-variation-settings:'wdth' 88;letter-spacing:-.012em}
-h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-spacing:0;font-variant-numeric:tabular-nums}
-.card{position:relative}
+.card{position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:16px clamp(16px,1.7vw,22px) 20px;display:flex;flex-direction:column;gap:14px;min-width:0;container-type:inline-size}
+/* Wichtige Karten (Wetter, Abfahrten, Kalender, Pendeln) schweben höher, ruhige (Schnellzugriff, Notizen, Vers) liegen flach */
+.card[data-tier="hero"]{background:var(--surface-hi);box-shadow:var(--shadow-2)}
+.card[data-tier="quiet"]{background:var(--quiet);box-shadow:none;--raise:var(--surface)}
+h2{margin:0;font:660 17px/1.25 var(--f-display);font-variation-settings:'wdth' 90;letter-spacing:-.008em}
+h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-spacing:0}
+
+/* Kartenkopf, überall gleich: Symbol, Titel und Status links, Knöpfe rechts. Der Titel klappt die Karte ein. */
+.card-head{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;min-height:32px}
+.card-head>h2{min-width:0;flex:0 1 auto;display:flex}
+.card-head>.actions,.card-head>.seg,.card-head>.icon-btn,.card-head>.btn-ghost{margin-left:auto}
+.card-head>.src{font-size:13px;line-height:1.3}
+.card-head .icon-btn{width:32px;height:32px;flex-basis:32px;border-radius:9px}
+.card-head .icon-btn svg{width:18px;height:18px}
+.card-head .btn-ghost{padding:5px 11px}
+/* Die negativen Ränder lassen die Klickfläche etwas größer werden, ohne dass sich Symbol und Text verschieben */
+.card-tg{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:calc(100% + 11px);margin:-3px -8px -3px -3px;padding:3px 8px 3px 3px;border:0;border-radius:11px;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:left}
+.card-tg:hover{background:color-mix(in srgb,var(--ink) 4.5%,transparent)}
+.card-tt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-ico{flex:0 0 28px;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--raise);color:var(--muted)}
+.card[data-tier="hero"] .card-ico{color:var(--ink)}
+.card[data-tier="quiet"] .card-ico{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.card-ico svg{width:16px;height:16px}
+.card-chev{flex:0 0 14px;width:14px;height:14px;margin-left:-3px;color:var(--muted);opacity:0;transition:opacity .15s,transform .25s var(--ease)}
+.card-tg:hover .card-chev,.card-tg:focus-visible .card-chev{opacity:1}
+@media (hover:none){.card-chev{opacity:.5}}
+.card-peek{display:none;flex:0 1 auto;margin-left:auto;min-width:0;font:600 14px/1.3 var(--f-body);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-peek small{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+.card-peek .dp-line{font-size:12px;height:1.7em;min-width:2.5em;margin-left:5px;vertical-align:-1px}
+
+/* Eingeklappt: nur der Kopf mit einer Kurzinfo rechts */
+.board:not(.editing)>.card.is-collapsed{gap:0;padding-bottom:16px}
+.board:not(.editing)>.card.is-collapsed>:not(.card-head){display:none!important}
+.board:not(.editing)>.card.is-collapsed>.card-head{flex-wrap:nowrap}
+.board:not(.editing)>.card.is-collapsed>.card-head>:not(h2):not(.card-peek){display:none!important}
+.board:not(.editing)>.card.is-collapsed .card-peek{display:block}
+.board:not(.editing)>.card.is-collapsed>.card-head>h2{flex:0 0 auto;max-width:62%}
+.board:not(.editing)>.card.is-collapsed .card-chev{opacity:1;transform:rotate(-90deg)}
+.board:not(.editing)>.card.is-collapsed[data-tier="hero"]{box-shadow:var(--shadow-1)}
+
+/* Seitenwechsel: Karten kommen kurz nacheinander rein */
+.board.page-in>.card:not(.add-tile){animation:card-in .46s var(--ease) both;animation-delay:calc(var(--i,0) * 32ms)}
+@keyframes card-in{from{opacity:0;translate:0 12px}}
+@media (prefers-reduced-motion: reduce){.board.page-in>.card{animation:none}.card-chev{transition:none}}
 
 /* Leere Seite und Bearbeiten-Modus */
 .page-empty{border:2px dashed var(--line);border-radius:var(--r);padding:30px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted)}
 .page-empty h3{margin:0;color:var(--ink);font:700 20px/1.25 var(--f-display)}
 .page-empty p{margin:0;max-width:52ch}
-.add-tile{border:2px dashed var(--line);background:transparent;color:var(--muted);min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:700 17px/1.2 var(--f-display);text-align:center}
+.add-tile{border:2px dashed var(--line);box-shadow:none;background:transparent;color:var(--muted);min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:700 17px/1.2 var(--f-display);text-align:center}
 .add-tile:hover,.add-tile:focus-visible{border-color:var(--accent);color:var(--ink);background:color-mix(in srgb,var(--accent) 6%,transparent)}
 .add-tile span{font:500 13px/1.3 var(--f-body)}
 .board.editing>.card:not(.add-tile){min-height:236px}
@@ -218,7 +326,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .ed-box{position:sticky;top:16px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;max-width:100%}
 .ed-ico{width:42px;height:42px;border-radius:12px;background:var(--chip-bg);color:var(--accent-ink);display:grid;place-items:center}
 .ed-ico svg{width:22px;height:22px}
-.ed-type{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
+.ed-type{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .ed-title{margin:0;font:700 19px/1.2 var(--f-display);overflow-wrap:anywhere}
 .ed-also{margin:0;font-size:12px;color:var(--muted)}
 .ed-tools{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
@@ -230,14 +338,18 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 
 /* 30-widgets.css */
 /* Fortschrittsbalken */
-.bars{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+.bars{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
 .bar-top{display:flex;align-items:center;gap:8px;min-width:0}
-.bar-name{font-weight:700;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-top .icon-btn{width:28px;height:28px;flex-basis:28px;margin:-4px -6px -4px 0;opacity:.6}
+.bar-top .icon-btn:hover,.bar-top .icon-btn:focus-visible{opacity:1}
+.bar-name{font-weight:600;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-meta{color:var(--muted);font-size:13px;white-space:nowrap}
 .bar-pct{margin-left:auto;font:500 15px/1 var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap}
-.track{position:relative;height:14px;border-radius:7px;background:var(--raise);border:1px solid var(--line);overflow:hidden;margin-top:6px}
-.fill{position:absolute;top:0;bottom:0;left:0;width:0;background:var(--accent);transition:width .9s cubic-bezier(.2,.7,.2,1)}
-.tick{position:absolute;top:3px;bottom:3px;width:1px;background:color-mix(in srgb,var(--ink) 20%,transparent)}
+.track{position:relative;height:10px;border-radius:5px;background:var(--raise);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;margin-top:7px}
+.fill{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:5px;background:var(--fill-n);transition:width .9s var(--ease)}
+/* Nur der laufende Arbeitstag ist „jetzt“ und bekommt die Akzentfarbe */
+.bar[data-kind="day"][data-state="run"] .fill{background:var(--accent)}
+.tick{position:absolute;top:2px;bottom:2px;width:1px;background:color-mix(in srgb,var(--ink) 18%,transparent)}
 .bar[data-state="done"] .fill{background:var(--good)}
 .bar[data-state="off"] .fill{background:var(--muted);opacity:.35}
 .bar-foot{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;margin-top:6px;font:400 12px/1.35 var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
@@ -254,7 +366,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .legend dd{margin:0;text-align:right;font:500 13px var(--f-data);font-variant-numeric:tabular-nums}
 .sw{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 10px}
 .sw-taken{background:var(--ink)}
-.sw-planned,.seg-planned{background:repeating-linear-gradient(-45deg,var(--accent) 0 4px,color-mix(in srgb,var(--accent) 50%,var(--surface)) 4px 7px)}
+.sw-planned,.seg-planned{background:repeating-linear-gradient(-45deg,var(--sea) 0 4px,color-mix(in srgb,var(--sea) 45%,var(--surface)) 4px 7px)}
 .sw-free{background:var(--raise);border:1px solid var(--line)}
 .stack{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--raise);border:1px solid var(--line)}
 .seg-taken{background:var(--ink)}
@@ -262,31 +374,29 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .vac-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:"label days edit del" "dates days edit del";align-items:center;gap:2px 8px;padding:10px 0;border-top:1px solid var(--line)}
 .vac-list li.editing{background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:8px;padding-inline:8px}
 .vac-list .icon-btn[data-vedit]{grid-area:edit}
-.v-half{color:var(--accent-ink)}
+.v-half{color:var(--muted)}
 .v-label{grid-area:label;min-width:0;font-weight:600;display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;overflow-wrap:anywhere}
 .v-dates{grid-area:dates;font:400 13px var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
 .v-days{grid-area:days;font:500 14px var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
 .vac-list .icon-btn[data-del]{grid-area:del}
 .status{font:600 12px/1.8 var(--f-body);padding:0 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);text-transform:capitalize}
 .status[data-s="läuft"]{border-color:var(--good);color:var(--good)}
-.status[data-s="geplant"]{border-color:var(--accent);color:var(--accent-ink)}
+.status[data-s="geplant"]{border-color:color-mix(in srgb,var(--sea) 55%,var(--line));color:var(--sea)}
 
 /* Wetter */
-.loc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.loc-name{font-weight:600;font-size:14px}
 .wx-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
 @container (max-width:540px){.wx-top{grid-template-columns:minmax(0,1fr)}}
 .wx-now{display:flex;flex-direction:column;gap:8px;min-width:0}
 .wx-main{display:flex;align-items:center;gap:12px}
-.wx-icon svg{width:58px;height:58px;color:var(--ink);display:block}
-.wx-temp{font:800 58px/.9 var(--f-display);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.wx-desc{font-weight:700;font-size:15px}
+.wx-icon svg{width:64px;height:64px;color:var(--ink);display:block}
+.wx-temp{font:760 clamp(58px,9cqi,74px)/.88 var(--f-display);font-variation-settings:'wdth' 92;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.wx-desc{font-weight:650;font-size:15px;margin-top:4px}
 .wx-feel{color:var(--muted);font-size:13px}
 .wx-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;margin:0;font-size:13px}
 .wx-dl dt{color:var(--muted)}
 .wx-dl dd{margin:0;font-family:var(--f-data);font-variant-numeric:tabular-nums}
 .wx-rain{background:var(--raise);border-radius:12px;padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.sub-h{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
+.sub-h{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .rainbars{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;height:72px;align-items:end;border-bottom:1px solid var(--line)}
 .rb{height:var(--h);min-height:2px;background:var(--line);border-radius:3px 3px 0 0}
 .rb.wet{background:var(--rain)}
@@ -298,7 +408,15 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .hr svg{width:26px;height:26px;color:var(--ink)}
 .hr b{font:600 14px var(--f-data);color:var(--ink);font-variant-numeric:tabular-nums}
 .hr .pp{color:var(--rain);font:500 11px var(--f-data);font-variant-numeric:tabular-nums}
-.radar-box{display:flex;flex-direction:column;gap:8px}
+.radar-box{display:flex;flex-direction:column;margin-top:14px;padding-top:6px;border-top:1px solid var(--line)}
+.sub-tg{display:flex;align-items:center;gap:6px;width:100%;padding:6px 0;border:0;background:none;color:var(--muted);font:600 13px/1.3 var(--f-body);text-align:left}
+.sub-tg:hover{color:var(--ink)}
+.sub-tg svg{width:14px;height:14px;flex:0 0 14px;transition:transform .25s var(--ease)}
+.sub-tg[aria-expanded="false"] svg{transform:rotate(-90deg)}
+.radar-body{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.rd-links{gap:6px}
+.rd-links .hint{font-size:12px;margin-right:2px}
+.rd-links .btn-ghost{padding:4px 10px;font-size:12px}
 .radar{height:clamp(250px,58cqi,540px);border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--raise);max-width:100%;isolation:isolate}
 #radar.leaflet-container{background:var(--raise);font:12px var(--f-body)}
 .radar-ctl{display:flex;align-items:center;gap:10px}
@@ -313,7 +431,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 /* Aufgaben (Todoist) */
 .tk-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px 22px}
 .tk-col{min-width:0}
-.tk-col h3{margin:0 0 4px;font:600 12.5px/1.3 var(--f-body);color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tk-col h3{margin:0 0 4px;font:600 13px/1.3 var(--f-body);color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tk-col h3 a{color:inherit;text-decoration:none}
 .tk-col h3 a:hover{color:var(--ink)}
 .tasks{list-style:none;margin:0;padding:0}
@@ -334,8 +452,10 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .due[data-s="today"]{color:var(--accent-ink)}
 .due[data-s="over"]{color:var(--bad)}
 .more{background:none;border:0;color:var(--sea);font-weight:600;font-size:13px;padding:8px 0 0}
-.tk-state{background:var(--raise);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
-.tk-state p{margin:0;font-size:14px}
+.tk-state{background:var(--raise);border-radius:12px;padding:10px 10px 10px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px}
+.tk-state p{margin:0;font-size:14px;flex:1 1 150px}
+.tk-state .btn{padding:7px 14px;font-size:13px}
+.tk-state.setup{border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent);display:flex}
 .tk-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .tk-add{display:flex;gap:8px;align-items:center}
 .tk-add input,.tk-add select,.ln-add input{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
@@ -411,8 +531,8 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .qlinks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:8px}
 .ql{position:relative;min-width:0}
 .ql a{display:flex;align-items:center;gap:10px;padding:9px 38px 9px 9px;border:1px solid var(--line);border-radius:12px;background:var(--raise);color:var(--ink);text-decoration:none;min-width:0}
-.ql a:hover{border-color:var(--accent)}
-.ql .av{flex:0 0 30px;height:30px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 15px/1 var(--f-display)}
+.ql a:hover{border-color:color-mix(in srgb,var(--ink) 30%,var(--line))}
+.ql .av{flex:0 0 30px;height:30px;border-radius:9px;background:color-mix(in srgb,var(--ink) 7%,var(--surface));color:var(--ink);display:grid;place-items:center;font:700 15px/1 var(--f-display)}
 .ql .tx{min-width:0;display:flex;flex-direction:column}
 .ql .nm{font-weight:600;font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ql .dom{font:400 11px/1.3 var(--f-data);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -428,7 +548,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .po-ring[data-mode="short"] .po-arc,.po-ring[data-mode="long"] .po-arc{stroke:var(--good)}
 @media (prefers-reduced-motion: reduce){.po-arc{transition:none}}
 .po-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center}
-.po-mode{font:600 12.5px/1.2 var(--f-body);color:var(--muted)}
+.po-mode{font:600 13px/1.2 var(--f-body);color:var(--muted)}
 .po-time{font:500 36px/1 var(--f-data);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .po-round{font-size:12px;color:var(--muted)}
 .po-side{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -473,8 +593,8 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .tp small{font:400 11px var(--f-data);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .tp .icon-btn{width:28px;height:28px;flex-basis:28px;opacity:.55}
 .tp .icon-btn:hover,.tp .icon-btn:focus-visible{opacity:1}
-[data-type="learn"] .seg-taken{background:var(--accent)}
-.tp-head{font:600 12.5px/1.3 var(--f-body);color:var(--muted);padding:12px 0 4px}
+[data-type="learn"] .seg-taken{background:var(--fill-n)}
+.tp-head{font:600 13px/1.3 var(--f-body);color:var(--muted);padding:12px 0 4px}
 
 /* Gleitzeit */
 .big[data-s="plus"] b{color:var(--good)}
@@ -509,13 +629,13 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fb-mid{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
 .fb-mid b{font:700 26px/1 var(--f-data);font-variant-numeric:tabular-nums}
 .fb-mid small{font-size:12px;color:var(--muted);white-space:nowrap}
-.fb-label{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
-.live{display:inline-flex;align-items:center;gap:5px;font:700 12.5px/1.6 var(--f-body);color:var(--bad)}
+.fb-label{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
+.live{display:inline-flex;align-items:center;gap:5px;font:700 13px/1.6 var(--f-body);color:var(--bad)}
 .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--bad);animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.25}}
 @media (prefers-reduced-motion: reduce){.live::before{animation:none}}
 .fb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.fb-day{font:600 12.5px/1.3 var(--f-body);color:var(--muted);padding:10px 0 4px}
+.fb-day{font:600 13px/1.3 var(--f-body);color:var(--muted);padding:10px 0 4px}
 .fb-day:first-child{padding-top:0}
 .fb-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
 .fb-row.fav{background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:8px;padding-inline:6px}
@@ -524,14 +644,14 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fb-t.r{justify-content:flex-end;text-align:right}
 .fb-t:hover span{text-decoration:underline}
 .fb-sc{font:600 14px/1 var(--f-data);font-variant-numeric:tabular-nums;min-width:3.4em;text-align:center}
-.fb-sc.time{font-weight:500;color:var(--muted);font-size:12.5px}
+.fb-sc.time{font-weight:500;color:var(--muted);font-size:13px}
 .fb-sc[data-live]{color:var(--bad)}
 .fb-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .fb-nav .icon-btn:disabled{opacity:.3;cursor:default}
 .fb-table{width:100%;border-collapse:collapse;font-size:13px}
 .fb-table th{font:600 12px/1.3 var(--f-body);color:var(--muted);text-align:right;padding:0 5px 6px}
 .fb-table th.n{text-align:left}
-.fb-table td{padding:4px 5px;border-top:1px solid var(--line);text-align:right;font:400 12.5px/1.3 var(--f-data);font-variant-numeric:tabular-nums}
+.fb-table td{padding:4px 5px;border-top:1px solid var(--line);text-align:right;font:400 13px/1.3 var(--f-data);font-variant-numeric:tabular-nums}
 .fb-table td.n{text-align:left;font-family:var(--f-body);font-size:13px}
 .fb-table td.p{font-weight:700}
 .fb-table td.pos{width:2.4em;border-left:3px solid transparent;color:var(--muted)}
@@ -542,7 +662,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fb-table tr[data-z="down"] td.pos{border-left-color:var(--bad)}
 .fb-table .fb-t{font-size:13px;padding:0}
 @container (max-width:340px){.fb-table .hide-s{display:none}}
-.fb-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:6px 0 0;padding:0;list-style:none;font-size:11.5px;color:var(--muted)}
+.fb-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin:6px 0 0;padding:0;list-style:none;font-size:12px;color:var(--muted)}
 .fb-legend li{display:flex;align-items:center;gap:5px}
 .fb-legend i{width:3px;height:12px;border-radius:2px;background:var(--c)}
 
@@ -601,9 +721,9 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .in-head small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
 .in-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
 .in-stats div{background:var(--raise);border-radius:10px;padding:8px 10px}
-.in-stats span{display:block;font-size:11.5px;color:var(--muted)}
+.in-stats span{display:block;font-size:12px;color:var(--muted)}
 .in-stats b{font:600 16px/1.3 var(--f-data);font-variant-numeric:tabular-nums}
-.in-sec h3{margin:0 0 4px;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
+.in-sec h3{margin:0 0 4px;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .in-wiki{font-size:14px;line-height:1.55}
 .in-wiki p{margin:0 0 10px}
 .in-wiki img{float:right;max-width:92px;max-height:120px;object-fit:contain;border-radius:8px;margin:0 0 8px 12px}
@@ -631,7 +751,8 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .ca-main b{font-weight:600;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
 .ca-main small{color:var(--muted);font-size:13px;line-height:1.35;overflow-wrap:anywhere}
 .ca-ev.is-now{background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:10px}
-.ca-now{align-self:center;font:700 11.5px/1.7 var(--f-body);padding:0 8px;border-radius:999px;background:var(--c);color:#fff}
+.ca-now{align-self:center;font:700 12px/1.7 var(--f-body);padding:0 8px;border-radius:999px;background:var(--c);color:#fff}
+.ca-in{align-self:center;font:650 12px/1.7 var(--f-body);padding:0 8px;border-radius:999px;background:var(--chip-bg);color:var(--accent-ink);white-space:nowrap}
 #ca-more{align-self:flex-start;margin-top:6px}
 #ca-live{display:flex;flex-direction:column;gap:4px}
 .ca-src{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
@@ -655,9 +776,10 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .vs{margin:0;display:flex;flex-direction:column;gap:12px}
 .vs-text{margin:0;font:italic 400 clamp(18px,1.25vw + 8px,22px)/1.5 var(--f-serif);font-variation-settings:'opsz' 24;text-wrap:pretty;max-width:52ch}
 .vs-text.muted{font-style:normal;font-family:var(--f-body);font-size:14px;color:var(--muted)}
+.vs-text .sk-lines{max-width:46ch}
 .vs-cap{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:13px;color:var(--muted)}
-.vs-cap a{font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--accent)}
-.vs-cap a:hover{color:var(--accent-ink)}
+.vs-cap a{font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent)}
+.vs-cap a:hover{border-bottom-color:var(--ink)}
 
 /* 34-alltag.css */
 /* Abfahrten */
@@ -669,20 +791,21 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
   font:700 14px/1 var(--f-display);font-variation-settings:'wdth' 86;font-variant-numeric:tabular-nums;white-space:nowrap;justify-self:start}
 .dp-main{min-width:0;display:flex;flex-direction:column;gap:1px}
 .dp-main b{font-weight:600;font-size:15px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dp-main small{display:flex;flex-wrap:wrap;gap:0 9px;color:var(--muted);font-size:12.5px;line-height:1.4;font-variant-numeric:tabular-nums}
+.dp-main small{display:flex;flex-wrap:wrap;gap:0 9px;color:var(--muted);font-size:13px;line-height:1.4;font-variant-numeric:tabular-nums}
 .dp-late{color:var(--warn);font-weight:700}
 .dp-late.big,.dp-x{color:var(--bad);font-weight:700}
 .dp-chg{color:var(--warn);font-weight:600}
 .dp-row.x .dp-main b{text-decoration:line-through;text-decoration-thickness:1.5px;color:var(--muted)}
 .dp-row.x .dp-line{opacity:.55}
 .dp-in{display:flex;align-items:baseline;gap:3px;justify-content:flex-end;white-space:nowrap;font-variant-numeric:tabular-nums}
-.dp-in b{font:650 21px/1 var(--f-display);font-variation-settings:'wdth' 82;letter-spacing:-.01em}
+.dp-in b{font:660 23px/1 var(--f-display);font-variation-settings:'wdth' 82;letter-spacing:-.015em}
 .dp-in small{color:var(--muted);font-size:12px;font-weight:600}
 .dp-go{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:10px 13px;border-radius:12px;background:color-mix(in srgb,var(--good) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--good) 30%,var(--line))}
 .dp-go b{font:700 17px/1.2 var(--f-display);font-variation-settings:'wdth' 88}
-.dp-go span{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;color:var(--muted);font-size:13.5px}
-.dp-go .dp-line{font-size:12.5px}
+.dp-go span{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;color:var(--muted);font-size:14px}
+.dp-go .dp-line{font-size:13px}
 .dp-go.now{background:color-mix(in srgb,var(--accent) 20%,var(--surface));border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.card-st{display:inline-flex;align-items:center}
 .dp-live,.dp-plan{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:600 12px/1.3 var(--f-body);color:var(--muted);border:1px solid var(--line);align-self:center}
 .dp-live{color:var(--good);border-color:color-mix(in srgb,var(--good) 40%,var(--line))}
 .dp-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--good);animation:dp-pulse 2s ease-in-out infinite}
@@ -717,9 +840,9 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .bd-cal small{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
 .bd-main{min-width:0;display:flex;flex-direction:column;gap:1px}
 .bd-main b{font-weight:600;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
-.bd-main small{color:var(--muted);font-size:12.5px;line-height:1.35}
+.bd-main small{color:var(--muted);font-size:13px;line-height:1.35}
 .bd-in{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
-.bd-in.soon{color:var(--accent-ink)}
+.bd-in.soon{color:var(--ink);font-weight:700}
 .bd-row.today{background:color-mix(in srgb,var(--accent) 15%,var(--surface));padding-left:8px;margin-inline:-8px 0}
 .bd-row.today .bd-cal{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .bd-row.today .bd-cal small{color:inherit}
@@ -744,7 +867,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .ws-dot::before{content:"";position:absolute;left:-2px;right:-2px;top:-3px;height:3px;border-radius:2px;background:var(--c)}
 .ws-main{min-width:0;display:flex;flex-direction:column;gap:1px}
 .ws-main b{font-weight:600;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
-.ws-main small{color:var(--muted);font-size:12.5px;line-height:1.35}
+.ws-main small{color:var(--muted);font-size:13px;line-height:1.35}
 .ws-when{font-size:14px;font-weight:600;white-space:nowrap}
 .ws-when.soon{color:var(--accent-ink);font-weight:700}
 .ws-warn{color:var(--warn);font-weight:600}
@@ -766,7 +889,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .dr-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 20px 32px}
 .dr-sec{padding:18px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
 .dr-sec:last-child{border-bottom:0}
-.dr-sec>h3{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
+.dr-sec>h3{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .dr-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dr-row>.lbl{font-size:14px;color:var(--ink);font-weight:600}
 .swatches{display:flex;flex-wrap:wrap;gap:10px}
@@ -813,7 +936,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .gal-act{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .gal-act .btn{padding:6px 13px;font-size:13px}
 .gal-act button:disabled{opacity:.5;cursor:default}
-.gal-sub{margin:10px 0 0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
+.gal-sub{margin:10px 0 0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .soon{display:flex;flex-wrap:wrap;gap:6px}
 .soon span{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 8px;border:1px dashed var(--line);border-radius:999px;font-size:13px;color:var(--muted)}
 .soon svg{width:16px;height:16px}
@@ -880,6 +1003,14 @@ html.mirror-on body{overflow:hidden}
 </style>
 </head>
 <body>
+  <!-- Schmale Leiste mit Uhrzeit und Seiten, sobald der Himmel aus dem Bild gescrollt ist -->
+  <div class="minibar" id="minibar" aria-hidden="true" inert>
+    <div class="mb-in">
+      <span class="mb-time" id="mb-time"></span>
+      <nav class="tabs mb-tabs" id="mb-tabs" aria-label="Seiten"></nav>
+      <button type="button" class="icon-btn mb-up" id="mb-up" aria-label="Nach oben" title="Nach oben"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+    </div>
+  </div>
   <header class="sky" id="sky">
     <div class="sky-stars" aria-hidden="true"></div>
     <div class="sky-in">
@@ -948,7 +1079,7 @@ html.mirror-on body{overflow:hidden}
           <button type="button" id="cm-dir-home" aria-pressed="true">Nach Hause</button>
           <button type="button" id="cm-dir-work" aria-pressed="false">Zur Arbeit</button>
         </div>
-        <button type="button" class="btn-ghost" id="cm-set-btn">Adressen</button>
+        <button type="button" class="icon-btn" id="cm-set-btn" aria-label="Adressen und Strecke einstellen" title="Adressen und Strecke"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
 
@@ -968,10 +1099,10 @@ html.mirror-on body{overflow:hidden}
       </div>
     </form>
 
-    <div class="wx-off" id="cm-empty" hidden>
+    <div class="setup" id="cm-empty" hidden>
       <h3>Strecke einrichten</h3>
-      <p>Trag ein, wo du wohnst und wo du arbeitest. Dann siehst du hier, wie lange du gerade brauchst und ob Staus, Baustellen oder Sperrungen auf dem Weg liegen.</p>
-      <div class="form-row"><button type="button" class="btn" id="cm-empty-btn">Adressen eintragen</button></div>
+      <p>Wohnort und Arbeit eintragen, dann siehst du Fahrzeit, Staus und Baustellen.</p>
+      <div class="form-row"><button type="button" class="btn" id="cm-empty-btn">Eintragen</button></div>
     </div>
 
     <div class="wx-off" id="cm-off" hidden>
@@ -1009,10 +1140,8 @@ html.mirror-on body{overflow:hidden}
   <section class="card" id="weather" data-type="weather" aria-labelledby="wx-h">
     <div class="card-head">
       <h2 id="wx-h"><span data-r="title">Wetter</span></h2>
-      <div class="loc">
-        <span class="loc-name" id="wx-loc">Hamburg</span>
-        <button type="button" class="btn-ghost" id="wx-loc-btn" hidden>Ort ändern</button>
-      </div>
+      <span class="src" id="wx-loc">Hamburg</span>
+      <button type="button" class="icon-btn" id="wx-loc-btn" hidden aria-label="Ort fürs Wetter ändern" title="Ort ändern"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.4-6.5-10.8a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21z"/><circle cx="12" cy="10.2" r="2.3"/></svg></button>
     </div>
 
     <form class="panel" id="wx-loc-form" hidden novalidate>
@@ -1057,32 +1186,31 @@ html.mirror-on body{overflow:hidden}
         <p class="sub-h" style="margin-bottom:6px">Nächste 12 Stunden</p>
         <div class="hours" id="wx-hours"></div>
       </div>
-      <div class="radar-box" style="margin-top:16px" id="radar-box">
-        <p class="sub-h">Regenradar, letzte 2 Stunden</p>
-        <div class="radar" id="radar"></div>
-        <div class="radar-ctl">
-          <button type="button" class="btn-ghost" id="rd-play" aria-pressed="false">Abspielen</button>
-          <label for="rd-slider" class="lbl" style="position:absolute;left:-9999px">Radarbild wählen</label>
-          <input type="range" id="rd-slider" min="0" max="0" value="0">
-          <span class="rd-time" id="rd-time"></span>
+      <div class="radar-box" id="radar-box">
+        <button type="button" class="sub-tg" id="rd-tg" aria-expanded="true" aria-controls="rd-body"><span>Regenradar, letzte 2 Stunden</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="radar-body" id="rd-body">
+          <div class="radar" id="radar"></div>
+          <div class="radar-ctl">
+            <button type="button" class="btn-ghost" id="rd-play" aria-pressed="false">Abspielen</button>
+            <label for="rd-slider" class="vh">Radarbild wählen</label>
+            <input type="range" id="rd-slider" min="0" max="0" value="0">
+            <span class="rd-time" id="rd-time"></span>
+          </div>
+          <p class="hint" id="radar-msg" hidden></p>
+          <div class="links rd-links">
+            <span class="hint">Größer bei</span>
+            <a class="btn-ghost" id="lk-rv" href="https://www.rainviewer.com/map.html?loc=53.5511,9.9937,8&layer=radar" target="_blank" rel="noopener">RainViewer ↗</a>
+            <a class="btn-ghost" href="https://www.wetteronline.de/regenradar/hamburg" target="_blank" rel="noopener">wetteronline ↗</a>
+            <a class="btn-ghost" href="https://www.dwd.de/DE/leistungen/radarbild_film/radarbild_film.html" target="_blank" rel="noopener">DWD ↗</a>
+          </div>
         </div>
-        <p class="hint" id="radar-msg" hidden></p>
       </div>
     </div>
 
-    <div class="wx-off" id="wx-off">
+    <div class="wx-off is-loading" id="wx-off" style="--sk-h:210px">
       <h3 id="wx-off-title">Wetter wird geladen</h3>
       <p id="wx-off-text">Einen Moment, die Daten für deinen Ort kommen gleich.</p>
       <div class="form-row"><button type="button" class="btn" id="wx-retry" hidden>Nochmal versuchen</button></div>
-    </div>
-
-    <div>
-      <p class="sub-h" style="margin-bottom:8px">Regenradar öffnen</p>
-      <div class="links">
-        <a class="btn-ghost" id="lk-rv" href="https://www.rainviewer.com/map.html?loc=53.5511,9.9937,8&layer=radar" target="_blank" rel="noopener">RainViewer ↗</a>
-        <a class="btn-ghost" href="https://www.wetteronline.de/regenradar/hamburg" target="_blank" rel="noopener">wetteronline ↗</a>
-        <a class="btn-ghost" href="https://www.dwd.de/DE/leistungen/radarbild_film/radarbild_film.html" target="_blank" rel="noopener">DWD Radarfilm ↗</a>
-      </div>
     </div>
     <p class="src" id="wx-src"></p>
   </section>
@@ -1092,8 +1220,8 @@ html.mirror-on body{overflow:hidden}
     <div class="card-head">
       <h2 id="va-h"><span data-r="title">Urlaub</span> <small id="va-year"></small></h2>
       <div class="actions">
-        <button type="button" class="btn-ghost" id="vac-set-btn">Anspruch</button>
-        <button type="button" class="btn-ghost" id="vac-add">+ Urlaub</button>
+        <button type="button" class="icon-btn" id="vac-add" aria-label="Urlaub eintragen" title="Urlaub eintragen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" class="icon-btn" id="vac-set-btn" aria-label="Urlaubsanspruch einstellen" title="Urlaubsanspruch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
     <div class="vac-hero">
@@ -1105,7 +1233,7 @@ html.mirror-on body{overflow:hidden}
       </dl>
     </div>
     <div class="stack" role="img" id="vac-stack" aria-label="Urlaubsverteilung"><div class="seg-taken" id="seg-t"></div><div class="seg-planned" id="seg-p"></div></div>
-    <p class="hint" id="vac-ex-hint" hidden>Der Anspruch von 30 Tagen ist ein Beispielwert. Tipp auf „Anspruch“ und trag deinen echten ein.</p>
+    <p class="hint" id="vac-ex-hint" hidden>Der Anspruch von 30 Tagen ist ein Beispielwert. Tipp oben rechts auf die Regler und trag deinen echten ein.</p>
 
     <form class="panel" id="vac-set" hidden novalidate>
       <h3>Urlaubsanspruch</h3>
@@ -1145,7 +1273,7 @@ html.mirror-on body{overflow:hidden}
   <section class="card" id="pomodoro" data-type="pomodoro" aria-labelledby="po-h">
     <div class="card-head">
       <h2 id="po-h"><span data-r="title">Pomodoro</span></h2>
-      <button type="button" class="btn-ghost" id="po-set-btn">Zeiten</button>
+      <button type="button" class="icon-btn" id="po-set-btn" aria-label="Zeiten einstellen" title="Zeiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
     </div>
     <form class="panel" id="po-form" hidden novalidate>
       <h3>Zeiten in Minuten</h3>
@@ -1194,7 +1322,7 @@ html.mirror-on body{overflow:hidden}
       <h2 id="f1-h"><span data-r="title">Formel 1</span></h2>
       <span class="src" id="f1-round"></span>
     </div>
-    <div class="wx-off" id="f1-off" hidden>
+    <div class="wx-off" id="f1-off" hidden style="--sk-h:150px">
       <h3 id="f1-off-t">Formel 1 wird geladen</h3>
       <p id="f1-off-p">Einen Moment, Kalender und WM-Stand kommen gleich.</p>
       <div class="form-row"><button type="button" class="btn" id="f1-retry" hidden>Nochmal versuchen</button></div>
@@ -1213,8 +1341,14 @@ html.mirror-on body{overflow:hidden}
   <section class="card" id="fuel" data-type="fuel" aria-labelledby="fu-h">
     <div class="card-head">
       <h2 id="fu-h"><span data-r="title">Spritpreise</span></h2>
-      <div class="seg sm" role="group" aria-label="Sorte" id="fu-type">
-        <button type="button" data-v="e5">Super E5</button><button type="button" data-v="e10">E10</button><button type="button" data-v="diesel">Diesel</button>
+      <div class="actions">
+        <div class="seg sm" role="group" aria-label="Sorte" id="fu-type">
+          <button type="button" data-v="e5">Super E5</button><button type="button" data-v="e10">E10</button><button type="button" data-v="diesel">Diesel</button>
+        </div>
+        <span class="actions" id="fu-foot">
+          <button type="button" class="icon-btn" id="fu-refresh" aria-label="Preise aktualisieren" title="Aktualisieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.4 9.6A7.9 7.9 0 0 0 5.4 7.2"/><path d="M4.6 3.8v4.1h4.1"/><path d="M4.6 14.4a7.9 7.9 0 0 0 14 2.4"/><path d="M19.4 20.2v-4.1h-4.1"/></svg></button>
+          <button type="button" class="icon-btn" id="fu-key-btn" aria-label="Tankerkönig-Key" title="Tankerkönig-Key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        </span>
       </div>
     </div>
     <form class="panel" id="fu-form" hidden novalidate>
@@ -1230,9 +1364,9 @@ html.mirror-on body{overflow:hidden}
         <button type="button" class="btn-danger" id="fu-forget" hidden>Key entfernen</button>
       </div>
     </form>
-    <div class="wx-off" id="fu-setup" hidden>
+    <div class="setup" id="fu-setup" hidden>
       <h3>Spritpreise einrichten</h3>
-      <p>Mit einem kostenlosen Key von Tankerkönig siehst du hier die günstigsten Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.</p>
+      <p>Mit einem kostenlosen Tankerkönig-Key siehst du die günstigsten Tankstellen in deiner Nähe.</p>
       <div class="form-row"><button type="button" class="btn" id="fu-setup-btn">Key eintragen</button></div>
     </div>
     <div id="fu-live" hidden>
@@ -1243,10 +1377,6 @@ html.mirror-on body{overflow:hidden}
       <ul class="fu-list" id="fu-list"></ul>
       <p class="hint" id="fu-hint"></p>
     </div>
-    <div class="tk-foot" id="fu-foot">
-      <button type="button" class="btn-ghost" id="fu-refresh">Aktualisieren</button>
-      <button type="button" class="btn-ghost" id="fu-key-btn">API-Key</button>
-    </div>
     <p class="src" id="fu-src"></p>
   </section>
 
@@ -1255,13 +1385,13 @@ html.mirror-on body{overflow:hidden}
     <div class="card-head">
       <h2 id="ca-h"><span data-r="title">Kalender</span></h2>
       <div class="actions">
-        <button type="button" class="btn-ghost" id="ca-refresh" hidden>Aktualisieren</button>
-        <button type="button" class="icon-btn" id="ca-set-btn" aria-label="Kalender einrichten" title="Kalender einrichten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" id="ca-refresh" hidden aria-label="Termine aktualisieren" title="Aktualisieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.4 9.6A7.9 7.9 0 0 0 5.4 7.2"/><path d="M4.6 3.8v4.1h4.1"/><path d="M4.6 14.4a7.9 7.9 0 0 0 14 2.4"/><path d="M19.4 20.2v-4.1h-4.1"/></svg></button>
+        <button type="button" class="icon-btn" id="ca-set-btn" aria-label="Kalender einrichten" title="Kalender einrichten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" id="ca-setup" hidden>
+    <div class="setup" id="ca-setup" hidden>
       <h3>iCloud-Kalender verbinden</h3>
-      <p>Hier tauchen deine nächsten Termine auf. Dafür brauchst du den Link deines öffentlich geteilten Kalenders und eine kleine Weiterleitung, die du einmal kostenlos bei Cloudflare anlegst.</p>
+      <p>Deine nächsten Termine aus einem geteilten iCloud-Kalender.</p>
       <div class="form-row"><button type="button" class="btn" id="ca-setup-btn">Einrichten</button></div>
     </div>
     <form class="panel ca-form" id="ca-form" hidden novalidate>
@@ -1305,12 +1435,12 @@ html.mirror-on body{overflow:hidden}
     <div class="card-head">
       <h2 id="vs-h"><span data-r="title">Vers des Tages</span></h2>
       <div class="actions">
-        <button type="button" class="btn-ghost" id="vs-back" hidden>Zurück zu heute</button>
-        <button type="button" class="btn-ghost" id="vs-more">Noch einer</button>
+        <button type="button" class="icon-btn" id="vs-back" hidden aria-label="Zurück zum Vers von heute" title="Zurück zu heute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 13.5L4.5 9 9 4.5"/><path d="M4.5 9H14a5.5 5.5 0 0 1 0 11h-3"/></svg></button>
+        <button type="button" class="icon-btn" id="vs-more" aria-label="Noch ein Vers" title="Noch einer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/></svg></button>
       </div>
     </div>
     <figure class="vs">
-      <blockquote class="vs-text" id="vs-text">Vers wird geladen …</blockquote>
+      <blockquote class="vs-text" id="vs-text"><span class="sk-lines" role="img" aria-label="Vers wird geladen"><i></i><i></i><i style="width:58%"></i></span></blockquote>
       <figcaption class="vs-cap"><a id="vs-ref" target="_blank" rel="noopener" hidden></a><span id="vs-tr"></span></figcaption>
     </figure>
   </section>
@@ -1320,12 +1450,12 @@ html.mirror-on body{overflow:hidden}
     <div class="card-head">
       <h2 id="bd-h"><span data-r="title">Geburtstage</span></h2>
       <div class="actions">
-        <button type="button" class="icon-btn" id="bd-set-btn" aria-label="Geburtstage verwalten" title="Geburtstage verwalten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" id="bd-set-btn" aria-label="Geburtstage verwalten" title="Geburtstage verwalten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" id="bd-setup" hidden>
+    <div class="setup" id="bd-setup" hidden>
       <h3>Geburtstage eintragen</h3>
-      <p>Übernimm die Geburtstage aus deinen Kontakten oder trag die wichtigsten selbst ein. Ganztägige Termine aus deinem Kalender mit „Geburtstag“ im Titel tauchen hier auch auf.</p>
+      <p>Aus den Kontakten übernehmen oder die wichtigsten selbst eintragen.</p>
       <div class="form-row"><button type="button" class="btn" id="bd-setup-btn">Einrichten</button></div>
     </div>
     <form class="panel bd-form" id="bd-form" hidden novalidate>
@@ -1365,12 +1495,12 @@ html.mirror-on body{overflow:hidden}
     <div class="card-head">
       <h2 id="ws-h"><span data-r="title">Müllabfuhr</span></h2>
       <div class="actions">
-        <button type="button" class="icon-btn" id="ws-set-btn" aria-label="Müllabfuhr einrichten" title="Müllabfuhr einrichten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" id="ws-set-btn" aria-label="Müllabfuhr einrichten" title="Müllabfuhr einrichten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" id="ws-setup" hidden>
+    <div class="setup" id="ws-setup" hidden>
       <h3>Abfuhrtermine eintragen</h3>
-      <p>Lad die Termine deines Entsorgers als Datei oder trag den Rhythmus deiner Tonnen ein. Am Abend vor der Abholung erinnert dich das Cockpit.</p>
+      <p>Datei vom Entsorger laden oder den Rhythmus deiner Tonnen eintragen.</p>
       <div class="form-row"><button type="button" class="btn" id="ws-setup-btn">Einrichten</button></div>
     </div>
     <form class="panel ws-form" id="ws-form" hidden novalidate>
@@ -1559,8 +1689,9 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-tasks">
   <section class="card" data-type="tasks">
     <div class="card-head">
-      <h2 data-r="title">Aufgaben</h2>
+      <h2><span data-r="title">Aufgaben</span></h2>
       <span class="src" data-r="src"></span>
+      <button type="button" class="icon-btn" data-r="conf" aria-label="Todoist-Verbindung" title="Todoist-Verbindung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
     </div>
     <div class="tk-state" data-r="state" hidden>
       <p data-r="state-text"></p>
@@ -1585,9 +1716,8 @@ html.mirror-on body{overflow:hidden}
       <button type="submit" class="btn-ghost" data-r="addbtn">Anlegen</button>
     </form>
     <div class="tk-cols" data-r="cols"></div>
-    <div class="tk-foot">
+    <div class="tk-foot" data-r="foot">
       <a class="btn-ghost" href="https://app.todoist.com/app/today" target="_blank" rel="noopener">Todoist öffnen ↗</a>
-      <button type="button" class="btn-ghost" data-r="conf">Verbindung</button>
     </div>
   </section>
 </template>
@@ -1595,8 +1725,8 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-progress">
   <section class="card" data-type="progress">
     <div class="card-head">
-      <h2 data-r="title">Fortschritt</h2>
-      <button type="button" class="btn-ghost" data-r="add">+ Balken</button>
+      <h2><span data-r="title">Fortschritt</span></h2>
+      <button type="button" class="icon-btn" data-r="add" aria-label="Balken hinzufügen" title="Balken hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3 data-r="form-title">Neuer Balken</h3>
@@ -1644,8 +1774,8 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-links">
   <section class="card" data-type="links">
     <div class="card-head">
-      <h2 data-r="title">Schnellzugriff</h2>
-      <button type="button" class="btn-ghost" data-r="add">+ Link</button>
+      <h2><span data-r="title">Schnellzugriff</span></h2>
+      <button type="button" class="icon-btn" data-r="add" aria-label="Link hinzufügen" title="Link hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3 data-r="form-title">Neuer Link</h3>
@@ -1667,7 +1797,7 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-notes">
   <section class="card" data-type="notes">
     <div class="card-head">
-      <h2 data-r="title">Notizen</h2>
+      <h2><span data-r="title">Notizen</span></h2>
       <span class="src" data-r="state"></span>
     </div>
     <textarea class="notes" data-r="text" maxlength="8000" placeholder="Schnell was notieren, wird automatisch gespeichert."></textarea>
@@ -1677,8 +1807,8 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-habits">
   <section class="card" data-type="habits">
     <div class="card-head">
-      <h2 data-r="title">Gewohnheiten</h2>
-      <button type="button" class="btn-ghost" data-r="add">+ Gewohnheit</button>
+      <h2><span data-r="title">Gewohnheiten</span></h2>
+      <button type="button" class="icon-btn" data-r="add" aria-label="Gewohnheit hinzufügen" title="Gewohnheit hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3 data-r="form-title">Neue Gewohnheit</h3>
@@ -1708,8 +1838,8 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-learn">
   <section class="card" data-type="learn">
     <div class="card-head">
-      <h2 data-r="title">Lernfortschritt</h2>
-      <button type="button" class="btn-ghost" data-r="set">Prüfung</button>
+      <h2><span data-r="title">Lernfortschritt</span></h2>
+      <button type="button" class="icon-btn" data-r="set" aria-label="Prüfung einstellen" title="Prüfung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3>Prüfung</h3>
@@ -1724,9 +1854,9 @@ html.mirror-on body{overflow:hidden}
         <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
       </div>
     </form>
-    <div class="wx-off" data-r="empty" hidden>
+    <div class="setup" data-r="empty" hidden>
       <h3>Wann ist die Prüfung?</h3>
-      <p>Trag das Datum ein und leg deine Themen an. Dann siehst du, wie weit du bist und ob dein Tempo bis zur Prüfung reicht.</p>
+      <p>Datum und Themen eintragen, dann siehst du, ob dein Tempo reicht.</p>
       <div class="form-row"><button type="button" class="btn" data-r="empty-btn">Datum eintragen</button></div>
     </div>
     <div class="vac-hero" data-r="hero">
@@ -1748,7 +1878,7 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-football">
   <section class="card" data-type="football">
     <div class="card-head">
-      <h2 data-r="title">Bundesliga</h2>
+      <h2><span data-r="title">Bundesliga</span></h2>
       <span class="src" data-r="md"></span>
     </div>
     <div class="fb-fav" data-r="fav"></div>
@@ -1764,16 +1894,16 @@ html.mirror-on body{overflow:hidden}
 <template id="tpl-dep">
   <section class="card" data-type="dep">
     <div class="card-head">
-      <h2 data-r="title">Abfahrten</h2>
+      <h2><span data-r="title">Abfahrten</span></h2>
+      <span class="card-st" data-r="rt"></span>
       <div class="actions">
-        <span data-r="rt"></span>
-        <button type="button" class="icon-btn" data-r="set" aria-label="Haltestelle und Filter einstellen" title="Haltestelle und Filter einstellen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" data-r="set" aria-label="Haltestelle und Filter einstellen" title="Haltestelle und Filter einstellen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" data-r="setup" hidden>
+    <div class="setup" data-r="setup" hidden>
       <h3>Haltestelle wählen</h3>
-      <p>Hier siehst du live, was an deiner Haltestelle abfährt, mit Verspätungen und Ausfällen. Mit deinem Fußweg sagt dir die Karte auch, wann du loslaufen musst.</p>
-      <div class="form-row"><button type="button" class="btn" data-r="setup-btn">Haltestelle suchen</button></div>
+      <p>Live-Abfahrten mit Verspätungen und wann du los musst.</p>
+      <div class="form-row"><button type="button" class="btn" data-r="setup-btn">Suchen</button></div>
     </div>
     <div class="dp-live-box" data-r="live" hidden>
       <p class="dp-go" data-r="go" hidden></p>
@@ -2365,6 +2495,7 @@ function ensureView(id) {
   v = { id, type: w.type, el, q: s => el.querySelector(s) };
   views.set(id, v);
   if (WT[w.type] && WT[w.type].mount) WT[w.type].mount(v);
+  decorateCard(v);
   if (cardRO) cardRO.observe(el);
   return v;
 }
@@ -2409,6 +2540,7 @@ function renderViews() {
     if (TYPES[w.type].multi) v.el.setAttribute('aria-label', widgetTitle(v.id));
     if (WT[w.type] && WT[w.type].render) WT[w.type].render(v);
   }
+  peekAll();
 }
 function newWidget(type, cfg, title) {
   let id;
@@ -2425,6 +2557,155 @@ function widgetLabel(id) {
   if (w.type === 'football') return FB_LEAGUES[w.cfg.league] + (w.cfg.teamName ? `, ${w.cfg.teamName}` : '');
   if (w.type === 'dep') return w.cfg.stop ? `Abfahrten: ${w.cfg.stop.name}` : 'Abfahrten';
   return TYPES[w.type].name;
+}
+
+/* 04-karten.js */
+/* Karten: einheitlicher Kopf (Symbol, Titel, Status links, Knöpfe rechts), Ebenen, Einklappen mit Kurzinfo,
+ * Platzhalter beim Laden und der kurze Auftritt beim Seitenwechsel.
+ * Eingeklappte Karten merkt sich jedes Gerät selbst (jere-cockpit-zu), aufs Handy passt eben weniger als auf den großen Schirm. */
+const ZU_KEY = 'jere-cockpit-zu';
+const zu = new Set((Array.isArray(lsGet(ZU_KEY)) ? lsGet(ZU_KEY) : []).map(String));
+const narrowMq = matchMedia('(max-width: 720px)');
+const isNarrow = () => narrowMq.matches;
+/* Wichtige Karten schweben etwas höher, ruhige liegen flach */
+const TIER = { weather: 'hero', dep: 'hero', cal: 'hero', commute: 'hero', links: 'quiet', notes: 'quiet', verse: 'quiet' };
+const CHEV = '<svg class="card-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+
+/* Aus dem Titel wird ein Knopf zum Einklappen, davor das Symbol des Widgets, dahinter Platz für die Kurzinfo */
+function decorateCard(v) {
+  const tier = TIER[v.type];
+  if (tier) v.el.dataset.tier = tier; else delete v.el.dataset.tier;
+  const head = v.el.querySelector(':scope > .card-head'), h2 = head && head.querySelector(':scope > h2');
+  if (!h2 || h2.querySelector('.card-tg')) { applyCollapsed(v); return; }
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'card-tg';
+  b.innerHTML = `<span class="card-ico">${TICON[v.type] || ''}</span>`;
+  const tt = document.createElement('span');
+  tt.className = 'card-tt';
+  while (h2.firstChild) tt.appendChild(h2.firstChild);
+  b.appendChild(tt);
+  b.insertAdjacentHTML('beforeend', CHEV);
+  h2.appendChild(b);
+  const peek = document.createElement('span');
+  peek.className = 'card-peek';
+  h2.after(peek);
+  applyCollapsed(v);
+}
+function applyCollapsed(v) {
+  const on = zu.has(v.id), b = v.el.querySelector('.card-tg');
+  v.el.classList.toggle('is-collapsed', on);
+  if (b) { b.setAttribute('aria-expanded', String(!on)); b.title = on ? 'Aufklappen' : 'Einklappen'; }
+  if (on) peekCard(v);
+}
+function setCollapsed(v, on) {
+  if (on) zu.add(v.id); else zu.delete(v.id);
+  for (const id of [...zu]) if (!state.widgets[id]) zu.delete(id);
+  lsSet(ZU_KEY, [...zu]);
+  applyCollapsed(v);
+  // Beim Aufklappen frisch zeichnen, Minuten und Zeiten könnten inzwischen anders sein
+  if (!on && WT[v.type] && WT[v.type].render) WT[v.type].render(v);
+  if (!on && v.type === 'progress') tickBars(new Date());
+  if (v.type === 'weather') renderRadarTg();
+  schedLayout();
+}
+$('#board').addEventListener('click', e => {
+  const b = e.target.closest('.card-tg');
+  if (!b || edit.on) return;
+  const card = b.closest('[data-wid]'), v = card && views.get(card.dataset.wid);
+  if (v) setCollapsed(v, !zu.has(v.id));
+});
+
+/* Kurzinfo für eingeklappte Karten. Gibt HTML zurück, Texte immer durch esc(). */
+const PEEK = {
+  weather() {
+    const c = wx.data && wx.data.current;
+    if (!c || !Number.isFinite(c.temperature_2m)) return '';
+    return `${Math.round(c.temperature_2m)}° <small>${esc((WMO[c.weather_code] || [''])[0])}</small>`;
+  },
+  dep(v) {
+    const c = state.widgets[v.id].cfg, D = c.stop && dp.data[c.stop.id];
+    if (!D) return '';
+    const now = Date.now(), r = dpRows(D, c, now).find(x => !x.x);
+    if (!r) return '<small>Gerade keine Abfahrt</small>';
+    if (c.walk) { const m = Math.floor((r.t - c.walk * 6e4 - now) / 6e4); return `${m < 1 ? 'Jetzt los' : `Los in ${m} Min`} ${dpBadge(r)}`; }
+    const m = Math.floor((r.t - now) / 6e4);
+    return `${dpBadge(r)} ${m < 1 ? 'jetzt' : m < 60 ? `in ${m} Min` : hm(new Date(r.t))}`;
+  },
+  cal() {
+    if (!caSec().feeds.length || !ca.data) return '';
+    const n = caNext(new Date());
+    return n ? `${esc(n.label)} <small>${esc(n.sub)}</small>` : '<small>Die nächsten 24 Std frei</small>';
+  },
+  tasks(v) {
+    if (!tdToken()) return '';
+    let open = 0, today = 0, any = false;
+    for (const p of state.widgets[v.id].cfg.projects) {
+      const list = tk.tasks[p.toLowerCase()];
+      if (!list) continue;
+      any = true;
+      for (const t of list) if (t && !t.checked) { open++; const d = dueInfo(t); if (d && d.s !== 'later') today++; }
+    }
+    return any ? `${open} offen${today ? ` <small>${today} heute</small>` : ''}` : '';
+  },
+  bday() {
+    const now = new Date(), x = bdUpcoming(now)[0];
+    return x ? `${esc(x.name)} <small>${esc(bdWhen(dayDiff(sod(now), x.d)))}</small>` : '';
+  },
+  waste() {
+    const now = new Date(), up = wsUpcoming(state.waste.bins, now);
+    if (!up.length) return '';
+    const d = up[0].next;
+    return `${esc(wsNames(up.filter(x => +x.next === +d).map(x => x.b)))} <small>${esc(wsDay(d, sod(now)))}</small>`;
+  },
+  vacation: () => `${esc($('#vac-free').textContent)} <small>Tage frei</small>`,
+  progress(v) {
+    const r = v.refs && [...v.refs.values()][0];
+    return r ? `${esc(r.b.name)} <small>${esc(r.pct.textContent)}</small>` : '';
+  },
+  commute: () => ($('#cm-live').hidden ? '' : `${esc($('#cm-time').textContent)} <small>${esc($('#cm-time-lbl').textContent)}</small>`),
+  verse: () => ($('#vs-ref').hidden ? '' : `<small>${esc($('#vs-ref').textContent)}</small>`),
+  notes(v) {
+    const line = (state.widgets[v.id].cfg.text || '').split('\n').map(s => s.trim()).find(Boolean);
+    return line ? `<small>${esc(line.slice(0, 60))}</small>` : '';
+  },
+  links(v) { const n = state.widgets[v.id].cfg.items.length; return n ? `<small>${n} ${n === 1 ? 'Link' : 'Links'}</small>` : ''; },
+  pomodoro: () => (po.running ? `${esc(PO_NAME[po.mode])} <small>${esc($('#po-time').textContent)}</small>` : ''),
+  habits(v) {
+    const items = state.widgets[v.id].cfg.items, today = ymd(new Date());
+    return items.length ? `${items.filter(h => h.log.includes(today)).length} von ${items.length} <small>heute</small>` : '';
+  },
+  learn(v) { const h = v.q('[data-r="hero"]'); return h && !h.hidden ? `${esc(v.q('[data-r="days"]').textContent)} <small>${esc(v.q('[data-r="days-lbl"]').textContent)}</small>` : ''; },
+  football(v) { const t = v.q('[data-r="md"]').textContent; return t ? `<small>${esc(t)}</small>` : ''; },
+  f1() { const t = $('#f1-round').textContent; return t ? `<small>${esc(t)}</small>` : ''; }
+};
+function peekCard(v) {
+  const el = v.el.querySelector(':scope > .card-head > .card-peek');
+  if (!el || !zu.has(v.id) || !state.widgets[v.id]) return;
+  let html = '';
+  try { html = PEEK[v.type] ? PEEK[v.type](v) || '' : ''; } catch { html = ''; }
+  if (el.dataset.h !== html) { el.dataset.h = html; el.innerHTML = html; }
+}
+function peekAll() { for (const v of views.values()) if (!v.el.hidden && zu.has(v.id)) peekCard(v); }
+
+/* Platzhalter-Zeilen für Listen, solange Daten unterwegs sind */
+const skelRows = (n, label) => `<li class="vh">${esc(label || 'Wird geladen')}</li>` + Array.from({ length: n }, (_, i) =>
+  `<li class="sk-row" aria-hidden="true"><i class="sk-a"></i><span><i style="width:${[72, 56, 64, 48][i % 4]}%"></i><i class="s" style="width:${[36, 44, 30, 40][i % 4]}%"></i></span><i class="sk-b"></i></li>`).join('');
+const skelLines = (n, label) => `<span class="sk-lines" role="img" aria-label="${esc(label || 'Wird geladen')}">${Array.from({ length: n }, (_, i) => `<i style="width:${i === n - 1 ? 58 : 100}%"></i>`).join('')}</span>`;
+
+/* Seitenwechsel: Karten kommen von oben links nach unten rechts kurz nacheinander rein */
+let cardsInTimer = 0;
+function cardsIn() {
+  if (reduceMotion) return;
+  const board = $('#board');
+  const cards = [...board.children].filter(el => el.classList.contains('card') && !el.hidden && el.id !== 'add-tile');
+  cards.map(el => [el, el.getBoundingClientRect()]).sort((a, b) => (a[1].top - b[1].top) || (a[1].left - b[1].left))
+    .forEach(([el], i) => el.style.setProperty('--i', String(Math.min(i, 12))));
+  board.classList.remove('page-in');
+  void board.offsetWidth;
+  board.classList.add('page-in');
+  clearTimeout(cardsInTimer);
+  cardsInTimer = setTimeout(() => board.classList.remove('page-in'), 1000);
 }
 
 /* 10-fortschritt.js */
@@ -2505,13 +2786,14 @@ function renderBars(v) {
   if (!bars.length) {
     const li = document.createElement('li');
     li.className = 'empty';
-    li.textContent = 'Noch keine Balken. Leg mit „+ Balken“ deinen ersten an.';
+    li.textContent = 'Noch keine Balken. Leg mit dem Plus oben deinen ersten an.';
     ul.appendChild(li);
     return;
   }
   for (const b of bars) {
     const li = document.createElement('li');
     li.className = 'bar';
+    li.dataset.kind = b.kind;
     li.innerHTML = `<div class="bar-top"><span class="bar-name"></span><span class="bar-meta"></span>${b.example ? '<span class="chip" title="Tipp auf den Stift und trag deine echten Werte ein">Beispiel</span>' : ''}<span class="bar-pct"></span><button type="button" class="icon-btn" data-edit="${esc(b.id)}">${PENCIL}</button></div><div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><i class="tick" style="left:25%"></i><i class="tick" style="left:50%"></i><i class="tick" style="left:75%"></i></div><div class="bar-foot"><span class="l"></span><span class="bar-sub"></span><span class="r"></span></div>`;
     li.querySelector('.bar-name').textContent = b.name;
     li.querySelector('[data-edit]').setAttribute('aria-label', `${b.name} bearbeiten`);
@@ -2996,6 +3278,7 @@ async function loadWeather(loc, seq) {
 function showWxOff() {
   $('#wx-live').hidden = true;
   $('#wx-off').hidden = false;
+  $('#wx-off').classList.remove('is-loading');
   $('#wx-loc-btn').hidden = true;
   $('#wx-off-title').textContent = 'Wetterdienst gerade nicht erreichbar';
   $('#wx-off-text').textContent = 'Keine Verbindung zu den Wetterdaten. In ein paar Minuten gibt es automatisch einen neuen Versuch.';
@@ -3004,7 +3287,7 @@ function showWxOff() {
   wx.retry = setTimeout(startWeather, 3 * 6e4);
   $('#wx-src').textContent = '';
 }
-$('#wx-retry').addEventListener('click', () => { $('#wx-off-title').textContent = 'Wetter wird geladen'; startWeather(); });
+$('#wx-retry').addEventListener('click', () => { $('#wx-off').classList.add('is-loading'); startWeather(); });
 
 function renderWeather() {
   const d = wx.data, c = d.current || {}, loc = wx.loc;
@@ -3173,7 +3456,7 @@ async function refreshRadar() {
     $('#rd-slider').max = String(rd.layers.length - 1);
     showFrame(rd.layers.length - 1);
     radarMsg('');
-    if (!reduceMotion && !rd.userPaused) play(); else stopPlay();
+    if (!reduceMotion && !rd.userPaused && radarShown()) play(); else stopPlay();
   } catch { radarMsg('Radarbilder gerade nicht erreichbar.'); }
 }
 function showFrame(i) {
@@ -3200,6 +3483,18 @@ function stopPlay() {
   $('#rd-play').textContent = 'Abspielen';
   $('#rd-play').setAttribute('aria-pressed', 'false');
 }
+/* Radar auf- und zuklappen. Auf dem Handy startet es zu, damit die Seite kürzer bleibt. Merkt sich jedes Gerät selbst. */
+const RD_KEY = 'jere-cockpit-radar';
+function radarOpen() { const v = lsGet(RD_KEY); return v == null ? !isNarrow() : !!v; }
+const radarShown = () => radarOpen() && !$('#radar-box').hidden && !zu.has('weather');
+function renderRadarTg() {
+  const on = radarOpen();
+  $('#rd-body').hidden = !on;
+  $('#rd-tg').setAttribute('aria-expanded', String(on));
+  if (!radarShown()) { if (rd.timer) stopPlay(); }
+  else if (rd.layers.length && !rd.timer && !rd.userPaused && !reduceMotion) play();
+}
+$('#rd-tg').addEventListener('click', () => { lsSet(RD_KEY, radarOpen() ? 0 : 1); renderRadarTg(); schedLayout(); });
 $('#rd-play').addEventListener('click', () => { if (rd.timer) { rd.userPaused = true; stopPlay(); } else { rd.userPaused = false; play(); } });
 $('#rd-slider').addEventListener('input', e => { rd.userPaused = true; stopPlay(); showFrame(+e.target.value); });
 
@@ -3208,7 +3503,7 @@ defineWidget('weather', {
     const c = state.widgets.weather.cfg;
     $('#wx-hours-box').hidden = !c.hours;
     $('#radar-box').hidden = !c.radar;
-    if (!c.radar && rd.timer) stopPlay();
+    renderRadarTg();
   },
   settings: {
     render(box, w) {
@@ -3242,7 +3537,15 @@ function tasksReconfigure() { tk.projAt = 0; renderTasksAll(); if (tdToken()) td
 const renderTasksAll = () => viewsOf('tasks').forEach(renderTaskView);
 function tkMsg(text, btnLabel, fn) { tk.msg = text ? { text, btnLabel, fn } : null; renderTasksAll(); }
 function tdAsk(err) { tk.msg = null; tk.ask = { err: err || '', fail: '' }; tk.askSeq++; renderTasksAll(); }
-function tdAskClose() { tk.ask = null; renderTasksAll(); }
+function tdAskClose() { tk.ask = null; if (!tdToken()) tkIdle(); else renderTasksAll(); }
+/* Ohne Token: kompakter Hinweis statt großem Formular. Das Formular kommt erst nach „Verbinden“. */
+function tkIdle() {
+  tkMsg('Noch nicht mit Todoist verbunden.', 'Verbinden', () => {
+    tdAsk();
+    const t = $('#board [data-type="tasks"]:not([hidden]) [data-r="token"]');
+    if (t) t.focus();
+  });
+}
 
 function tdToken() {
   try { return localStorage.getItem(TK_TOKEN) || tk.memTok; } catch { return tk.memTok; }
@@ -3467,11 +3770,13 @@ function renderTaskView(v) {
   act.hidden = !(m && m.btnLabel);
   act.textContent = m && m.btnLabel ? m.btnLabel : '';
   const has = !!tdToken(), ask = tk.ask;
+  q('[data-r="state"]').classList.toggle('setup', !has && !ask);
+  q('[data-r="foot"]').hidden = !has;
   q('[data-r="form"]').hidden = !ask;
   if (ask) {
     if (v.askSeq !== tk.askSeq) { v.askSeq = tk.askSeq; q('[data-r="token"]').value = ''; }
     q('[data-r="token"]').placeholder = has && !ask.err ? 'Gespeichert. Für einen neuen hier einfügen' : 'Token aus Todoist einfügen';
-    q('[data-r="cancel"]').hidden = !has || !!ask.err;
+    q('[data-r="cancel"]').hidden = has && !!ask.err;
     q('[data-r="forget"]').hidden = !has;
     const e = ask.fail || ask.err;
     q('[data-r="err"]').textContent = e;
@@ -3499,7 +3804,10 @@ function renderTaskCols(v, wrap, projects) {
     h.appendChild(a);
     col.appendChild(h);
     const note = txt => { const p = document.createElement('p'); p.className = 'hint'; p.textContent = txt; col.appendChild(p); };
-    if (list == null) { note(tdToken() ? 'Wird geladen …' : 'Noch nicht geladen.'); continue; }
+    if (list == null) {
+      if (tdToken()) { const ul = document.createElement('ul'); ul.className = 'tasks'; ul.innerHTML = skelRows(3, 'Aufgaben werden geladen'); col.appendChild(ul); } else note('Noch nicht geladen.');
+      continue;
+    }
     const open = list.filter(t => t && !t.checked).map((t, i) => ({ t, i, due: dueInfo(t), id: t.id, parentId: t.parentId }));
     const ids = new Set(open.map(x => x.id));
     const kids = new Map(), tops = [];
@@ -3517,7 +3825,7 @@ function renderTaskCols(v, wrap, projects) {
     if (!open.length) { note('Alles erledigt. Nice.'); continue; }
     const ul = document.createElement('ul');
     ul.className = 'tasks';
-    const LIMIT = 7;
+    const LIMIT = isNarrow() ? 5 : 7;
     const shown = tk.open[okey] ? tops : tops.slice(0, LIMIT);
     const add = (x, sub) => {
       const t = x.t, due = x.due;
@@ -3573,7 +3881,7 @@ async function completeTask(id) {
 }
 function initTasks() {
   setInterval(() => { if (document.visibilityState === 'visible' && tdToken() && tkKeys().length) tdLoad(); }, 120000);
-  if (!tdToken()) return tdAsk();
+  if (!tdToken()) return tkIdle();
   renderTasksAll();
   return tdLoad();
 }
@@ -3589,7 +3897,7 @@ defineWidget('tasks', {
     });
     q('[data-r="conf"]').addEventListener('click', () => {
       if (!tk.ask) { tdAsk(); q('[data-r="token"]').focus(); }
-      else if (tdToken()) tdAskClose();
+      else tdAskClose();
     });
     q('[data-r="cancel"]').addEventListener('click', tdAskClose);
     q('[data-r="forget"]').addEventListener('click', () => { tdSetToken(''); tkReset(); tdAsk(); });
@@ -3797,7 +4105,7 @@ async function loadCommute() {
       if (p.lat !== null && p.lon !== null) continue;
       const g = await geocode(p.text);
       if (seq !== cm.seq) return;
-      if (!g) { cmOff('Adresse nicht gefunden', `„${p.text}“ findet die Kartensuche nicht. Tipp auf „Adressen“ und schreib sie genauer, am besten mit Ort.`); return; }
+      if (!g) { cmOff('Adresse nicht gefunden', `„${p.text}“ findet die Kartensuche nicht. Tipp oben rechts auf die Regler und schreib sie genauer, am besten mit Ort.`); return; }
       Object.assign(p, g);
       changed = true;
     }
@@ -4071,7 +4379,8 @@ function tickTiles(now) {
   if (running) setTile('#t-ur', 'Läuft gerade', `${running.label || 'Urlaub'} bis ${WD[parseYmd(running.to).getDay()]} ${dm(parseYmd(running.to))}`, 'good');
   else if (upcoming) {
     const f = parseYmd(upcoming.from);
-    setTile('#t-ur', inDays(dayDiff(t, f)), `${upcoming.label || 'Urlaub'}${upcoming.example ? ' (Beispiel)' : ''}, ab ${WD[f.getDay()]} ${dm(f)}`, 'hot');
+    const n = dayDiff(t, f);
+    setTile('#t-ur', inDays(n), `${upcoming.label || 'Urlaub'}${upcoming.example ? ' (Beispiel)' : ''}, ab ${WD[f.getDay()]} ${dm(f)}`, n <= 1 ? 'hot' : null);
   } else setTile('#t-ur', 'Nix geplant', 'Trag deinen nächsten Urlaub ein');
   // Eigene Countdowns
   for (const el of document.querySelectorAll('[data-cd]')) {
@@ -4079,7 +4388,7 @@ function tickTiles(now) {
     if (!c) continue;
     const day = parseYmd(c.date), n = dayDiff(t, day), target = c.time ? at(day, c.time) : day;
     const sub = `${WDL[day.getDay()]}, ${dm(day)}${day.getFullYear() !== t.getFullYear() ? day.getFullYear() : ''}${c.time ? ` um ${c.time} Uhr` : ''}`;
-    if (n > 1 && !(c.time && target - now < 36e5 * 36)) setTile(el, `in ${n} Tagen`, sub, n <= 7 ? 'hot' : null);
+    if (n > 1 && !(c.time && target - now < 36e5 * 36)) setTile(el, `in ${n} Tagen`, sub, null);
     else if (c.time && target > now) setTile(el, `in ${dur(target - now, true)}`, sub, 'hot');
     else if (n === 1) setTile(el, 'Morgen', sub, 'hot');
     else if (n === 0) setTile(el, c.time ? 'Läuft' : 'Heute', sub, 'good');
@@ -4111,6 +4420,7 @@ function tickHeader(now) {
     $('#h-day').textContent = WDL[now.getDay()];
     $('#h-date').textContent = `${now.getDate()}. ${ML[now.getMonth()]} ${now.getFullYear()}`;
     $('#h-kw').textContent = isoWeek(now);
+    $('#mb-time').textContent = hm(now);
   }
   const s = $('#h-time .sec');
   if (s) s.textContent = pad(now.getSeconds());
@@ -4230,7 +4540,29 @@ function renderTabs() {
   const act = nav.querySelector('[aria-selected="true"]');
   if (act && had) act.focus();
   if (act && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = Math.max(0, act.offsetLeft - 24);
+  // Dieselben Seiten in der Mini-Leiste oben
+  const mb = $('#mb-tabs');
+  mb.innerHTML = state.pages.map(p => `<button type="button" class="tab" data-page="${esc(p.id)}"${p.id === cur.id ? ' aria-current="page"' : ''}>${esc(p.name)}</button>`).join('');
+  const ma = mb.querySelector('[aria-current]');
+  if (ma && mb.scrollWidth > mb.clientWidth) mb.scrollLeft = Math.max(0, ma.offsetLeft - 24);
 }
+/* Mini-Leiste: taucht auf, sobald die Seiten-Tabs oben aus dem Bild sind */
+function setMinibar(on) {
+  const m = $('#minibar');
+  if (m.classList.contains('on') === on) return;
+  m.classList.toggle('on', on);
+  m.inert = !on;
+  m.setAttribute('aria-hidden', String(!on));
+}
+if (typeof IntersectionObserver === 'function') new IntersectionObserver(es => { for (const e of es) setMinibar(!e.isIntersecting && e.boundingClientRect.top < 0); }).observe($('#tabs'));
+$('#mb-tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-page]');
+  if (!b) return;
+  const y = $('.wrap').getBoundingClientRect().top + scrollY - 6;
+  showPage(b.dataset.page, 'user');
+  if (scrollY > y) scrollTo({ top: y, behavior: 'instant' });
+});
+$('#mb-up').addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' }));
 function showPage(id, how) {
   const p = pageById(id);
   if (!p) return;
@@ -4243,6 +4575,7 @@ function showPage(id, how) {
   persist();
   renderAll();
   layoutNow();
+  cardsIn();
 }
 $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-page]'); if (b) showPage(b.dataset.page, 'user'); });
 $('#tabs').addEventListener('keydown', e => {
@@ -5100,7 +5433,7 @@ function renderHabits(v) {
   if (!items.length) {
     const li = document.createElement('li');
     li.className = 'habit empty';
-    li.innerHTML = '<p class="empty">Noch keine Gewohnheit. Leg mit „+ Gewohnheit“ eine an, zum Beispiel Sport, Lesen oder Vokabeln.</p>';
+    li.innerHTML = '<p class="empty">Noch keine Gewohnheit. Leg mit dem Plus oben eine an, zum Beispiel Sport, Lesen oder Vokabeln.</p>';
     ul.appendChild(li);
     return;
   }
@@ -5610,7 +5943,7 @@ function renderFootball(v) {
   const body = q('[data-r="body"]'), fav = q('[data-r="fav"]');
   if (!D.matches) {
     fav.innerHTML = '';
-    body.innerHTML = D.err && !D.busy ? '<div class="wx-off"><h3>Fußballdaten gerade nicht erreichbar</h3><p>OpenLigaDB antwortet nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.</p></div>' : '<p class="hint">Spiele und Tabelle werden geladen …</p>';
+    body.innerHTML = D.err && !D.busy ? '<div class="wx-off"><h3>Fußballdaten gerade nicht erreichbar</h3><p>OpenLigaDB antwortet nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.</p></div>' : `<ul class="sk-list">${skelRows(5, 'Spiele und Tabelle werden geladen')}</ul>`;
     q('[data-r="tabs"]').hidden = true;
     q('[data-r="src"]').textContent = '';
     return;
@@ -5830,6 +6163,7 @@ function renderF1() {
   $('#f1-live').hidden = !ready;
   if (!ready) {
     const bad = f1.err && !f1.busy;
+    $('#f1-off').classList.toggle('is-loading', !bad);
     $('#f1-off-t').textContent = bad ? 'Formel-1-Daten gerade nicht erreichbar' : 'Formel 1 wird geladen';
     $('#f1-off-p').textContent = bad ? 'Jolpica antwortet gerade nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.' : 'Einen Moment, Kalender und WM-Stand kommen gleich.';
     $('#f1-retry').hidden = !bad;
@@ -5979,7 +6313,7 @@ async function fuLoad(manual) {
     fu.here = { lat: p.latitude, lon: p.longitude };
   }
   const A = fuArea(c.mode);
-  if (!A) { fu.err = c.mode === 'route' ? '' : 'Dafür fehlt deine Heimadresse. Trag sie im Pendeln-Widget unter „Adressen“ ein.'; renderFuel(); return; }
+  if (!A) { fu.err = c.mode === 'route' ? '' : 'Dafür fehlt deine Heimadresse. Trag sie im Pendeln-Widget über die Regler oben rechts ein.'; renderFuel(); return; }
   fu.busy = true;
   fu.last = Date.now();
   renderFuel();
@@ -5996,7 +6330,7 @@ async function fuLoad(manual) {
     lsSet(FU_CACHE, fu.data);
     fu.err = '';
   } catch (e) {
-    fu.err = e && e.api ? (/key|schl/i.test(e.message) ? 'Tankerkönig kennt diesen Key nicht. Prüf ihn unter „API-Key“.' : `Tankerkönig meldet: ${e.message}`) : 'Tankerkönig ist gerade nicht erreichbar. Versuch es gleich nochmal.';
+    fu.err = e && e.api ? (/key|schl/i.test(e.message) ? 'Tankerkönig kennt diesen Key nicht. Prüf ihn über die Regler oben rechts.' : `Tankerkönig meldet: ${e.message}`) : 'Tankerkönig ist gerade nicht erreichbar. Versuch es gleich nochmal.';
   } finally {
     fu.busy = false;
     renderFuel();
@@ -6053,7 +6387,7 @@ function renderFuel() {
     setTimeout(() => fuLoad(), 400 + Math.random() * 1600);
   }
   $('#fu-refresh').disabled = fu.busy;
-  $('#fu-refresh').textContent = fu.busy ? 'Lädt …' : 'Aktualisieren';
+  $('#fu-refresh').classList.toggle('spin', fu.busy);
   if (!R) {
     best.innerHTML = '';
     ul.textContent = '';
@@ -6132,7 +6466,7 @@ defineWidget('fuel', { render: renderFuel });
 
 /* 38-vers.js */
 /* Bibelvers des Tages. Den Text liefert bolls.life (frei, ohne Key, CORS offen), die Liste der Verse steht hier.
- * Jeden Tag kommt der nächste Vers aus der Liste, auf allen Geräten derselbe. Mit „Noch einer“ blätterst du weiter.
+ * Jeden Tag kommt der nächste Vers aus der Liste, auf allen Geräten derselbe. Mit dem Würfel oben blätterst du weiter.
  * Nur Stellen, die in allen angebotenen Übersetzungen gleich nummeriert sind (bei manchen Psalmen zählen
  * deutsche und englische Ausgaben die Überschrift mit, deshalb fehlen die hier). */
 const VS_CACHE = 'jere-cockpit-vers';
@@ -6199,8 +6533,9 @@ function renderVerse() {
   const want = `${ymd(now)}|${tr}|${i}`;
   if (!vs.busy && (!vs.cur || vs.cur.key !== want) && !vs.err) { vsLoad(); return; }
   const c = vs.cur && vs.cur.key === want ? vs.cur : null;
-  $('#vs-text').textContent = c ? c.text : vs.err || 'Vers wird geladen …';
-  $('#vs-text').classList.toggle('muted', !c);
+  if (c || vs.err) $('#vs-text').textContent = c ? c.text : vs.err;
+  else $('#vs-text').innerHTML = skelLines(3, 'Vers wird geladen');
+  $('#vs-text').classList.toggle('muted', !c && !!vs.err);
   const ref = $('#vs-ref');
   ref.hidden = !c;
   if (c) { ref.textContent = c.ref; ref.href = c.link; ref.title = `${c.ref} im Zusammenhang auf bibleserver.com lesen`; }
@@ -6421,7 +6756,7 @@ function renderCal() {
   $('#ca-live').hidden = formOpen || !sec.feeds.length;
   $('#ca-refresh').hidden = formOpen || !sec.feeds.length;
   $('#ca-refresh').disabled = ca.busy;
-  $('#ca-refresh').textContent = ca.busy ? 'Lädt …' : 'Aktualisieren';
+  $('#ca-refresh').classList.toggle('spin', ca.busy);
   if (!sec.feeds.length || formOpen) return;
   // Automatisch aktualisieren, wenn die Daten älter als 15 Minuten sind
   if (!ca.busy && (!ca.data || Date.now() - ca.data.at > 15 * 6e4) && Date.now() - ca.last > 6e4) setTimeout(caLoad, 300);
@@ -6430,8 +6765,10 @@ function renderCal() {
   const errs = sec.feeds.filter(f => ca.feedErr[f.id]).map(f => `${f.name}: ${ca.feedErr[f.id]}`);
   $('#ca-err').textContent = ca.err || errs.join(' ');
   $('#ca-err').hidden = !ca.err && !errs.length;
-  if (!ca.data) { ul.innerHTML = `<li class="empty">${ca.busy ? 'Termine werden geladen …' : 'Noch keine Termine geladen.'}</li>`; $('#ca-more').hidden = true; $('#ca-src').textContent = ''; return; }
-  const LIMIT = 9;
+  if (!ca.data) { ul.innerHTML = ca.busy || !ca.err ? skelRows(4, 'Termine werden geladen') : '<li class="empty">Noch keine Termine geladen.</li>'; $('#ca-more').hidden = true; $('#ca-src').textContent = ''; return; }
+  // Auf dem Handy erst mal nur die nächsten fünf, der Rest steckt hinter „Alle zeigen“
+  const LIMIT = isNarrow() ? 5 : 9;
+  const nx = caNext(now), nxIn = nx && nx.e.s > +now ? nx.e.s - now : 0;
   let html = '', shown = 0, total = 0, past = 0;
   for (let i = 0; i < c.days; i++) {
     const d = addDays(t0, i);
@@ -6444,7 +6781,7 @@ function renderCal() {
     for (const e of list) {
       if (!ca.more && shown >= LIMIT) break;
       shown++;
-      const s = new Date(e.s), en = new Date(e.e), live = !e.a && e.s <= +now && e.e > +now;
+      const s = new Date(e.s), en = new Date(e.e), live = !e.a && e.s <= +now && e.e > +now, next = !live && nx && nx.e === e && i === 0;
       let tm, sub = '';
       if (e.a) {
         const span = dayDiff(s, en);
@@ -6456,7 +6793,8 @@ function renderCal() {
         sub = endsToday ? (e.e > e.s ? `bis ${hm(en)}` : '') : `bis ${WD[en.getDay()]} ${hm(en)}`;
       }
       const where = c.loc && e.l ? e.l : '';
-      html += `<li class="ca-ev${live ? ' is-now' : ''}" style="--c:${caFeedColor(e.f)}"><span class="ca-t">${esc(tm)}${!e.a && sub ? `<small>${esc(sub)}</small>` : ''}</span><span class="ca-main"><b>${esc(e.t)}</b>${e.a && sub ? `<small>${esc(sub)}</small>` : ''}${where ? `<small>${esc(where)}</small>` : ''}</span>${live ? '<span class="ca-now">Jetzt</span>' : ''}</li>`;
+      const tag = live ? '<span class="ca-now">Jetzt</span>' : next && nxIn < 3 * 36e5 ? `<span class="ca-in">in ${esc(dur(nxIn))}</span>` : '';
+      html += `<li class="ca-ev${live ? ' is-now' : ''}${next ? ' is-next' : ''}" style="--c:${caFeedColor(e.f)}"><span class="ca-t">${esc(tm)}${!e.a && sub ? `<small>${esc(sub)}</small>` : ''}</span><span class="ca-main"><b>${esc(e.t)}</b>${e.a && sub ? `<small>${esc(sub)}</small>` : ''}${where ? `<small>${esc(where)}</small>` : ''}</span>${tag}</li>`;
     }
   }
   if (!total) html = `<li class="empty">Keine Termine in den nächsten ${c.days} Tagen${past ? ', die von heute sind schon vorbei' : ''}.</li>`;
@@ -6688,6 +7026,8 @@ function renderSky(now) {
   for (const k of ['--sky-top', '--sky-mid', '--sky-low', '--sky-ink', '--sky-ink-low', '--sky-glow', '--sky-stars']) {
     if (v[k] !== undefined) el.style.setProperty(k, v[k]); else el.style.removeProperty(k);
   }
+  // Die Farbe am Horizont schimmert unter dem Himmel noch ein Stück auf der Seite nach
+  if (on) document.documentElement.style.setProperty('--horizon', rgb2hex(low)); else document.documentElement.style.removeProperty('--horizon');
   el.style.setProperty('--sun-x', (xNow * 100).toFixed(2) + '%');
   el.style.setProperty('--sun-f', yNow.toFixed(3));
   el.dataset.night = alt < -6 ? '1' : '0';
@@ -7047,7 +7387,7 @@ function renderDep(v) {
   e.hidden = !err;
   const ul = v.q('[data-r="list"]'), go = v.q('[data-r="go"]'), al = v.q('[data-r="alerts"]');
   if (!D) {
-    ul.innerHTML = `<li class="empty">${busy || !err ? 'Abfahrten werden geladen …' : 'Noch keine Abfahrten geladen.'}</li>`;
+    ul.innerHTML = busy || !err ? skelRows(Math.min(c.n, 5), 'Abfahrten werden geladen') : '<li class="empty">Noch keine Abfahrten geladen.</li>';
     go.hidden = true; al.innerHTML = ''; v.q('[data-r="rt"]').innerHTML = ''; v.q('[data-r="src"]').innerHTML = dpSrcHtml(null);
     return;
   }
@@ -7226,13 +7566,13 @@ function renderBday() {
   $('#bd-src').textContent = list.length ? `${list.length} ${list.length === 1 ? 'Geburtstag' : 'Geburtstage'} gespeichert${c.cal && caSec().feeds.length ? ', dazu die aus deinem Kalender' : ''}.` : '';
   if (formOpen) { bdRenderAll(); return; }
   if (!all.length) return;
-  const n = bd.more ? Math.min(all.length, 40) : c.n;
+  const base = isNarrow() ? Math.min(c.n, 4) : c.n, n = bd.more ? Math.min(all.length, 40) : base;
   $('#bd-list').innerHTML = all.slice(0, n).map(x => {
     const dd = dayDiff(today, x.d), soon = dd <= 1;
     const sub = [`${WD[x.d.getDay()]} ${x.d.getDate()}. ${MS[x.d.getMonth()]}`, x.age != null ? (dd === 0 ? `wird heute ${x.age}` : `wird ${x.age}`) : '', x.cal ? 'aus dem Kalender' : ''].filter(Boolean).join(' · ');
     return `<li class="bd-row${dd === 0 ? ' today' : ''}"${x.cal ? ` style="--c:${x.color}"` : ''}><span class="bd-cal" aria-hidden="true"><b>${x.d.getDate()}</b><small>${MS[x.d.getMonth()]}</small></span><span class="bd-main"><b>${esc(x.name)}</b><small>${esc(sub)}</small></span><span class="bd-in${soon ? ' soon' : ''}">${bdWhen(dd)}</span></li>`;
   }).join('');
-  $('#bd-more').hidden = all.length <= c.n;
+  $('#bd-more').hidden = all.length <= base;
   $('#bd-more').textContent = bd.more ? 'Weniger zeigen' : `Mehr zeigen`;
 }
 /* Für den Spiegel: Geburtstage heute und morgen */
@@ -7701,7 +8041,7 @@ renderAppInfo();
 
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.4';
+const VERSION = '2.5';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -7717,6 +8057,7 @@ function tick() {
   wsTick(now);
   mirrorTick(now);
   f1Tick(now);
+  if (now.getSeconds() % 10 === 3) peekAll();
   if (ymd(now) !== vacDayKey) renderVacation();
   if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
 }
@@ -7750,14 +8091,19 @@ const NEWS = {
   '2.1': ['Neu: Pomodoro, Gewohnheiten und Lernfortschritt. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
   '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()],
   '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()],
-  '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()]
+  '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
+  '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null]
 };
+const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {
   if (state.meta.seen === VERSION) return;
-  const known = state.edited, news = NEWS[VERSION];
+  const known = state.edited, from = verNum(state.meta.seen);
+  // Wer eine Version übersprungen hat, bekommt das neueste Angebot mit Knopf, sonst den neuesten Hinweis
+  const fresh = Object.keys(NEWS).filter(k => verNum(k) > from && verNum(k) <= verNum(VERSION)).sort((a, b) => verNum(b) - verNum(a));
+  const news = NEWS[fresh.find(k => NEWS[k][1]) || fresh[0]];
   state.meta.seen = VERSION;
   persist();
-  if (known && news) setTimeout(() => toast(news[0], news[1], { label: 'Einrichten', ms: 20000 }), 900);
+  if (known && news) setTimeout(() => toast(news[0], news[1], { label: 'Einrichten', ms: news[1] ? 20000 : 12000 }), 900);
 }
 function setupSportPage() {
   if (state.pages.length >= 12) return;
@@ -7835,6 +8181,8 @@ renderAll();
 announceNew();
 if (mirrorFromHash()) mirrorOpen(false);
 setInterval(tick, 1000);
+/* Handy quer oder Fenster schmaler: Listen kürzen oder wieder verlängern */
+narrowMq.addEventListener('change', () => { renderViews(); renderRadarTg(); schedLayout(); });
 startWeather();
 loadCommute();
 initTasks();

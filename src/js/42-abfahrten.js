@@ -136,7 +136,7 @@ function renderDep(v) {
   e.hidden = !err;
   const ul = v.q('[data-r="list"]'), go = v.q('[data-r="go"]'), al = v.q('[data-r="alerts"]');
   if (!D) {
-    ul.innerHTML = `<li class="empty">${busy || !err ? 'Abfahrten werden geladen …' : 'Noch keine Abfahrten geladen.'}</li>`;
+    ul.innerHTML = busy || !err ? skelRows(Math.min(c.n, 5), 'Abfahrten werden geladen') : '<li class="empty">Noch keine Abfahrten geladen.</li>';
     go.hidden = true; al.innerHTML = ''; v.q('[data-r="rt"]').innerHTML = ''; v.q('[data-r="src"]').innerHTML = dpSrcHtml(null);
     return;
   }

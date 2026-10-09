@@ -4,8 +4,9 @@
 <template id="tpl-tasks">
   <section class="card" data-type="tasks">
     <div class="card-head">
-      <h2 data-r="title">Aufgaben</h2>
+      <h2><span data-r="title">Aufgaben</span></h2>
       <span class="src" data-r="src"></span>
+      <button type="button" class="icon-btn" data-r="conf" aria-label="Todoist-Verbindung" title="Todoist-Verbindung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
     </div>
     <div class="tk-state" data-r="state" hidden>
       <p data-r="state-text"></p>
@@ -30,9 +31,8 @@
       <button type="submit" class="btn-ghost" data-r="addbtn">Anlegen</button>
     </form>
     <div class="tk-cols" data-r="cols"></div>
-    <div class="tk-foot">
+    <div class="tk-foot" data-r="foot">
       <a class="btn-ghost" href="https://app.todoist.com/app/today" target="_blank" rel="noopener">Todoist öffnen ↗</a>
-      <button type="button" class="btn-ghost" data-r="conf">Verbindung</button>
     </div>
   </section>
 </template>
@@ -40,8 +40,8 @@
 <template id="tpl-progress">
   <section class="card" data-type="progress">
     <div class="card-head">
-      <h2 data-r="title">Fortschritt</h2>
-      <button type="button" class="btn-ghost" data-r="add">+ Balken</button>
+      <h2><span data-r="title">Fortschritt</span></h2>
+      <button type="button" class="icon-btn" data-r="add" aria-label="Balken hinzufügen" title="Balken hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3 data-r="form-title">Neuer Balken</h3>
@@ -89,8 +89,8 @@
 <template id="tpl-links">
   <section class="card" data-type="links">
     <div class="card-head">
-      <h2 data-r="title">Schnellzugriff</h2>
-      <button type="button" class="btn-ghost" data-r="add">+ Link</button>
+      <h2><span data-r="title">Schnellzugriff</span></h2>
+      <button type="button" class="icon-btn" data-r="add" aria-label="Link hinzufügen" title="Link hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3 data-r="form-title">Neuer Link</h3>
@@ -112,7 +112,7 @@
 <template id="tpl-notes">
   <section class="card" data-type="notes">
     <div class="card-head">
-      <h2 data-r="title">Notizen</h2>
+      <h2><span data-r="title">Notizen</span></h2>
       <span class="src" data-r="state"></span>
     </div>
     <textarea class="notes" data-r="text" maxlength="8000" placeholder="Schnell was notieren, wird automatisch gespeichert."></textarea>
@@ -122,8 +122,8 @@
 <template id="tpl-habits">
   <section class="card" data-type="habits">
     <div class="card-head">
-      <h2 data-r="title">Gewohnheiten</h2>
-      <button type="button" class="btn-ghost" data-r="add">+ Gewohnheit</button>
+      <h2><span data-r="title">Gewohnheiten</span></h2>
+      <button type="button" class="icon-btn" data-r="add" aria-label="Gewohnheit hinzufügen" title="Gewohnheit hinzufügen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3 data-r="form-title">Neue Gewohnheit</h3>
@@ -153,8 +153,8 @@
 <template id="tpl-learn">
   <section class="card" data-type="learn">
     <div class="card-head">
-      <h2 data-r="title">Lernfortschritt</h2>
-      <button type="button" class="btn-ghost" data-r="set">Prüfung</button>
+      <h2><span data-r="title">Lernfortschritt</span></h2>
+      <button type="button" class="icon-btn" data-r="set" aria-label="Prüfung einstellen" title="Prüfung"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
     </div>
     <form class="panel" data-r="form" hidden novalidate>
       <h3>Prüfung</h3>
@@ -169,9 +169,9 @@
         <button type="button" class="btn-ghost" data-r="cancel">Abbrechen</button>
       </div>
     </form>
-    <div class="wx-off" data-r="empty" hidden>
+    <div class="setup" data-r="empty" hidden>
       <h3>Wann ist die Prüfung?</h3>
-      <p>Trag das Datum ein und leg deine Themen an. Dann siehst du, wie weit du bist und ob dein Tempo bis zur Prüfung reicht.</p>
+      <p>Datum und Themen eintragen, dann siehst du, ob dein Tempo reicht.</p>
       <div class="form-row"><button type="button" class="btn" data-r="empty-btn">Datum eintragen</button></div>
     </div>
     <div class="vac-hero" data-r="hero">
@@ -193,7 +193,7 @@
 <template id="tpl-football">
   <section class="card" data-type="football">
     <div class="card-head">
-      <h2 data-r="title">Bundesliga</h2>
+      <h2><span data-r="title">Bundesliga</span></h2>
       <span class="src" data-r="md"></span>
     </div>
     <div class="fb-fav" data-r="fav"></div>
@@ -209,16 +209,16 @@
 <template id="tpl-dep">
   <section class="card" data-type="dep">
     <div class="card-head">
-      <h2 data-r="title">Abfahrten</h2>
+      <h2><span data-r="title">Abfahrten</span></h2>
+      <span class="card-st" data-r="rt"></span>
       <div class="actions">
-        <span data-r="rt"></span>
-        <button type="button" class="icon-btn" data-r="set" aria-label="Haltestelle und Filter einstellen" title="Haltestelle und Filter einstellen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" data-r="set" aria-label="Haltestelle und Filter einstellen" title="Haltestelle und Filter einstellen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" data-r="setup" hidden>
+    <div class="setup" data-r="setup" hidden>
       <h3>Haltestelle wählen</h3>
-      <p>Hier siehst du live, was an deiner Haltestelle abfährt, mit Verspätungen und Ausfällen. Mit deinem Fußweg sagt dir die Karte auch, wann du loslaufen musst.</p>
-      <div class="form-row"><button type="button" class="btn" data-r="setup-btn">Haltestelle suchen</button></div>
+      <p>Live-Abfahrten mit Verspätungen und wann du los musst.</p>
+      <div class="form-row"><button type="button" class="btn" data-r="setup-btn">Suchen</button></div>
     </div>
     <div class="dp-live-box" data-r="live" hidden>
       <p class="dp-go" data-r="go" hidden></p>

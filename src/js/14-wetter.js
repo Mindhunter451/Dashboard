@@ -80,6 +80,7 @@ async function loadWeather(loc, seq) {
 function showWxOff() {
   $('#wx-live').hidden = true;
   $('#wx-off').hidden = false;
+  $('#wx-off').classList.remove('is-loading');
   $('#wx-loc-btn').hidden = true;
   $('#wx-off-title').textContent = 'Wetterdienst gerade nicht erreichbar';
   $('#wx-off-text').textContent = 'Keine Verbindung zu den Wetterdaten. In ein paar Minuten gibt es automatisch einen neuen Versuch.';
@@ -88,7 +89,7 @@ function showWxOff() {
   wx.retry = setTimeout(startWeather, 3 * 6e4);
   $('#wx-src').textContent = '';
 }
-$('#wx-retry').addEventListener('click', () => { $('#wx-off-title').textContent = 'Wetter wird geladen'; startWeather(); });
+$('#wx-retry').addEventListener('click', () => { $('#wx-off').classList.add('is-loading'); startWeather(); });
 
 function renderWeather() {
   const d = wx.data, c = d.current || {}, loc = wx.loc;
@@ -257,7 +258,7 @@ async function refreshRadar() {
     $('#rd-slider').max = String(rd.layers.length - 1);
     showFrame(rd.layers.length - 1);
     radarMsg('');
-    if (!reduceMotion && !rd.userPaused) play(); else stopPlay();
+    if (!reduceMotion && !rd.userPaused && radarShown()) play(); else stopPlay();
   } catch { radarMsg('Radarbilder gerade nicht erreichbar.'); }
 }
 function showFrame(i) {
@@ -284,6 +285,18 @@ function stopPlay() {
   $('#rd-play').textContent = 'Abspielen';
   $('#rd-play').setAttribute('aria-pressed', 'false');
 }
+/* Radar auf- und zuklappen. Auf dem Handy startet es zu, damit die Seite kürzer bleibt. Merkt sich jedes Gerät selbst. */
+const RD_KEY = 'jere-cockpit-radar';
+function radarOpen() { const v = lsGet(RD_KEY); return v == null ? !isNarrow() : !!v; }
+const radarShown = () => radarOpen() && !$('#radar-box').hidden && !zu.has('weather');
+function renderRadarTg() {
+  const on = radarOpen();
+  $('#rd-body').hidden = !on;
+  $('#rd-tg').setAttribute('aria-expanded', String(on));
+  if (!radarShown()) { if (rd.timer) stopPlay(); }
+  else if (rd.layers.length && !rd.timer && !rd.userPaused && !reduceMotion) play();
+}
+$('#rd-tg').addEventListener('click', () => { lsSet(RD_KEY, radarOpen() ? 0 : 1); renderRadarTg(); schedLayout(); });
 $('#rd-play').addEventListener('click', () => { if (rd.timer) { rd.userPaused = true; stopPlay(); } else { rd.userPaused = false; play(); } });
 $('#rd-slider').addEventListener('input', e => { rd.userPaused = true; stopPlay(); showFrame(+e.target.value); });
 
@@ -292,7 +305,7 @@ defineWidget('weather', {
     const c = state.widgets.weather.cfg;
     $('#wx-hours-box').hidden = !c.hours;
     $('#radar-box').hidden = !c.radar;
-    if (!c.radar && rd.timer) stopPlay();
+    renderRadarTg();
   },
   settings: {
     render(box, w) {

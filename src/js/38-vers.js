@@ -1,5 +1,5 @@
 /* Bibelvers des Tages. Den Text liefert bolls.life (frei, ohne Key, CORS offen), die Liste der Verse steht hier.
- * Jeden Tag kommt der nächste Vers aus der Liste, auf allen Geräten derselbe. Mit „Noch einer“ blätterst du weiter.
+ * Jeden Tag kommt der nächste Vers aus der Liste, auf allen Geräten derselbe. Mit dem Würfel oben blätterst du weiter.
  * Nur Stellen, die in allen angebotenen Übersetzungen gleich nummeriert sind (bei manchen Psalmen zählen
  * deutsche und englische Ausgaben die Überschrift mit, deshalb fehlen die hier). */
 const VS_CACHE = 'jere-cockpit-vers';
@@ -66,8 +66,9 @@ function renderVerse() {
   const want = `${ymd(now)}|${tr}|${i}`;
   if (!vs.busy && (!vs.cur || vs.cur.key !== want) && !vs.err) { vsLoad(); return; }
   const c = vs.cur && vs.cur.key === want ? vs.cur : null;
-  $('#vs-text').textContent = c ? c.text : vs.err || 'Vers wird geladen …';
-  $('#vs-text').classList.toggle('muted', !c);
+  if (c || vs.err) $('#vs-text').textContent = c ? c.text : vs.err;
+  else $('#vs-text').innerHTML = skelLines(3, 'Vers wird geladen');
+  $('#vs-text').classList.toggle('muted', !c && !!vs.err);
   const ref = $('#vs-ref');
   ref.hidden = !c;
   if (c) { ref.textContent = c.ref; ref.href = c.link; ref.title = `${c.ref} im Zusammenhang auf bibleserver.com lesen`; }

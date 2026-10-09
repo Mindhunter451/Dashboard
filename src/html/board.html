@@ -8,7 +8,7 @@
           <button type="button" id="cm-dir-home" aria-pressed="true">Nach Hause</button>
           <button type="button" id="cm-dir-work" aria-pressed="false">Zur Arbeit</button>
         </div>
-        <button type="button" class="btn-ghost" id="cm-set-btn">Adressen</button>
+        <button type="button" class="icon-btn" id="cm-set-btn" aria-label="Adressen und Strecke einstellen" title="Adressen und Strecke"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
 
@@ -28,10 +28,10 @@
       </div>
     </form>
 
-    <div class="wx-off" id="cm-empty" hidden>
+    <div class="setup" id="cm-empty" hidden>
       <h3>Strecke einrichten</h3>
-      <p>Trag ein, wo du wohnst und wo du arbeitest. Dann siehst du hier, wie lange du gerade brauchst und ob Staus, Baustellen oder Sperrungen auf dem Weg liegen.</p>
-      <div class="form-row"><button type="button" class="btn" id="cm-empty-btn">Adressen eintragen</button></div>
+      <p>Wohnort und Arbeit eintragen, dann siehst du Fahrzeit, Staus und Baustellen.</p>
+      <div class="form-row"><button type="button" class="btn" id="cm-empty-btn">Eintragen</button></div>
     </div>
 
     <div class="wx-off" id="cm-off" hidden>
@@ -69,10 +69,8 @@
   <section class="card" id="weather" data-type="weather" aria-labelledby="wx-h">
     <div class="card-head">
       <h2 id="wx-h"><span data-r="title">Wetter</span></h2>
-      <div class="loc">
-        <span class="loc-name" id="wx-loc">Hamburg</span>
-        <button type="button" class="btn-ghost" id="wx-loc-btn" hidden>Ort ändern</button>
-      </div>
+      <span class="src" id="wx-loc">Hamburg</span>
+      <button type="button" class="icon-btn" id="wx-loc-btn" hidden aria-label="Ort fürs Wetter ändern" title="Ort ändern"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.4-6.5-10.8a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21z"/><circle cx="12" cy="10.2" r="2.3"/></svg></button>
     </div>
 
     <form class="panel" id="wx-loc-form" hidden novalidate>
@@ -117,32 +115,31 @@
         <p class="sub-h" style="margin-bottom:6px">Nächste 12 Stunden</p>
         <div class="hours" id="wx-hours"></div>
       </div>
-      <div class="radar-box" style="margin-top:16px" id="radar-box">
-        <p class="sub-h">Regenradar, letzte 2 Stunden</p>
-        <div class="radar" id="radar"></div>
-        <div class="radar-ctl">
-          <button type="button" class="btn-ghost" id="rd-play" aria-pressed="false">Abspielen</button>
-          <label for="rd-slider" class="lbl" style="position:absolute;left:-9999px">Radarbild wählen</label>
-          <input type="range" id="rd-slider" min="0" max="0" value="0">
-          <span class="rd-time" id="rd-time"></span>
+      <div class="radar-box" id="radar-box">
+        <button type="button" class="sub-tg" id="rd-tg" aria-expanded="true" aria-controls="rd-body"><span>Regenradar, letzte 2 Stunden</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="radar-body" id="rd-body">
+          <div class="radar" id="radar"></div>
+          <div class="radar-ctl">
+            <button type="button" class="btn-ghost" id="rd-play" aria-pressed="false">Abspielen</button>
+            <label for="rd-slider" class="vh">Radarbild wählen</label>
+            <input type="range" id="rd-slider" min="0" max="0" value="0">
+            <span class="rd-time" id="rd-time"></span>
+          </div>
+          <p class="hint" id="radar-msg" hidden></p>
+          <div class="links rd-links">
+            <span class="hint">Größer bei</span>
+            <a class="btn-ghost" id="lk-rv" href="https://www.rainviewer.com/map.html?loc=53.5511,9.9937,8&layer=radar" target="_blank" rel="noopener">RainViewer ↗</a>
+            <a class="btn-ghost" href="https://www.wetteronline.de/regenradar/hamburg" target="_blank" rel="noopener">wetteronline ↗</a>
+            <a class="btn-ghost" href="https://www.dwd.de/DE/leistungen/radarbild_film/radarbild_film.html" target="_blank" rel="noopener">DWD ↗</a>
+          </div>
         </div>
-        <p class="hint" id="radar-msg" hidden></p>
       </div>
     </div>
 
-    <div class="wx-off" id="wx-off">
+    <div class="wx-off is-loading" id="wx-off" style="--sk-h:210px">
       <h3 id="wx-off-title">Wetter wird geladen</h3>
       <p id="wx-off-text">Einen Moment, die Daten für deinen Ort kommen gleich.</p>
       <div class="form-row"><button type="button" class="btn" id="wx-retry" hidden>Nochmal versuchen</button></div>
-    </div>
-
-    <div>
-      <p class="sub-h" style="margin-bottom:8px">Regenradar öffnen</p>
-      <div class="links">
-        <a class="btn-ghost" id="lk-rv" href="https://www.rainviewer.com/map.html?loc=53.5511,9.9937,8&layer=radar" target="_blank" rel="noopener">RainViewer ↗</a>
-        <a class="btn-ghost" href="https://www.wetteronline.de/regenradar/hamburg" target="_blank" rel="noopener">wetteronline ↗</a>
-        <a class="btn-ghost" href="https://www.dwd.de/DE/leistungen/radarbild_film/radarbild_film.html" target="_blank" rel="noopener">DWD Radarfilm ↗</a>
-      </div>
     </div>
     <p class="src" id="wx-src"></p>
   </section>
@@ -152,8 +149,8 @@
     <div class="card-head">
       <h2 id="va-h"><span data-r="title">Urlaub</span> <small id="va-year"></small></h2>
       <div class="actions">
-        <button type="button" class="btn-ghost" id="vac-set-btn">Anspruch</button>
-        <button type="button" class="btn-ghost" id="vac-add">+ Urlaub</button>
+        <button type="button" class="icon-btn" id="vac-add" aria-label="Urlaub eintragen" title="Urlaub eintragen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+        <button type="button" class="icon-btn" id="vac-set-btn" aria-label="Urlaubsanspruch einstellen" title="Urlaubsanspruch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
     <div class="vac-hero">
@@ -165,7 +162,7 @@
       </dl>
     </div>
     <div class="stack" role="img" id="vac-stack" aria-label="Urlaubsverteilung"><div class="seg-taken" id="seg-t"></div><div class="seg-planned" id="seg-p"></div></div>
-    <p class="hint" id="vac-ex-hint" hidden>Der Anspruch von 30 Tagen ist ein Beispielwert. Tipp auf „Anspruch“ und trag deinen echten ein.</p>
+    <p class="hint" id="vac-ex-hint" hidden>Der Anspruch von 30 Tagen ist ein Beispielwert. Tipp oben rechts auf die Regler und trag deinen echten ein.</p>
 
     <form class="panel" id="vac-set" hidden novalidate>
       <h3>Urlaubsanspruch</h3>
@@ -205,7 +202,7 @@
   <section class="card" id="pomodoro" data-type="pomodoro" aria-labelledby="po-h">
     <div class="card-head">
       <h2 id="po-h"><span data-r="title">Pomodoro</span></h2>
-      <button type="button" class="btn-ghost" id="po-set-btn">Zeiten</button>
+      <button type="button" class="icon-btn" id="po-set-btn" aria-label="Zeiten einstellen" title="Zeiten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
     </div>
     <form class="panel" id="po-form" hidden novalidate>
       <h3>Zeiten in Minuten</h3>
@@ -254,7 +251,7 @@
       <h2 id="f1-h"><span data-r="title">Formel 1</span></h2>
       <span class="src" id="f1-round"></span>
     </div>
-    <div class="wx-off" id="f1-off" hidden>
+    <div class="wx-off" id="f1-off" hidden style="--sk-h:150px">
       <h3 id="f1-off-t">Formel 1 wird geladen</h3>
       <p id="f1-off-p">Einen Moment, Kalender und WM-Stand kommen gleich.</p>
       <div class="form-row"><button type="button" class="btn" id="f1-retry" hidden>Nochmal versuchen</button></div>
@@ -273,8 +270,14 @@
   <section class="card" id="fuel" data-type="fuel" aria-labelledby="fu-h">
     <div class="card-head">
       <h2 id="fu-h"><span data-r="title">Spritpreise</span></h2>
-      <div class="seg sm" role="group" aria-label="Sorte" id="fu-type">
-        <button type="button" data-v="e5">Super E5</button><button type="button" data-v="e10">E10</button><button type="button" data-v="diesel">Diesel</button>
+      <div class="actions">
+        <div class="seg sm" role="group" aria-label="Sorte" id="fu-type">
+          <button type="button" data-v="e5">Super E5</button><button type="button" data-v="e10">E10</button><button type="button" data-v="diesel">Diesel</button>
+        </div>
+        <span class="actions" id="fu-foot">
+          <button type="button" class="icon-btn" id="fu-refresh" aria-label="Preise aktualisieren" title="Aktualisieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.4 9.6A7.9 7.9 0 0 0 5.4 7.2"/><path d="M4.6 3.8v4.1h4.1"/><path d="M4.6 14.4a7.9 7.9 0 0 0 14 2.4"/><path d="M19.4 20.2v-4.1h-4.1"/></svg></button>
+          <button type="button" class="icon-btn" id="fu-key-btn" aria-label="Tankerkönig-Key" title="Tankerkönig-Key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        </span>
       </div>
     </div>
     <form class="panel" id="fu-form" hidden novalidate>
@@ -290,9 +293,9 @@
         <button type="button" class="btn-danger" id="fu-forget" hidden>Key entfernen</button>
       </div>
     </form>
-    <div class="wx-off" id="fu-setup" hidden>
+    <div class="setup" id="fu-setup" hidden>
       <h3>Spritpreise einrichten</h3>
-      <p>Mit einem kostenlosen Key von Tankerkönig siehst du hier die günstigsten Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.</p>
+      <p>Mit einem kostenlosen Tankerkönig-Key siehst du die günstigsten Tankstellen in deiner Nähe.</p>
       <div class="form-row"><button type="button" class="btn" id="fu-setup-btn">Key eintragen</button></div>
     </div>
     <div id="fu-live" hidden>
@@ -303,10 +306,6 @@
       <ul class="fu-list" id="fu-list"></ul>
       <p class="hint" id="fu-hint"></p>
     </div>
-    <div class="tk-foot" id="fu-foot">
-      <button type="button" class="btn-ghost" id="fu-refresh">Aktualisieren</button>
-      <button type="button" class="btn-ghost" id="fu-key-btn">API-Key</button>
-    </div>
     <p class="src" id="fu-src"></p>
   </section>
 
@@ -315,13 +314,13 @@
     <div class="card-head">
       <h2 id="ca-h"><span data-r="title">Kalender</span></h2>
       <div class="actions">
-        <button type="button" class="btn-ghost" id="ca-refresh" hidden>Aktualisieren</button>
-        <button type="button" class="icon-btn" id="ca-set-btn" aria-label="Kalender einrichten" title="Kalender einrichten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" id="ca-refresh" hidden aria-label="Termine aktualisieren" title="Aktualisieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.4 9.6A7.9 7.9 0 0 0 5.4 7.2"/><path d="M4.6 3.8v4.1h4.1"/><path d="M4.6 14.4a7.9 7.9 0 0 0 14 2.4"/><path d="M19.4 20.2v-4.1h-4.1"/></svg></button>
+        <button type="button" class="icon-btn" id="ca-set-btn" aria-label="Kalender einrichten" title="Kalender einrichten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" id="ca-setup" hidden>
+    <div class="setup" id="ca-setup" hidden>
       <h3>iCloud-Kalender verbinden</h3>
-      <p>Hier tauchen deine nächsten Termine auf. Dafür brauchst du den Link deines öffentlich geteilten Kalenders und eine kleine Weiterleitung, die du einmal kostenlos bei Cloudflare anlegst.</p>
+      <p>Deine nächsten Termine aus einem geteilten iCloud-Kalender.</p>
       <div class="form-row"><button type="button" class="btn" id="ca-setup-btn">Einrichten</button></div>
     </div>
     <form class="panel ca-form" id="ca-form" hidden novalidate>
@@ -365,12 +364,12 @@
     <div class="card-head">
       <h2 id="vs-h"><span data-r="title">Vers des Tages</span></h2>
       <div class="actions">
-        <button type="button" class="btn-ghost" id="vs-back" hidden>Zurück zu heute</button>
-        <button type="button" class="btn-ghost" id="vs-more">Noch einer</button>
+        <button type="button" class="icon-btn" id="vs-back" hidden aria-label="Zurück zum Vers von heute" title="Zurück zu heute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 13.5L4.5 9 9 4.5"/><path d="M4.5 9H14a5.5 5.5 0 0 1 0 11h-3"/></svg></button>
+        <button type="button" class="icon-btn" id="vs-more" aria-label="Noch ein Vers" title="Noch einer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/></svg></button>
       </div>
     </div>
     <figure class="vs">
-      <blockquote class="vs-text" id="vs-text">Vers wird geladen …</blockquote>
+      <blockquote class="vs-text" id="vs-text"><span class="sk-lines" role="img" aria-label="Vers wird geladen"><i></i><i></i><i style="width:58%"></i></span></blockquote>
       <figcaption class="vs-cap"><a id="vs-ref" target="_blank" rel="noopener" hidden></a><span id="vs-tr"></span></figcaption>
     </figure>
   </section>
@@ -380,12 +379,12 @@
     <div class="card-head">
       <h2 id="bd-h"><span data-r="title">Geburtstage</span></h2>
       <div class="actions">
-        <button type="button" class="icon-btn" id="bd-set-btn" aria-label="Geburtstage verwalten" title="Geburtstage verwalten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" id="bd-set-btn" aria-label="Geburtstage verwalten" title="Geburtstage verwalten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" id="bd-setup" hidden>
+    <div class="setup" id="bd-setup" hidden>
       <h3>Geburtstage eintragen</h3>
-      <p>Übernimm die Geburtstage aus deinen Kontakten oder trag die wichtigsten selbst ein. Ganztägige Termine aus deinem Kalender mit „Geburtstag“ im Titel tauchen hier auch auf.</p>
+      <p>Aus den Kontakten übernehmen oder die wichtigsten selbst eintragen.</p>
       <div class="form-row"><button type="button" class="btn" id="bd-setup-btn">Einrichten</button></div>
     </div>
     <form class="panel bd-form" id="bd-form" hidden novalidate>
@@ -425,12 +424,12 @@
     <div class="card-head">
       <h2 id="ws-h"><span data-r="title">Müllabfuhr</span></h2>
       <div class="actions">
-        <button type="button" class="icon-btn" id="ws-set-btn" aria-label="Müllabfuhr einrichten" title="Müllabfuhr einrichten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+        <button type="button" class="icon-btn" id="ws-set-btn" aria-label="Müllabfuhr einrichten" title="Müllabfuhr einrichten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
       </div>
     </div>
-    <div class="wx-off" id="ws-setup" hidden>
+    <div class="setup" id="ws-setup" hidden>
       <h3>Abfuhrtermine eintragen</h3>
-      <p>Lad die Termine deines Entsorgers als Datei oder trag den Rhythmus deiner Tonnen ein. Am Abend vor der Abholung erinnert dich das Cockpit.</p>
+      <p>Datei vom Entsorger laden oder den Rhythmus deiner Tonnen eintragen.</p>
       <div class="form-row"><button type="button" class="btn" id="ws-setup-btn">Einrichten</button></div>
     </div>
     <form class="panel ws-form" id="ws-form" hidden novalidate>

@@ -160,7 +160,7 @@ async function loadCommute() {
       if (p.lat !== null && p.lon !== null) continue;
       const g = await geocode(p.text);
       if (seq !== cm.seq) return;
-      if (!g) { cmOff('Adresse nicht gefunden', `„${p.text}“ findet die Kartensuche nicht. Tipp auf „Adressen“ und schreib sie genauer, am besten mit Ort.`); return; }
+      if (!g) { cmOff('Adresse nicht gefunden', `„${p.text}“ findet die Kartensuche nicht. Tipp oben rechts auf die Regler und schreib sie genauer, am besten mit Ort.`); return; }
       Object.assign(p, g);
       changed = true;
     }

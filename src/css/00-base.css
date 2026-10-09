@@ -24,32 +24,58 @@
   --r:18px;
   --gap:clamp(14px,1.8vw,22px);
   --arc-h:96px;
+  /* Ebenen: ruhige Karten liegen flach, normale leicht erhaben, wichtige Karten schweben etwas höher */
+  --card-line:rgba(15,27,43,.075);
+  --shadow-1:0 1px 2px rgba(15,27,43,.04),0 3px 12px -4px rgba(15,27,43,.07);
+  --shadow-2:0 1px 2px rgba(15,27,43,.05),0 12px 30px -10px rgba(15,27,43,.2);
+  --surface-hi:var(--surface);
+  --quiet:color-mix(in srgb,var(--surface) 48%,var(--bg));
+  /* Füllung für Balken, die nicht „jetzt“ sind. Die Akzentfarbe bleibt für jetzt, heute und Aktionen. */
+  --fill-n:color-mix(in srgb,var(--ink) 52%,var(--surface));
+  --ease:cubic-bezier(.2,.7,.2,1);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
+    --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
     --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
     --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+    --card-line:rgba(255,255,255,.065);
+    --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
+    --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
+    --surface-hi:#142039;
+    --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
+    --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
+  --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
   --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
   --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+  --card-line:rgba(255,255,255,.065);
+  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
+  --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
+  --surface-hi:#142039;
+  --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
+  --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
   color-scheme:dark;
 }
 @media (max-width:720px){:root{--arc-h:70px}}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
-.wrap{max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+/* Unter dem Horizont schimmert die Farbe des Himmels noch ein Stück nach */
+.wrap{position:relative;isolation:isolate;max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
+.wrap::before{content:"";position:absolute;z-index:-1;top:0;left:calc(50% - 50vw);width:100vw;height:clamp(200px,24vw,340px);pointer-events:none;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--horizon,var(--bg)) 20%,transparent),transparent)}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* Knöpfe, Chips */
-.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .btn{border:0;background:var(--ink);color:var(--surface);padding:8px 15px;border-radius:999px;font-weight:600;font-size:14px}
 .btn:hover{opacity:.9}
 .btn-ghost{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:999px;font-weight:600;font-size:13px;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:6px}
@@ -59,6 +85,36 @@ button{font:inherit;color:inherit;cursor:pointer}
 .icon-btn:hover{background:var(--raise);color:var(--ink)}
 .chip{display:inline-block;padding:0 7px;border-radius:999px;background:var(--chip-bg);color:var(--accent-ink);font:600 11px/1.7 var(--f-body);white-space:nowrap}
 .empty{color:var(--muted);font-size:14px;padding:6px 0}
+.icon-btn.spin svg{animation:spin 1s linear infinite}
+.icon-btn:disabled{cursor:default}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Platzhalter beim Laden: graue Zeilen mit einem Schimmer, statt „wird geladen“ */
+.sk-row{display:grid;grid-template-columns:2.6em minmax(0,1fr) 2.4em;gap:12px;align-items:center;padding:9px 0;list-style:none}
+.sk-row span{display:flex;flex-direction:column;gap:7px}
+.sk-row i,.sk-lines i,.is-loading::before{display:block;border-radius:6px;background:linear-gradient(100deg,var(--raise) 30%,color-mix(in srgb,var(--raise) 35%,var(--surface)) 50%,var(--raise) 70%) 0 0/300% 100%;animation:skel 1.5s ease-in-out infinite}
+.sk-row i{height:11px}
+.sk-row .sk-a{height:2.1em;border-radius:8px}
+.sk-row .sk-b{height:1.3em}
+.sk-row i.s{height:9px;opacity:.7}
+.sk-lines{display:flex;flex-direction:column;gap:12px;padding:4px 0}
+.sk-lines i{height:15px;width:100%}
+.is-loading{background:none!important;border:0!important;padding:0!important}
+.is-loading>*{display:none!important}
+.is-loading::before{content:"";height:var(--sk-h,118px);border-radius:0;
+  -webkit-mask:linear-gradient(#000 0 0) 0 0/100% 34px no-repeat,repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 25px) 0 50px/100% 100% no-repeat;
+  mask:linear-gradient(#000 0 0) 0 0/100% 34px no-repeat,repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 25px) 0 50px/100% 100% no-repeat}
+.sk-list{list-style:none;margin:0;padding:0}
+@keyframes skel{from{background-position:100% 0}to{background-position:0 0}}
+@media (prefers-reduced-motion: reduce){.sk-row i,.sk-lines i,.is-loading::before{animation:none}.icon-btn.spin svg{animation-duration:3s}}
+
+/* Einrichten-Hinweis in einer Karte: kompakt, eine Zeile Text und ein Knopf */
+.setup{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;padding:12px 12px 12px 14px;border-radius:12px;background:var(--raise);border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent)}
+.setup h3{margin:0;font:650 15px/1.3 var(--f-display);font-variation-settings:'wdth' 92;grid-column:1}
+.setup p{margin:0;grid-column:1;font-size:13px;line-height:1.45;color:var(--muted);max-width:none}
+.setup .form-row{grid-column:2;grid-row:1/span 2;flex-wrap:nowrap}
+.setup .btn{padding:7px 14px;font-size:13px;white-space:nowrap}
+@container (max-width:330px){.setup{grid-template-columns:minmax(0,1fr)}.setup .form-row{grid-column:1;grid-row:auto;margin-top:8px}}
 
 /* Formulare */
 .panel{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
