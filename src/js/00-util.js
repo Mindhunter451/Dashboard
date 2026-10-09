@@ -59,7 +59,10 @@ async function getJson(url, ms = 9000) {
   try {
     const r = await fetch(url, { signal: ctl.signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    return await r.json();
+    const j = await r.json();
+    // Ohne Netz liefert der Service Worker die letzte Antwort und schreibt dazu, von wann sie ist
+    if (j && typeof j === 'object' && typeof j._cockpitCache === 'string') Object.defineProperty(j, 'cachedAt', { value: Date.parse(j._cockpitCache) || 0 });
+    return j;
   } finally { clearTimeout(timer); }
 }
 

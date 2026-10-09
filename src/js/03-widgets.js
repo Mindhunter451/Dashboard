@@ -84,5 +84,6 @@ function widgetLabel(id) {
   if (w.title) return w.title;
   if (w.type === 'tasks') return `Aufgaben: ${w.cfg.projects.join(', ')}`;
   if (w.type === 'football') return FB_LEAGUES[w.cfg.league] + (w.cfg.teamName ? `, ${w.cfg.teamName}` : '');
+  if (w.type === 'dep') return w.cfg.stop ? `Abfahrten: ${w.cfg.stop.name}` : 'Abfahrten';
   return TYPES[w.type].name;
 }

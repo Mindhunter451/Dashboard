@@ -211,7 +211,7 @@ $('#gal-body').addEventListener('click', e => {
     const type = n.dataset.gnew;
     const id = newWidget(type, newCfg(type));
     placeWidget(id);
-    if (type === 'tasks') openWidgetDialog(id);
+    if (type === 'tasks' || type === 'dep') openWidgetDialog(id);
   } else if (a) placeWidget(a.dataset.gadd);
 });
 $('#add-tile').addEventListener('click', openGallery);

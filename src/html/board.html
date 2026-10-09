@@ -375,6 +375,99 @@
     </figure>
   </section>
 
+  <!-- Geburtstage -->
+  <section class="card" id="bday" data-type="bday" aria-labelledby="bd-h" hidden>
+    <div class="card-head">
+      <h2 id="bd-h"><span data-r="title">Geburtstage</span></h2>
+      <div class="actions">
+        <button type="button" class="icon-btn" id="bd-set-btn" aria-label="Geburtstage verwalten" title="Geburtstage verwalten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      </div>
+    </div>
+    <div class="wx-off" id="bd-setup" hidden>
+      <h3>Geburtstage eintragen</h3>
+      <p>Übernimm die Geburtstage aus deinen Kontakten oder trag die wichtigsten selbst ein. Ganztägige Termine aus deinem Kalender mit „Geburtstag“ im Titel tauchen hier auch auf.</p>
+      <div class="form-row"><button type="button" class="btn" id="bd-setup-btn">Einrichten</button></div>
+    </div>
+    <form class="panel bd-form" id="bd-form" hidden novalidate>
+      <h3>Geburtstage verwalten</h3>
+      <div class="bd-import">
+        <p class="hint"><b>Aus den Kontakten übernehmen.</b> Auf dem iPhone in der Kontakte-App auf „Listen“, dann „Alle Kontakte“ gedrückt halten, „Exportieren“ und die Datei mit „In Dateien sichern“ ablegen. Am Mac in der App Kontakte alle markieren und über Ablage, Exportieren als vCard sichern. Die Datei lädst du dann hier.</p>
+        <div class="form-row"><button type="button" class="btn-ghost" id="bd-import">vCard-Datei laden</button><input type="file" id="bd-file" accept=".vcf,.vcard,text/vcard,text/x-vcard" hidden></div>
+        <p class="hint bd-msg" id="bd-import-msg" role="status" hidden></p>
+      </div>
+      <div class="grid2">
+        <div class="field"><label for="bd-name">Name</label><input id="bd-name" type="text" maxlength="60" autocomplete="off" placeholder="z. B. Mama"></div>
+        <div class="field"><label for="bd-date">Geburtstag</label><input id="bd-date" type="text" maxlength="10" autocomplete="off" inputmode="decimal" placeholder="TT.MM. oder TT.MM.JJJJ"></div>
+      </div>
+      <div class="form-row"><button type="button" class="btn-ghost" id="bd-add">+ Eintragen</button></div>
+      <p class="err" id="bd-ferr" hidden></p>
+      <div class="field" id="bd-filter-box" hidden><input id="bd-filter" type="search" autocomplete="off" aria-label="Geburtstage durchsuchen"></div>
+      <ul class="ca-feeds bd-all" id="bd-all" hidden></ul>
+      <div class="grid2">
+        <div class="field"><label for="bd-n">In der Karte zeigen</label><select id="bd-n"><option value="4">4 Geburtstage</option><option value="6">6 Geburtstage</option><option value="8">8 Geburtstage</option><option value="12">12 Geburtstage</option></select></div>
+        <label class="check-row ca-locrow"><input type="checkbox" id="bd-cal"> Geburtstage aus dem Kalender mitzeigen</label>
+      </div>
+      <p class="hint">Die Geburtstage kommen mit in deine Sicherung.</p>
+      <div class="form-row">
+        <button type="submit" class="btn">Fertig</button>
+        <button type="button" class="btn-danger" id="bd-clear" hidden>Alle löschen</button>
+      </div>
+    </form>
+    <div id="bd-live" hidden>
+      <ul class="bd-list" id="bd-list"></ul>
+      <button type="button" class="btn-ghost" id="bd-more" hidden>Mehr zeigen</button>
+    </div>
+    <p class="src" id="bd-src"></p>
+  </section>
+
+  <!-- Müllabfuhr -->
+  <section class="card" id="waste" data-type="waste" aria-labelledby="ws-h" hidden>
+    <div class="card-head">
+      <h2 id="ws-h"><span data-r="title">Müllabfuhr</span></h2>
+      <div class="actions">
+        <button type="button" class="icon-btn" id="ws-set-btn" aria-label="Müllabfuhr einrichten" title="Müllabfuhr einrichten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      </div>
+    </div>
+    <div class="wx-off" id="ws-setup" hidden>
+      <h3>Abfuhrtermine eintragen</h3>
+      <p>Lad die Termine deines Entsorgers als Datei oder trag den Rhythmus deiner Tonnen ein. Am Abend vor der Abholung erinnert dich das Cockpit.</p>
+      <div class="form-row"><button type="button" class="btn" id="ws-setup-btn">Einrichten</button></div>
+    </div>
+    <form class="panel ws-form" id="ws-form" hidden novalidate>
+      <h3>Müllabfuhr einrichten</h3>
+      <div>
+        <p class="hint"><b>Termine als Datei.</b> Die meisten Entsorger, etwa die Stadtreinigung Hamburg, bieten die Abfuhrtermine für deine Adresse als Kalenderdatei (ICS) zum Herunterladen an. Lad die Datei hier hoch, einmal im Jahr brauchst du eine neue.</p>
+        <div class="form-row"><button type="button" class="btn-ghost" id="ws-import">ICS-Datei laden</button><input type="file" id="ws-file" accept=".ics,.ical,text/calendar" hidden></div>
+        <p class="hint bd-msg" id="ws-import-msg" role="status" hidden></p>
+      </div>
+      <ul class="ca-feeds ws-bins" id="ws-bins" hidden></ul>
+      <p class="hint"><b>Oder selbst eintragen.</b> Name der Tonne, nächster Abholtag und wie oft sie kommt.</p>
+      <div class="ws-addrow">
+        <div class="field"><label for="ws-name">Tonne</label><input id="ws-name" type="text" maxlength="40" autocomplete="off" placeholder="z. B. Papier"></div>
+        <div class="field"><label for="ws-start">Nächste Abholung</label><input id="ws-start" type="date"></div>
+        <div class="field"><label for="ws-every">Rhythmus</label><select id="ws-every"><option value="1">Jede Woche</option><option value="2">Alle 2 Wochen</option><option value="3">Alle 3 Wochen</option><option value="4">Alle 4 Wochen</option></select></div>
+      </div>
+      <div class="form-row"><button type="button" class="btn-ghost" id="ws-add">+ Tonne</button></div>
+      <div class="ws-remind">
+        <label class="check-row"><input type="checkbox" id="ws-remind"> Am Vorabend erinnern ab</label>
+        <input id="ws-at" type="time" aria-label="Uhrzeit der Erinnerung">
+        <button type="button" class="btn-ghost" id="ws-notify" hidden>Auch als Mitteilung</button>
+        <span class="hint" id="ws-notify-on" hidden>Mitteilungen sind erlaubt.</span>
+      </div>
+      <p class="hint">Die Erinnerung kommt, wenn das Cockpit offen ist. Die Termine kommen mit in deine Sicherung.</p>
+      <p class="err" id="ws-ferr" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="ws-cancel">Abbrechen</button>
+      </div>
+    </form>
+    <div id="ws-live" hidden>
+      <p class="ws-banner" id="ws-banner" hidden></p>
+      <ul class="ws-list" id="ws-list"></ul>
+    </div>
+    <p class="src" id="ws-src"></p>
+  </section>
+
   <button type="button" class="card add-tile" id="add-tile" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Widget hinzufügen<span>Neu anlegen oder ein vorhandenes einfügen</span></button>
 </main>
 

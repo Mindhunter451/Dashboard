@@ -8,7 +8,7 @@
 .sky-stars{position:absolute;inset:0;z-index:-1;opacity:var(--sky-stars,0);background-size:cover;background-position:center top;pointer-events:none}
 .sky.plain{--sky-ink:var(--ink);--sky-ink-low:var(--muted);--sky-top:var(--surface);background:var(--bg);border-bottom:1px solid var(--line)}
 .sky.plain .sky-stars{display:none}
-.sky-in{position:relative;max-width:3200px;margin:0 auto;padding:clamp(14px,2vw,24px) clamp(16px,2.6vw,44px) calc(var(--arc-h) + 16px);display:flex;flex-direction:column;gap:clamp(18px,3.2vw,40px)}
+.sky-in{position:relative;max-width:3200px;margin:0 auto;padding:calc(clamp(14px,2vw,24px) + env(safe-area-inset-top,0px)) max(clamp(16px,2.6vw,44px),env(safe-area-inset-right,0px)) calc(var(--arc-h) + 16px) max(clamp(16px,2.6vw,44px),env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:clamp(18px,3.2vw,40px)}
 
 /* Zeile oben: Begrüßung, Seiten, Knöpfe */
 .sky-top{display:flex;align-items:center;gap:10px 18px;min-width:0}

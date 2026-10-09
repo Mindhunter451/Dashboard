@@ -204,3 +204,28 @@
     <p class="src" data-r="src"></p>
   </section>
 </template>
+
+<!-- Abfahrten an einer Haltestelle (gibt es beliebig oft) -->
+<template id="tpl-dep">
+  <section class="card" data-type="dep">
+    <div class="card-head">
+      <h2 data-r="title">Abfahrten</h2>
+      <div class="actions">
+        <span data-r="rt"></span>
+        <button type="button" class="icon-btn" data-r="set" aria-label="Haltestelle und Filter einstellen" title="Haltestelle und Filter einstellen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      </div>
+    </div>
+    <div class="wx-off" data-r="setup" hidden>
+      <h3>Haltestelle wählen</h3>
+      <p>Hier siehst du live, was an deiner Haltestelle abfährt, mit Verspätungen und Ausfällen. Mit deinem Fußweg sagt dir die Karte auch, wann du loslaufen musst.</p>
+      <div class="form-row"><button type="button" class="btn" data-r="setup-btn">Haltestelle suchen</button></div>
+    </div>
+    <div class="dp-live-box" data-r="live" hidden>
+      <p class="dp-go" data-r="go" hidden></p>
+      <p class="err" data-r="err" hidden></p>
+      <ul class="dp-list" data-r="list"></ul>
+      <div class="dp-alerts" data-r="alerts"></div>
+    </div>
+    <p class="src dp-src" data-r="src"></p>
+  </section>
+</template>

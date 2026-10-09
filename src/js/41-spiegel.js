@@ -77,6 +77,17 @@ function renderMirror() {
     }
     box.innerHTML = html || '<h3>Heute</h3><p class="m-dim">Keine Termine mehr heute und morgen.</p>';
   }
+  // Hinweise unter dem Datum: Geburtstage und Müllabfuhr von heute und morgen
+  const notes = [...bdMirror(now).map(t => ({ t, c: '#F0B040' })), ...wsMirror(now)];
+  $('#m-notes').innerHTML = notes.map(n => `<li style="--c:${n.c}">${esc(n.t)}</li>`).join('');
+  // Abfahrten der ersten Haltestelle
+  const dep = dpMirror(now), dbox = $('#m-dep');
+  dbox.hidden = !dep;
+  if (dep) {
+    const go = dep.walk ? dep.rows.find(r => !r.x) : null, left = go ? Math.floor((go.t - dep.walk * 6e4 - +now) / 6e4) : 0;
+    dbox.innerHTML = `<h3>${esc(dep.name)}${go ? ` <span>${left < 1 ? 'jetzt los' : `los in ${left} Min`}</span>` : ''}</h3>`
+      + (dep.rows.length ? `<ul>${dep.rows.map(r => `<li${r.x ? ' class="x"' : ''}>${dpBadge(r)}<span class="m-to">${esc(r.to)}</span><b>${r.x ? 'fällt aus' : mirrorMin(r.t - +now, r.t)}</b></li>`).join('')}</ul>` : '<p class="m-dim">Gerade keine Abfahrten.</p>');
+  }
   // Countdowns aus den Kacheln
   const cd = [];
   for (const id of ['t-fa', 't-we', 't-ur']) {
@@ -93,7 +104,19 @@ function renderMirror() {
   const v = vs.cur && vs.cur.key && vs.cur.key.startsWith(ymd(now)) ? vs.cur : null;
   $('#m-verse').hidden = !v;
   if (v) { $('#m-verse-text').textContent = v.text; $('#m-verse-ref').textContent = v.ref; }
+  mirrorFit();
 }
+/* Rechte Spalte: Was nicht mehr ganz passt, fliegt raus, zuerst Countdowns, dann späte Abfahrten (mindestens 2 bleiben) */
+function mirrorFit() {
+  const side = $('.m-side');
+  for (let i = 0; i < 12 && side.scrollHeight > side.clientHeight + 1; i++) {
+    const cd = $$('#m-cd li'), dep = $$('#m-dep li');
+    if (cd.length) cd[cd.length - 1].remove();
+    else if (dep.length > 2) dep[dep.length - 1].remove();
+    else break;
+  }
+}
+const mirrorMin = (ms, t) => { const m = Math.floor(ms / 6e4); return m < 1 ? 'jetzt' : m < 60 ? `${m} Min` : hm(new Date(t)); };
 /* Regen in den nächsten 2 Stunden in einem Satz */
 function mirrorRain(d, now) {
   const m = d.minutely_15;

@@ -5,6 +5,10 @@
 //   <!--@include pfad-->  fügt eine Datei aus src/ ein (z. B. html/drawer.html)
 //   <!--@css-->           alle Dateien aus src/css/ in Namensreihenfolge
 //   <!--@js-->            alle Dateien aus src/js/ in Namensreihenfolge, in einem gemeinsamen Block
+//
+// Dazu kommen für die Installation als App manifest.webmanifest und sw.js aus src/pwa/.
+// In sw.js wird __VERSION__ durch die Version aus src/js/99-start.js ersetzt, damit jede Version
+// einen eigenen Speicher bekommt. Die Icons liegen fertig im Ordner icons/.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -29,3 +33,9 @@ if (/<!--@/.test(out)) throw new Error('Unbekannter Platzhalter in src/index.htm
 
 writeFileSync(join(root, 'index.html'), out);
 console.log(`index.html gebaut, ${(Buffer.byteLength(out) / 1024).toFixed(0)} KB`);
+
+const version = (/const VERSION = '([^']+)'/.exec(read('js/99-start.js')) || [])[1];
+if (!version) throw new Error('VERSION in src/js/99-start.js nicht gefunden');
+writeFileSync(join(root, 'sw.js'), read('pwa/sw.js').replace(/__VERSION__/g, version));
+writeFileSync(join(root, 'manifest.webmanifest'), read('pwa/manifest.webmanifest'));
+console.log(`sw.js und manifest.webmanifest für Version ${version} geschrieben`);
