@@ -23,7 +23,22 @@ html.mirror-on body{overflow:hidden}
 .m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7vmin,34px);line-height:1.25}
 .m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c)}
 .m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
-.m-cd{grid-area:cd;justify-self:end;text-align:right}
+.m-side{grid-area:cd;justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:clamp(22px,4vmin,48px);min-height:0;overflow:hidden}
+.m-cd{text-align:right}
+.m-notes{list-style:none;margin:.9em 0 0;padding:0;display:flex;flex-direction:column;gap:.35em;font-size:clamp(16px,2.2vmin,26px);line-height:1.3}
+.m-notes:empty{display:none}
+.m-notes li{display:flex;align-items:center;gap:.55em}
+.m-notes li::before{content:"";flex:0 0 auto;width:.5em;height:.5em;border-radius:50%;background:var(--c)}
+.m-dep{text-align:right;min-width:0;max-width:100%}
+.m-dep h3{margin:0 0 .5em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-dep h3 span{color:#F2F4F7;margin-left:.4em}
+.m-dep ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4em;font-size:clamp(17px,2.5vmin,30px);line-height:1.25}
+.m-dep li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.6em;text-align:left}
+.m-dep .dp-line{font-size:.72em;min-width:2.5em}
+.m-to{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:14em}
+.m-dep b{font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;min-width:3.6em}
+.m-dep li.x{color:var(--m-dim)}
+.m-dep li.x .m-to{text-decoration:line-through}
 .m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9em}
 .m-cd li{display:flex;flex-direction:column;font-size:clamp(15px,2vmin,24px)}
 .m-cd b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.5em;line-height:1.15}
@@ -35,5 +50,6 @@ html.mirror-on body{overflow:hidden}
 @media (orientation:portrait){
   .m-in{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"clock clock" "wx cd" "cal cal" "verse verse"}
   .m-wx{justify-self:start;text-align:left;align-items:flex-start}
+  .m-to{max-width:9em}
 }
 @media (prefers-reduced-motion: reduce){.m-in{transition:none}}

@@ -9,6 +9,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Figtree:ital,wght@0,400..700;1,400&family=Literata:ital,opsz,wght@0,7..72,400;1,7..72,300..500&display=swap">
 <meta name="theme-color" content="#1D3672">
+<meta name="description" content="Jeres persönliches Dashboard mit Uhr, Wetter, Terminen, Abfahrten und mehr.">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cockpit">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 /* 00-base.css */
 /* Layout: Oben ein Himmel über die ganze Breite, gefärbt nach dem echten Sonnenstand, mit großer Uhr, Seiten-Tabs und
@@ -106,7 +114,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .sky-stars{position:absolute;inset:0;z-index:-1;opacity:var(--sky-stars,0);background-size:cover;background-position:center top;pointer-events:none}
 .sky.plain{--sky-ink:var(--ink);--sky-ink-low:var(--muted);--sky-top:var(--surface);background:var(--bg);border-bottom:1px solid var(--line)}
 .sky.plain .sky-stars{display:none}
-.sky-in{position:relative;max-width:3200px;margin:0 auto;padding:clamp(14px,2vw,24px) clamp(16px,2.6vw,44px) calc(var(--arc-h) + 16px);display:flex;flex-direction:column;gap:clamp(18px,3.2vw,40px)}
+.sky-in{position:relative;max-width:3200px;margin:0 auto;padding:calc(clamp(14px,2vw,24px) + env(safe-area-inset-top,0px)) max(clamp(16px,2.6vw,44px),env(safe-area-inset-right,0px)) calc(var(--arc-h) + 16px) max(clamp(16px,2.6vw,44px),env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:clamp(18px,3.2vw,40px)}
 
 /* Zeile oben: Begrüßung, Seiten, Knöpfe */
 .sky-top{display:flex;align-items:center;gap:10px 18px;min-width:0}
@@ -651,6 +659,104 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .vs-cap a{font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--accent)}
 .vs-cap a:hover{color:var(--accent-ink)}
 
+/* 34-alltag.css */
+/* Abfahrten */
+.dp-live-box{display:flex;flex-direction:column;gap:8px}
+.dp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.dp-row{display:grid;grid-template-columns:3.3em minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.dp-row:first-child{border-top:0;padding-top:2px}
+.dp-line{display:inline-flex;align-items:center;justify-content:center;min-width:2.7em;height:1.8em;padding:0 .45em;border-radius:7px;background:var(--lc);color:var(--lt);
+  font:700 14px/1 var(--f-display);font-variation-settings:'wdth' 86;font-variant-numeric:tabular-nums;white-space:nowrap;justify-self:start}
+.dp-main{min-width:0;display:flex;flex-direction:column;gap:1px}
+.dp-main b{font-weight:600;font-size:15px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dp-main small{display:flex;flex-wrap:wrap;gap:0 9px;color:var(--muted);font-size:12.5px;line-height:1.4;font-variant-numeric:tabular-nums}
+.dp-late{color:var(--warn);font-weight:700}
+.dp-late.big,.dp-x{color:var(--bad);font-weight:700}
+.dp-chg{color:var(--warn);font-weight:600}
+.dp-row.x .dp-main b{text-decoration:line-through;text-decoration-thickness:1.5px;color:var(--muted)}
+.dp-row.x .dp-line{opacity:.55}
+.dp-in{display:flex;align-items:baseline;gap:3px;justify-content:flex-end;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dp-in b{font:650 21px/1 var(--f-display);font-variation-settings:'wdth' 82;letter-spacing:-.01em}
+.dp-in small{color:var(--muted);font-size:12px;font-weight:600}
+.dp-go{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:10px 13px;border-radius:12px;background:color-mix(in srgb,var(--good) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--good) 30%,var(--line))}
+.dp-go b{font:700 17px/1.2 var(--f-display);font-variation-settings:'wdth' 88}
+.dp-go span{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;color:var(--muted);font-size:13.5px}
+.dp-go .dp-line{font-size:12.5px}
+.dp-go.now{background:color-mix(in srgb,var(--accent) 20%,var(--surface));border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.dp-live,.dp-plan{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font:600 12px/1.3 var(--f-body);color:var(--muted);border:1px solid var(--line);align-self:center}
+.dp-live{color:var(--good);border-color:color-mix(in srgb,var(--good) 40%,var(--line))}
+.dp-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--good);animation:dp-pulse 2s ease-in-out infinite}
+@keyframes dp-pulse{50%{opacity:.3}}
+@media (prefers-reduced-motion: reduce){.dp-live::before{animation:none}}
+.dp-alerts{display:flex;flex-direction:column;gap:6px}
+.dp-alerts:empty{display:none}
+.dp-alert{margin:0;padding:8px 11px;border-radius:9px;background:var(--raise);border-left:3px solid var(--warn);font-size:13px;line-height:1.4}
+.dp-alert summary{cursor:pointer;font-weight:600}
+.dp-alert p{margin:6px 0 0;color:var(--muted);white-space:pre-line}
+.dp-src{display:flex;flex-wrap:wrap;gap:2px 12px}
+.dp-src a,.hint a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.dp-search{display:flex;flex-wrap:wrap;gap:6px}
+.dp-search input{flex:1 1 12em;font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.dp-hits{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:250px;overflow:auto}
+.dp-hits:empty{display:none}
+.dp-hits button{width:100%;text-align:left;display:flex;flex-direction:column;gap:1px;padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:var(--surface)}
+.dp-hits button:hover{background:var(--raise)}
+.dp-hits button.on{border-color:var(--accent);background:var(--chip-bg)}
+.dp-hits b{font-weight:600;font-size:14px}
+.dp-hits span{font-size:12px;color:var(--muted)}
+.dp-find .hint{margin-top:4px}
+
+/* Geburtstage */
+#bd-live{display:flex;flex-direction:column;gap:6px}
+#bd-more{align-self:flex-start}
+.bd-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.bd-row{display:grid;grid-template-columns:2.9em minmax(0,1fr) auto;gap:12px;align-items:center;padding:6px 8px 6px 0;border-radius:12px}
+.bd-cal{display:flex;flex-direction:column;align-items:center;justify-content:center;height:2.9em;border-radius:10px;background:var(--raise);border:1px solid var(--line);line-height:1}
+.bd-row[style] .bd-cal{box-shadow:inset 3px 0 0 var(--c)}
+.bd-cal b{font:700 17px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.bd-cal small{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.bd-main{min-width:0;display:flex;flex-direction:column;gap:1px}
+.bd-main b{font-weight:600;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.bd-main small{color:var(--muted);font-size:12.5px;line-height:1.35}
+.bd-in{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.bd-in.soon{color:var(--accent-ink)}
+.bd-row.today{background:color-mix(in srgb,var(--accent) 15%,var(--surface));padding-left:8px;margin-inline:-8px 0}
+.bd-row.today .bd-cal{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.bd-row.today .bd-cal small{color:inherit}
+.bd-row.today .bd-in{padding:2px 10px;border-radius:999px;background:var(--accent);color:var(--on-accent)}
+.bd-msg{padding:8px 11px;border-radius:9px;background:var(--surface);border:1px solid var(--line);color:var(--ink);margin-top:8px}
+.bd-all{max-height:300px;overflow:auto}
+.bd-all .tx span{font-variant-numeric:tabular-nums}
+.bd-form .hint b,.ws-form .hint b{color:var(--ink)}
+
+/* Müllabfuhr */
+#ws-live{display:flex;flex-direction:column;gap:10px}
+.ws-banner{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:10px 13px;border-radius:12px;background:var(--raise);border:1px solid var(--line)}
+.ws-banner.due{background:color-mix(in srgb,var(--accent) 18%,var(--surface));border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.ws-banner b{font:700 16px/1.25 var(--f-display);font-variation-settings:'wdth' 90;color:var(--ink)}
+.ws-banner span{display:flex;flex-wrap:wrap;gap:6px}
+.ws-banner i{font-style:normal;display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px;font-weight:600}
+.ws-banner i::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--c)}
+.ws-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ws-row{display:grid;grid-template-columns:16px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.ws-row:first-child{border-top:0;padding-top:2px}
+.ws-dot{width:16px;height:19px;border-radius:3px 3px 5px 5px;background:var(--c);position:relative}
+.ws-dot::before{content:"";position:absolute;left:-2px;right:-2px;top:-3px;height:3px;border-radius:2px;background:var(--c)}
+.ws-main{min-width:0;display:flex;flex-direction:column;gap:1px}
+.ws-main b{font-weight:600;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.ws-main small{color:var(--muted);font-size:12.5px;line-height:1.35}
+.ws-when{font-size:14px;font-weight:600;white-space:nowrap}
+.ws-when.soon{color:var(--accent-ink);font-weight:700}
+.ws-warn{color:var(--warn);font-weight:600}
+.ws-bins .tx input{font:600 14px/1.3 var(--f-body);color:var(--ink);background:transparent;border:1px solid transparent;border-radius:6px;padding:2px 5px;margin-left:-6px;min-width:0;width:100%}
+.ws-bins .tx input:hover{border-color:var(--line)}
+.ws-bins .tx input:focus{border-color:var(--sea);background:var(--surface);outline:0}
+.ws-addrow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:10px}
+@container (max-width:440px){.ws-addrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ws-addrow .field:first-child{grid-column:1/-1}}
+.ws-remind{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.ws-remind input[type=time]{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+.bd-import .form-row,.ws-form > div > .form-row{margin-top:10px}
+
 /* 40-anpassen.css */
 /* Anpassen */
 .scrim{position:fixed;inset:0;background:rgba(6,12,18,.42);z-index:2900}
@@ -741,7 +847,22 @@ html.mirror-on body{overflow:hidden}
 .m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7vmin,34px);line-height:1.25}
 .m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c)}
 .m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
-.m-cd{grid-area:cd;justify-self:end;text-align:right}
+.m-side{grid-area:cd;justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:clamp(22px,4vmin,48px);min-height:0;overflow:hidden}
+.m-cd{text-align:right}
+.m-notes{list-style:none;margin:.9em 0 0;padding:0;display:flex;flex-direction:column;gap:.35em;font-size:clamp(16px,2.2vmin,26px);line-height:1.3}
+.m-notes:empty{display:none}
+.m-notes li{display:flex;align-items:center;gap:.55em}
+.m-notes li::before{content:"";flex:0 0 auto;width:.5em;height:.5em;border-radius:50%;background:var(--c)}
+.m-dep{text-align:right;min-width:0;max-width:100%}
+.m-dep h3{margin:0 0 .5em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-dep h3 span{color:#F2F4F7;margin-left:.4em}
+.m-dep ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4em;font-size:clamp(17px,2.5vmin,30px);line-height:1.25}
+.m-dep li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.6em;text-align:left}
+.m-dep .dp-line{font-size:.72em;min-width:2.5em}
+.m-to{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:14em}
+.m-dep b{font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;min-width:3.6em}
+.m-dep li.x{color:var(--m-dim)}
+.m-dep li.x .m-to{text-decoration:line-through}
 .m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9em}
 .m-cd li{display:flex;flex-direction:column;font-size:clamp(15px,2vmin,24px)}
 .m-cd b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.5em;line-height:1.15}
@@ -753,6 +874,7 @@ html.mirror-on body{overflow:hidden}
 @media (orientation:portrait){
   .m-in{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"clock clock" "wx cd" "cal cal" "verse verse"}
   .m-wx{justify-self:start;text-align:left;align-items:flex-start}
+  .m-to{max-width:9em}
 }
 @media (prefers-reduced-motion: reduce){.m-in{transition:none}}
 </style>
@@ -1193,6 +1315,99 @@ html.mirror-on body{overflow:hidden}
     </figure>
   </section>
 
+  <!-- Geburtstage -->
+  <section class="card" id="bday" data-type="bday" aria-labelledby="bd-h" hidden>
+    <div class="card-head">
+      <h2 id="bd-h"><span data-r="title">Geburtstage</span></h2>
+      <div class="actions">
+        <button type="button" class="icon-btn" id="bd-set-btn" aria-label="Geburtstage verwalten" title="Geburtstage verwalten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      </div>
+    </div>
+    <div class="wx-off" id="bd-setup" hidden>
+      <h3>Geburtstage eintragen</h3>
+      <p>Übernimm die Geburtstage aus deinen Kontakten oder trag die wichtigsten selbst ein. Ganztägige Termine aus deinem Kalender mit „Geburtstag“ im Titel tauchen hier auch auf.</p>
+      <div class="form-row"><button type="button" class="btn" id="bd-setup-btn">Einrichten</button></div>
+    </div>
+    <form class="panel bd-form" id="bd-form" hidden novalidate>
+      <h3>Geburtstage verwalten</h3>
+      <div class="bd-import">
+        <p class="hint"><b>Aus den Kontakten übernehmen.</b> Auf dem iPhone in der Kontakte-App auf „Listen“, dann „Alle Kontakte“ gedrückt halten, „Exportieren“ und die Datei mit „In Dateien sichern“ ablegen. Am Mac in der App Kontakte alle markieren und über Ablage, Exportieren als vCard sichern. Die Datei lädst du dann hier.</p>
+        <div class="form-row"><button type="button" class="btn-ghost" id="bd-import">vCard-Datei laden</button><input type="file" id="bd-file" accept=".vcf,.vcard,text/vcard,text/x-vcard" hidden></div>
+        <p class="hint bd-msg" id="bd-import-msg" role="status" hidden></p>
+      </div>
+      <div class="grid2">
+        <div class="field"><label for="bd-name">Name</label><input id="bd-name" type="text" maxlength="60" autocomplete="off" placeholder="z. B. Mama"></div>
+        <div class="field"><label for="bd-date">Geburtstag</label><input id="bd-date" type="text" maxlength="10" autocomplete="off" inputmode="decimal" placeholder="TT.MM. oder TT.MM.JJJJ"></div>
+      </div>
+      <div class="form-row"><button type="button" class="btn-ghost" id="bd-add">+ Eintragen</button></div>
+      <p class="err" id="bd-ferr" hidden></p>
+      <div class="field" id="bd-filter-box" hidden><input id="bd-filter" type="search" autocomplete="off" aria-label="Geburtstage durchsuchen"></div>
+      <ul class="ca-feeds bd-all" id="bd-all" hidden></ul>
+      <div class="grid2">
+        <div class="field"><label for="bd-n">In der Karte zeigen</label><select id="bd-n"><option value="4">4 Geburtstage</option><option value="6">6 Geburtstage</option><option value="8">8 Geburtstage</option><option value="12">12 Geburtstage</option></select></div>
+        <label class="check-row ca-locrow"><input type="checkbox" id="bd-cal"> Geburtstage aus dem Kalender mitzeigen</label>
+      </div>
+      <p class="hint">Die Geburtstage kommen mit in deine Sicherung.</p>
+      <div class="form-row">
+        <button type="submit" class="btn">Fertig</button>
+        <button type="button" class="btn-danger" id="bd-clear" hidden>Alle löschen</button>
+      </div>
+    </form>
+    <div id="bd-live" hidden>
+      <ul class="bd-list" id="bd-list"></ul>
+      <button type="button" class="btn-ghost" id="bd-more" hidden>Mehr zeigen</button>
+    </div>
+    <p class="src" id="bd-src"></p>
+  </section>
+
+  <!-- Müllabfuhr -->
+  <section class="card" id="waste" data-type="waste" aria-labelledby="ws-h" hidden>
+    <div class="card-head">
+      <h2 id="ws-h"><span data-r="title">Müllabfuhr</span></h2>
+      <div class="actions">
+        <button type="button" class="icon-btn" id="ws-set-btn" aria-label="Müllabfuhr einrichten" title="Müllabfuhr einrichten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      </div>
+    </div>
+    <div class="wx-off" id="ws-setup" hidden>
+      <h3>Abfuhrtermine eintragen</h3>
+      <p>Lad die Termine deines Entsorgers als Datei oder trag den Rhythmus deiner Tonnen ein. Am Abend vor der Abholung erinnert dich das Cockpit.</p>
+      <div class="form-row"><button type="button" class="btn" id="ws-setup-btn">Einrichten</button></div>
+    </div>
+    <form class="panel ws-form" id="ws-form" hidden novalidate>
+      <h3>Müllabfuhr einrichten</h3>
+      <div>
+        <p class="hint"><b>Termine als Datei.</b> Die meisten Entsorger, etwa die Stadtreinigung Hamburg, bieten die Abfuhrtermine für deine Adresse als Kalenderdatei (ICS) zum Herunterladen an. Lad die Datei hier hoch, einmal im Jahr brauchst du eine neue.</p>
+        <div class="form-row"><button type="button" class="btn-ghost" id="ws-import">ICS-Datei laden</button><input type="file" id="ws-file" accept=".ics,.ical,text/calendar" hidden></div>
+        <p class="hint bd-msg" id="ws-import-msg" role="status" hidden></p>
+      </div>
+      <ul class="ca-feeds ws-bins" id="ws-bins" hidden></ul>
+      <p class="hint"><b>Oder selbst eintragen.</b> Name der Tonne, nächster Abholtag und wie oft sie kommt.</p>
+      <div class="ws-addrow">
+        <div class="field"><label for="ws-name">Tonne</label><input id="ws-name" type="text" maxlength="40" autocomplete="off" placeholder="z. B. Papier"></div>
+        <div class="field"><label for="ws-start">Nächste Abholung</label><input id="ws-start" type="date"></div>
+        <div class="field"><label for="ws-every">Rhythmus</label><select id="ws-every"><option value="1">Jede Woche</option><option value="2">Alle 2 Wochen</option><option value="3">Alle 3 Wochen</option><option value="4">Alle 4 Wochen</option></select></div>
+      </div>
+      <div class="form-row"><button type="button" class="btn-ghost" id="ws-add">+ Tonne</button></div>
+      <div class="ws-remind">
+        <label class="check-row"><input type="checkbox" id="ws-remind"> Am Vorabend erinnern ab</label>
+        <input id="ws-at" type="time" aria-label="Uhrzeit der Erinnerung">
+        <button type="button" class="btn-ghost" id="ws-notify" hidden>Auch als Mitteilung</button>
+        <span class="hint" id="ws-notify-on" hidden>Mitteilungen sind erlaubt.</span>
+      </div>
+      <p class="hint">Die Erinnerung kommt, wenn das Cockpit offen ist. Die Termine kommen mit in deine Sicherung.</p>
+      <p class="err" id="ws-ferr" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="ws-cancel">Abbrechen</button>
+      </div>
+    </form>
+    <div id="ws-live" hidden>
+      <p class="ws-banner" id="ws-banner" hidden></p>
+      <ul class="ws-list" id="ws-list"></ul>
+    </div>
+    <p class="src" id="ws-src"></p>
+  </section>
+
   <button type="button" class="card add-tile" id="add-tile" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Widget hinzufügen<span>Neu anlegen oder ein vorhandenes einfügen</span></button>
 </main>
 
@@ -1235,8 +1450,15 @@ html.mirror-on body{overflow:hidden}
 
     <section class="dr-sec">
       <h3>Spiegel-Modus</h3>
-      <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Countdowns und Vers, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
+      <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Abfahrten, Countdowns und Vers, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
       <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
+    </section>
+
+    <section class="dr-sec" id="dr-app">
+      <h3>Als App</h3>
+      <p class="hint" id="dr-app-txt">Das Cockpit lässt sich wie eine App installieren. Es startet dann ohne Browserleiste in einem eigenen Fenster und öffnet auch ohne Netz.</p>
+      <div class="form-row"><button type="button" class="btn-ghost" id="dr-install" hidden>Als App installieren</button></div>
+      <p class="hint" id="dr-app-ios" hidden></p>
     </section>
 
     <section class="dr-sec">
@@ -1538,11 +1760,37 @@ html.mirror-on body{overflow:hidden}
   </section>
 </template>
 
+<!-- Abfahrten an einer Haltestelle (gibt es beliebig oft) -->
+<template id="tpl-dep">
+  <section class="card" data-type="dep">
+    <div class="card-head">
+      <h2 data-r="title">Abfahrten</h2>
+      <div class="actions">
+        <span data-r="rt"></span>
+        <button type="button" class="icon-btn" data-r="set" aria-label="Haltestelle und Filter einstellen" title="Haltestelle und Filter einstellen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      </div>
+    </div>
+    <div class="wx-off" data-r="setup" hidden>
+      <h3>Haltestelle wählen</h3>
+      <p>Hier siehst du live, was an deiner Haltestelle abfährt, mit Verspätungen und Ausfällen. Mit deinem Fußweg sagt dir die Karte auch, wann du loslaufen musst.</p>
+      <div class="form-row"><button type="button" class="btn" data-r="setup-btn">Haltestelle suchen</button></div>
+    </div>
+    <div class="dp-live-box" data-r="live" hidden>
+      <p class="dp-go" data-r="go" hidden></p>
+      <p class="err" data-r="err" hidden></p>
+      <ul class="dp-list" data-r="list"></ul>
+      <div class="dp-alerts" data-r="alerts"></div>
+    </div>
+    <p class="src dp-src" data-r="src"></p>
+  </section>
+</template>
+
 <div class="mirror" id="mirror" hidden aria-label="Spiegel-Modus">
   <div class="m-in" id="m-in">
     <section class="m-clock">
       <p class="m-time" id="m-time">00:00</p>
       <p class="m-date" id="m-date">&nbsp;</p>
+      <ul class="m-notes" id="m-notes"></ul>
     </section>
     <section class="m-wx" id="m-wx" hidden>
       <div class="m-wx-now"><span class="m-wx-ico" id="m-wx-ico"></span><b id="m-wx-temp"></b></div>
@@ -1550,7 +1798,10 @@ html.mirror-on body{overflow:hidden}
       <p class="m-dim" id="m-wx-sub"></p>
     </section>
     <section class="m-cal" id="m-cal" hidden></section>
-    <section class="m-cd" id="m-cd"></section>
+    <div class="m-side">
+      <section class="m-dep" id="m-dep" hidden></section>
+      <section class="m-cd" id="m-cd"></section>
+    </div>
     <figure class="m-verse" id="m-verse" hidden>
       <blockquote id="m-verse-text"></blockquote>
       <figcaption id="m-verse-ref"></figcaption>
@@ -1626,7 +1877,10 @@ async function getJson(url, ms = 9000) {
   try {
     const r = await fetch(url, { signal: ctl.signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    return await r.json();
+    const j = await r.json();
+    // Ohne Netz liefert der Service Worker die letzte Antwort und schreibt dazu, von wann sie ist
+    if (j && typeof j === 'object' && typeof j._cockpitCache === 'string') Object.defineProperty(j, 'cachedAt', { value: Date.parse(j._cockpitCache) || 0 });
+    return j;
   } finally { clearTimeout(timer); }
 }
 
@@ -1690,6 +1944,8 @@ const numTxt = n => numDe(n, n % 1 ? 1 : 0);
  * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern), zuletzt gesehene Version
  * state.flex     alte Gleitzeit-Daten (Widget gibt es seit 2.3 nicht mehr, die Daten bleiben für die Sicherung)
  * state.pomo     erledigte Pomodoro-Runden pro Tag
+ * state.bdays    Geburtstage: { list: [{ id, name, m, d, y }] }, y fehlt, wenn das Jahr unbekannt ist
+ * state.waste    Müllabfuhr: { bins: [{ id, name, color, dates[], every, start }], file: { name, at } }
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
@@ -1720,7 +1976,10 @@ const TYPES = {
   f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
   fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
   cal:      { name: 'Kalender', multi: false, w: 1, since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
-  verse:    { name: 'Vers des Tages', multi: false, w: 1, since: '2.3', desc: 'Jeden Tag ein Bibelvers, in Luther 1912 oder einer anderen Übersetzung. Mit Link zum ganzen Abschnitt.' }
+  verse:    { name: 'Vers des Tages', multi: false, w: 1, since: '2.3', desc: 'Jeden Tag ein Bibelvers, in Luther 1912 oder einer anderen Übersetzung. Mit Link zum ganzen Abschnitt.' },
+  dep:      { name: 'Abfahrten', multi: true, w: 1, since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
+  bday:     { name: 'Geburtstage', multi: false, w: 1, since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
+  waste:    { name: 'Müllabfuhr', multi: false, w: 1, since: '2.4', desc: 'Welche Tonne wann rausmuss, mit Erinnerung am Vorabend. Termine aus der Datei deines Entsorgers oder als eigener Rhythmus.' }
 };
 const SOON = [];
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
@@ -1733,6 +1992,8 @@ const VS_TR = {
   NeU: { name: 'Neue evangelistische Übersetzung', bs: 'NE%C3%9C' },
   HFA: { name: 'Hoffnung für alle', bs: 'HFA' }
 };
+/* Verkehrsmittel im Abfahrten-Widget */
+const DP_CATS = { s: 'S-Bahn', u: 'U-Bahn', bus: 'Bus', tram: 'Straßenbahn', ferry: 'Fähre', re: 'Regionalzug', fv: 'Fernzug' };
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -1749,7 +2010,10 @@ const TICON = {
   f1: svgIco('<path d="M5 21V4"/><path d="M5 4.6c4-2 6 2 10 0s4 0 4 0v8.6s-1-2-4 0-6-2-10 0"/>'),
   fuel: svgIco('<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M5 10h9"/><path d="M14 8.5l3 2.5v6.5a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/>'),
   cal: svgIco('<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r=".9" fill="currentColor"/><circle cx="12" cy="14.5" r=".9" fill="currentColor"/>'),
-  verse: svgIco('<path d="M12 6.5c-1.8-1.4-4.6-2-7.5-1.8v13c2.9-.2 5.7.4 7.5 1.8 1.8-1.4 4.6-2 7.5-1.8v-13c-2.9-.2-5.7.4-7.5 1.8z"/><path d="M12 6.5v13"/>')
+  verse: svgIco('<path d="M12 6.5c-1.8-1.4-4.6-2-7.5-1.8v13c2.9-.2 5.7.4 7.5 1.8 1.8-1.4 4.6-2 7.5-1.8v-13c-2.9-.2-5.7.4-7.5 1.8z"/><path d="M12 6.5v13"/>'),
+  dep: svgIco('<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9 6.6h6M8.5 17.5l-1.6 3M15.5 17.5l1.6 3"/><circle cx="8.7" cy="14.2" r=".8" fill="currentColor"/><circle cx="15.3" cy="14.2" r=".8" fill="currentColor"/>'),
+  bday: svgIco('<path d="M4.5 20.5h15v-7a2 2 0 0 0-2-2h-11a2 2 0 0 0-2 2z"/><path d="M4.5 15.6c1.3 1 2.5 1 3.75 0s2.5-1 3.75 0 2.5 1 3.75 0 2.5-1 3.75 0M12 11.5V8.4"/><path d="M12 3.5c.9 1 1.3 1.8 1.3 2.5a1.3 1.3 0 0 1-2.6 0c0-.7.4-1.5 1.3-2.5z"/>'),
+  waste: svgIco('<path d="M4 6.5h16M9.5 6.5V4h5v2.5M6 6.5l1.2 14h9.6L18 6.5"/><path d="M10 10.5v6.5M14 10.5v6.5"/>')
 };
 
 const DEF_WIDGETS_V1 = [['tasks', 1], ['commute', 1], ['weather', 2], ['progress', 1], ['vacation', 1], ['links', 1], ['notes', 1]];
@@ -1851,6 +2115,44 @@ function normPomoLog(o) {
   }
   return out;
 }
+const strIn = (x, n) => typeof x === 'string' ? x.trim().slice(0, n) : '';
+function normStop(p) {
+  if (!p || typeof p !== 'object' || typeof p.id !== 'string' || !p.id.trim()) return null;
+  const ok = v => v !== null && v !== undefined && v !== '' && Number.isFinite(+v);
+  return { id: p.id.trim().slice(0, 200), name: strIn(p.name, 60) || 'Haltestelle', lat: ok(p.lat) ? +p.lat : null, lon: ok(p.lon) ? +p.lon : null };
+}
+const normCats = list => { const a = (Array.isArray(list) ? list : []).filter(k => DP_CATS[k]); return a.length ? [...new Set(a)] : Object.keys(DP_CATS); };
+/* Geburtstage: Monat und Tag müssen ein echtes Datum ergeben (29.2. ist erlaubt), das Jahr ist freiwillig */
+function normBdays(o) {
+  const list = o && Array.isArray(o.list) ? o.list : [];
+  const out = [], seen = new Set();
+  for (const b of list) {
+    if (out.length >= 600 || !b || typeof b !== 'object') continue;
+    const name = strIn(b.name, 60), m = intIn(b.m, 1, 12, 0), d = intIn(b.d, 1, 31, 0);
+    if (!name || !m || !d || d > [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]) continue;
+    const y = intIn(b.y, 1880, 2200, null), key = `${name.toLowerCase()}|${m}|${d}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ id: String(b.id || uid()).replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(), name, m, d, y: y && !(m === 2 && d === 29 && !leapYear(y)) ? y : null });
+  }
+  return { list: out };
+}
+const leapYear = y => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+/* Müllabfuhr: pro Tonne Termine aus einer Datei und/oder ein fester Rhythmus in Wochen ab einem Starttermin */
+const WS_COLORS = ['#6B7280', '#8B5E34', '#2B6CC4', '#E2B007', '#2F8458', '#8A5CD8', '#C2410C', '#1A9AA0'];
+function normWaste(o) {
+  o = o && typeof o === 'object' ? o : {};
+  const bins = (Array.isArray(o.bins) ? o.bins : []).filter(b => b && strIn(b.name, 40)).slice(0, 12).map((b, i) => ({
+    id: String(b.id || uid()).replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(),
+    name: strIn(b.name, 40),
+    color: /^#[0-9a-f]{6}$/i.test(b.color) ? b.color : WS_COLORS[i % WS_COLORS.length],
+    dates: [...new Set((Array.isArray(b.dates) ? b.dates : []).filter(validYmd))].sort().slice(-500),
+    every: [1, 2, 3, 4].includes(+b.every) && validYmd(b.start) ? +b.every : 0,
+    start: [1, 2, 3, 4].includes(+b.every) && validYmd(b.start) ? b.start : ''
+  }));
+  const f = o.file && typeof o.file === 'object' && strIn(o.file.name, 80) ? { name: strIn(o.file.name, 80), at: isoOrNull(o.file.at) } : null;
+  return { bins, file: f };
+}
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
@@ -1861,6 +2163,9 @@ function normCfg(type, c) {
     case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
     case 'cal': return { days: [7, 14, 30].includes(+c.days) ? +c.days : 14, loc: c.loc !== false };
     case 'verse': return { tr: VS_TR[c.tr] ? c.tr : 'LUT' };
+    case 'dep': return { stop: normStop(c.stop), modes: normCats(c.modes), walk: intIn(c.walk, 0, 60, 0), n: [4, 6, 8, 10].includes(+c.n) ? +c.n : 6, lines: strIn(c.lines, 60), dir: strIn(c.dir, 60) };
+    case 'bday': return { n: [4, 6, 8, 12].includes(+c.n) ? +c.n : 6, cal: c.cal !== false };
+    case 'waste': return { remind: c.remind !== false, at: validHm(c.at) ? c.at : '18:00' };
     case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
@@ -1979,6 +2284,8 @@ function normalize(s) {
     commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) },
     flex: { days: normFlexDays(s.flex && s.flex.days), cfg: flexCfgKeep(s) },
     pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
+    bdays: normBdays(s.bdays),
+    waste: normWaste(s.waste),
     meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
 }
@@ -2116,6 +2423,7 @@ function widgetLabel(id) {
   if (w.title) return w.title;
   if (w.type === 'tasks') return `Aufgaben: ${w.cfg.projects.join(', ')}`;
   if (w.type === 'football') return FB_LEAGUES[w.cfg.league] + (w.cfg.teamName ? `, ${w.cfg.teamName}` : '');
+  if (w.type === 'dep') return w.cfg.stop ? `Abfahrten: ${w.cfg.stop.name}` : 'Abfahrten';
   return TYPES[w.type].name;
 }
 
@@ -2670,14 +2978,14 @@ async function loadWeather(loc, seq) {
   try {
     const d = await getJson(url);
     if (seq !== undefined && seq !== wx.seq) return true;
-    wx.live = true; wx.loc = loc; wx.data = d; wx.at = Date.now();
+    wx.live = true; wx.loc = loc; wx.data = d; wx.at = d.cachedAt || Date.now(); wx.offline = !!d.cachedAt;
     renderWeather();
     sky.minute = -1;
     skyTick(new Date());
     renderMirror();
     ensureRadar(loc);
     clearTimeout(wx.timer);
-    wx.timer = setTimeout(() => loadWeather(wx.loc), 10 * 6e4);
+    wx.timer = setTimeout(() => loadWeather(wx.loc), (wx.offline ? 3 : 10) * 6e4);
     return true;
   } catch {
     if (!wx.live) showWxOff();
@@ -2764,7 +3072,8 @@ function renderWeather() {
       hours.appendChild(el);
     }
   }
-  $('#wx-src').textContent = `Stand ${hm(new Date(wx.at))} Uhr · Wetterdaten: Open-Meteo · Radar: RainViewer`;
+  const wa = new Date(wx.at), old = dayDiff(wa, new Date());
+  $('#wx-src').textContent = `Stand ${old ? `${dm(wa)} ` : ''}${hm(wa)} Uhr${wx.offline ? ', ohne Netz' : ''} · Wetterdaten: Open-Meteo · Radar: RainViewer`;
 }
 
 /* Ort ändern */
@@ -4210,7 +4519,7 @@ $('#gal-body').addEventListener('click', e => {
     const type = n.dataset.gnew;
     const id = newWidget(type, newCfg(type));
     placeWidget(id);
-    if (type === 'tasks') openWidgetDialog(id);
+    if (type === 'tasks' || type === 'dep') openWidgetDialog(id);
   } else if (a) placeWidget(a.dataset.gadd);
 });
 $('#add-tile').addEventListener('click', openGallery);
@@ -6157,7 +6466,7 @@ function renderCal() {
   const names = sec.feeds.length > 1 ? sec.feeds.map(f => `<span class="ca-key" style="--c:${f.color}">${esc(f.name)}</span>`).join('') : '';
   $('#ca-src').innerHTML = `${names}<span>Stand ${hm(new Date(ca.data.at))} Uhr${past ? `, ${past} ${past === 1 ? 'Termin' : 'Termine'} von heute schon vorbei` : ''}</span>`;
 }
-function renderCalAll() { if (views.has('cal')) renderCal(); renderSkyNext(); renderMirror(); }
+function renderCalAll() { if (views.has('cal')) renderCal(); if (views.has('bday')) renderBday(); renderSkyNext(); renderMirror(); }
 
 /* Einrichten: Formular mit Kalendern, Weiterleitung und Zeitraum. Erst beim Speichern wird etwas übernommen. */
 function caOpenForm() {
@@ -6518,6 +6827,17 @@ function renderMirror() {
     }
     box.innerHTML = html || '<h3>Heute</h3><p class="m-dim">Keine Termine mehr heute und morgen.</p>';
   }
+  // Hinweise unter dem Datum: Geburtstage und Müllabfuhr von heute und morgen
+  const notes = [...bdMirror(now).map(t => ({ t, c: '#F0B040' })), ...wsMirror(now)];
+  $('#m-notes').innerHTML = notes.map(n => `<li style="--c:${n.c}">${esc(n.t)}</li>`).join('');
+  // Abfahrten der ersten Haltestelle
+  const dep = dpMirror(now), dbox = $('#m-dep');
+  dbox.hidden = !dep;
+  if (dep) {
+    const go = dep.walk ? dep.rows.find(r => !r.x) : null, left = go ? Math.floor((go.t - dep.walk * 6e4 - +now) / 6e4) : 0;
+    dbox.innerHTML = `<h3>${esc(dep.name)}${go ? ` <span>${left < 1 ? 'jetzt los' : `los in ${left} Min`}</span>` : ''}</h3>`
+      + (dep.rows.length ? `<ul>${dep.rows.map(r => `<li${r.x ? ' class="x"' : ''}>${dpBadge(r)}<span class="m-to">${esc(r.to)}</span><b>${r.x ? 'fällt aus' : mirrorMin(r.t - +now, r.t)}</b></li>`).join('')}</ul>` : '<p class="m-dim">Gerade keine Abfahrten.</p>');
+  }
   // Countdowns aus den Kacheln
   const cd = [];
   for (const id of ['t-fa', 't-we', 't-ur']) {
@@ -6534,7 +6854,19 @@ function renderMirror() {
   const v = vs.cur && vs.cur.key && vs.cur.key.startsWith(ymd(now)) ? vs.cur : null;
   $('#m-verse').hidden = !v;
   if (v) { $('#m-verse-text').textContent = v.text; $('#m-verse-ref').textContent = v.ref; }
+  mirrorFit();
 }
+/* Rechte Spalte: Was nicht mehr ganz passt, fliegt raus, zuerst Countdowns, dann späte Abfahrten (mindestens 2 bleiben) */
+function mirrorFit() {
+  const side = $('.m-side');
+  for (let i = 0; i < 12 && side.scrollHeight > side.clientHeight + 1; i++) {
+    const cd = $$('#m-cd li'), dep = $$('#m-dep li');
+    if (cd.length) cd[cd.length - 1].remove();
+    else if (dep.length > 2) dep[dep.length - 1].remove();
+    else break;
+  }
+}
+const mirrorMin = (ms, t) => { const m = Math.floor(ms / 6e4); return m < 1 ? 'jetzt' : m < 60 ? `${m} Min` : hm(new Date(t)); };
 /* Regen in den nächsten 2 Stunden in einem Satz */
 function mirrorRain(d, now) {
   const m = d.minutely_15;
@@ -6576,9 +6908,800 @@ document.addEventListener('fullscreenchange', () => { if (!document.fullscreenEl
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') mirrorLock(); });
 addEventListener('hashchange', () => { if (mirrorFromHash()) mirrorOpen(false); else if (mr.on) mirrorClose(); });
 
+/* 42-abfahrten.js */
+/* Abfahrten über Transitous: eine freie, nicht kommerzielle Fahrplanauskunft (MOTIS) mit offenen Daten,
+ * für Deutschland aus DELFI samt Echtzeit, soweit die Verkehrsbetriebe sie liefern. Ohne Key, CORS ist offen.
+ * Bedingungen von Transitous: sparsam abfragen und die Quellen sichtbar verlinken (transitous.org/sources).
+ * Deshalb wird nur geladen, wenn eine Karte zu sehen ist (oder der Spiegel läuft), höchstens einmal pro Minute.
+ * Jede Kopie des Widgets zeigt eine Haltestelle. Zwei Widgets mit derselben Haltestelle teilen sich die Daten. */
+const TRS = 'https://api.transitous.org/api';
+const DP_SRC = 'https://transitous.org/sources/';
+const DP_COLOR = { s: '#0A8A4A', u: '#1660B0', bus: '#C8102E', tram: '#9E1B32', ferry: '#0A86B8', re: '#59677A', fv: '#2F3A4A' };
+const DP_RAIL = new Set(['s', 'u', 're', 'fv']);
+const dp = { data: {}, busy: {}, last: {}, err: {} };
+const DP_ERR = {
+  net: 'Keine Verbindung zur Fahrplanauskunft. Das Cockpit versucht es gleich nochmal.',
+  busy: 'Die Fahrplanauskunft ist gerade überlastet. Das Cockpit versucht es gleich nochmal.',
+  stop: 'Diese Haltestelle kennt die Fahrplanauskunft nicht mehr. Wähl sie in den Einstellungen neu aus.'
+};
+
+/* Liniennummer kurz und so, wie sie an der Haltestelle steht: „S1“, „U3“, „5“, „RE 3“ wird „RE3“ */
+function dpLine(st) {
+  let n = String(st.displayName || st.routeShortName || st.tripShortName || '').trim();
+  n = n.replace(/^(Bus|STR|Tram)\s+(?=\S)/i, '').replace(/^(S|U|RE|RB|A)\s+(?=\d)/i, '$1');
+  return n.slice(0, 10) || '?';
+}
+function dpCat(mode, line) {
+  if (/^S\d/i.test(line)) return 's';
+  if (/^U\d/i.test(line)) return 'u';
+  if (/^(ICE|IC|EC|ECE|EN|NJ|RJX?|FLX|TGV|IR)\b/i.test(line) || ['HIGHSPEED_RAIL', 'LONG_DISTANCE', 'NIGHT_RAIL'].includes(mode)) return 'fv';
+  if (mode === 'SUBURBAN' || mode === 'METRO') return 's';
+  if (mode === 'SUBWAY') return 'u';
+  if (mode === 'TRAM') return 'tram';
+  if (mode === 'FERRY') return 'ferry';
+  if (/RAIL|FUNICULAR/.test(mode || '')) return 're';
+  return 'bus';
+}
+/* Linienfarbe aus den Fahrplandaten, sonst die Farbe des Verkehrsmittels. Schrift hell oder dunkel je nach Hintergrund. */
+function dpInk(hex) {
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  return 0.299 * r + 0.587 * g + 0.114 * b > 160 ? '#111' : '#fff';
+}
+function dpColor(st, cat) {
+  const c = /^#?([0-9a-f]{6})$/i.exec(st.routeColor || ''), t = /^#?([0-9a-f]{6})$/i.exec(st.routeTextColor || '');
+  if (c && !/^(000000|ffffff)$/i.test(c[1])) {
+    const bg = '#' + c[1];
+    return [bg, t && t[1].toLowerCase() !== c[1].toLowerCase() ? '#' + t[1] : dpInk(bg)];
+  }
+  return [DP_COLOR[cat], '#fff'];
+}
+/* Nur das behalten, was die Karte braucht */
+function dpSlim(st) {
+  const p = st && st.place;
+  if (!p) return null;
+  const t = Date.parse(p.departure || p.scheduledDeparture), s = Date.parse(p.scheduledDeparture || p.departure);
+  if (!Number.isFinite(t)) return null;
+  const line = dpLine(st), cat = dpCat(st.mode, line), [bg, fg] = dpColor(st, cat);
+  const to = String(st.headsign || (st.tripTo && st.tripTo.name) || '').replace(/^Hamburg,\s*/, '').trim();
+  return {
+    t, s: Number.isFinite(s) ? s : t, rt: !!st.realTime, x: !!(st.cancelled || st.tripCancelled || p.cancelled),
+    line, cat, bg, fg, to: to.slice(0, 60), tr: String(p.track || '').slice(0, 8), str: String(p.scheduledTrack || '').slice(0, 8)
+  };
+}
+/* Hinweise der Verkehrsbetriebe zur Haltestelle, jeder nur einmal */
+function dpAlerts(list) {
+  const out = [], seen = new Set();
+  for (const st of list) {
+    for (const a of (st.place && st.place.alerts) || []) {
+      const h = String(a.headerText || '').trim(), d = String(a.descriptionText || '').trim();
+      const k = (h || d).slice(0, 120);
+      if (!k || seen.has(k)) continue;
+      seen.add(k);
+      out.push({ h: (h || d).slice(0, 200), d: h && d && d !== h ? d.slice(0, 1200) : '' });
+      if (out.length >= 3) return out;
+    }
+  }
+  return out;
+}
+const dpNeed = c => (c.lines || c.dir || c.modes.length < Object.keys(DP_CATS).length || c.walk >= 10 ? 60 : 30);
+async function dpLoad(stop, need) {
+  const k = stop.id;
+  if (dp.busy[k]) return;
+  dp.busy[k] = true;
+  dp.last[k] = Date.now();
+  const q = new URLSearchParams({ stopId: stop.id, n: String(need), language: 'de' });
+  try {
+    let j;
+    try { j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000); }
+    catch (e) {
+      // IDs von Haltestellen ändern sich manchmal mit neuen Fahrplandaten. Dann über die Koordinaten suchen.
+      if (!/HTTP (400|404|422)/.test(e.message) || stop.lat == null) throw e;
+      q.delete('stopId');
+      q.set('center', `${stop.lat},${stop.lon}`);
+      q.set('radius', '120');
+      j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000);
+    }
+    if (!j || !Array.isArray(j.stopTimes)) throw new Error('format');
+    dp.data[k] = { at: Date.now(), need, list: j.stopTimes.map(dpSlim).filter(Boolean).sort((a, b) => a.t - b.t), alerts: dpAlerts(j.stopTimes) };
+    dp.err[k] = '';
+  } catch (e) {
+    const m = String(e && e.message);
+    dp.err[k] = /HTTP 429|HTTP 503/.test(m) ? DP_ERR.busy : /HTTP (400|404|422)/.test(m) ? DP_ERR.stop : DP_ERR.net;
+  }
+  dp.busy[k] = false;
+  renderDepAll();
+}
+/* Gefiltert nach Verkehrsmittel, Linie und Richtung. Mit Fußweg fallen Abfahrten weg, die du nicht mehr schaffst. */
+function dpRows(D, c, now) {
+  const lines = c.lines ? c.lines.toUpperCase().split(/[,;]+/).map(x => x.replace(/\s+/g, '')).filter(Boolean) : [];
+  const dirs = c.dir ? c.dir.toLowerCase().split(/[,;]+/).map(x => x.trim()).filter(Boolean) : [];
+  const walk = c.walk * 6e4;
+  return D.list.filter(r => c.modes.includes(r.cat)
+    && (!lines.length || lines.includes(r.line.toUpperCase().replace(/\s+/g, '')))
+    && (!dirs.length || dirs.some(x => r.to.toLowerCase().includes(x)))
+    && r.t - walk >= now - 3e4);
+}
+const dpWhen = (r, now) => {
+  const m = Math.floor((r.t - now) / 6e4);
+  return m < 1 ? '<b>jetzt</b>' : m < 60 ? `<b>${m}</b><small>Min</small>` : `<b>${hm(new Date(r.t))}</b>`;
+};
+const dpBadge = r => `<span class="dp-line" style="--lc:${r.bg};--lt:${r.fg}">${esc(r.line)}</span>`;
+function dpRowHtml(r, now) {
+  const delay = r.rt ? Math.round((r.t - r.s) / 6e4) : 0;
+  const plat = r.tr ? `<span class="${r.str && r.str !== r.tr ? 'dp-chg' : ''}">${DP_RAIL.has(r.cat) ? 'Gl.' : 'Steig'} ${esc(r.tr)}</span>` : '';
+  const late = r.x ? '<span class="dp-x">fällt aus</span>' : delay >= 1 ? `<span class="dp-late${delay >= 5 ? ' big' : ''}">+${delay}</span>` : '';
+  return `<li class="dp-row${r.x ? ' x' : ''}">${dpBadge(r)}<span class="dp-main"><b>${esc(r.to || 'Ohne Ziel')}</b><small><span class="dp-hm">${hm(new Date(r.s))}</span>${late}${plat}</small></span><span class="dp-in">${r.x ? '' : dpWhen(r, now)}</span></li>`;
+}
+function renderDep(v) {
+  const w = state.widgets[v.id];
+  if (!w) return;
+  const c = w.cfg, st = c.stop, now = Date.now();
+  v.q('[data-r="title"]').textContent = w.title || (st ? st.name : 'Abfahrten');
+  v.q('[data-r="setup"]').hidden = !!st;
+  v.q('[data-r="live"]').hidden = !st;
+  if (!st) { v.q('[data-r="rt"]').innerHTML = ''; v.q('[data-r="src"]').innerHTML = ''; return; }
+  const D = dp.data[st.id], err = dp.err[st.id], busy = dp.busy[st.id];
+  if (!busy && !v.el.hidden && (!D || D.need < dpNeed(c) || now - D.at > 6e4) && now - (dp.last[st.id] || 0) > (err ? 6e4 : 2e4)) setTimeout(() => dpLoad(st, Math.max(dpNeed(c), D ? D.need : 0)), 50);
+  const e = v.q('[data-r="err"]');
+  e.textContent = err || '';
+  e.hidden = !err;
+  const ul = v.q('[data-r="list"]'), go = v.q('[data-r="go"]'), al = v.q('[data-r="alerts"]');
+  if (!D) {
+    ul.innerHTML = `<li class="empty">${busy || !err ? 'Abfahrten werden geladen …' : 'Noch keine Abfahrten geladen.'}</li>`;
+    go.hidden = true; al.innerHTML = ''; v.q('[data-r="rt"]').innerHTML = ''; v.q('[data-r="src"]').innerHTML = dpSrcHtml(null);
+    return;
+  }
+  const rows = dpRows(D, c, now), shown = rows.slice(0, c.n);
+  const filtered = c.lines || c.dir || c.modes.length < Object.keys(DP_CATS).length;
+  ul.innerHTML = shown.length ? shown.map(r => dpRowHtml(r, now)).join('')
+    : `<li class="empty">Gerade keine Abfahrten${filtered ? ', die zu deinen Filtern passen' : ''}${c.walk ? ', die du zu Fuß noch schaffst' : ''}.</li>`;
+  // Wann musst du los? Nur mit Fußweg und nur für Fahrten, die nicht ausfallen
+  const first = c.walk ? rows.find(r => !r.x) : null;
+  go.hidden = !first;
+  if (first) {
+    const leave = first.t - c.walk * 6e4 - now, m = Math.floor(leave / 6e4);
+    go.classList.toggle('now', m < 1);
+    go.innerHTML = `<b>${m < 1 ? 'Jetzt los' : `Los in ${m} Min`}</b><span>für ${dpBadge(first)} um ${hm(new Date(first.t))}${first.to ? ` nach ${esc(first.to)}` : ''}</span>`;
+  }
+  al.innerHTML = D.alerts.map(a => a.d ? `<details class="dp-alert"><summary>${esc(a.h)}</summary><p>${esc(a.d)}</p></details>` : `<p class="dp-alert">${esc(a.h)}</p>`).join('');
+  const rt = D.list.some(r => r.rt);
+  v.q('[data-r="rt"]').innerHTML = rt ? '<span class="dp-live" title="Zeiten mit Echtzeitdaten der Verkehrsbetriebe">Live</span>'
+    : '<span class="dp-plan" title="Für diese Haltestelle kommen gerade keine Echtzeitdaten, die Zeiten sind laut Fahrplan">Fahrplan</span>';
+  v.q('[data-r="src"]').innerHTML = dpSrcHtml(D, err);
+}
+const dpSrcHtml = (D, err) => `<span>Daten: <a href="${DP_SRC}" target="_blank" rel="noopener">Transitous und offene Fahrplandaten</a></span>${D ? `<span>Stand ${hm(new Date(D.at))}${err ? ', gerade ohne Verbindung' : ''}</span>` : ''}`;
+function renderDepAll() { for (const v of viewsOf('dep')) renderDep(v); renderMirror(); }
+
+/* Für den Spiegel: das erste Abfahrten-Widget mit Haltestelle, bevorzugt von der offenen Seite */
+function dpMirrorWidget() {
+  const ids = [...curPage().items.map(x => x.w), ...state.pages.flatMap(p => p.items.map(x => x.w))];
+  for (const id of ids) { const w = state.widgets[id]; if (w && w.type === 'dep' && w.cfg.stop) return w; }
+  return null;
+}
+function dpMirror(now) {
+  const w = dpMirrorWidget();
+  if (!w) return null;
+  const st = w.cfg.stop, D = dp.data[st.id], t = +now;
+  if ((!D || t - D.at > 6e4) && !dp.busy[st.id] && t - (dp.last[st.id] || 0) > 6e4) setTimeout(() => dpLoad(st, Math.max(dpNeed(w.cfg), D ? D.need : 0)), 50);
+  if (!D) return null;
+  return { name: w.title || st.name, rows: dpRows(D, w.cfg, t).slice(0, 5), walk: w.cfg.walk };
+}
+/* Takt: alle 10 Sekunden die Minuten neu zeichnen, einmal pro Minute nachladen */
+function dpTick(now) {
+  if (now.getSeconds() % 10 || document.visibilityState !== 'visible') return;
+  for (const v of viewsOf('dep')) if (!v.el.hidden) renderDep(v);
+}
+
+/* Einstellungen: Haltestelle suchen (Name oder in der Nähe), Verkehrsmittel, Fußweg, Anzahl, Linien, Richtung */
+function dpBias() {
+  const h = state.commute.home;
+  if (h && h.lat != null) return `${h.lat},${h.lon}`;
+  if (state.loc.mode === 'fixed') return `${state.loc.lat},${state.loc.lon}`;
+  return wx.loc ? `${(+wx.loc.lat).toFixed(4)},${(+wx.loc.lon).toFixed(4)}` : '';
+}
+function dpHitArea(m) {
+  const a = Array.isArray(m.areas) ? m.areas : [];
+  const d = a.find(x => x.default) || a.find(x => x.adminLevel === 8) || a[0];
+  return d && d.name && d.name !== m.name ? d.name : '';
+}
+function dpHitModes(m) {
+  const cats = [...new Set((Array.isArray(m.modes) ? m.modes : []).map(x => dpCat(x, '')))];
+  return cats.filter(k => DP_CATS[k]).map(k => DP_CATS[k]).join(', ');
+}
+async function dpSearch(box, near) {
+  const hits = box.querySelector('[data-s="hits"]'), q = box.querySelector('[data-s="q"]').value.trim(), bias = dpBias();
+  if (!near && q.length < 2) { hits.innerHTML = '<li class="empty">Gib mindestens zwei Buchstaben ein.</li>'; return; }
+  if (near && !bias) { hits.innerHTML = '<li class="empty">Dein Ort ist noch unbekannt. Such einfach nach dem Namen der Haltestelle.</li>'; return; }
+  hits.innerHTML = '<li class="empty">Suche läuft …</li>';
+  const p = new URLSearchParams(near ? { place: bias, type: 'STOP', numResults: '8' } : { text: q, type: 'STOP', numResults: '8', language: 'de' });
+  if (!near && bias) p.set('place', bias);
+  let list;
+  try { list = await getJson(`${TRS}/v1/${near ? 'reverse-geocode' : 'geocode'}?${p}`, 12000); }
+  catch { if (box.isConnected) hits.innerHTML = '<li class="empty">Die Suche ist gerade nicht erreichbar. Versuch es gleich nochmal.</li>'; return; }
+  if (!box.isConnected) return;
+  const stops = (Array.isArray(list) ? list : []).filter(m => m && m.id && m.name && (!m.type || m.type === 'STOP')).slice(0, 8);
+  box._hits = stops;
+  hits.innerHTML = stops.length ? stops.map((m, i) => {
+    const area = dpHitArea(m), modes = dpHitModes(m);
+    return `<li><button type="button" data-hit="${i}"><b>${esc(m.name)}</b><span>${esc([area, modes].filter(Boolean).join(' · '))}</span></button></li>`;
+  }).join('') : `<li class="empty">${near ? 'Keine Haltestelle in der Nähe gefunden.' : 'Nichts gefunden. Versuch es mit einem anderen Namen.'}</li>`;
+}
+function dpPickInfo(box) {
+  const s = box._stop;
+  box.querySelector('[data-s="pick"]').innerHTML = s ? `Gewählt: <b>${esc(s.name)}</b>` : 'Noch keine Haltestelle gewählt.';
+}
+
+defineWidget('dep', {
+  mount(v) {
+    v.q('[data-r="setup-btn"]').addEventListener('click', () => openWidgetDialog(v.id));
+    v.q('[data-r="set"]').addEventListener('click', () => openWidgetDialog(v.id));
+  },
+  render: renderDep,
+  settings: {
+    render(box, w) {
+      const c = w.cfg;
+      box._stop = c.stop ? { ...c.stop } : null;
+      box._hits = [];
+      const walks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30];
+      box.innerHTML = `<div class="field dp-find"><label class="lbl" for="dp-q">Haltestelle</label>
+        <div class="dp-search"><input id="dp-q" data-s="q" type="search" maxlength="60" autocomplete="off" placeholder="z. B. Jungfernstieg"><button type="button" class="btn-ghost" data-s="go">Suchen</button><button type="button" class="btn-ghost" data-s="near">In der Nähe</button></div>
+        <ul class="dp-hits" data-s="hits"></ul><p class="hint" data-s="pick"></p></div>
+      <fieldset class="days"><legend class="lbl">Verkehrsmittel</legend>${Object.entries(DP_CATS).map(([k, n]) => `<label><input type="checkbox" data-cat="${k}"${c.modes.includes(k) ? ' checked' : ''}><span>${esc(n)}</span></label>`).join('')}</fieldset>
+      <div class="grid2"><label class="field"><span class="lbl">Fußweg zur Haltestelle</span><select data-s="walk">${walks.map(m => `<option value="${m}"${m === c.walk ? ' selected' : ''}>${m ? `${m} Min` : 'Nicht berücksichtigen'}</option>`).join('')}</select></label>
+      <label class="field"><span class="lbl">Wie viele Abfahrten</span><select data-s="n">${[4, 6, 8, 10].map(n => `<option value="${n}"${n === c.n ? ' selected' : ''}>${n}</option>`).join('')}</select></label></div>
+      <div class="grid2"><label class="field"><span class="lbl">Nur diese Linien</span><input data-s="lines" type="text" maxlength="60" autocomplete="off" placeholder="leer = alle, z. B. S1, U3, 5" value="${esc(c.lines)}"></label>
+      <label class="field"><span class="lbl">Nur in Richtung</span><input data-s="dir" type="text" maxlength="60" autocomplete="off" placeholder="leer = alle, z. B. Hauptbahnhof" value="${esc(c.dir)}"></label></div>
+      <p class="hint">Mit Fußweg zeigt die Karte, wann du loslaufen musst, und blendet Fahrten aus, die du nicht mehr schaffst. Die Daten kommen von <a href="${DP_SRC}" target="_blank" rel="noopener">Transitous</a>, Haltestellen von OpenStreetMap. Echtzeit gibt es, wo die Verkehrsbetriebe sie liefern.</p>`;
+      dpPickInfo(box);
+      const qEl = box.querySelector('[data-s="q"]');
+      qEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); dpSearch(box, false); } });
+      box.querySelector('[data-s="go"]').addEventListener('click', () => dpSearch(box, false));
+      box.querySelector('[data-s="near"]').addEventListener('click', () => dpSearch(box, true));
+      box.querySelector('[data-s="hits"]').addEventListener('click', e => {
+        const b = e.target.closest('[data-hit]'), m = b && box._hits[+b.dataset.hit];
+        if (!m) return;
+        box._stop = { id: m.id, name: m.name, lat: m.lat, lon: m.lon };
+        for (const x of box.querySelectorAll('[data-hit]')) x.classList.toggle('on', x === b);
+        dpPickInfo(box);
+      });
+      if (!c.stop) setTimeout(() => qEl.focus(), 50);
+    },
+    save(box, w) {
+      if (!box._stop) return 'Such zuerst deine Haltestelle und tipp sie in der Liste an.';
+      const modes = [...box.querySelectorAll('[data-cat]')].filter(x => x.checked).map(x => x.dataset.cat);
+      if (!modes.length) return 'Wähl mindestens ein Verkehrsmittel aus.';
+      w.cfg.stop = box._stop;
+      w.cfg.modes = modes;
+      w.cfg.walk = +box.querySelector('[data-s="walk"]').value || 0;
+      w.cfg.n = +box.querySelector('[data-s="n"]').value || 6;
+      w.cfg.lines = box.querySelector('[data-s="lines"]').value.trim();
+      w.cfg.dir = box.querySelector('[data-s="dir"]').value.trim();
+      return null;
+    }
+  }
+});
+
+/* 43-geburtstage.js */
+/* Geburtstage (gibt es nur einmal). Die Liste steht in state.bdays und damit auch in der Sicherung.
+ * Quellen: selbst eingetragen, aus einer vCard-Datei der Kontakte übernommen (iPhone, Mac, icloud.com)
+ * und ganztägige Termine aus dem Kalender-Widget, die „Geburtstag“ im Titel haben.
+ * Wer am 29. Februar Geburtstag hat, feiert in Jahren ohne Schalttag am 28. */
+const bd = { more: false, filter: '' };
+const bdCfg = () => state.widgets.bday.cfg;
+const bdDate = (b, y) => (b.m === 2 && b.d === 29 && !leapYear(y) ? new Date(y, 1, 28) : new Date(y, b.m - 1, b.d));
+function bdNext(b, today) {
+  const d = bdDate(b, today.getFullYear());
+  return d < today ? bdDate(b, today.getFullYear() + 1) : d;
+}
+const BD_CAL = /geburtstag|birthday|bday|🎂/i;
+/* Alle kommenden Geburtstage, eigene und aus dem Kalender, nach Datum sortiert */
+function bdUpcoming(now) {
+  const today = sod(now), out = [];
+  for (const b of state.bdays.list) {
+    const d = bdNext(b, today);
+    out.push({ id: b.id, name: b.name, d, age: b.y ? d.getFullYear() - b.y : null, cal: false });
+  }
+  if (bdCfg().cal && ca.data && caSec().feeds.length) {
+    const seen = new Set();
+    for (const e of ca.data.events) {
+      if (!e.a || !BD_CAL.test(e.t)) continue;
+      const d = sod(new Date(e.s));
+      if (d < today || seen.has(e.t + +d)) continue;
+      seen.add(e.t + +d);
+      // Steht dieselbe Person schon in der eigenen Liste, reicht der eigene Eintrag
+      const low = e.t.toLowerCase();
+      if (out.some(x => !x.cal && +x.d === +d && low.includes(x.name.toLowerCase().split(/\s+/)[0]))) continue;
+      out.push({ id: e.id, name: e.t, d, age: null, cal: true, color: caFeedColor(e.f) });
+    }
+  }
+  return out.sort((a, b) => a.d - b.d || a.name.localeCompare(b.name, 'de'));
+}
+const bdWhen = n => (n === 0 ? 'Heute' : n === 1 ? 'Morgen' : `in ${n} Tagen`);
+function renderBday() {
+  const list = state.bdays.list, c = bdCfg(), now = new Date(), today = sod(now);
+  const formOpen = !$('#bd-form').hidden;
+  const all = bdUpcoming(now);
+  $('#bd-setup').hidden = formOpen || all.length > 0;
+  $('#bd-live').hidden = formOpen || !all.length;
+  $('#bd-src').textContent = list.length ? `${list.length} ${list.length === 1 ? 'Geburtstag' : 'Geburtstage'} gespeichert${c.cal && caSec().feeds.length ? ', dazu die aus deinem Kalender' : ''}.` : '';
+  if (formOpen) { bdRenderAll(); return; }
+  if (!all.length) return;
+  const n = bd.more ? Math.min(all.length, 40) : c.n;
+  $('#bd-list').innerHTML = all.slice(0, n).map(x => {
+    const dd = dayDiff(today, x.d), soon = dd <= 1;
+    const sub = [`${WD[x.d.getDay()]} ${x.d.getDate()}. ${MS[x.d.getMonth()]}`, x.age != null ? (dd === 0 ? `wird heute ${x.age}` : `wird ${x.age}`) : '', x.cal ? 'aus dem Kalender' : ''].filter(Boolean).join(' · ');
+    return `<li class="bd-row${dd === 0 ? ' today' : ''}"${x.cal ? ` style="--c:${x.color}"` : ''}><span class="bd-cal" aria-hidden="true"><b>${x.d.getDate()}</b><small>${MS[x.d.getMonth()]}</small></span><span class="bd-main"><b>${esc(x.name)}</b><small>${esc(sub)}</small></span><span class="bd-in${soon ? ' soon' : ''}">${bdWhen(dd)}</span></li>`;
+  }).join('');
+  $('#bd-more').hidden = all.length <= c.n;
+  $('#bd-more').textContent = bd.more ? 'Weniger zeigen' : `Mehr zeigen`;
+}
+/* Für den Spiegel: Geburtstage heute und morgen */
+function bdMirror(now) {
+  const today = sod(now);
+  return bdUpcoming(now).filter(x => dayDiff(today, x.d) <= 1).slice(0, 4).map(x => {
+    const dd = dayDiff(today, x.d);
+    return `${dd ? 'Morgen' : 'Heute'}: ${x.name}${x.age != null ? ` wird ${x.age}` : x.cal ? '' : ' hat Geburtstag'}`;
+  });
+}
+
+/* Verwalten: alle Einträge alphabetisch, mit Suche, Löschen mit Rückgängig */
+function bdRenderAll() {
+  const list = state.bdays.list, q = bd.filter.trim().toLowerCase();
+  $('#bd-filter-box').hidden = list.length < 8;
+  $('#bd-filter').placeholder = `In ${list.length} Geburtstagen suchen`;
+  $('#bd-clear').hidden = !list.length;
+  const hits = list.filter(b => !q || b.name.toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  const show = hits.slice(0, 150);
+  $('#bd-all').innerHTML = show.map(b => `<li><span class="tx"><b>${esc(b.name)}</b><span>${pad(b.d)}.${pad(b.m)}.${b.y || ''}</span></span><button type="button" class="icon-btn" data-bddel="${b.id}" aria-label="${esc(b.name)} löschen">${TRASH}</button></li>`).join('')
+    + (hits.length > show.length ? `<li class="empty">Noch ${hits.length - show.length} weitere. Such nach dem Namen.</li>` : '')
+    + (!hits.length && list.length ? '<li class="empty">Niemand gefunden.</li>' : '');
+  $('#bd-all').hidden = !list.length;
+}
+function bdOpenForm() {
+  const c = bdCfg();
+  $('#bd-n').value = String(c.n);
+  $('#bd-cal').checked = c.cal;
+  $('#bd-name').value = '';
+  $('#bd-date').value = '';
+  $('#bd-ferr').hidden = true;
+  $('#bd-import-msg').hidden = true;
+  bd.filter = '';
+  $('#bd-filter').value = '';
+  $('#bd-form').hidden = false;
+  renderBday();
+  layoutNow();
+  $('#bd-name').focus();
+}
+/* „15.3.“, „15.03.1990“, „15.3.90“ */
+function bdParseInput(s) {
+  const m = /^(\d{1,2})\.\s*(\d{1,2})\.?\s*(\d{2}|\d{4})?$/.exec(String(s).trim());
+  if (!m) return null;
+  const d = +m[1], mo = +m[2];
+  let y = m[3] ? +m[3] : null;
+  if (y != null && y < 100) y += y > new Date().getFullYear() % 100 ? 1900 : 2000;
+  if (mo < 1 || mo > 12 || d < 1 || d > [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][mo - 1]) return null;
+  if (y != null && (y < 1880 || y > new Date().getFullYear() || (mo === 2 && d === 29 && !leapYear(y)))) return null;
+  return { m: mo, d, y };
+}
+function bdAdd() {
+  const fail = m => { $('#bd-ferr').textContent = m; $('#bd-ferr').hidden = false; return false; };
+  const name = $('#bd-name').value.trim().slice(0, 60), raw = $('#bd-date').value.trim();
+  if (!name && !raw) return true;
+  if (!name) return fail('Wer hat Geburtstag? Trag einen Namen ein.');
+  const p = bdParseInput(raw);
+  if (!p) return fail('Das Datum bitte als TT.MM. oder TT.MM.JJJJ, zum Beispiel 15.03. oder 15.03.1990.');
+  if (state.bdays.list.length >= 600) return fail('Mehr als 600 Geburtstage gehen nicht.');
+  const old = state.bdays.list.find(b => b.name.toLowerCase() === name.toLowerCase());
+  if (old) Object.assign(old, p);
+  else state.bdays.list.push({ id: uid(), name, ...p });
+  $('#bd-ferr').hidden = true;
+  $('#bd-name').value = '';
+  $('#bd-date').value = '';
+  commit();
+  toast(old ? `Geburtstag von ${name} geändert` : `${name} ist eingetragen`);
+  return true;
+}
+
+/* vCard lesen: Zeilenumbrüche nach RFC 6350 zusammenfügen, Name aus FN (sonst N), Geburtstag aus BDAY.
+ * Apple speichert Geburtstage ohne Jahr als 1604 oder mit X-APPLE-OMIT-YEAR. */
+function vcUnesc(s) { return String(s).replace(/\\n/gi, ' ').replace(/\\([,;\\])/g, '$1').trim(); }
+function vcQp(s, charset) {
+  const bytes = [];
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '=' && /^[0-9A-F]{2}$/i.test(s.slice(i + 1, i + 3))) { bytes.push(parseInt(s.slice(i + 1, i + 3), 16)); i += 2; }
+    else bytes.push(s.charCodeAt(i) & 255);
+  }
+  try { return new TextDecoder(/8859|latin|1252/i.test(charset) ? 'windows-1252' : 'utf-8').decode(new Uint8Array(bytes)); } catch { return s; }
+}
+function vcDate(v, params) {
+  v = String(v).trim();
+  let y = null, m, d, r;
+  if ((r = /^(\d{4})-?(\d{2})-?(\d{2})/.exec(v))) { y = +r[1]; m = +r[2]; d = +r[3]; }
+  else if ((r = /^--(\d{2})-?(\d{2})/.exec(v))) { m = +r[1]; d = +r[2]; }
+  else return null;
+  if (/X-APPLE-OMIT-YEAR/i.test(params) || (y != null && y <= 1604)) y = null;
+  if (m < 1 || m > 12 || d < 1 || d > [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]) return null;
+  return { m, d, y };
+}
+function parseVcf(text) {
+  const lines = String(text).replace(/\r\n?/g, '\n').replace(/\n[ \t]/g, '').split('\n');
+  const cards = [];
+  let cur = null;
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    if (/^BEGIN:VCARD/i.test(line)) { cur = { fn: '', n: '', bday: null }; continue; }
+    if (/^END:VCARD/i.test(line)) { if (cur) cards.push(cur); cur = null; continue; }
+    if (!cur) continue;
+    const m = /^(?:[\w-]+\.)?([A-Za-z-]+)((?:;[^:]*)?):(.*)$/.exec(line);
+    if (!m) continue;
+    const key = m[1].toUpperCase(), params = m[2];
+    if (key !== 'FN' && key !== 'N' && key !== 'BDAY') continue;
+    let val = m[3];
+    if (/QUOTED-PRINTABLE/i.test(params)) {
+      // Alte vCards (2.1) brechen lange Zeilen mit = am Ende um
+      while (val.endsWith('=') && i + 1 < lines.length) val = val.slice(0, -1) + lines[++i];
+      const cs = /CHARSET=([\w-]+)/i.exec(params);
+      val = vcQp(val, cs ? cs[1] : 'utf-8');
+    }
+    if (key === 'FN') cur.fn = vcUnesc(val);
+    else if (key === 'N') { const p = val.split(';').map(vcUnesc); cur.n = [p[3], p[1], p[2], p[0], p[4]].filter(Boolean).join(' '); }
+    else cur.bday = vcDate(val, params);
+  }
+  return cards.map(c => ({ name: (c.fn || c.n).replace(/\s+/g, ' ').trim().slice(0, 60), bday: c.bday })).filter(c => c.name);
+}
+function bdImport(text) {
+  const cards = parseVcf(text);
+  if (!cards.length) return { err: 'In der Datei stehen keine Kontakte. Nimm eine vCard-Datei (.vcf).' };
+  let added = 0, changed = 0, same = 0;
+  const list = state.bdays.list, without = cards.filter(c => !c.bday).length;
+  for (const c of cards) {
+    if (!c.bday) continue;
+    const old = list.find(b => b.name.toLowerCase() === c.name.toLowerCase());
+    if (old) {
+      if (old.m === c.bday.m && old.d === c.bday.d && (old.y === c.bday.y || !c.bday.y)) { same++; continue; }
+      Object.assign(old, { m: c.bday.m, d: c.bday.d, y: c.bday.y || old.y });
+      changed++;
+    } else if (list.length < 600) { list.push({ id: uid(), name: c.name, ...c.bday }); added++; }
+  }
+  return { added, changed, same, without };
+}
+$('#bd-setup-btn').addEventListener('click', bdOpenForm);
+$('#bd-set-btn').addEventListener('click', () => { if ($('#bd-form').hidden) bdOpenForm(); else { $('#bd-form').hidden = true; renderBday(); layoutNow(); } });
+$('#bd-add').addEventListener('click', () => { if (bdAdd()) $('#bd-name').focus(); });
+for (const id of ['#bd-name', '#bd-date']) $(id).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (bdAdd()) $('#bd-name').focus(); } });
+$('#bd-filter').addEventListener('input', e => { bd.filter = e.target.value; bdRenderAll(); });
+$('#bd-all').addEventListener('click', e => {
+  const b = e.target.closest('[data-bddel]');
+  if (!b) return;
+  const list = state.bdays.list, i = list.findIndex(x => x.id === b.dataset.bddel);
+  if (i < 0) return;
+  const [gone] = list.splice(i, 1);
+  commit();
+  toast(`${gone.name} gelöscht`, () => { if (!state.bdays.list.some(x => x.id === gone.id)) { state.bdays.list.push(gone); commit(); } });
+});
+$('#bd-clear').addEventListener('click', () => {
+  const old = state.bdays.list.slice();
+  state.bdays.list = [];
+  commit();
+  toast(`Alle ${old.length} Geburtstage gelöscht`, () => { state.bdays.list = old; commit(); }, { ms: 12000 });
+});
+$('#bd-import').addEventListener('click', () => { $('#bd-file').value = ''; $('#bd-file').click(); });
+$('#bd-file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0], msg = $('#bd-import-msg');
+  if (!f) return;
+  msg.hidden = false;
+  if (f.size > 60e6) { msg.textContent = 'Die Datei ist zu groß.'; return; }
+  let r;
+  try { r = bdImport(await f.text()); } catch { r = { err: 'Die Datei konnte nicht gelesen werden.' }; }
+  if (r.err) { msg.textContent = r.err; return; }
+  const parts = [];
+  if (r.added) parts.push(`${r.added} neu`);
+  if (r.changed) parts.push(`${r.changed} geändert`);
+  if (r.same) parts.push(`${r.same} schon da`);
+  msg.textContent = (r.added + r.changed + r.same ? `Geburtstage übernommen: ${parts.join(', ')}.` : 'In der Datei steht bei keinem Kontakt ein Geburtstag.')
+    + (r.without ? ` ${r.without} ${r.without === 1 ? 'Kontakt hat' : 'Kontakte haben'} keinen Geburtstag eingetragen.` : '');
+  if (r.added || r.changed) commit(); else bdRenderAll();
+});
+$('#bd-form').addEventListener('submit', e => {
+  e.preventDefault();
+  if (($('#bd-name').value.trim() || $('#bd-date').value.trim()) && !bdAdd()) return;
+  const c = bdCfg();
+  c.n = +$('#bd-n').value || 6;
+  c.cal = $('#bd-cal').checked;
+  $('#bd-form').hidden = true;
+  commit();
+  layoutNow();
+});
+$('#bd-more').addEventListener('click', () => { bd.more = !bd.more; renderBday(); layoutNow(); });
+/* Um Mitternacht springen die Countdowns weiter */
+let bdDayKey = '';
+function bdTick(now) {
+  const k = ymd(now);
+  if (k === bdDayKey) return;
+  bdDayKey = k;
+  if (views.has('bday')) renderBday();
+}
+
+defineWidget('bday', { render: renderBday });
+
+/* 44-muell.js */
+/* Müllabfuhr (gibt es nur einmal). Termine pro Tonne kommen aus der ICS-Datei des Entsorgers
+ * (ein Mal im Jahr neu laden) oder aus einem festen Rhythmus, z. B. alle 2 Wochen ab einem Dienstag.
+ * Am Vorabend erinnert das Cockpit mit einem Hinweis, auf Wunsch auch als Mitteilung, wenn es offen ist.
+ * Die Daten stehen in state.waste und damit in der Sicherung. */
+const WS_NOTE = 'jere-cockpit-muell-hinweis';
+const WS_AUTO = [[/rest|grau|schwarz/i, '#6B7280'], [/bio|braun|kompost|grüne/i, '#8B5E34'], [/papier|pappe|blau|ppk/i, '#2B6CC4'],
+  [/gelb|wertstoff|verpack|lvp|plastik/i, '#E2B007'], [/glas/i, '#2F8458'], [/sperr/i, '#8A5CD8'], [/schadstoff|problem|sonder/i, '#C2410C'], [/baum|tanne|weihnacht/i, '#1C6B45']];
+const ws = { draft: null, file: undefined };
+const wsCfg = () => state.widgets.waste.cfg;
+function wsAutoColor(name, used) {
+  const hit = WS_AUTO.find(([re]) => re.test(name));
+  if (hit && !used.has(hit[1])) return hit[1];
+  return WS_COLORS.find(c => !used.has(c)) || WS_COLORS[0];
+}
+/* Alle Abholtage einer Tonne zwischen from und to (beide als Tagesbeginn), als YYYY-MM-DD */
+function wsDates(b, from, to) {
+  const a = ymd(from), z = ymd(to), out = new Set(b.dates.filter(x => x >= a && x <= z));
+  if (b.every && b.start) {
+    const s = parseYmd(b.start), step = b.every * 7;
+    const k = Math.max(0, Math.ceil(dayDiff(s, from) / step));
+    for (let d = addDays(s, k * step), n = 0; d <= to && n < 60; d = addDays(d, step), n++) out.add(ymd(d));
+  }
+  return [...out].sort();
+}
+/* Pro Tonne der nächste und übernächste Termin, sortiert nach dem nächsten */
+function wsUpcoming(bins, now) {
+  const t0 = sod(now), t1 = addDays(t0, 120);
+  return bins.map(b => { const ds = wsDates(b, t0, t1); return { b, next: ds[0] ? parseYmd(ds[0]) : null, after: ds[1] ? parseYmd(ds[1]) : null }; })
+    .filter(x => x.next).sort((x, y) => x.next - y.next || x.b.name.localeCompare(y.b.name, 'de'));
+}
+const wsOn = (bins, d) => bins.filter(b => wsDates(b, d, d).length);
+const wsNames = list => list.map(b => b.name).join(', ').replace(/, ([^,]*)$/, ' und $1');
+const wsDay = (d, today) => { const n = dayDiff(today, d); return n === 0 ? 'Heute' : n === 1 ? 'Morgen' : n < 7 ? WDL[d.getDay()] : `${WD[d.getDay()]} ${d.getDate()}. ${MS[d.getMonth()]}`; };
+/* Termine aus Dateien, die bald ausgehen: Hinweis, die neue Datei zu laden */
+function wsRunsOut(bins, now) {
+  const fileOnly = bins.filter(b => !b.every && b.dates.length);
+  if (!fileOnly.length) return null;
+  const last = fileOnly.map(b => b.dates[b.dates.length - 1]).sort().pop();
+  return dayDiff(now, parseYmd(last)) < 21 ? parseYmd(last) : null;
+}
+
+function renderWaste() {
+  const W = state.waste, c = wsCfg(), now = new Date(), today = sod(now);
+  const formOpen = !$('#ws-form').hidden;
+  $('#ws-setup').hidden = formOpen || W.bins.length > 0;
+  $('#ws-live').hidden = formOpen || !W.bins.length;
+  if (formOpen || !W.bins.length) { $('#ws-src').textContent = ''; return; }
+  const up = wsUpcoming(W.bins, now);
+  const tom = wsOn(W.bins, addDays(today, 1)), tod = wsOn(W.bins, today);
+  const late = now >= at(now, c.at);
+  const ban = $('#ws-banner');
+  if (tom.length) {
+    ban.hidden = false;
+    ban.className = `ws-banner${late ? ' due' : ''}`;
+    ban.innerHTML = `<b>${late ? 'Heute Abend rausstellen' : 'Morgen wird abgeholt'}</b><span>${tom.map(b => `<i style="--c:${b.color}">${esc(b.name)}</i>`).join('')}</span>`;
+  } else if (tod.length && now.getHours() < 12) {
+    ban.hidden = false;
+    ban.className = 'ws-banner due';
+    ban.innerHTML = `<b>Heute wird abgeholt</b><span>${tod.map(b => `<i style="--c:${b.color}">${esc(b.name)}</i>`).join('')}</span>`;
+  } else ban.hidden = true;
+  $('#ws-list').innerHTML = up.length ? up.map(x => {
+    const n = dayDiff(today, x.next);
+    const sub = [n >= 2 ? `in ${n} Tagen` : '', x.after ? `danach ${WD[x.after.getDay()]} ${x.after.getDate()}. ${MS[x.after.getMonth()]}` : ''].filter(Boolean).join(' · ');
+    return `<li class="ws-row" style="--c:${x.b.color}"><span class="ws-dot" aria-hidden="true"></span><span class="ws-main"><b>${esc(x.b.name)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</span><span class="ws-when${n <= 1 ? ' soon' : ''}">${wsDay(x.next, today)}</span></li>`;
+  }).join('') : '<li class="empty">Keine Termine in den nächsten Monaten. Lad die neue Datei deines Entsorgers.</li>';
+  const out = wsRunsOut(W.bins, now);
+  $('#ws-src').innerHTML = out ? `<span class="ws-warn">Die Termine aus der Datei reichen nur bis ${dm(out)}${out.getFullYear()}. Lad die neue Datei deines Entsorgers.</span>`
+    : esc(W.file ? `Termine aus ${W.file.name}${c.remind ? `, Erinnerung am Vorabend ab ${c.at} Uhr` : ''}` : c.remind ? `Erinnerung am Vorabend ab ${c.at} Uhr` : '');
+}
+/* Für den Spiegel: was heute oder morgen abgeholt wird */
+function wsMirror(now) {
+  const bins = state.waste.bins, today = sod(now), out = [];
+  if (!bins.length) return out;
+  const tod = wsOn(bins, today), tom = wsOn(bins, addDays(today, 1));
+  if (tod.length && now.getHours() < 12) out.push({ t: `Heute Abholung: ${wsNames(tod)}`, c: tod[0].color });
+  if (tom.length) out.push({ t: `Morgen Abholung: ${wsNames(tom)}${now >= at(now, wsCfg().at) ? ', heute Abend rausstellen' : ''}`, c: tom[0].color });
+  return out;
+}
+/* Einmal pro Minute: ab der eingestellten Uhrzeit am Vorabend einmal erinnern */
+function wsTick(now) {
+  if (now.getSeconds() !== 20) return;
+  if (views.has('waste') && !views.get('waste').el.hidden && now.getMinutes() % 5 === 0) renderWaste();
+  const c = wsCfg(), bins = state.waste.bins;
+  if (!c.remind || !bins.length || now < at(now, c.at)) return;
+  const tomorrow = addDays(sod(now), 1), key = ymd(tomorrow), tom = wsOn(bins, tomorrow);
+  if (!tom.length || lsGet(WS_NOTE) === key) return;
+  lsSet(WS_NOTE, key);
+  const body = `Morgen wird abgeholt: ${wsNames(tom)}.`;
+  toast(`${body} Denk dran, heute Abend rauszustellen.`, null, { ms: 30000 });
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try { new Notification('Müll rausstellen', { body, tag: 'cockpit-muell-' + key }); } catch { /* manche Browser wollen das nur über den Service Worker */ }
+  }
+  if (views.has('waste')) renderWaste();
+}
+
+/* Einrichten mit Entwurf: erst „Speichern“ übernimmt Datei, Rhythmen, Namen und Farben */
+function wsOpenForm() {
+  const c = wsCfg();
+  ws.draft = JSON.parse(JSON.stringify(state.waste.bins));
+  ws.file = undefined;
+  $('#ws-remind').checked = c.remind;
+  $('#ws-at').value = c.at;
+  $('#ws-name').value = '';
+  $('#ws-start').value = '';
+  $('#ws-every').value = '2';
+  $('#ws-ferr').hidden = true;
+  $('#ws-import-msg').hidden = true;
+  wsRenderDraft();
+  $('#ws-form').hidden = false;
+  renderWaste();
+  layoutNow();
+}
+const wsCount = n => `${n} ${n === 1 ? 'Termin' : 'Termine'} aus der Datei`;
+function wsRenderDraft() {
+  const ul = $('#ws-bins'), now = new Date();
+  ul.innerHTML = ws.draft.map((b, i) => {
+    const ds = wsDates(b, sod(now), addDays(sod(now), 400));
+    const info = [b.every ? `alle ${b.every === 1 ? 'Woche' : `${b.every} Wochen`} ab ${dm(parseYmd(b.start))}` : '', b.dates.length ? wsCount(ds.filter(d => b.dates.includes(d)).length) : ''].filter(Boolean).join(', ');
+    return `<li><button type="button" class="ca-dot" data-wscol="${i}" style="--c:${b.color}" aria-label="Farbe von ${esc(b.name)} ändern" title="Farbe ändern"></button><div class="tx"><input type="text" maxlength="40" value="${esc(b.name)}" data-wsname="${i}" aria-label="Name der Tonne"><span>${esc(info || 'keine Termine')}</span></div><button type="button" class="icon-btn" data-wsdel="${i}" aria-label="${esc(b.name)} entfernen">${TRASH}</button></li>`;
+  }).join('');
+  ul.hidden = !ws.draft.length;
+  const N = 'Notification' in window;
+  $('#ws-notify').hidden = !N || Notification.permission !== 'default';
+  $('#ws-notify-on').hidden = !N || Notification.permission !== 'granted';
+}
+function wsAddDraft() {
+  const fail = m => { $('#ws-ferr').textContent = m; $('#ws-ferr').hidden = false; return false; };
+  const name = $('#ws-name').value.trim().slice(0, 40), start = $('#ws-start').value;
+  if (!name && !start) return true;
+  if (!name) return fail('Wie heißt die Tonne? Zum Beispiel Restmüll oder Papier.');
+  if (!validYmd(start)) return fail('Wann wird sie das nächste Mal abgeholt? Trag das Datum ein.');
+  const every = +$('#ws-every').value || 2;
+  const old = ws.draft.find(b => b.name.toLowerCase() === name.toLowerCase());
+  if (old) Object.assign(old, { every, start });
+  else {
+    if (ws.draft.length >= 12) return fail('Mehr als 12 Tonnen gehen nicht.');
+    ws.draft.push({ id: uid(), name, color: wsAutoColor(name, new Set(ws.draft.map(b => b.color))), dates: [], every, start });
+  }
+  $('#ws-name').value = '';
+  $('#ws-start').value = '';
+  $('#ws-ferr').hidden = true;
+  wsRenderDraft();
+  return true;
+}
+/* ICS des Entsorgers: Termine eines Jahres, pro Titel eine Tonne. Bestehende Tonnen mit gleichem Namen bekommen die neuen Termine. */
+const wsKind = t => String(t).replace(/^(abfuhr|leerung|abholung|entleerung|termin)\s*[:-]?\s*/i, '').replace(/\s+/g, ' ').trim().slice(0, 40) || 'Abfuhr';
+async function wsImport(text, fileName) {
+  const ICAL = await caLoadLib();
+  if (!/BEGIN:VCALENDAR/i.test(text)) return { err: 'Das ist keine Kalenderdatei. Nimm die ICS-Datei deines Entsorgers.' };
+  const from = sod(new Date()), to = addDays(from, 400);
+  let evs;
+  try { evs = caExpand(ICAL, text, { id: 'ws' }, addDays(from, -1), to); } catch { return { err: 'Die Datei konnte nicht gelesen werden.' }; }
+  const byKind = new Map();
+  for (const e of evs) {
+    const k = wsKind(e.t), d = ymd(new Date(e.s));
+    if (!byKind.has(k)) byKind.set(k, new Set());
+    byKind.get(k).add(d);
+  }
+  if (!byKind.size) return { err: 'In der Datei stehen keine Termine ab heute. Vielleicht ist sie vom letzten Jahr?' };
+  const kinds = [...byKind.entries()].sort((a, b) => b[1].size - a[1].size).slice(0, 12);
+  const a = ymd(from);
+  let n = 0;
+  for (const [name, set] of kinds) {
+    const dates = [...set].sort();
+    n += dates.length;
+    const old = ws.draft.find(b => b.name.toLowerCase() === name.toLowerCase());
+    if (old) old.dates = [...new Set([...old.dates.filter(x => x < a), ...dates])].sort().slice(-500);
+    else if (ws.draft.length < 12) ws.draft.push({ id: uid(), name, color: wsAutoColor(name, new Set(ws.draft.map(b => b.color))), dates, every: 0, start: '' });
+  }
+  ws.file = { name: String(fileName || 'Datei').slice(0, 80), at: new Date().toISOString() };
+  const last = kinds.flatMap(([, s]) => [...s]).sort().pop();
+  return { kinds: kinds.length, n, last };
+}
+$('#ws-setup-btn').addEventListener('click', wsOpenForm);
+$('#ws-set-btn').addEventListener('click', () => { if ($('#ws-form').hidden) wsOpenForm(); else { $('#ws-form').hidden = true; ws.draft = null; renderWaste(); layoutNow(); } });
+$('#ws-add').addEventListener('click', () => { if (wsAddDraft()) $('#ws-name').focus(); });
+for (const id of ['#ws-name', '#ws-start']) $(id).addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); wsAddDraft(); } });
+$('#ws-bins').addEventListener('click', e => {
+  const d = e.target.closest('[data-wsdel]'), c = e.target.closest('[data-wscol]');
+  if (d) { ws.draft.splice(+d.dataset.wsdel, 1); wsRenderDraft(); layoutNow(); }
+  if (c) { const b = ws.draft[+c.dataset.wscol]; b.color = WS_COLORS[(WS_COLORS.indexOf(b.color) + 1) % WS_COLORS.length]; wsRenderDraft(); }
+});
+$('#ws-bins').addEventListener('input', e => {
+  const i = e.target.dataset.wsname;
+  if (i != null && ws.draft[+i]) ws.draft[+i].name = e.target.value.slice(0, 40);
+});
+$('#ws-import').addEventListener('click', () => { $('#ws-file').value = ''; $('#ws-file').click(); });
+$('#ws-file').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0], msg = $('#ws-import-msg');
+  if (!f) return;
+  msg.hidden = false;
+  msg.textContent = 'Datei wird gelesen …';
+  if (f.size > 5e6) { msg.textContent = 'Die Datei ist zu groß für einen Abfuhrkalender.'; return; }
+  let r;
+  try { r = await wsImport(await f.text(), f.name); } catch { r = { err: 'Der Kalender-Leser konnte nicht geladen werden. Prüf die Verbindung und versuch es nochmal.' }; }
+  msg.textContent = r.err || `${r.n} Termine für ${r.kinds} ${r.kinds === 1 ? 'Tonne' : 'Tonnen'} gefunden, bis ${dm(parseYmd(r.last))}${r.last.slice(0, 4)}. Prüf die Namen und klick auf Speichern.`;
+  wsRenderDraft();
+  layoutNow();
+});
+$('#ws-notify').addEventListener('click', () => {
+  try { Promise.resolve(Notification.requestPermission()).then(wsRenderDraft, wsRenderDraft); } catch { wsRenderDraft(); }
+});
+$('#ws-cancel').addEventListener('click', () => { $('#ws-form').hidden = true; ws.draft = null; renderWaste(); layoutNow(); });
+$('#ws-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const fail = m => { $('#ws-ferr').textContent = m; $('#ws-ferr').hidden = false; };
+  if (($('#ws-name').value.trim() || $('#ws-start').value) && !wsAddDraft()) return;
+  if (ws.draft.some(b => !b.name.trim())) return fail('Jede Tonne braucht einen Namen.');
+  const at2 = $('#ws-at').value;
+  if (!validHm(at2)) return fail('Die Uhrzeit für die Erinnerung bitte als HH:MM.');
+  const old = { bins: state.waste.bins, file: state.waste.file };
+  state.waste = normWaste({ bins: ws.draft.map(b => ({ ...b, name: b.name.trim() })), file: ws.file === undefined ? old.file : ws.file });
+  if (!state.waste.bins.length) state.waste.file = null;
+  const c = wsCfg();
+  c.remind = $('#ws-remind').checked;
+  c.at = at2;
+  $('#ws-form').hidden = true;
+  ws.draft = null;
+  commit();
+  layoutNow();
+});
+
+defineWidget('waste', { render: renderWaste });
+
+/* 45-app.js */
+/* Als App installieren: Manifest und Service Worker (sw.js). Klappt nur über die Adresse im Netz
+ * (GitHub Pages) oder localhost, nicht mit der Datei vom Rechner. Das Manifest wird deshalb erst hier eingehängt,
+ * sonst meckert der Browser bei der lokalen Datei. Der Service Worker holt die Seite immer zuerst frisch,
+ * Updates kommen also wie gewohnt an. Ohne Netz startet das Cockpit mit dem letzten Stand. */
+const app = { prompt: null };
+const appWeb = /^https?:$/.test(location.protocol);
+const appSecure = appWeb && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname));
+const appStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const appIos = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const appMacSafari = () => /Macintosh/.test(navigator.userAgent) && /Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|Edg\/|Firefox|OPR\//.test(navigator.userAgent) && navigator.maxTouchPoints <= 1;
+function appInit() {
+  if (!appWeb) return;
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const l = document.createElement('link');
+    l.rel = 'manifest';
+    l.href = 'manifest.webmanifest';
+    document.head.appendChild(l);
+  }
+  if (appSecure && 'serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { /* ohne Service Worker geht alles, nur nicht offline */ });
+  // Als App darf der Browser die Daten nicht einfach wegräumen, wenn der Speicher knapp wird
+  if (appStandalone() && navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+}
+function renderAppInfo() {
+  const txt = $('#dr-app-txt'), ios = $('#dr-app-ios');
+  $('#dr-install').hidden = !app.prompt;
+  ios.hidden = true;
+  if (appStandalone()) txt.textContent = 'Das Cockpit läuft gerade als App. Updates kommen wie im Browser von selbst, sobald du es neu öffnest.';
+  else if (!appWeb) txt.textContent = 'Installieren geht nur über die Adresse im Netz, also mindhunter451.github.io/Dashboard, nicht mit der Datei vom Rechner.';
+  else if (app.prompt) txt.textContent = 'Das Cockpit lässt sich wie eine App installieren. Es startet dann ohne Browserleiste in einem eigenen Fenster und öffnet auch ohne Netz.';
+  else if (appIos()) {
+    txt.textContent = 'Auf iPhone und iPad: unten auf Teilen tippen und dann „Zum Home-Bildschirm“. Das Cockpit startet dann ohne Browserleiste und öffnet auch ohne Netz.';
+    ios.hidden = false;
+    ios.textContent = 'Wichtig: Die App auf dem Home-Bildschirm hat ihren eigenen Speicher. Speicher hier im Browser unter Daten eine Sicherung und lade sie in der App. Den Todoist-Token, die Keys und die Kalender-Links trägst du dort einmal neu ein.';
+  } else if (appMacSafari()) txt.textContent = 'In Safari am Mac über Ablage und „Zum Dock hinzufügen“. Das Cockpit startet dann in einem eigenen Fenster und öffnet auch ohne Netz.';
+  else if (/Firefox\//.test(navigator.userAgent)) txt.textContent = 'Firefox kann Webseiten nicht als App installieren. Mit Chrome, Edge oder Safari geht es.';
+  else txt.textContent = 'Im Browser-Menü findest du „App installieren“ oder „Zum Startbildschirm hinzufügen“, manchmal auch als Symbol in der Adressleiste.';
+}
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); app.prompt = e; renderAppInfo(); });
+addEventListener('appinstalled', () => { app.prompt = null; renderAppInfo(); toast('Installiert. Du findest das Cockpit jetzt bei deinen Apps.'); });
+$('#dr-install').addEventListener('click', async () => {
+  const p = app.prompt;
+  if (!p) return;
+  app.prompt = null;
+  try { await p.prompt(); await p.userChoice; } catch { /* abgebrochen */ }
+  renderAppInfo();
+});
+appInit();
+renderAppInfo();
+
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.3';
+const VERSION = '2.4';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -6589,6 +7712,9 @@ function tick() {
   skyTick(now);
   vsTick(now);
   caTick(now);
+  dpTick(now);
+  bdTick(now);
+  wsTick(now);
   mirrorTick(now);
   f1Tick(now);
   if (ymd(now) !== vacDayKey) renderVacation();
@@ -6623,7 +7749,8 @@ document.addEventListener('visibilitychange', () => {
 const NEWS = {
   '2.1': ['Neu: Pomodoro, Gewohnheiten und Lernfortschritt. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
   '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()],
-  '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()]
+  '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()],
+  '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()]
 };
 function announceNew() {
   if (state.meta.seen === VERSION) return;
@@ -6656,6 +7783,21 @@ function setupNews23() {
   commit();
   layoutNow();
   toast(`Liegt jetzt auf „${p.name}“. Den Kalender richtest du direkt im Widget ein.`);
+}
+/* 2.4: Abfahrten, Geburtstage und Müllabfuhr auf die erste Seite. Abfahrten fragen gleich nach der Haltestelle. */
+function setupNews24() {
+  const p = state.pages[0];
+  let dep = widgetsOf('dep').map(([id]) => id).find(id => p.items.some(x => x.w === id));
+  const fresh = !dep;
+  if (fresh) dep = newWidget('dep', {});
+  const add = [dep, 'bday', 'waste'].filter(w => !p.items.some(x => x.w === w));
+  if (!add.length) { toast(`Die drei liegen schon auf „${p.name}“.`); return; }
+  p.items.splice(Math.min(1, p.items.length), 0, ...add.map(w => ({ w, s: 1 })));
+  if (state.page !== p.id) state.page = p.id;
+  commit();
+  layoutNow();
+  if (fresh) openWidgetDialog(dep);
+  else toast(`Liegt jetzt auf „${p.name}“. Geburtstage und Müllabfuhr richtest du direkt in der Karte ein.`);
 }
 function setupFocusPage() {
   if (state.pages.length >= 12) return;

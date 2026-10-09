@@ -233,7 +233,7 @@ function renderCal() {
   const names = sec.feeds.length > 1 ? sec.feeds.map(f => `<span class="ca-key" style="--c:${f.color}">${esc(f.name)}</span>`).join('') : '';
   $('#ca-src').innerHTML = `${names}<span>Stand ${hm(new Date(ca.data.at))} Uhr${past ? `, ${past} ${past === 1 ? 'Termin' : 'Termine'} von heute schon vorbei` : ''}</span>`;
 }
-function renderCalAll() { if (views.has('cal')) renderCal(); renderSkyNext(); renderMirror(); }
+function renderCalAll() { if (views.has('cal')) renderCal(); if (views.has('bday')) renderBday(); renderSkyNext(); renderMirror(); }
 
 /* Einrichten: Formular mit Kalendern, Weiterleitung und Zeitraum. Erst beim Speichern wird etwas übernommen. */
 function caOpenForm() {

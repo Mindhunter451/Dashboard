@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '2.3';
+const VERSION = '2.4';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -10,6 +10,9 @@ function tick() {
   skyTick(now);
   vsTick(now);
   caTick(now);
+  dpTick(now);
+  bdTick(now);
+  wsTick(now);
   mirrorTick(now);
   f1Tick(now);
   if (ymd(now) !== vacDayKey) renderVacation();
@@ -44,7 +47,8 @@ document.addEventListener('visibilitychange', () => {
 const NEWS = {
   '2.1': ['Neu: Pomodoro, Gewohnheiten und Lernfortschritt. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
   '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()],
-  '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()]
+  '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()],
+  '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()]
 };
 function announceNew() {
   if (state.meta.seen === VERSION) return;
@@ -77,6 +81,21 @@ function setupNews23() {
   commit();
   layoutNow();
   toast(`Liegt jetzt auf „${p.name}“. Den Kalender richtest du direkt im Widget ein.`);
+}
+/* 2.4: Abfahrten, Geburtstage und Müllabfuhr auf die erste Seite. Abfahrten fragen gleich nach der Haltestelle. */
+function setupNews24() {
+  const p = state.pages[0];
+  let dep = widgetsOf('dep').map(([id]) => id).find(id => p.items.some(x => x.w === id));
+  const fresh = !dep;
+  if (fresh) dep = newWidget('dep', {});
+  const add = [dep, 'bday', 'waste'].filter(w => !p.items.some(x => x.w === w));
+  if (!add.length) { toast(`Die drei liegen schon auf „${p.name}“.`); return; }
+  p.items.splice(Math.min(1, p.items.length), 0, ...add.map(w => ({ w, s: 1 })));
+  if (state.page !== p.id) state.page = p.id;
+  commit();
+  layoutNow();
+  if (fresh) openWidgetDialog(dep);
+  else toast(`Liegt jetzt auf „${p.name}“. Geburtstage und Müllabfuhr richtest du direkt in der Karte ein.`);
 }
 function setupFocusPage() {
   if (state.pages.length >= 12) return;

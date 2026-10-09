@@ -7,6 +7,8 @@
  * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern), zuletzt gesehene Version
  * state.flex     alte Gleitzeit-Daten (Widget gibt es seit 2.3 nicht mehr, die Daten bleiben für die Sicherung)
  * state.pomo     erledigte Pomodoro-Runden pro Tag
+ * state.bdays    Geburtstage: { list: [{ id, name, m, d, y }] }, y fehlt, wenn das Jahr unbekannt ist
+ * state.waste    Müllabfuhr: { bins: [{ id, name, color, dates[], every, start }], file: { name, at } }
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
@@ -37,7 +39,10 @@ const TYPES = {
   f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
   fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
   cal:      { name: 'Kalender', multi: false, w: 1, since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
-  verse:    { name: 'Vers des Tages', multi: false, w: 1, since: '2.3', desc: 'Jeden Tag ein Bibelvers, in Luther 1912 oder einer anderen Übersetzung. Mit Link zum ganzen Abschnitt.' }
+  verse:    { name: 'Vers des Tages', multi: false, w: 1, since: '2.3', desc: 'Jeden Tag ein Bibelvers, in Luther 1912 oder einer anderen Übersetzung. Mit Link zum ganzen Abschnitt.' },
+  dep:      { name: 'Abfahrten', multi: true, w: 1, since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
+  bday:     { name: 'Geburtstage', multi: false, w: 1, since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
+  waste:    { name: 'Müllabfuhr', multi: false, w: 1, since: '2.4', desc: 'Welche Tonne wann rausmuss, mit Erinnerung am Vorabend. Termine aus der Datei deines Entsorgers oder als eigener Rhythmus.' }
 };
 const SOON = [];
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
@@ -50,6 +55,8 @@ const VS_TR = {
   NeU: { name: 'Neue evangelistische Übersetzung', bs: 'NE%C3%9C' },
   HFA: { name: 'Hoffnung für alle', bs: 'HFA' }
 };
+/* Verkehrsmittel im Abfahrten-Widget */
+const DP_CATS = { s: 'S-Bahn', u: 'U-Bahn', bus: 'Bus', tram: 'Straßenbahn', ferry: 'Fähre', re: 'Regionalzug', fv: 'Fernzug' };
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -66,7 +73,10 @@ const TICON = {
   f1: svgIco('<path d="M5 21V4"/><path d="M5 4.6c4-2 6 2 10 0s4 0 4 0v8.6s-1-2-4 0-6-2-10 0"/>'),
   fuel: svgIco('<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M5 10h9"/><path d="M14 8.5l3 2.5v6.5a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/>'),
   cal: svgIco('<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r=".9" fill="currentColor"/><circle cx="12" cy="14.5" r=".9" fill="currentColor"/>'),
-  verse: svgIco('<path d="M12 6.5c-1.8-1.4-4.6-2-7.5-1.8v13c2.9-.2 5.7.4 7.5 1.8 1.8-1.4 4.6-2 7.5-1.8v-13c-2.9-.2-5.7.4-7.5 1.8z"/><path d="M12 6.5v13"/>')
+  verse: svgIco('<path d="M12 6.5c-1.8-1.4-4.6-2-7.5-1.8v13c2.9-.2 5.7.4 7.5 1.8 1.8-1.4 4.6-2 7.5-1.8v-13c-2.9-.2-5.7.4-7.5 1.8z"/><path d="M12 6.5v13"/>'),
+  dep: svgIco('<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9 6.6h6M8.5 17.5l-1.6 3M15.5 17.5l1.6 3"/><circle cx="8.7" cy="14.2" r=".8" fill="currentColor"/><circle cx="15.3" cy="14.2" r=".8" fill="currentColor"/>'),
+  bday: svgIco('<path d="M4.5 20.5h15v-7a2 2 0 0 0-2-2h-11a2 2 0 0 0-2 2z"/><path d="M4.5 15.6c1.3 1 2.5 1 3.75 0s2.5-1 3.75 0 2.5 1 3.75 0 2.5-1 3.75 0M12 11.5V8.4"/><path d="M12 3.5c.9 1 1.3 1.8 1.3 2.5a1.3 1.3 0 0 1-2.6 0c0-.7.4-1.5 1.3-2.5z"/>'),
+  waste: svgIco('<path d="M4 6.5h16M9.5 6.5V4h5v2.5M6 6.5l1.2 14h9.6L18 6.5"/><path d="M10 10.5v6.5M14 10.5v6.5"/>')
 };
 
 const DEF_WIDGETS_V1 = [['tasks', 1], ['commute', 1], ['weather', 2], ['progress', 1], ['vacation', 1], ['links', 1], ['notes', 1]];
@@ -168,6 +178,44 @@ function normPomoLog(o) {
   }
   return out;
 }
+const strIn = (x, n) => typeof x === 'string' ? x.trim().slice(0, n) : '';
+function normStop(p) {
+  if (!p || typeof p !== 'object' || typeof p.id !== 'string' || !p.id.trim()) return null;
+  const ok = v => v !== null && v !== undefined && v !== '' && Number.isFinite(+v);
+  return { id: p.id.trim().slice(0, 200), name: strIn(p.name, 60) || 'Haltestelle', lat: ok(p.lat) ? +p.lat : null, lon: ok(p.lon) ? +p.lon : null };
+}
+const normCats = list => { const a = (Array.isArray(list) ? list : []).filter(k => DP_CATS[k]); return a.length ? [...new Set(a)] : Object.keys(DP_CATS); };
+/* Geburtstage: Monat und Tag müssen ein echtes Datum ergeben (29.2. ist erlaubt), das Jahr ist freiwillig */
+function normBdays(o) {
+  const list = o && Array.isArray(o.list) ? o.list : [];
+  const out = [], seen = new Set();
+  for (const b of list) {
+    if (out.length >= 600 || !b || typeof b !== 'object') continue;
+    const name = strIn(b.name, 60), m = intIn(b.m, 1, 12, 0), d = intIn(b.d, 1, 31, 0);
+    if (!name || !m || !d || d > [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]) continue;
+    const y = intIn(b.y, 1880, 2200, null), key = `${name.toLowerCase()}|${m}|${d}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ id: String(b.id || uid()).replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(), name, m, d, y: y && !(m === 2 && d === 29 && !leapYear(y)) ? y : null });
+  }
+  return { list: out };
+}
+const leapYear = y => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+/* Müllabfuhr: pro Tonne Termine aus einer Datei und/oder ein fester Rhythmus in Wochen ab einem Starttermin */
+const WS_COLORS = ['#6B7280', '#8B5E34', '#2B6CC4', '#E2B007', '#2F8458', '#8A5CD8', '#C2410C', '#1A9AA0'];
+function normWaste(o) {
+  o = o && typeof o === 'object' ? o : {};
+  const bins = (Array.isArray(o.bins) ? o.bins : []).filter(b => b && strIn(b.name, 40)).slice(0, 12).map((b, i) => ({
+    id: String(b.id || uid()).replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(),
+    name: strIn(b.name, 40),
+    color: /^#[0-9a-f]{6}$/i.test(b.color) ? b.color : WS_COLORS[i % WS_COLORS.length],
+    dates: [...new Set((Array.isArray(b.dates) ? b.dates : []).filter(validYmd))].sort().slice(-500),
+    every: [1, 2, 3, 4].includes(+b.every) && validYmd(b.start) ? +b.every : 0,
+    start: [1, 2, 3, 4].includes(+b.every) && validYmd(b.start) ? b.start : ''
+  }));
+  const f = o.file && typeof o.file === 'object' && strIn(o.file.name, 80) ? { name: strIn(o.file.name, 80), at: isoOrNull(o.file.at) } : null;
+  return { bins, file: f };
+}
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
@@ -178,6 +226,9 @@ function normCfg(type, c) {
     case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
     case 'cal': return { days: [7, 14, 30].includes(+c.days) ? +c.days : 14, loc: c.loc !== false };
     case 'verse': return { tr: VS_TR[c.tr] ? c.tr : 'LUT' };
+    case 'dep': return { stop: normStop(c.stop), modes: normCats(c.modes), walk: intIn(c.walk, 0, 60, 0), n: [4, 6, 8, 10].includes(+c.n) ? +c.n : 6, lines: strIn(c.lines, 60), dir: strIn(c.dir, 60) };
+    case 'bday': return { n: [4, 6, 8, 12].includes(+c.n) ? +c.n : 6, cal: c.cal !== false };
+    case 'waste': return { remind: c.remind !== false, at: validHm(c.at) ? c.at : '18:00' };
     case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
@@ -296,6 +347,8 @@ function normalize(s) {
     commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) },
     flex: { days: normFlexDays(s.flex && s.flex.days), cfg: flexCfgKeep(s) },
     pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
+    bdays: normBdays(s.bdays),
+    waste: normWaste(s.waste),
     meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
 }

@@ -1,0 +1,23 @@
+{
+  "id": "./",
+  "name": "Jeres Tagescockpit",
+  "short_name": "Cockpit",
+  "description": "Persönliches Dashboard mit Uhr, Wetter, Terminen, Abfahrten, Aufgaben und mehr.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0E1B3D",
+  "theme_color": "#1D3672",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Spiegel-Modus", "short_name": "Spiegel", "url": "./#spiegel", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+  ]
+}
