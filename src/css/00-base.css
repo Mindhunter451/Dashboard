@@ -1,12 +1,13 @@
-/* Layout: Leitstand. Kopfzeile mit Uhr und KW-Stempel, darunter die Seiten-Tabs, eine Instrumentenleiste mit Countdowns
-   und ein Raster aus Widgets, das sich an jede Fensterbreite anpasst (Masonry, Spaltenzahl per JS). Mobil einspaltig. */
+/* Layout: Oben ein Himmel über die ganze Breite, gefärbt nach dem echten Sonnenstand, mit großer Uhr, Seiten-Tabs und
+   dem Sonnenbogen des Tages. Darunter eine ruhige Leiste mit Countdowns und das Raster aus Widgets (Masonry, Spaltenzahl
+   per JS). Mobil einspaltig. Schriften: Bricolage Grotesque für Uhr und Überschriften, Figtree für Text, Literata für Verse. */
 :root{
-  --bg:#E7ECF0;
-  --surface:#FAFBFC;
-  --raise:#EFF3F6;
-  --ink:#13202C;
-  --muted:#5A6977;
-  --line:#D1DAE2;
+  --bg:#E8EDF2;
+  --surface:#FFFFFF;
+  --raise:#F0F3F7;
+  --ink:#0F1B2B;
+  --muted:#5B6B7D;
+  --line:#DCE3EA;
   --accent:#E8A126;
   --accent-ink:#8A5604;
   --on-accent:#1D1404;
@@ -18,29 +19,32 @@
   --warn:#C9700E;
   --f-display:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-data:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --r:14px;
-  --gap:clamp(14px,2vw,20px);
+  --f-data:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-serif:"Literata", Georgia, "Times New Roman", serif;
+  --r:18px;
+  --gap:clamp(14px,1.8vw,22px);
+  --arc-h:96px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0D141B; --surface:#141E28; --raise:#1A2632; --ink:#E3E9EF; --muted:#8D9CAA; --line:#26333F;
+    --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
     --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
     --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0D141B; --surface:#141E28; --raise:#1A2632; --ink:#E3E9EF; --muted:#8D9CAA; --line:#26333F;
+  --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
   --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
   --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
   color-scheme:dark;
 }
+@media (max-width:720px){:root{--arc-h:70px}}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
-.wrap{max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(18px,3vw,30px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
+.wrap{max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 

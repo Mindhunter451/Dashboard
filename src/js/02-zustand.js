@@ -5,7 +5,8 @@
  *                Pendeln, Wetter und Urlaub gibt es genau einmal (ID = Typ), den Rest beliebig oft.
  * state.page     zuletzt geöffnete Seite
  * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern), zuletzt gesehene Version
- * state.flex     Gleitzeit: gestempelte Tage. state.pomo: erledigte Pomodoro-Runden pro Tag
+ * state.flex     alte Gleitzeit-Daten (Widget gibt es seit 2.3 nicht mehr, die Daten bleiben für die Sicherung)
+ * state.pomo     erledigte Pomodoro-Runden pro Tag
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
@@ -32,13 +33,23 @@ const TYPES = {
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
   habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' },
   football: { name: 'Fußball', multi: true, w: 1, since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
   f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
-  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' }
+  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
+  cal:      { name: 'Kalender', multi: false, w: 1, since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
+  verse:    { name: 'Vers des Tages', multi: false, w: 1, since: '2.3', desc: 'Jeden Tag ein Bibelvers, in Luther 1912 oder einer anderen Übersetzung. Mit Link zum ganzen Abschnitt.' }
 };
 const SOON = [];
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
+/* Bibelübersetzungen bei bolls.life, bs = Kürzel für den Link zu bibleserver.com */
+const VS_TR = {
+  LUT: { name: 'Luther 1912', bs: 'LUT' },
+  S00: { name: 'Schlachter 2000', bs: 'SLT' },
+  ELB: { name: 'Elberfelder 1871', bs: 'ELB' },
+  MB: { name: 'Menge', bs: 'MENG' },
+  NeU: { name: 'Neue evangelistische Übersetzung', bs: 'NE%C3%9C' },
+  HFA: { name: 'Hoffnung für alle', bs: 'HFA' }
+};
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -51,10 +62,11 @@ const TICON = {
   pomodoro: svgIco('<circle cx="12" cy="13" r="7.5"/><path d="M12 9.2V13l2.6 1.8M10 2.6h4"/>'),
   habits: svgIco('<path d="M12 21c-3.8 0-6.5-2.6-6.5-6 0-3.6 3-5.4 3.8-9 2.7 1.7 3.4 4 3.2 6 1-.6 1.8-1.7 2-3 1.7 1.6 2.9 3.6 2.9 6 0 3.4-2.6 6-5.4 6z"/>'),
   learn: svgIco('<path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.6v4c1.5 1.6 3.4 2.4 5.5 2.4s4-.8 5.5-2.4v-4"/>'),
-  flex: svgIco('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
   football: svgIco('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6l3.7 2.7-1.4 4.4H9.7l-1.4-4.4z"/>'),
   f1: svgIco('<path d="M5 21V4"/><path d="M5 4.6c4-2 6 2 10 0s4 0 4 0v8.6s-1-2-4 0-6-2-10 0"/>'),
-  fuel: svgIco('<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M5 10h9"/><path d="M14 8.5l3 2.5v6.5a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/>')
+  fuel: svgIco('<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M5 10h9"/><path d="M14 8.5l3 2.5v6.5a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/>'),
+  cal: svgIco('<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r=".9" fill="currentColor"/><circle cx="12" cy="14.5" r=".9" fill="currentColor"/>'),
+  verse: svgIco('<path d="M12 6.5c-1.8-1.4-4.6-2-7.5-1.8v13c2.9-.2 5.7.4 7.5 1.8 1.8-1.4 4.6-2 7.5-1.8v-13c-2.9-.2-5.7.4-7.5 1.8z"/><path d="M12 6.5v13"/>')
 };
 
 const DEF_WIDGETS_V1 = [['tasks', 1], ['commute', 1], ['weather', 2], ['progress', 1], ['vacation', 1], ['links', 1], ['notes', 1]];
@@ -66,7 +78,7 @@ const DEF_BARS = () => [
   { id: 'b5', kind: 'range', name: 'Ausbildung', from: '2024-08-01', to: '2027-07-31', example: true }
 ];
 const DEF_UI = () => ({
-  greet: 'Moin Jere', theme: 'auto', accent: 'amber', size: 'm', seconds: true, region: 'HH',
+  greet: 'Moin Jere', theme: 'auto', accent: 'amber', size: 'm', seconds: true, region: 'HH', sky: true,
   tiles: { fa: true, we: true, ft: true, ur: true }, countdowns: [],
   start: { mode: 'last', page: '', work: '', free: '' }
 });
@@ -136,6 +148,17 @@ function normFlexDays(o) {
   }
   return out;
 }
+/* Einstellungen des früheren Gleitzeit-Widgets aufheben, damit nichts verloren geht */
+function flexCfgKeep(s) {
+  const w = s.widgets && s.widgets.flex && s.widgets.flex.type === 'flex' ? s.widgets.flex.cfg : s.flex && s.flex.cfg;
+  if (!w || typeof w !== 'object') return null;
+  const out = {};
+  for (const k of ['soll', 'carry']) if (Number.isFinite(+w[k])) out[k] = Math.round(+w[k]);
+  if (Array.isArray(w.days)) out.days = normDays(w.days, []);
+  if (validYmd(w.from)) out.from = w.from;
+  if (w.autoBreak === false) out.autoBreak = false;
+  return Object.keys(out).length ? out : null;
+}
 function normPomoLog(o) {
   const out = {};
   if (!o || typeof o !== 'object') return out;
@@ -153,8 +176,9 @@ function normCfg(type, c) {
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
     case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '' };
     case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
+    case 'cal': return { days: [7, 14, 30].includes(+c.days) ? +c.days : 14, loc: c.loc !== false };
+    case 'verse': return { tr: VS_TR[c.tr] ? c.tr : 'LUT' };
     case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
-    case 'flex': return { soll: intIn(c.soll, 0, 720, 480), days: normDays(c.days, [1, 2, 3, 4, 5]), autoBreak: c.autoBreak !== false, carry: intIn(c.carry, -60000, 60000, 0), from: validYmd(c.from) ? c.from : ymd(new Date()) };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false };
@@ -212,6 +236,7 @@ function normUi(u) {
     accent: ACCENTS[u.accent] ? u.accent : 'amber',
     size: SIZES[u.size] ? u.size : 'm',
     seconds: u.seconds !== false,
+    sky: u.sky !== false,
     region: REGIONS[u.region] ? u.region : 'HH',
     tiles: { fa: t.fa !== false, we: t.we !== false, ft: t.ft !== false, ur: t.ur !== false },
     countdowns: (Array.isArray(u.countdowns) ? u.countdowns : []).filter(c => c && validYmd(c.date)).slice(0, 6)
@@ -269,7 +294,7 @@ function normalize(s) {
     widgets,
     loc: s.loc && s.loc.mode === 'fixed' && Number.isFinite(+s.loc.lat) && Number.isFinite(+s.loc.lon) ? { mode: 'fixed', name: String(s.loc.name || 'Ort'), lat: +s.loc.lat, lon: +s.loc.lon } : { mode: 'auto' },
     commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) },
-    flex: { days: normFlexDays(s.flex && s.flex.days) },
+    flex: { days: normFlexDays(s.flex && s.flex.days), cfg: flexCfgKeep(s) },
     pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
     meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };

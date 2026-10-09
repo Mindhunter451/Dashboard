@@ -7,18 +7,20 @@
 <title>Jeres Tagescockpit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Figtree:ital,wght@0,400..700;1,400&family=Literata:ital,opsz,wght@0,7..72,400;1,7..72,300..500&display=swap">
+<meta name="theme-color" content="#1D3672">
 <style>
 /* 00-base.css */
-/* Layout: Leitstand. Kopfzeile mit Uhr und KW-Stempel, darunter die Seiten-Tabs, eine Instrumentenleiste mit Countdowns
-   und ein Raster aus Widgets, das sich an jede Fensterbreite anpasst (Masonry, Spaltenzahl per JS). Mobil einspaltig. */
+/* Layout: Oben ein Himmel über die ganze Breite, gefärbt nach dem echten Sonnenstand, mit großer Uhr, Seiten-Tabs und
+   dem Sonnenbogen des Tages. Darunter eine ruhige Leiste mit Countdowns und das Raster aus Widgets (Masonry, Spaltenzahl
+   per JS). Mobil einspaltig. Schriften: Bricolage Grotesque für Uhr und Überschriften, Figtree für Text, Literata für Verse. */
 :root{
-  --bg:#E7ECF0;
-  --surface:#FAFBFC;
-  --raise:#EFF3F6;
-  --ink:#13202C;
-  --muted:#5A6977;
-  --line:#D1DAE2;
+  --bg:#E8EDF2;
+  --surface:#FFFFFF;
+  --raise:#F0F3F7;
+  --ink:#0F1B2B;
+  --muted:#5B6B7D;
+  --line:#DCE3EA;
   --accent:#E8A126;
   --accent-ink:#8A5604;
   --on-accent:#1D1404;
@@ -30,29 +32,32 @@
   --warn:#C9700E;
   --f-display:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-data:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  --r:14px;
-  --gap:clamp(14px,2vw,20px);
+  --f-data:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-serif:"Literata", Georgia, "Times New Roman", serif;
+  --r:18px;
+  --gap:clamp(14px,1.8vw,22px);
+  --arc-h:96px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0D141B; --surface:#141E28; --raise:#1A2632; --ink:#E3E9EF; --muted:#8D9CAA; --line:#26333F;
+    --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
     --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
     --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0D141B; --surface:#141E28; --raise:#1A2632; --ink:#E3E9EF; --muted:#8D9CAA; --line:#26333F;
+  --bg:#0A1120; --surface:#111A2B; --raise:#18233A; --ink:#E5ECF4; --muted:#8C9BB0; --line:#223049;
   --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
   --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
   color-scheme:dark;
 }
+@media (max-width:720px){:root{--arc-h:70px}}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
-.wrap{max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(18px,3vw,30px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
+.wrap{max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 
@@ -91,37 +96,85 @@ button{font:inherit;color:inherit;cursor:pointer}
 .preview{margin:0;font-weight:600;font-size:14px}
 
 /* 10-kopf.css */
-/* Kopfzeile */
-.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-bottom:14px;border-bottom:1px solid var(--line)}
-.eyebrow{margin:0 0 4px;font:500 12px/1.3 var(--f-data);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
-h1{margin:0;font:800 clamp(32px,5vw,48px)/1 var(--f-display);letter-spacing:-.025em;text-wrap:balance}
-.clock{display:flex;align-items:center;gap:14px}
-.time{font:500 clamp(32px,5vw,48px)/1 var(--f-data);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
-.time .sec{font-size:.42em;color:var(--muted);margin-left:3px;letter-spacing:0}
-.kw{display:flex;flex-direction:column;align-items:center;padding:6px 10px 5px;border:1.5px solid var(--ink);border-radius:8px;line-height:1}
-.kw span{font:600 10px/1 var(--f-data);letter-spacing:.14em}
-.kw b{font:800 22px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
-.cust-btn{align-self:center}
-.cust-btn svg{width:16px;height:16px}
+/* Kopf: Himmel über die ganze Breite. Die Farben setzt 40-himmel.js als Variablen (--sky-top, --sky-mid, --sky-low),
+   dazu die Schriftfarbe oben (--sky-ink) und am Horizont (--sky-ink-low). Die Unterkante ist der Horizont. */
+.sky{position:relative;isolation:isolate;overflow:hidden;color:var(--sky-ink,#fff);
+  --sky-top:#1D3672;--sky-mid:#5A5590;--sky-low:#D27B78;
+  background:
+    radial-gradient(ellipse min(46vw,620px) calc(var(--arc-h) * 2.2) at var(--sun-x,50%) calc(100% - var(--sun-f,0) * var(--arc-h) * .94), var(--sky-glow,transparent), transparent 72%),
+    linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 64%,var(--sky-low) 100%)}
+.sky-stars{position:absolute;inset:0;z-index:-1;opacity:var(--sky-stars,0);background-size:cover;background-position:center top;pointer-events:none}
+.sky.plain{--sky-ink:var(--ink);--sky-ink-low:var(--muted);--sky-top:var(--surface);background:var(--bg);border-bottom:1px solid var(--line)}
+.sky.plain .sky-stars{display:none}
+.sky-in{position:relative;max-width:3200px;margin:0 auto;padding:clamp(14px,2vw,24px) clamp(16px,2.6vw,44px) calc(var(--arc-h) + 16px);display:flex;flex-direction:column;gap:clamp(18px,3.2vw,40px)}
 
-/* Instrumentenleiste */
-.next{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
-.tile{flex:1 1 160px;background:var(--surface);padding:14px 16px 15px;display:flex;flex-direction:column;gap:1px;min-width:0}
-.t-label{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.t-val{margin:6px 0 0;font:700 clamp(19px,2.3vw,24px)/1.15 var(--f-display);letter-spacing:-.01em;text-wrap:balance}
+/* Zeile oben: Begrüßung, Seiten, Knöpfe */
+.sky-top{display:flex;align-items:center;gap:10px 18px;min-width:0}
+.greet{margin:0;flex:0 0 auto;font:680 clamp(19px,1.7vw,23px)/1.1 var(--f-display);font-variation-settings:'wdth' 88;letter-spacing:-.012em}
+.tabs{display:flex;gap:2px;padding:3px;border-radius:999px;overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%;
+  background:color-mix(in srgb,var(--sky-ink) 9%,transparent);border:1px solid color-mix(in srgb,var(--sky-ink) 16%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:0;background:transparent;padding:6px 15px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:color-mix(in srgb,var(--sky-ink) 76%,transparent);white-space:nowrap}
+.tab:hover{color:var(--sky-ink);background:color-mix(in srgb,var(--sky-ink) 12%,transparent)}
+.tab[aria-selected="true"]{background:var(--sky-ink);color:var(--sky-top)}
+.sky.plain .tab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
+.sky-tools{display:flex;gap:8px;margin-left:auto;flex:0 0 auto}
+.sky-btn{position:relative;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;font:600 13px/1.2 var(--f-body);color:var(--sky-ink);
+  border:1px solid color-mix(in srgb,var(--sky-ink) 22%,transparent);background:color-mix(in srgb,var(--sky-ink) 7%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.sky-btn:hover{background:color-mix(in srgb,var(--sky-ink) 15%,transparent)}
+.sky-btn svg{width:16px;height:16px;flex:0 0 16px}
+.sky :focus-visible{outline-color:var(--sky-ink)}
+.edit-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+@media (max-width:860px){
+  .sky-top{flex-wrap:wrap}
+  .sky-top .tabs{order:3;flex:1 1 100%}
+}
+@media (max-width:620px){
+  .sky-btn{padding:8px}
+  .sky-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+
+/* Uhr und Tagesinfos */
+.sky-main{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 40px;flex-wrap:wrap}
+.time{margin:0 0 0 -.03em;font-family:var(--f-display);font-weight:220;font-variation-settings:'wdth' 75,'opsz' 96;font-size:clamp(92px,14vw,236px);line-height:.78;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
+.time .sec{display:inline-block;font-size:.17em;font-weight:400;font-variation-settings:'wdth' 85;letter-spacing:0;margin-left:.45em;opacity:.65;vertical-align:top;line-height:1;transform:translateY(.2em)}
+.sky-side{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right;min-width:0;max-width:48ch;padding-bottom:.2em}
+.sky-day{margin:0;font:600 clamp(24px,2.6vw,38px)/1.05 var(--f-display);font-variation-settings:'wdth' 82;letter-spacing:-.015em}
+.sky-date{margin:0 0 8px;display:flex;align-items:center;gap:10px;font-size:15px;opacity:.88}
+.kw{font:600 12px/1 var(--f-body);padding:4px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--sky-ink) 32%,transparent);font-variant-numeric:tabular-nums}
+.kw b{font-weight:700}
+.sky-line{margin:0;font-size:14px;line-height:1.45;opacity:.9;overflow-wrap:anywhere}
+.sky-line b{font-weight:700}
+.sky-next{margin-top:4px;padding:5px 12px;border-radius:12px;background:color-mix(in srgb,var(--sky-ink) 10%,transparent);opacity:1}
+.sky-next span{opacity:.8}
+@media (max-width:720px){
+  .time{font-size:min(31vw,150px)}
+  .sky-side{align-items:flex-start;text-align:left}
+}
+
+/* Sonnenbogen: Sonnenhöhe von 0 bis 24 Uhr, die Unterkante ist der Horizont */
+.arc{position:absolute;left:0;right:0;bottom:0;height:var(--arc-h);color:var(--sky-ink-low,#fff);pointer-events:none}
+.arc-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.arc-svg path{fill:none;stroke:currentColor;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.arc-rest{stroke-opacity:.38;stroke-width:1.25;stroke-dasharray:1.5 5}
+.arc-done{stroke-opacity:.85;stroke-width:2}
+.arc-sun{position:absolute;left:var(--sun-x,50%);bottom:calc(var(--sun-f,0) * var(--arc-h) * .94);width:14px;height:14px;margin:0 0 -7px -7px;border-radius:50%;background:#FFF4DA;box-shadow:0 0 0 4px rgba(255,238,200,.22),0 0 26px 8px rgba(255,210,140,.5)}
+.sky.plain .arc-sun{background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.arc-lbl{position:absolute;bottom:9px;font:600 12px/1 var(--f-body);font-variant-numeric:tabular-nums;opacity:.8;white-space:nowrap}
+#arc-rise{transform:translateX(calc(-100% - 8px))}
+#arc-set{transform:translateX(8px)}
+
+/* Leiste mit Countdowns unter dem Himmel: ruhige Anzeigen, nur durch Linien getrennt */
+.next{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));overflow:hidden;padding:2px 0}
+.tile{min-width:0;margin-left:-1px;border-left:1px solid var(--line);padding:2px clamp(14px,1.8vw,24px);display:flex;flex-direction:column;gap:1px}
+@media (max-width:620px){.next{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:14px}.tile{padding-inline:12px}}
+.t-label{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
+.t-val{margin:3px 0 1px;font:640 clamp(21px,2vw,27px)/1.1 var(--f-display);font-variation-settings:'wdth' 86;letter-spacing:-.015em;text-wrap:balance}
 .tile[data-hot] .t-val{color:var(--accent-ink)}
 .tile[data-good] .t-val{color:var(--good)}
 .t-sub{margin:0;color:var(--muted);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
 
-/* Seiten-Tabs und Bearbeiten */
-.pagebar{display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap}
-.tabs{display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface);overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;border:0;background:transparent;padding:7px 16px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:var(--muted);white-space:nowrap}
-.tab:hover{color:var(--ink);background:var(--raise)}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
-.edit-btn svg{width:15px;height:15px}
-.edit-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .editbar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 18px;padding:14px 16px;border:1.5px dashed var(--accent);border-radius:var(--r);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
 .editbar .field{flex:1 1 200px;max-width:320px}
 .eb-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
@@ -139,10 +192,10 @@ h1{margin:0;font:800 clamp(32px,5vw,48px)/1 var(--f-display);letter-spacing:-.02
 .board:not(.flow)>.card{position:absolute;top:0;left:0}
 .board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
 @media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px clamp(16px,2vw,22px) 20px;display:flex;flex-direction:column;gap:16px;min-width:0;container-type:inline-size}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px clamp(16px,2vw,24px) 22px;display:flex;flex-direction:column;gap:16px;min-width:0;container-type:inline-size}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-h2{margin:0;font:700 21px/1.2 var(--f-display);letter-spacing:-.015em}
-h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-spacing:0}
+h2{margin:0;font:680 21px/1.15 var(--f-display);font-variation-settings:'wdth' 88;letter-spacing:-.012em}
+h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-spacing:0;font-variant-numeric:tabular-nums}
 .card{position:relative}
 
 /* Leere Seite und Bearbeiten-Modus */
@@ -157,7 +210,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .ed-box{position:sticky;top:16px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;max-width:100%}
 .ed-ico{width:42px;height:42px;border-radius:12px;background:var(--chip-bg);color:var(--accent-ink);display:grid;place-items:center}
 .ed-ico svg{width:22px;height:22px}
-.ed-type{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.ed-type{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
 .ed-title{margin:0;font:700 19px/1.2 var(--f-display);overflow-wrap:anywhere}
 .ed-also{margin:0;font-size:12px;color:var(--muted)}
 .ed-tools{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}
@@ -206,7 +259,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .v-dates{grid-area:dates;font:400 13px var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
 .v-days{grid-area:days;font:500 14px var(--f-data);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
 .vac-list .icon-btn[data-del]{grid-area:del}
-.status{font:600 10px/1.8 var(--f-data);padding:0 7px;border-radius:999px;border:1px solid var(--line);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.status{font:600 12px/1.8 var(--f-body);padding:0 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);text-transform:capitalize}
 .status[data-s="läuft"]{border-color:var(--good);color:var(--good)}
 .status[data-s="geplant"]{border-color:var(--accent);color:var(--accent-ink)}
 
@@ -225,7 +278,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .wx-dl dt{color:var(--muted)}
 .wx-dl dd{margin:0;font-family:var(--f-data);font-variant-numeric:tabular-nums}
 .wx-rain{background:var(--raise);border-radius:12px;padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.sub-h{margin:0;font:600 11px/1.3 var(--f-data);text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.sub-h{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
 .rainbars{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;height:72px;align-items:end;border-bottom:1px solid var(--line)}
 .rb{height:var(--h);min-height:2px;background:var(--line);border-radius:3px 3px 0 0}
 .rb.wet{background:var(--rain)}
@@ -236,7 +289,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .hr:first-child{background:var(--raise)}
 .hr svg{width:26px;height:26px;color:var(--ink)}
 .hr b{font:600 14px var(--f-data);color:var(--ink);font-variant-numeric:tabular-nums}
-.hr .pp{color:var(--rain);font:500 11px var(--f-data)}
+.hr .pp{color:var(--rain);font:500 11px var(--f-data);font-variant-numeric:tabular-nums}
 .radar-box{display:flex;flex-direction:column;gap:8px}
 .radar{height:clamp(250px,58cqi,540px);border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--raise);max-width:100%;isolation:isolate}
 #radar.leaflet-container{background:var(--raise);font:12px var(--f-body)}
@@ -252,7 +305,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 /* Aufgaben (Todoist) */
 .tk-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px 22px}
 .tk-col{min-width:0}
-.tk-col h3{margin:0 0 4px;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tk-col h3{margin:0 0 4px;font:600 12.5px/1.3 var(--f-body);color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tk-col h3 a{color:inherit;text-decoration:none}
 .tk-col h3 a:hover{color:var(--ink)}
 .tasks{list-style:none;margin:0;padding:0}
@@ -269,7 +322,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .t-body{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}
 .t-title{color:var(--ink);text-decoration:none;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
 .t-title:hover{text-decoration:underline}
-.due{font:500 11px/1.5 var(--f-data);color:var(--muted)}
+.due{font:500 11px/1.5 var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
 .due[data-s="today"]{color:var(--accent-ink)}
 .due[data-s="over"]{color:var(--bad)}
 .more{background:none;border:0;color:var(--sea);font-weight:600;font-size:13px;padding:8px 0 0}
@@ -277,7 +330,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .tk-state p{margin:0;font-size:14px}
 .tk-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .tk-add{display:flex;gap:8px;align-items:center}
-.tk-add input,.tk-add select,.ln-add input,.fx-in{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+.tk-add input,.tk-add select,.ln-add input{font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
 .tk-add input,.ln-add input{flex:1}
 .tk-add select{max-width:10em}
 .tk-add :disabled{opacity:.6}
@@ -294,14 +347,14 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .verdict[data-lv="ok"]{color:var(--good)}
 .incidents{list-style:none;margin:0;padding:0}
 .inc{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2px 10px;padding:10px 0;border-top:1px solid var(--line);align-items:start}
-.inc-type{font:600 10px/1.8 var(--f-data);text-transform:uppercase;letter-spacing:.06em;padding:0 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;margin-top:1px}
+.inc-type{font:600 12px/1.8 var(--f-body);padding:0 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap;margin-top:1px}
 .inc[data-k="closure"] .inc-type{color:var(--bad)}
 .inc[data-k="jam"] .inc-type,.inc[data-k="slow"] .inc-type,.inc[data-k="warn"] .inc-type{color:var(--accent-ink)}
 .inc[data-k="works"] .inc-type{color:var(--muted)}
 .inc-main{min-width:0}
 .inc-title{font-weight:600;font-size:14px;line-height:1.35;overflow-wrap:anywhere}
 .inc-sub{color:var(--muted);font-size:12px;line-height:1.4}
-.inc-delay{font:600 13px var(--f-data);white-space:nowrap;color:var(--accent-ink)}
+.inc-delay{font:600 13px var(--f-data);white-space:nowrap;color:var(--accent-ink);font-variant-numeric:tabular-nums}
 .inc details{font-size:13px;color:var(--muted);margin-top:4px}
 .inc summary{cursor:pointer;font-weight:600;color:var(--sea);font-size:12px}
 .inc details p{margin:3px 0 0}
@@ -351,10 +404,10 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .ql{position:relative;min-width:0}
 .ql a{display:flex;align-items:center;gap:10px;padding:9px 38px 9px 9px;border:1px solid var(--line);border-radius:12px;background:var(--raise);color:var(--ink);text-decoration:none;min-width:0}
 .ql a:hover{border-color:var(--accent)}
-.ql .av{flex:0 0 30px;height:30px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 15px/1 var(--f-display);text-transform:uppercase}
+.ql .av{flex:0 0 30px;height:30px;border-radius:9px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:700 15px/1 var(--f-display)}
 .ql .tx{min-width:0;display:flex;flex-direction:column}
 .ql .nm{font-weight:600;font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ql .dom{font:400 11px/1.3 var(--f-data);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ql .dom{font:400 11px/1.3 var(--f-data);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
 .ql .icon-btn{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:30px;height:30px}
 
 /* Pomodoro */
@@ -367,7 +420,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .po-ring[data-mode="short"] .po-arc,.po-ring[data-mode="long"] .po-arc{stroke:var(--good)}
 @media (prefers-reduced-motion: reduce){.po-arc{transition:none}}
 .po-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center}
-.po-mode{font:600 11px/1.2 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.po-mode{font:600 12.5px/1.2 var(--f-body);color:var(--muted)}
 .po-time{font:500 36px/1 var(--f-data);font-variant-numeric:tabular-nums;letter-spacing:-.03em}
 .po-round{font-size:12px;color:var(--muted)}
 .po-side{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -388,7 +441,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .hb-main{min-width:0}
 .hb-top{display:flex;align-items:center;gap:8px;min-width:0}
 .hb-name{font-weight:700;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hb-streak{font:600 11px/1.6 var(--f-data);color:var(--accent-ink);background:var(--chip-bg);padding:0 7px;border-radius:999px;white-space:nowrap}
+.hb-streak{font:600 11px/1.6 var(--f-data);color:var(--accent-ink);background:var(--chip-bg);padding:0 7px;border-radius:999px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .hb-top .icon-btn{margin-left:auto;width:28px;height:28px;flex-basis:28px}
 .hb-meta{font-size:12px;color:var(--muted)}
 .hb-days{display:flex;gap:9px;margin-top:8px}
@@ -409,42 +462,22 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .tp .check-row{flex:1;min-width:0;padding:3px 0}
 .tp .check-row span{overflow-wrap:anywhere}
 .tp.done .check-row span{text-decoration:line-through;color:var(--muted)}
-.tp small{font:400 11px var(--f-data);color:var(--muted);white-space:nowrap}
+.tp small{font:400 11px var(--f-data);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .tp .icon-btn{width:28px;height:28px;flex-basis:28px;opacity:.55}
 .tp .icon-btn:hover,.tp .icon-btn:focus-visible{opacity:1}
 [data-type="learn"] .seg-taken{background:var(--accent)}
-.tp-head{font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:12px 0 4px}
+.tp-head{font:600 12.5px/1.3 var(--f-body);color:var(--muted);padding:12px 0 4px}
 
 /* Gleitzeit */
 .big[data-s="plus"] b{color:var(--good)}
 .big[data-s="minus"] b{color:var(--bad)}
-.fx-now{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 14px;padding:12px 14px;border-radius:12px;background:var(--raise)}
-.fx-now p{margin:0;font-size:14px;line-height:1.45;flex:1 1 200px}
-.fx-now b{font-weight:700}
-.fx-stamp{min-width:104px}
-.fx-now[data-s="in"] .fx-stamp{background:var(--accent);color:var(--on-accent)}
-.fx-week-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
-.fx-week-head .sub-h{text-align:center}
-.fx-week-head .icon-btn:disabled{opacity:.3;cursor:default}
-.fx-week{list-style:none;margin:0;padding:0}
-.fx-row{display:grid;grid-template-columns:5.6em minmax(0,1fr) auto 4.2em;gap:2px 10px;align-items:center;width:100%;padding:7px 6px;border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:inherit;font:inherit;font-size:13px}
-.fx-week li:first-child .fx-row{border-top:0}
-.fx-row:hover{background:var(--raise)}
-.fx-row.today{background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:8px}
-.fx-row .d{font-weight:700;white-space:nowrap}
-.fx-row .t{color:var(--muted);font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fx-row .i{font:500 13px var(--f-data);font-variant-numeric:tabular-nums}
-.fx-row .x{font:600 13px var(--f-data);font-variant-numeric:tabular-nums;text-align:right}
-.fx-row .x[data-s="plus"]{color:var(--good)}
-.fx-row .x[data-s="minus"]{color:var(--bad)}
-.fx-row.off .d,.fx-row.off .i{color:var(--muted)}
 
 /* 32-sport.css */
 /* Fußball, Formel 1, Spritpreise und das Infofenster */
 .logo{width:22px;height:22px;object-fit:contain;flex:0 0 22px}
 .logo.lg{width:42px;height:42px;flex-basis:42px}
 .logo.xl{width:60px;height:60px;flex-basis:60px}
-.logo.ini{display:inline-grid;place-items:center;border-radius:50%;background:var(--raise);border:1px solid var(--line);font:700 9px/1 var(--f-data);color:var(--muted);letter-spacing:0}
+.logo.ini{display:inline-grid;place-items:center;border-radius:50%;background:var(--raise);border:1px solid var(--line);font:700 9px/1 var(--f-data);color:var(--muted);letter-spacing:0;font-variant-numeric:tabular-nums}
 .logo.lg.ini{font-size:13px}
 .logo.xl.ini{font-size:18px}
 .fb-tabs{align-self:flex-start;max-width:100%;overflow-x:auto}
@@ -457,7 +490,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fb-head:hover b{text-decoration:underline}
 .fb-top{display:flex;align-items:center;justify-content:space-between;gap:10px 14px;flex-wrap:wrap}
 .form{display:inline-flex;gap:4px}
-.form i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:700 11px/1 var(--f-data);font-style:normal;color:#fff}
+.form i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:700 11px/1 var(--f-data);font-style:normal;color:#fff;font-variant-numeric:tabular-nums}
 .form i[data-res="S"]{background:var(--good)}
 .form i[data-res="U"]{background:var(--muted)}
 .form i[data-res="N"]{background:var(--bad)}
@@ -468,13 +501,13 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fb-mid{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
 .fb-mid b{font:700 26px/1 var(--f-data);font-variant-numeric:tabular-nums}
 .fb-mid small{font-size:12px;color:var(--muted);white-space:nowrap}
-.fb-label{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-.live{display:inline-flex;align-items:center;gap:5px;font:700 11px/1.6 var(--f-data);letter-spacing:.06em;text-transform:uppercase;color:var(--bad)}
+.fb-label{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
+.live{display:inline-flex;align-items:center;gap:5px;font:700 12.5px/1.6 var(--f-body);color:var(--bad)}
 .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--bad);animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.25}}
 @media (prefers-reduced-motion: reduce){.live::before{animation:none}}
 .fb-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.fb-day{font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:10px 0 4px}
+.fb-day{font:600 12.5px/1.3 var(--f-body);color:var(--muted);padding:10px 0 4px}
 .fb-day:first-child{padding-top:0}
 .fb-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
 .fb-row.fav{background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:8px;padding-inline:6px}
@@ -488,7 +521,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fb-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .fb-nav .icon-btn:disabled{opacity:.3;cursor:default}
 .fb-table{width:100%;border-collapse:collapse;font-size:13px}
-.fb-table th{font:600 10px/1.3 var(--f-data);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:right;padding:0 5px 6px}
+.fb-table th{font:600 12px/1.3 var(--f-body);color:var(--muted);text-align:right;padding:0 5px 6px}
 .fb-table th.n{text-align:left}
 .fb-table td{padding:4px 5px;border-top:1px solid var(--line);text-align:right;font:400 12.5px/1.3 var(--f-data);font-variant-numeric:tabular-nums}
 .fb-table td.n{text-align:left;font-family:var(--f-body);font-size:13px}
@@ -510,11 +543,11 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .f1-race{display:flex;align-items:flex-end;justify-content:space-between;gap:6px 14px;flex-wrap:wrap}
 .f1-race b{display:block;font:800 21px/1.15 var(--f-display);letter-spacing:-.01em}
 .f1-race small{display:block;color:var(--muted);font-size:13px}
-.f1-cd{font:600 15px/1.2 var(--f-data);color:var(--accent-ink);white-space:nowrap}
+.f1-cd{font:600 15px/1.2 var(--f-data);color:var(--accent-ink);white-space:nowrap;font-variant-numeric:tabular-nums}
 .f1-sess{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr));gap:6px}
 .f1-sess li{padding:7px 10px;border-radius:10px;background:var(--raise);display:flex;flex-direction:column;gap:1px;min-width:0}
 .f1-sess li b{font-size:13px}
-.f1-sess li span{font:400 12px/1.3 var(--f-data);color:var(--muted)}
+.f1-sess li span{font:400 12px/1.3 var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
 .f1-sess li.next{box-shadow:inset 0 0 0 2px var(--accent)}
 .f1-sess li.done{opacity:.5}
 .f1-sess li.race{background:color-mix(in srgb,var(--accent) 16%,var(--raise))}
@@ -523,7 +556,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .st-list li:first-child .st-row{border-top:0}
 .st-row:hover{background:var(--raise)}
 .st-row.fav{background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:8px}
-.st-pos{font:600 13px var(--f-data);color:var(--muted);text-align:right}
+.st-pos{font:600 13px var(--f-data);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .st-name{min-width:0;display:flex;align-items:center;gap:8px}
 .st-name b{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st-name>span{display:flex;flex-direction:column;min-width:0}
@@ -538,7 +571,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fu-best:empty{display:none}
 .pr{font-variant-numeric:tabular-nums;white-space:nowrap}
 .pr sup{font-size:.55em;vertical-align:.7em;margin-left:1px}
-.fu-best .pr{font:700 38px/1 var(--f-data);letter-spacing:-.03em;color:var(--good)}
+.fu-best .pr{font:700 38px/1 var(--f-data);letter-spacing:-.03em;color:var(--good);font-variant-numeric:tabular-nums}
 .fu-best b{display:block;font:700 16px/1.25 var(--f-display)}
 .fu-best small{display:block;color:var(--muted);font-size:13px;line-height:1.35}
 .fu-list{list-style:none;margin:0;padding:0}
@@ -546,9 +579,9 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .fu-row:hover{background:var(--raise)}
 .fu-row b{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fu-row small{color:var(--muted);font-size:12px;grid-column:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fu-row .pr{grid-row:1 / span 2;grid-column:2;font:600 18px/1.1 var(--f-data);text-align:right}
+.fu-row .pr{grid-row:1 / span 2;grid-column:2;font:600 18px/1.1 var(--f-data);text-align:right;font-variant-numeric:tabular-nums}
 .fu-row.closed{opacity:.5}
-.fu-diff{display:block;font:500 11px/1.2 var(--f-data);text-align:right;color:var(--muted)}
+.fu-diff{display:block;font:500 11px/1.2 var(--f-data);text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 .fu-diff[data-s="down"]{color:var(--good)}
 .fu-diff[data-s="up"]{color:var(--bad)}
 #fu-mode button:disabled{opacity:.4;cursor:default}
@@ -562,18 +595,61 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .in-stats div{background:var(--raise);border-radius:10px;padding:8px 10px}
 .in-stats span{display:block;font-size:11.5px;color:var(--muted)}
 .in-stats b{font:600 16px/1.3 var(--f-data);font-variant-numeric:tabular-nums}
-.in-sec h3{margin:0 0 4px;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.in-sec h3{margin:0 0 4px;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
 .in-wiki{font-size:14px;line-height:1.55}
 .in-wiki p{margin:0 0 10px}
 .in-wiki img{float:right;max-width:92px;max-height:120px;object-fit:contain;border-radius:8px;margin:0 0 8px 12px}
 .in-res{list-style:none;margin:0;padding:0}
 .in-res li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:13px}
 .in-res li:first-child{border-top:0}
-.in-res .d{color:var(--muted);font:400 12px var(--f-data);white-space:nowrap}
+.in-res .d{color:var(--muted);font:400 12px var(--f-data);white-space:nowrap;font-variant-numeric:tabular-nums}
 .in-res .s{font:600 13px var(--f-data);font-variant-numeric:tabular-nums;text-align:right;min-width:3em}
 .in-res button{border:0;background:transparent;padding:0;color:inherit;font:inherit;text-align:left;display:flex;align-items:center;gap:7px;min-width:0}
 .in-res button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .in-res button:hover span{text-decoration:underline}
+
+/* 33-kalender-vers.css */
+/* Kalender */
+.ca-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ca-day{display:flex;align-items:baseline;gap:8px;padding:12px 0 6px;border-top:1px solid var(--line)}
+.ca-day:first-child{padding-top:0;border-top:0}
+.ca-day b{font:650 16px/1.2 var(--f-display);font-variation-settings:'wdth' 88}
+.ca-day span{color:var(--muted);font-size:13px}
+.ca-ev{position:relative;display:grid;grid-template-columns:4.6em minmax(0,1fr) auto;gap:2px 12px;align-items:start;padding:7px 0 7px 12px}
+.ca-ev::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3.5px;border-radius:2px;background:var(--c)}
+.ca-t{font:600 14px/1.3 var(--f-body);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ca-t small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
+.ca-main{min-width:0;display:flex;flex-direction:column;gap:1px}
+.ca-main b{font-weight:600;font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.ca-main small{color:var(--muted);font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.ca-ev.is-now{background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:10px}
+.ca-now{align-self:center;font:700 11.5px/1.7 var(--f-body);padding:0 8px;border-radius:999px;background:var(--c);color:#fff}
+#ca-more{align-self:flex-start;margin-top:6px}
+#ca-live{display:flex;flex-direction:column;gap:4px}
+.ca-src{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px}
+.ca-key{display:inline-flex;align-items:center;gap:6px}
+.ca-key::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.ca-form .ca-steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
+.ca-steps li::marker{font-weight:700;color:var(--muted)}
+.ca-steps b{font-weight:700}
+.ca-code{margin-top:8px}
+.ca-code summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--sea)}
+.ca-code pre{margin:8px 0;max-height:260px;overflow:auto;padding:12px;border-radius:10px;background:var(--surface);border:1px solid var(--line);font:400 12px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;white-space:pre;tab-size:2}
+.ca-feeds{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ca-feeds li{display:flex;align-items:center;gap:10px;padding:8px 6px 8px 10px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.ca-feeds .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.ca-feeds .tx b{font-weight:600;font-size:14px}
+.ca-feeds .tx span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ca-dot{flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:0;background:var(--c);padding:0}
+.ca-locrow{align-self:end;padding-bottom:9px}
+
+/* Vers des Tages */
+.vs{margin:0;display:flex;flex-direction:column;gap:12px}
+.vs-text{margin:0;font:italic 400 clamp(18px,1.25vw + 8px,22px)/1.5 var(--f-serif);font-variation-settings:'opsz' 24;text-wrap:pretty;max-width:52ch}
+.vs-text.muted{font-style:normal;font-family:var(--f-body);font-size:14px;color:var(--muted)}
+.vs-cap{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:13px;color:var(--muted)}
+.vs-cap a{font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--accent)}
+.vs-cap a:hover{color:var(--accent-ink)}
 
 /* 40-anpassen.css */
 /* Anpassen */
@@ -584,7 +660,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .dr-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 20px 32px}
 .dr-sec{padding:18px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
 .dr-sec:last-child{border-bottom:0}
-.dr-sec>h3{margin:0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.dr-sec>h3{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
 .dr-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .dr-row>.lbl{font-size:14px;color:var(--ink);font-weight:600}
 .swatches{display:flex;flex-wrap:wrap;gap:10px}
@@ -598,7 +674,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .cd-list li{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--line)}
 .cd-list .tx{flex:1;min-width:0;font-size:14px}
 .cd-list .tx b{font-weight:600}
-.cd-list .tx span{color:var(--muted);font:400 12px var(--f-data);margin-left:6px}
+.cd-list .tx span{color:var(--muted);font:400 12px var(--f-data);margin-left:6px;font-variant-numeric:tabular-nums}
 .grid3{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.8fr);gap:8px}
 @media (max-width:420px){.grid3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid3>:first-child{grid-column:1/-1}}
 .drawer .field input,.drawer .field select{font-size:14px;padding:7px 9px}
@@ -631,34 +707,89 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .gal-act{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .gal-act .btn{padding:6px 13px;font-size:13px}
 .gal-act button:disabled{opacity:.5;cursor:default}
-.gal-sub{margin:10px 0 0;font:600 11px/1.3 var(--f-data);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.gal-sub{margin:10px 0 0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
 .soon{display:flex;flex-wrap:wrap;gap:6px}
 .soon span{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 8px;border:1px dashed var(--line);border-radius:999px;font-size:13px;color:var(--muted)}
 .soon svg{width:16px;height:16px}
 .pick{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;padding:2px}
 .pick .check-row{padding:7px 10px;border:1px solid var(--line);border-radius:10px}
 .pick .check-row small{color:var(--muted);margin-left:auto;font-size:12px}
+
+/* 45-spiegel.css */
+/* Spiegel-Modus: reines Schwarz, nur Schrift. Funktioniert hoch und quer. */
+.mirror{position:fixed;inset:0;z-index:200;background:#000;color:#F2F4F7;overflow:hidden;cursor:none;
+  --m-dim:#8B93A0;font-family:var(--f-body)}
+.mirror.awake{cursor:auto}
+html.mirror-on body{overflow:hidden}
+.m-in{position:absolute;inset:0;padding:clamp(28px,5vmin,72px);display:grid;gap:clamp(24px,4vmin,56px);
+  grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;
+  grid-template-areas:"clock wx" "cal cd" "cal cd" "verse verse";transition:transform 2s ease}
+.m-clock{grid-area:clock}
+.m-time{margin:0;font-family:var(--f-display);font-weight:250;font-variation-settings:'wdth' 75,'opsz' 96;font-size:clamp(96px,19vmin,260px);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.m-time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
+.m-date{margin:.7em 0 0;font:500 clamp(18px,2.6vmin,32px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-wx{grid-area:wx;justify-self:end;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.m-wx p{margin:0;font-size:clamp(17px,2.3vmin,28px);line-height:1.3}
+.m-wx-now{display:flex;align-items:center;gap:.3em;font-size:clamp(56px,10vmin,140px)}
+.m-wx-now b{font-family:var(--f-display);font-weight:300;font-variation-settings:'wdth' 80;line-height:.9;letter-spacing:-.03em}
+.m-wx-ico svg{width:.75em;height:.75em;display:block;color:#F2F4F7;--surface:#000}
+.m-dim{color:var(--m-dim)}
+.m-wx .m-dim{max-width:22em}
+.m-cal{grid-area:cal;min-height:0;overflow:hidden}
+.m-cal h3{margin:0 0 .4em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-cal h3:not(:first-child){margin-top:1em}
+.m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7vmin,34px);line-height:1.25}
+.m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c)}
+.m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-cd{grid-area:cd;justify-self:end;text-align:right}
+.m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9em}
+.m-cd li{display:flex;flex-direction:column;font-size:clamp(15px,2vmin,24px)}
+.m-cd b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.5em;line-height:1.15}
+.m-verse{grid-area:verse;margin:0 auto;max-width:46em;text-align:center}
+.m-verse blockquote{margin:0;font:italic 300 clamp(18px,2.6vmin,32px)/1.5 var(--f-serif);text-wrap:balance;color:#DADFE6}
+.m-verse figcaption{margin-top:.6em;color:var(--m-dim);font-size:clamp(14px,1.8vmin,20px)}
+.m-exit{position:absolute;top:16px;right:16px;opacity:0;pointer-events:none;transition:opacity .3s;border:1px solid #333;background:#111;color:#ddd;padding:8px 14px;border-radius:999px;font:600 14px var(--f-body)}
+.mirror.awake .m-exit,.m-exit:focus-visible{opacity:1;pointer-events:auto}
+@media (orientation:portrait){
+  .m-in{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"clock clock" "wx cd" "cal cal" "verse verse"}
+  .m-wx{justify-self:start;text-align:left;align-items:flex-start}
+}
+@media (prefers-reduced-motion: reduce){.m-in{transition:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div>
-      <p class="eyebrow" id="h-date">&nbsp;</p>
-      <h1 id="h-greet">Moin Jere</h1>
+  <header class="sky" id="sky">
+    <div class="sky-stars" aria-hidden="true"></div>
+    <div class="sky-in">
+      <div class="sky-top">
+        <h1 class="greet" id="h-greet">Moin Jere</h1>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="Seiten"></nav>
+        <div class="sky-tools">
+          <button type="button" class="sky-btn" id="mirror-btn" title="Spiegel-Modus (Taste S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/></svg><span>Spiegel</span></button>
+          <button type="button" class="sky-btn edit-btn" id="edit-btn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><span id="edit-btn-txt">Bearbeiten</span></button>
+          <button type="button" class="sky-btn cust-btn" id="cust-btn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Anpassen</span></button>
+        </div>
+      </div>
+      <div class="sky-main">
+        <p class="time" id="h-time" aria-live="off">00:00</p>
+        <div class="sky-side">
+          <p class="sky-day" id="h-day">&nbsp;</p>
+          <p class="sky-date"><span id="h-date">&nbsp;</span><span class="kw" title="Kalenderwoche">KW <b id="h-kw">00</b></span></p>
+          <p class="sky-line" id="h-wx" hidden></p>
+          <p class="sky-line" id="h-sun"></p>
+          <p class="sky-line sky-next" id="h-next" hidden></p>
+        </div>
+      </div>
     </div>
-    <div class="clock">
-      <div class="time" id="h-time" aria-live="off">00:00</div>
-      <div class="kw" title="Kalenderwoche"><span>KW</span><b id="h-kw">00</b></div>
-      <button type="button" class="btn-ghost cust-btn" id="cust-btn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Anpassen</button>
+    <div class="arc" id="arc" aria-hidden="true">
+      <svg class="arc-svg" viewBox="0 0 1440 100" preserveAspectRatio="none"><path class="arc-rest" id="arc-rest" d=""/><path class="arc-done" id="arc-done" d=""/></svg>
+      <span class="arc-sun" id="arc-sun"></span>
+      <span class="arc-lbl" id="arc-rise"></span>
+      <span class="arc-lbl" id="arc-set"></span>
     </div>
   </header>
 
-  <div class="pagebar">
-    <nav class="tabs" id="tabs" role="tablist" aria-label="Seiten"></nav>
-    <button type="button" class="btn-ghost edit-btn" id="edit-btn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><span id="edit-btn-txt">Bearbeiten</span></button>
-  </div>
-
+<div class="wrap">
   <div class="editbar" id="editbar" hidden>
     <label class="field"><span class="lbl">Name dieser Seite</span><input id="eb-name" type="text" maxlength="24" autocomplete="off"></label>
     <div class="eb-tools">
@@ -935,85 +1066,6 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
     <div class="form-row" id="po-notify-row" hidden><button type="button" class="btn-ghost" id="po-notify">Hinweis am Ende auch im Hintergrund</button></div>
   </section>
 
-  <!-- Gleitzeit -->
-  <section class="card" id="flex" data-type="flex" aria-labelledby="fx-h">
-    <div class="card-head">
-      <h2 id="fx-h"><span data-r="title">Gleitzeit</span></h2>
-      <div class="actions">
-        <button type="button" class="btn-ghost" id="fx-set-btn">Regeln</button>
-        <button type="button" class="btn-ghost" id="fx-add-btn">+ Tag</button>
-      </div>
-    </div>
-    <form class="panel" id="fx-set" hidden novalidate>
-      <h3>Deine Regeln</h3>
-      <div class="grid2">
-        <div class="field"><label for="fx-soll">Soll pro Arbeitstag (Std:Min)</label><input id="fx-soll" type="text" inputmode="decimal" maxlength="6" placeholder="8:00" autocomplete="off"></div>
-        <div class="field"><label for="fx-carry">Saldo zum Start (Std:Min, auch minus)</label><input id="fx-carry" type="text" inputmode="text" maxlength="8" placeholder="0:00" autocomplete="off"></div>
-      </div>
-      <fieldset class="days" id="fx-days">
-        <legend class="lbl">Arbeitstage</legend>
-        <label><input type="checkbox" data-fxday="1"><span>Mo</span></label>
-        <label><input type="checkbox" data-fxday="2"><span>Di</span></label>
-        <label><input type="checkbox" data-fxday="3"><span>Mi</span></label>
-        <label><input type="checkbox" data-fxday="4"><span>Do</span></label>
-        <label><input type="checkbox" data-fxday="5"><span>Fr</span></label>
-        <label><input type="checkbox" data-fxday="6"><span>Sa</span></label>
-        <label><input type="checkbox" data-fxday="0"><span>So</span></label>
-      </fieldset>
-      <div class="field"><label for="fx-from">Zählen ab</label><input id="fx-from" type="date"></div>
-      <label class="check-row"><input type="checkbox" id="fx-break"> Gesetzliche Pause abziehen, wenn du weniger gestempelt hast (über 6 Std 30 Min, über 9 Std 45 Min)</label>
-      <p class="hint">Feiertage und Urlaub aus dem Urlaub-Widget senken das Soll automatisch, halbe Urlaubstage zur Hälfte.</p>
-      <p class="err" id="fx-set-err" hidden></p>
-      <div class="form-row">
-        <button type="submit" class="btn">Speichern</button>
-        <button type="button" class="btn-ghost" id="fx-set-cancel">Abbrechen</button>
-      </div>
-    </form>
-    <form class="panel" id="fx-day" hidden novalidate>
-      <h3 id="fx-day-title">Tag eintragen</h3>
-      <div class="grid2">
-        <div class="field"><label for="fx-d-date">Datum</label><input id="fx-d-date" type="date"></div>
-        <div class="field"><label for="fx-d-kind">Art</label>
-          <select id="fx-d-kind">
-            <option value="">Arbeit</option>
-            <option value="school">Berufsschule (zählt wie Soll)</option>
-            <option value="sick">Krank (zählt wie Soll)</option>
-            <option value="flexday">Gleittag (Soll geht vom Saldo ab)</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid3" id="fx-d-times">
-        <div class="field"><label for="fx-d-in">Kommen</label><input id="fx-d-in" type="time"></div>
-        <div class="field"><label for="fx-d-out">Gehen</label><input id="fx-d-out" type="time"></div>
-        <div class="field"><label for="fx-d-pause">Pause (Min)</label><input id="fx-d-pause" type="number" min="0" max="600" inputmode="numeric"></div>
-      </div>
-      <p class="preview" id="fx-d-prev"></p>
-      <p class="err" id="fx-d-err" hidden></p>
-      <div class="form-row">
-        <button type="submit" class="btn">Speichern</button>
-        <button type="button" class="btn-ghost" id="fx-d-cancel">Abbrechen</button>
-        <button type="button" class="btn-danger" id="fx-d-del" hidden>Eintrag löschen</button>
-      </div>
-    </form>
-    <div class="vac-hero">
-      <div class="big" id="fx-big"><b id="fx-saldo">0:00</b><span>Std auf dem Gleitzeitkonto</span></div>
-      <dl class="legend" id="fx-dl"></dl>
-    </div>
-    <div class="fx-now" id="fx-now">
-      <p id="fx-now-txt"></p>
-      <button type="button" class="btn fx-stamp" id="fx-stamp">Kommen</button>
-    </div>
-    <p class="hint" id="fx-missing" hidden></p>
-    <div>
-      <div class="fx-week-head">
-        <button type="button" class="icon-btn" id="fx-prev" aria-label="Woche davor"></button>
-        <p class="sub-h" id="fx-week-lbl"></p>
-        <button type="button" class="icon-btn" id="fx-next" aria-label="Woche danach"></button>
-      </div>
-      <ul class="fx-week" id="fx-week"></ul>
-    </div>
-  </section>
-
   <!-- Formel 1 -->
   <section class="card" id="f1" data-type="f1" aria-labelledby="f1-h">
     <div class="card-head">
@@ -1076,6 +1128,71 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
     <p class="src" id="fu-src"></p>
   </section>
 
+  <!-- Kalender -->
+  <section class="card" id="cal" data-type="cal" aria-labelledby="ca-h">
+    <div class="card-head">
+      <h2 id="ca-h"><span data-r="title">Kalender</span></h2>
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="ca-refresh" hidden>Aktualisieren</button>
+        <button type="button" class="icon-btn" id="ca-set-btn" aria-label="Kalender einrichten" title="Kalender einrichten"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      </div>
+    </div>
+    <div class="wx-off" id="ca-setup" hidden>
+      <h3>iCloud-Kalender verbinden</h3>
+      <p>Hier tauchen deine nächsten Termine auf. Dafür brauchst du den Link deines öffentlich geteilten Kalenders und eine kleine Weiterleitung, die du einmal kostenlos bei Cloudflare anlegst.</p>
+      <div class="form-row"><button type="button" class="btn" id="ca-setup-btn">Einrichten</button></div>
+    </div>
+    <form class="panel ca-form" id="ca-form" hidden novalidate>
+      <h3>Kalender einrichten</h3>
+      <ol class="ca-steps">
+        <li><b>Kalender teilen.</b> Auf dem iPhone in der Kalender-App unten auf „Kalender“, beim gewünschten Kalender auf das (i), „Öffentlicher Kalender“ einschalten, „Link teilen“ und kopieren. Auf icloud.com geht es über das Teilen-Symbol neben dem Kalender. Jeder mit diesem Link kann den Kalender lesen, gib ihn also nicht weiter.</li>
+        <li><b>Weiterleitung anlegen.</b> Apple lässt Webseiten den Kalender nicht direkt abrufen. Leg dir auf dash.cloudflare.com ein kostenloses Konto an, dann unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“. Ersetz dort den Code durch den Code unten, klick auf „Deploy“ und trag die Adresse des Workers hier ein.
+          <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="ca-code"></pre><button type="button" class="btn-ghost" id="ca-copy">Code kopieren</button></details>
+        </li>
+        <li><b>Link eintragen.</b> Du kannst mehrere Kalender hinzufügen, jeder bekommt eine eigene Farbe.</li>
+      </ol>
+      <div class="field"><label for="ca-proxy">Adresse der Weiterleitung</label><input id="ca-proxy" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://kalender.dein-name.workers.dev"></div>
+      <ul class="ca-feeds" id="ca-feeds" hidden></ul>
+      <div class="grid2 ca-addrow">
+        <div class="field"><label for="ca-name">Name</label><input id="ca-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Privat"></div>
+        <div class="field"><label for="ca-url">Kalender-Link</label><input id="ca-url" type="url" maxlength="400" autocomplete="off" spellcheck="false" placeholder="webcal://p…-caldav.icloud.com/published/2/…"></div>
+      </div>
+      <div class="form-row"><button type="button" class="btn-ghost" id="ca-add">+ Kalender</button></div>
+      <div class="grid2">
+        <div class="field"><label for="ca-days">Zeitraum</label><select id="ca-days"><option value="7">Nächste 7 Tage</option><option value="14">Nächste 14 Tage</option><option value="30">Nächste 30 Tage</option></select></div>
+        <label class="check-row ca-locrow"><input type="checkbox" id="ca-loc"> Ort unter dem Termin zeigen</label>
+      </div>
+      <p class="hint">Links und Weiterleitung bleiben nur in diesem Browser und kommen nicht mit in die Sicherung.</p>
+      <p class="err" id="ca-ferr" hidden></p>
+      <div class="form-row">
+        <button type="submit" class="btn">Speichern</button>
+        <button type="button" class="btn-ghost" id="ca-cancel">Abbrechen</button>
+        <button type="button" class="btn-danger" id="ca-forget" hidden>Kalender entfernen</button>
+      </div>
+    </form>
+    <div id="ca-live" hidden>
+      <p class="err" id="ca-err" hidden></p>
+      <ul class="ca-list" id="ca-list"></ul>
+      <button type="button" class="btn-ghost" id="ca-more" hidden></button>
+    </div>
+    <p class="src ca-src" id="ca-src"></p>
+  </section>
+
+  <!-- Vers des Tages -->
+  <section class="card" id="verse" data-type="verse" aria-labelledby="vs-h">
+    <div class="card-head">
+      <h2 id="vs-h"><span data-r="title">Vers des Tages</span></h2>
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="vs-back" hidden>Zurück zu heute</button>
+        <button type="button" class="btn-ghost" id="vs-more">Noch einer</button>
+      </div>
+    </div>
+    <figure class="vs">
+      <blockquote class="vs-text" id="vs-text">Vers wird geladen …</blockquote>
+      <figcaption class="vs-cap"><a id="vs-ref" target="_blank" rel="noopener" hidden></a><span id="vs-tr"></span></figcaption>
+    </figure>
+  </section>
+
   <button type="button" class="card add-tile" id="add-tile" hidden><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Widget hinzufügen<span>Neu anlegen oder ein vorhandenes einfügen</span></button>
 </main>
 
@@ -1113,6 +1230,13 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
       </div>
       <div class="field"><span class="lbl" id="dr-acc-l">Akzentfarbe</span><div class="swatches" id="dr-accent" role="radiogroup" aria-labelledby="dr-acc-l"></div></div>
       <label class="check-row"><input type="checkbox" id="dr-secs"> Sekunden an der Uhr zeigen</label>
+      <label class="check-row"><input type="checkbox" id="dr-sky"> Himmel oben nach dem echten Sonnenstand färben</label>
+    </section>
+
+    <section class="dr-sec">
+      <h3>Spiegel-Modus</h3>
+      <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Countdowns und Vers, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
+      <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
     </section>
 
     <section class="dr-sec">
@@ -1158,7 +1282,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 
     <section class="dr-sec" id="dr-data">
       <h3>Daten</h3>
-      <p class="hint">Deine Einstellungen liegen nur in diesem Browser. Sicher sie ab und zu als Datei. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key und Tankerkönig-Key sind nicht mit drin.</p>
+      <p class="hint">Deine Einstellungen liegen nur in diesem Browser. Sicher sie ab und zu als Datei. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key, Tankerkönig-Key und deine Kalender-Links sind nicht mit drin.</p>
       <p class="hint" id="dr-backup-at"></p>
       <div class="form-row">
         <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>
@@ -1414,6 +1538,27 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
   </section>
 </template>
 
+<div class="mirror" id="mirror" hidden aria-label="Spiegel-Modus">
+  <div class="m-in" id="m-in">
+    <section class="m-clock">
+      <p class="m-time" id="m-time">00:00</p>
+      <p class="m-date" id="m-date">&nbsp;</p>
+    </section>
+    <section class="m-wx" id="m-wx" hidden>
+      <div class="m-wx-now"><span class="m-wx-ico" id="m-wx-ico"></span><b id="m-wx-temp"></b></div>
+      <p id="m-wx-desc"></p>
+      <p class="m-dim" id="m-wx-sub"></p>
+    </section>
+    <section class="m-cal" id="m-cal" hidden></section>
+    <section class="m-cd" id="m-cd"></section>
+    <figure class="m-verse" id="m-verse" hidden>
+      <blockquote id="m-verse-text"></blockquote>
+      <figcaption id="m-verse-ref"></figcaption>
+    </figure>
+  </div>
+  <button type="button" class="m-exit" id="m-exit">Spiegel verlassen</button>
+</div>
+
 <div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Rückgängig</button></div>
 
 <script>
@@ -1543,7 +1688,8 @@ const numTxt = n => numDe(n, n % 1 ? 1 : 0);
  *                Pendeln, Wetter und Urlaub gibt es genau einmal (ID = Typ), den Rest beliebig oft.
  * state.page     zuletzt geöffnete Seite
  * state.meta     wann zuletzt geändert und gesichert wurde (für die Erinnerung ans Sichern), zuletzt gesehene Version
- * state.flex     Gleitzeit: gestempelte Tage. state.pomo: erledigte Pomodoro-Runden pro Tag
+ * state.flex     alte Gleitzeit-Daten (Widget gibt es seit 2.3 nicht mehr, die Daten bleiben für die Sicherung)
+ * state.pomo     erledigte Pomodoro-Runden pro Tag
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
@@ -1570,13 +1716,23 @@ const TYPES = {
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
   habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  flex:     { name: 'Gleitzeit', multi: false, w: 1, since: '2.1', desc: 'Kommen und Gehen stempeln, Soll und Saldo. Urlaub und Feiertage zählen automatisch mit.' },
   football: { name: 'Fußball', multi: true, w: 1, since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
   f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
-  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' }
+  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
+  cal:      { name: 'Kalender', multi: false, w: 1, since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
+  verse:    { name: 'Vers des Tages', multi: false, w: 1, since: '2.3', desc: 'Jeden Tag ein Bibelvers, in Luther 1912 oder einer anderen Übersetzung. Mit Link zum ganzen Abschnitt.' }
 };
 const SOON = [];
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
+/* Bibelübersetzungen bei bolls.life, bs = Kürzel für den Link zu bibleserver.com */
+const VS_TR = {
+  LUT: { name: 'Luther 1912', bs: 'LUT' },
+  S00: { name: 'Schlachter 2000', bs: 'SLT' },
+  ELB: { name: 'Elberfelder 1871', bs: 'ELB' },
+  MB: { name: 'Menge', bs: 'MENG' },
+  NeU: { name: 'Neue evangelistische Übersetzung', bs: 'NE%C3%9C' },
+  HFA: { name: 'Hoffnung für alle', bs: 'HFA' }
+};
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
@@ -1589,10 +1745,11 @@ const TICON = {
   pomodoro: svgIco('<circle cx="12" cy="13" r="7.5"/><path d="M12 9.2V13l2.6 1.8M10 2.6h4"/>'),
   habits: svgIco('<path d="M12 21c-3.8 0-6.5-2.6-6.5-6 0-3.6 3-5.4 3.8-9 2.7 1.7 3.4 4 3.2 6 1-.6 1.8-1.7 2-3 1.7 1.6 2.9 3.6 2.9 6 0 3.4-2.6 6-5.4 6z"/>'),
   learn: svgIco('<path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.6v4c1.5 1.6 3.4 2.4 5.5 2.4s4-.8 5.5-2.4v-4"/>'),
-  flex: svgIco('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'),
   football: svgIco('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6l3.7 2.7-1.4 4.4H9.7l-1.4-4.4z"/>'),
   f1: svgIco('<path d="M5 21V4"/><path d="M5 4.6c4-2 6 2 10 0s4 0 4 0v8.6s-1-2-4 0-6-2-10 0"/>'),
-  fuel: svgIco('<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M5 10h9"/><path d="M14 8.5l3 2.5v6.5a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/>')
+  fuel: svgIco('<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M5 10h9"/><path d="M14 8.5l3 2.5v6.5a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/>'),
+  cal: svgIco('<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r=".9" fill="currentColor"/><circle cx="12" cy="14.5" r=".9" fill="currentColor"/>'),
+  verse: svgIco('<path d="M12 6.5c-1.8-1.4-4.6-2-7.5-1.8v13c2.9-.2 5.7.4 7.5 1.8 1.8-1.4 4.6-2 7.5-1.8v-13c-2.9-.2-5.7.4-7.5 1.8z"/><path d="M12 6.5v13"/>')
 };
 
 const DEF_WIDGETS_V1 = [['tasks', 1], ['commute', 1], ['weather', 2], ['progress', 1], ['vacation', 1], ['links', 1], ['notes', 1]];
@@ -1604,7 +1761,7 @@ const DEF_BARS = () => [
   { id: 'b5', kind: 'range', name: 'Ausbildung', from: '2024-08-01', to: '2027-07-31', example: true }
 ];
 const DEF_UI = () => ({
-  greet: 'Moin Jere', theme: 'auto', accent: 'amber', size: 'm', seconds: true, region: 'HH',
+  greet: 'Moin Jere', theme: 'auto', accent: 'amber', size: 'm', seconds: true, region: 'HH', sky: true,
   tiles: { fa: true, we: true, ft: true, ur: true }, countdowns: [],
   start: { mode: 'last', page: '', work: '', free: '' }
 });
@@ -1674,6 +1831,17 @@ function normFlexDays(o) {
   }
   return out;
 }
+/* Einstellungen des früheren Gleitzeit-Widgets aufheben, damit nichts verloren geht */
+function flexCfgKeep(s) {
+  const w = s.widgets && s.widgets.flex && s.widgets.flex.type === 'flex' ? s.widgets.flex.cfg : s.flex && s.flex.cfg;
+  if (!w || typeof w !== 'object') return null;
+  const out = {};
+  for (const k of ['soll', 'carry']) if (Number.isFinite(+w[k])) out[k] = Math.round(+w[k]);
+  if (Array.isArray(w.days)) out.days = normDays(w.days, []);
+  if (validYmd(w.from)) out.from = w.from;
+  if (w.autoBreak === false) out.autoBreak = false;
+  return Object.keys(out).length ? out : null;
+}
 function normPomoLog(o) {
   const out = {};
   if (!o || typeof o !== 'object') return out;
@@ -1691,8 +1859,9 @@ function normCfg(type, c) {
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
     case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '' };
     case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
+    case 'cal': return { days: [7, 14, 30].includes(+c.days) ? +c.days : 14, loc: c.loc !== false };
+    case 'verse': return { tr: VS_TR[c.tr] ? c.tr : 'LUT' };
     case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
-    case 'flex': return { soll: intIn(c.soll, 0, 720, 480), days: normDays(c.days, [1, 2, 3, 4, 5]), autoBreak: c.autoBreak !== false, carry: intIn(c.carry, -60000, 60000, 0), from: validYmd(c.from) ? c.from : ymd(new Date()) };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false };
@@ -1750,6 +1919,7 @@ function normUi(u) {
     accent: ACCENTS[u.accent] ? u.accent : 'amber',
     size: SIZES[u.size] ? u.size : 'm',
     seconds: u.seconds !== false,
+    sky: u.sky !== false,
     region: REGIONS[u.region] ? u.region : 'HH',
     tiles: { fa: t.fa !== false, we: t.we !== false, ft: t.ft !== false, ur: t.ur !== false },
     countdowns: (Array.isArray(u.countdowns) ? u.countdowns : []).filter(c => c && validYmd(c.date)).slice(0, 6)
@@ -1807,7 +1977,7 @@ function normalize(s) {
     widgets,
     loc: s.loc && s.loc.mode === 'fixed' && Number.isFinite(+s.loc.lat) && Number.isFinite(+s.loc.lon) ? { mode: 'fixed', name: String(s.loc.name || 'Ort'), lat: +s.loc.lat, lon: +s.loc.lon } : { mode: 'auto' },
     commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) },
-    flex: { days: normFlexDays(s.flex && s.flex.days) },
+    flex: { days: normFlexDays(s.flex && s.flex.days), cfg: flexCfgKeep(s) },
     pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
     meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
@@ -1967,13 +2137,6 @@ function calcBar(b, now) {
   switch (b.kind) {
     case 'day': {
       if (!validHm(b.start) || !validHm(b.end)) return { pct: 0, state: 'off', sub: 'Uhrzeit fehlt', left: '', right: '' };
-      const wb = workBar(), fxt = wb && wb.id === b.id ? flexToday(now) : null;
-      if (fxt) {
-        const fr = { left: hm(fxt.start), right: hm(fxt.end) };
-        if (!fxt.running) return { ...fr, pct: 1, state: 'done', sub: `Ausgestempelt um ${hm(fxt.end)}` };
-        if (now >= fxt.end) return { ...fr, pct: 1, state: 'done', sub: 'Soll erreicht, ab jetzt Plus' };
-        return { ...fr, pct: clamp01((now - fxt.start) / (fxt.end - fxt.start)), state: 'run', sub: `noch ${dur(fxt.end - now)} bis zum Soll` };
-      }
       const r = { left: b.start, right: b.end };
       const why = freeReason(b, now);
       if (why) return { ...r, pct: 0, state: 'off', sub: why === 'Urlaub' ? 'Heute Urlaub' : why === 'Wochenende' || why === 'Kein Arbeitstag' ? 'Heute frei' : `Heute frei, ${why}` };
@@ -2509,6 +2672,9 @@ async function loadWeather(loc, seq) {
     if (seq !== undefined && seq !== wx.seq) return true;
     wx.live = true; wx.loc = loc; wx.data = d; wx.at = Date.now();
     renderWeather();
+    sky.minute = -1;
+    skyTick(new Date());
+    renderMirror();
     ensureRadar(loc);
     clearTimeout(wx.timer);
     wx.timer = setTimeout(() => loadWeather(wx.loc), 10 * 6e4);
@@ -3369,8 +3535,7 @@ function renderCommute() {
   const now = new Date();
   const dl = [['Jetzt los', `an ${hm(new Date(now.getTime() + mins * 6e4))} Uhr`], ['Strecke', `${numDe(km, 1)} km${R.refs.length ? ' über ' + R.refs.join(', ') : ''}`], ['Verzögerung', delay >= 1 ? `+${Math.round(delay)} Min` : 'keine']];
   const wb = workBar();
-  const fxt = flexToday(now);
-  const endT = fxt && fxt.running ? fxt.end : wb && !freeReason(wb, now) ? at(now, wb.end) : null;
+  const endT = wb && !freeReason(wb, now) ? at(now, wb.end) : null;
   if (R.dir === 'home' && endT && now < endT) dl.splice(1, 0, [`Ab ${hm(endT)}`, `an ${hm(new Date(endT.getTime() + mins * 6e4))} Uhr`]);
   $('#cm-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   $('#cm-route').textContent = `${R.from.label || R.from.text} → ${R.to.label || R.to.text}`;
@@ -3565,14 +3730,8 @@ function setTile(id, val, sub, mode) {
 }
 function tickTiles(now) {
   const t = sod(now), wb = workBar();
-  // Feierabend (wenn heute in der Gleitzeit gestempelt: ab dann zählt das Soll)
-  const fxt = flexToday(now);
-  const way = cm.homeMins ? `, Heimweg ca. ${cm.homeMins} Min` : '';
-  if (fxt && fxt.running) {
-    if (now < fxt.end) setTile('#t-fa', `in ${dur(fxt.end - now, true)}`, `um ${hm(fxt.end)} Uhr ist dein Soll voll${way}`, 'hot');
-    else setTile('#t-fa', 'Soll erreicht', `seit ${hm(fxt.end)} Uhr, ab jetzt sammelst du Plus`, 'good');
-  } else if (fxt) setTile('#t-fa', 'Geschafft', `ausgestempelt um ${hm(fxt.end)} Uhr`, 'good');
-  else if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
+  // Feierabend
+  if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
   else {
     const why = freeReason(wb, now);
     const s = at(now, wb.start), e = at(now, wb.end);
@@ -3634,10 +3793,18 @@ function renderTiles() {
   box.hidden = !curPage().tiles || !box.querySelector('.tile:not([hidden])');
 }
 
+let headKey = '';
 function tickHeader(now) {
-  $('#h-time').innerHTML = state.ui.seconds ? `${hm(now)}<span class="sec">:${pad(now.getSeconds())}</span>` : hm(now);
-  $('#h-date').textContent = `${WDL[now.getDay()]}, ${now.getDate()}. ${ML[now.getMonth()]} ${now.getFullYear()}`;
-  $('#h-kw').textContent = pad(isoWeek(now));
+  const k = `${hm(now)}|${state.ui.seconds}`;
+  if (k !== headKey) {
+    headKey = k;
+    $('#h-time').innerHTML = `${pad(now.getHours())}<span class="colon">:</span>${pad(now.getMinutes())}${state.ui.seconds ? '<span class="sec"></span>' : ''}`;
+    $('#h-day').textContent = WDL[now.getDay()];
+    $('#h-date').textContent = `${now.getDate()}. ${ML[now.getMonth()]} ${now.getFullYear()}`;
+    $('#h-kw').textContent = isoWeek(now);
+  }
+  const s = $('#h-time .sec');
+  if (s) s.textContent = pad(now.getSeconds());
 }
 
 const themeStyle = document.createElement('style');
@@ -3651,6 +3818,8 @@ function applyUi() {
   themeStyle.textContent = `:root{${vars(p.l)}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${vars(p.d)}}}:root[data-theme="dark"]{${vars(p.d)}}`;
   $('#h-greet').textContent = u.greet.trim() || 'Moin';
   $('#foot-region').textContent = `Feiertage: ${REGIONS[u.region]}`;
+  headKey = '';
+  sky.minute = -1;
   const look = `${isDark()}|${u.accent}`;
   if (look !== lastLook) { lastLook = look; refreshMapLook(); }
 }
@@ -3795,8 +3964,6 @@ function startTargets() {
 }
 /* Arbeitszeit aus dem Arbeitstag-Balken, ab einer Stunde vor Beginn. Feiertage und Urlaub zählen als frei. */
 function isWorkTime(now) {
-  const fxt = flexToday(now);
-  if (fxt) return fxt.running;
   const wb = workBar();
   if (!wb || freeReason(wb, now)) return false;
   const s = at(now, wb.start).getTime() - 36e5, e = at(now, wb.end).getTime();
@@ -4177,6 +4344,7 @@ function renderDrawer() {
   segSet($('#dr-size'), u.size);
   renderSwatches();
   $('#dr-secs').checked = u.seconds;
+  $('#dr-sky').checked = u.sky;
   const tl = $('#dr-tiles');
   tl.textContent = '';
   for (const [k, n] of Object.entries(TILES)) {
@@ -4247,6 +4415,8 @@ $('#dr-size').addEventListener('click', e => {
 });
 $('#dr-accent').addEventListener('change', e => { if (e.target.name === 'dr-acc') { state.ui.accent = e.target.value; commit(); } });
 $('#dr-secs').addEventListener('change', e => { state.ui.seconds = e.target.checked; commit(); });
+$('#dr-sky').addEventListener('change', e => { state.ui.sky = e.target.checked; commit(); });
+$('#dr-mirror').addEventListener('click', () => { closeDrawer(); mirrorOpen(true); });
 $('#dr-tiles').addEventListener('change', e => {
   const k = e.target.dataset.tile;
   if (!k) return;
@@ -4872,294 +5042,6 @@ defineWidget('learn', {
   },
   render: renderLearn
 });
-
-/* 33-gleitzeit.js */
-/* Gleitzeit (gibt es nur einmal). Regeln in state.widgets.flex.cfg, gestempelte Tage in state.flex.days:
- * { 'JJJJ-MM-TT': { in: 'HH:MM', out: 'HH:MM' oder leer, pause: Minuten, kind: '' | 'school' | 'sick' | 'flexday' } }
- * Nicht gestempelte Arbeitstage zählen nicht ins Saldo, sie werden nur als fehlend angezeigt. */
-const fxCfg = () => state.widgets.flex.cfg;
-const fx = { week: 0, editing: null };
-const FX_KIND = { school: 'Berufsschule', sick: 'Krank', flexday: 'Gleittag' };
-const toMin = s => { const [h, m] = s.split(':').map(Number); return h * 60 + m; };
-const fmtDur = (min, sign) => { const a = Math.abs(Math.round(min)); return `${min < 0 && a ? '-' : sign && a ? '+' : ''}${Math.floor(a / 60)}:${pad(a % 60)}`; };
-const nowMin = d => d.getHours() * 60 + d.getMinutes();
-/* "8", "8:00", "7,5" oder "-1:15" in Minuten. Leer: 0. Unlesbar: null */
-function parseDur(str) {
-  const s = String(str || '').trim().replace(/\s/g, '').replace(/[−–]/g, '-');
-  if (!s) return 0;
-  let m = s.match(/^([+-]?)(\d{1,3}):(\d{2})$/);
-  if (m) return +m[3] > 59 ? null : (m[1] === '-' ? -1 : 1) * (+m[2] * 60 + +m[3]);
-  m = s.match(/^([+-]?)(\d{1,3})(?:[.,](\d{1,2}))?$/);
-  if (m) return (m[1] === '-' ? -1 : 1) * Math.round(parseFloat(`${m[2]}.${m[3] || 0}`) * 60);
-  return null;
-}
-/* Gesetzliche Pause: über 6 Std mindestens 30 Min, über 9 Std mindestens 45 Min. Nie unter die Grenze rutschen. */
-function legalNet(work, pause) {
-  if (work <= 360) return work;
-  let net = Math.max(360, work - Math.max(0, 30 - pause));
-  if (net > 540) net = Math.max(540, work - Math.max(0, 45 - pause));
-  return net;
-}
-/* Soll eines Tages: 0 an freien Tagen, Feiertagen und im Urlaub. Halbe Urlaubstage und 24.12./31.12. halbieren. */
-function fxSoll(d) {
-  const c = fxCfg();
-  if (!c.days.includes(d.getDay()) || holidayName(d)) return 0;
-  const xmas = state.vacation.halfXmas && isXmasHalf(d), v = vacationOn(d);
-  if (v) return v.half && !xmas ? Math.round(c.soll / 2) : 0;
-  return xmas ? Math.round(c.soll / 2) : c.soll;
-}
-/* Ist eines Tages in Minuten. upTo: aktuelle Minute, falls heute noch eingestempelt */
-function fxIst(k, e, upTo) {
-  if (!e) return null;
-  if (e.kind === 'school' || e.kind === 'sick') return fxSoll(parseYmd(k));
-  if (e.kind === 'flexday') return 0;
-  if (!e.in) return null;
-  const end = e.out ? toMin(e.out) : upTo;
-  if (end == null) return null;
-  const work = Math.max(0, end - toMin(e.in) - e.pause);
-  return fxCfg().autoBreak ? legalNet(work, e.pause) : work;
-}
-/* Wie lange man arbeiten muss (ohne gestempelte Pause), damit das Netto das Soll erreicht */
-function fxWorkFor(soll, pause) {
-  if (!fxCfg().autoBreak || soll <= 360) return soll;
-  return soll > 540 ? soll + Math.max(0, 45 - pause) : soll + Math.max(0, 30 - pause);
-}
-/* Für Kacheln, Arbeitstag-Balken und Startseite: heute eingestempelt? Start und (voraussichtliches) Ende */
-function flexToday(now) {
-  const k = ymd(now), e = state.flex.days[k];
-  if (!e || e.kind || !e.in) return null;
-  const base = sod(now).getTime(), start = toMin(e.in);
-  if (e.out) return { running: false, start: new Date(base + start * 6e4), end: new Date(base + toMin(e.out) * 6e4) };
-  const soll = fxSoll(now);
-  return { running: true, start: new Date(base + start * 6e4), end: new Date(base + (start + e.pause + fxWorkFor(soll, e.pause)) * 6e4) };
-}
-function fxBalance(now) {
-  const c = fxCfg(), today = ymd(now), mon = ymd(weekStart(now));
-  let bal = c.carry, week = 0;
-  for (const [k, e] of Object.entries(state.flex.days)) {
-    if (k < c.from || k > today) continue;
-    if (k === today && e.in && !e.out && !e.kind) continue; // laufender Tag zählt erst nach dem Ausstempeln
-    const ist = fxIst(k, e, null);
-    if (ist == null) continue;
-    const diff = ist - fxSoll(parseYmd(k));
-    bal += diff;
-    if (k >= mon) week += diff;
-  }
-  return { bal, week };
-}
-function fxMissing(now) {
-  const c = fxCfg(), out = [];
-  for (let i = 14; i >= 1; i--) {
-    const d = addDays(sod(now), -i), k = ymd(d);
-    if (k < c.from || state.flex.days[k]) continue;
-    if (fxSoll(d) > 0) out.push(d);
-  }
-  return out;
-}
-function fxStamp() {
-  const now = new Date(), k = ymd(now), t = hm(now), e = state.flex.days[k];
-  if (!e || e.kind || !e.in) state.flex.days[k] = { in: t, out: '', pause: 0, kind: '' };
-  else if (!e.out) {
-    if (toMin(t) <= toMin(e.in)) return;
-    e.out = t;
-    const ist = fxIst(k, e, null), soll = fxSoll(now);
-    toast(`Ausgestempelt. Heute ${fmtDur(ist)} Std, das sind ${fmtDur(ist - soll, true)}.`);
-  } else {
-    // wieder da: die Zeit dazwischen zählt als Pause
-    e.pause = Math.min(600, e.pause + Math.max(0, toMin(t) - toMin(e.out)));
-    e.out = '';
-  }
-  commit();
-}
-function fxDayLine(d, k, e, now) {
-  const today = k === ymd(now), soll = fxSoll(d), h = holidayName(d), v = vacationOn(d);
-  if (e && e.kind) return { t: FX_KIND[e.kind] + (e.kind === 'flexday' ? '' : ', zählt wie Soll'), i: fmtDur(fxIst(k, e, null)), x: fxIst(k, e, null) - soll };
-  if (e && e.in) {
-    const run = !e.out, ist = fxIst(k, e, run && today ? nowMin(now) : null);
-    const t = `${e.in} bis ${e.out || (today ? 'jetzt' : '?')}${e.pause ? `, ${e.pause} Min Pause` : ''}`;
-    if (ist == null) return { t, i: '', x: null };
-    return { t, i: fmtDur(ist), x: run ? null : ist - soll };
-  }
-  if (h) return { t: h, i: '', x: null, off: true };
-  if (v) return { t: soll ? 'Halber Urlaubstag' : 'Urlaub', i: '', x: null, off: true };
-  if (!soll) return { t: 'Frei', i: '', x: null, off: true };
-  if (d > sod(now) || today) return { t: `Soll ${fmtDur(soll)}`, i: '', x: null };
-  return { t: k < fxCfg().from ? 'vor dem Start' : 'nicht erfasst', i: '', x: null, miss: k >= fxCfg().from };
-}
-function renderFlex() {
-  const c = fxCfg(), now = new Date(), k = ymd(now), e = state.flex.days[k], soll = fxSoll(now);
-  const { bal, week } = fxBalance(now);
-  $('#fx-saldo').textContent = fmtDur(bal, true);
-  $('#fx-big').dataset.s = bal > 0 ? 'plus' : bal < 0 ? 'minus' : '';
-  const todayIst = e ? fxIst(k, e, nowMin(now)) : null;
-  $('#fx-dl').innerHTML = [
-    ['Diese Woche', fmtDur(week, true)],
-    ['Heute', todayIst == null ? `0:00 von ${fmtDur(soll)}` : `${fmtDur(todayIst)} von ${fmtDur(soll)}`],
-    ['Soll pro Tag', fmtDur(c.soll)]
-  ].map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join('');
-
-  // Jetzt-Zeile mit Stempel-Knopf
-  const box = $('#fx-now'), txt = $('#fx-now-txt'), btn = $('#fx-stamp');
-  const ft = flexToday(now);
-  let s = 'none';
-  if (e && e.kind) txt.innerHTML = `<b>Heute: ${esc(FX_KIND[e.kind])}.</b> ${e.kind === 'flexday' ? `Das Soll von ${fmtDur(soll)} geht vom Saldo ab.` : `Zählt wie ${fmtDur(soll)} Std.`}`;
-  else if (ft && ft.running) {
-    s = 'in';
-    const reached = now >= ft.end;
-    txt.innerHTML = `<b>Eingestempelt seit ${esc(e.in)}.</b> Bisher ${fmtDur(todayIst)} Std${soll ? (reached ? `, Soll erreicht um ${hm(ft.end)}. Alles ab jetzt ist Plus: ${fmtDur(todayIst - soll, true)}.` : `, Soll voll um <b>${hm(ft.end)}</b>.`) : ', heute ist eigentlich frei.'}`;
-  } else if (ft) {
-    s = 'out';
-    txt.innerHTML = `<b>Heute ${fmtDur(todayIst)} Std, ${fmtDur(todayIst - soll, true)}.</b> Ausgestempelt um ${esc(e.out)}${e.pause ? `, ${e.pause} Min Pause` : ''}.`;
-  } else {
-    const h = holidayName(now), v = vacationOn(now);
-    txt.innerHTML = soll ? `<b>Noch nicht eingestempelt.</b> Heute sind ${fmtDur(soll)} Std Soll.` : `<b>${esc(h ? `Heute ist ${h}.` : v ? 'Heute hast du Urlaub.' : 'Heute ist kein Arbeitstag.')}</b> Stempeln geht trotzdem.`;
-  }
-  box.dataset.s = s;
-  btn.textContent = s === 'in' ? 'Gehen' : 'Kommen';
-  btn.setAttribute('aria-label', s === 'in' ? `Ausstempeln, ${hm(now)} Uhr` : `Einstempeln, ${hm(now)} Uhr`);
-
-  const miss = fxMissing(now);
-  $('#fx-missing').hidden = !miss.length;
-  $('#fx-missing').textContent = miss.length ? `${miss.length === 1 ? 'Ein Arbeitstag ist' : `${miss.length} Arbeitstage sind`} noch nicht erfasst: ${miss.slice(-4).map(d => `${WD[d.getDay()]} ${dm(d)}`).join(', ')}${miss.length > 4 ? ' …' : ''}. Tipp auf den Tag in der Woche, um ihn nachzutragen.` : '';
-
-  // Woche
-  const mon = addDays(weekStart(now), 7 * fx.week), sun = addDays(mon, 6);
-  $('#fx-week-lbl').textContent = `KW ${isoWeek(mon)} · ${dm(mon)} bis ${dm(sun)}`;
-  $('#fx-prev').innerHTML = LEFT;
-  $('#fx-next').innerHTML = RIGHT;
-  $('#fx-next').disabled = fx.week >= 0;
-  const ul = $('#fx-week');
-  ul.textContent = '';
-  for (let i = 0; i < 7; i++) {
-    const d = addDays(mon, i), dk = ymd(d), de = state.flex.days[dk];
-    if (!c.days.includes(d.getDay()) && !de) continue;
-    const L = fxDayLine(d, dk, de, now);
-    const li = document.createElement('li');
-    li.innerHTML = `<button type="button" class="fx-row${dk === k ? ' today' : ''}${L.off ? ' off' : ''}" data-fxd="${dk}"><span class="d">${WD[d.getDay()]} ${dm(d)}</span><span class="t"></span><span class="i">${esc(L.i)}</span><span class="x"${L.x == null ? '' : ` data-s="${L.x > 0 ? 'plus' : L.x < 0 ? 'minus' : ''}"`}>${L.x == null ? '' : esc(fmtDur(L.x, true))}</span></button>`;
-    li.querySelector('.t').textContent = L.t;
-    if (L.miss) li.querySelector('.t').style.color = 'var(--bad)';
-    li.querySelector('button').setAttribute('aria-label', `${WDL[d.getDay()]}, ${dm(d)}: ${L.t}${L.i ? `, ${L.i} Std` : ''}. Bearbeiten`);
-    ul.appendChild(li);
-  }
-}
-function fxTick(now) {
-  // Jede neue Minute auffrischen (auch wenn der Browser den Takt im Hintergrund drosselt)
-  const v = views.get('flex'), mk = Math.floor(now.getTime() / 6e4);
-  if (!v || v.el.hidden || mk === fx.minute) return;
-  const first = fx.minute === undefined;
-  fx.minute = mk;
-  if (!first) renderFlex();
-}
-
-/* Tag eintragen oder ändern */
-function fxPreview() {
-  const k = $('#fx-d-date').value, kind = $('#fx-d-kind').value, inT = $('#fx-d-in').value, outT = $('#fx-d-out').value, p = Math.max(0, Math.round(+$('#fx-d-pause').value || 0));
-  $('#fx-d-times').hidden = !!kind;
-  if (!validYmd(k)) { $('#fx-d-prev').textContent = ''; return; }
-  const soll = fxSoll(parseYmd(k));
-  if (kind) { const ist = fxIst(k, { kind }, null); $('#fx-d-prev').textContent = `Soll ${fmtDur(soll)}, zählt ${fmtDur(ist)}, also ${fmtDur(ist - soll, true)}.`; return; }
-  if (!validHm(inT) || !validHm(outT) || toMin(outT) <= toMin(inT)) { $('#fx-d-prev').textContent = soll ? `Soll an dem Tag: ${fmtDur(soll)} Std.` : 'An dem Tag ist kein Soll.'; return; }
-  const ist = fxIst(k, { in: inT, out: outT, pause: p, kind: '' }, null);
-  const gross = toMin(outT) - toMin(inT) - p;
-  $('#fx-d-prev').textContent = `Das sind ${fmtDur(ist)} Std${ist < gross ? ` (${gross - ist} Min Pause automatisch abgezogen)` : ''}, Soll ${fmtDur(soll)}, also ${fmtDur(ist - soll, true)}.`;
-}
-function openFxDay(k) {
-  const e = state.flex.days[k];
-  fx.editing = k;
-  $('#fx-set').hidden = true;
-  $('#fx-day-title').textContent = e ? `${WDL[parseYmd(k).getDay()]}, ${dm(parseYmd(k))} bearbeiten` : `${WDL[parseYmd(k).getDay()]}, ${dm(parseYmd(k))} eintragen`;
-  $('#fx-d-date').value = k;
-  $('#fx-d-kind').value = e ? e.kind : '';
-  $('#fx-d-in').value = e ? e.in : '';
-  $('#fx-d-out').value = e ? e.out : '';
-  $('#fx-d-pause').value = e ? e.pause : 0;
-  $('#fx-d-del').hidden = !e;
-  $('#fx-d-err').hidden = true;
-  $('#fx-day').hidden = false;
-  fxPreview();
-  $('#fx-day').scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
-  $('#fx-d-in').focus({ preventScroll: true });
-}
-$('#fx-stamp').addEventListener('click', fxStamp);
-$('#fx-add-btn').addEventListener('click', () => { if ($('#fx-day').hidden) openFxDay(ymd(new Date())); else $('#fx-day').hidden = true; });
-$('#fx-week').addEventListener('click', e => { const b = e.target.closest('[data-fxd]'); if (b) openFxDay(b.dataset.fxd); });
-$('#fx-prev').addEventListener('click', () => { fx.week = Math.max(-104, fx.week - 1); renderFlex(); });
-$('#fx-next').addEventListener('click', () => { fx.week = Math.min(0, fx.week + 1); renderFlex(); });
-for (const id of ['#fx-d-date', '#fx-d-kind', '#fx-d-in', '#fx-d-out', '#fx-d-pause']) $(id).addEventListener('input', fxPreview);
-$('#fx-d-date').addEventListener('change', () => {
-  const k = $('#fx-d-date').value, e = validYmd(k) && state.flex.days[k];
-  if (e && k !== fx.editing) { fx.editing = k; $('#fx-d-kind').value = e.kind; $('#fx-d-in').value = e.in; $('#fx-d-out').value = e.out; $('#fx-d-pause').value = e.pause; $('#fx-d-del').hidden = false; fxPreview(); }
-});
-$('#fx-d-cancel').addEventListener('click', () => { $('#fx-day').hidden = true; fx.editing = null; });
-$('#fx-day').addEventListener('submit', ev => {
-  ev.preventDefault();
-  const fail = m => { $('#fx-d-err').textContent = m; $('#fx-d-err').hidden = false; };
-  const k = $('#fx-d-date').value, kind = $('#fx-d-kind').value, inT = $('#fx-d-in').value, outT = $('#fx-d-out').value;
-  const p = Math.round(+$('#fx-d-pause').value || 0);
-  if (!validYmd(k)) return fail('Wähl ein Datum.');
-  if (k > ymd(new Date())) return fail('Tage in der Zukunft kannst du noch nicht eintragen. Für Urlaub nimm das Urlaub-Widget.');
-  let entry;
-  if (kind) entry = { in: '', out: '', pause: 0, kind };
-  else {
-    if (!validHm(inT)) return fail('Trag ein, wann du gekommen bist.');
-    if (outT && toMin(outT) <= toMin(inT)) return fail('Gehen muss nach Kommen liegen.');
-    if (!(p >= 0 && p <= 600)) return fail('Pause geht von 0 bis 600 Minuten.');
-    if (!outT && k !== ymd(new Date())) return fail('Für vergangene Tage brauchst du auch die Zeit fürs Gehen.');
-    entry = { in: inT, out: validHm(outT) ? outT : '', pause: p, kind: '' };
-  }
-  const before = state.flex.days[k] ? { ...state.flex.days[k] } : null;
-  if (fx.editing && fx.editing !== k && state.flex.days[fx.editing] && !before) delete state.flex.days[fx.editing];
-  state.flex.days[k] = entry;
-  const c = fxCfg(), moved = k < c.from;
-  if (moved) c.from = k;
-  $('#fx-day').hidden = true;
-  fx.editing = null;
-  commit();
-  if (moved) toast(`Gezählt wird jetzt ab ${dm(parseYmd(k))}, fehlende Arbeitstage dazwischen siehst du in der Wochenliste.`);
-  else if (before) toast(`${dm(parseYmd(k))} geändert`, () => { state.flex.days[k] = before; commit(); });
-});
-$('#fx-d-del').addEventListener('click', () => {
-  const k = fx.editing, old = k && state.flex.days[k];
-  if (!old) return;
-  delete state.flex.days[k];
-  $('#fx-day').hidden = true;
-  fx.editing = null;
-  commit();
-  toast(`Eintrag vom ${dm(parseYmd(k))} gelöscht`, () => { state.flex.days[k] = old; commit(); });
-});
-
-/* Regeln */
-$('#fx-set-btn').addEventListener('click', () => {
-  const f = $('#fx-set');
-  if (!f.hidden) { f.hidden = true; return; }
-  const c = fxCfg();
-  $('#fx-day').hidden = true;
-  $('#fx-soll').value = fmtDur(c.soll);
-  $('#fx-carry').value = fmtDur(c.carry, true);
-  document.querySelectorAll('[data-fxday]').forEach(cb => { cb.checked = c.days.includes(+cb.dataset.fxday); });
-  $('#fx-from').value = c.from;
-  $('#fx-break').checked = c.autoBreak;
-  $('#fx-set-err').hidden = true;
-  f.hidden = false;
-  $('#fx-soll').focus();
-});
-$('#fx-set-cancel').addEventListener('click', () => { $('#fx-set').hidden = true; });
-$('#fx-set').addEventListener('submit', e => {
-  e.preventDefault();
-  const fail = m => { $('#fx-set-err').textContent = m; $('#fx-set-err').hidden = false; };
-  const soll = parseDur($('#fx-soll').value), carry = parseDur($('#fx-carry').value);
-  if (soll == null || soll <= 0 || soll > 720) return fail('Soll bitte als Stunden angeben, zum Beispiel 8:00 oder 7,8.');
-  if (carry == null || Math.abs(carry) > 60000) return fail('Den Startsaldo bitte als Stunden angeben, zum Beispiel 3:30 oder -1:15.');
-  const days = [...document.querySelectorAll('[data-fxday]')].filter(cb => cb.checked).map(cb => +cb.dataset.fxday);
-  if (!days.length) return fail('Wähl mindestens einen Arbeitstag.');
-  const from = $('#fx-from').value;
-  if (!validYmd(from)) return fail('Wähl ein Datum, ab dem gezählt wird.');
-  state.widgets.flex.cfg = { soll, carry, days, from, autoBreak: $('#fx-break').checked };
-  $('#fx-set').hidden = true;
-  commit();
-});
-
-defineWidget('flex', { render: renderFlex });
 
 /* 34-info.js */
 /* Infofenster für Vereine, Fahrer und Teams, mit Kurztext aus Wikipedia */
@@ -5939,9 +5821,764 @@ $('#fu-mode').addEventListener('click', e => {
 
 defineWidget('fuel', { render: renderFuel });
 
+/* 38-vers.js */
+/* Bibelvers des Tages. Den Text liefert bolls.life (frei, ohne Key, CORS offen), die Liste der Verse steht hier.
+ * Jeden Tag kommt der nächste Vers aus der Liste, auf allen Geräten derselbe. Mit „Noch einer“ blätterst du weiter.
+ * Nur Stellen, die in allen angebotenen Übersetzungen gleich nummeriert sind (bei manchen Psalmen zählen
+ * deutsche und englische Ausgaben die Überschrift mit, deshalb fehlen die hier). */
+const VS_CACHE = 'jere-cockpit-vers';
+const VS_BOOK = { 1: '1. Mose', 2: '2. Mose', 4: '4. Mose', 5: '5. Mose', 6: 'Josua', 8: 'Rut', 9: '1. Samuel', 13: '1. Chronik', 18: 'Hiob', 19: 'Psalm', 20: 'Sprüche', 21: 'Prediger', 23: 'Jesaja', 24: 'Jeremia', 25: 'Klagelieder', 26: 'Hesekiel', 33: 'Micha', 34: 'Nahum', 36: 'Zefanja', 40: 'Matthäus', 41: 'Markus', 42: 'Lukas', 43: 'Johannes', 45: 'Römer', 46: '1. Korinther', 47: '2. Korinther', 48: 'Galater', 49: 'Epheser', 50: 'Philipper', 51: 'Kolosser', 52: '1. Thessalonicher', 53: '2. Thessalonicher', 54: '1. Timotheus', 55: '2. Timotheus', 58: 'Hebräer', 59: 'Jakobus', 60: '1. Petrus', 62: '1. Johannes', 66: 'Offenbarung' };
+// Buch:Kapitel:Vers oder Vers-Vers, bunt gemischt zwischen Altem und Neuem Testament
+const VS_LIST = ('43:3:16 23:41:10 19:23:4 50:4:6-7 24:29:11 40:11:28 20:3:5-6 45:8:28 6:1:9 43:14:27 19:121:7-8 55:1:7 '
+  + '25:3:22-23 43:16:33 23:40:31 46:13:13 19:37:5 60:5:7 1:28:15 50:4:13 19:139:14 40:6:33 23:43:1 47:12:9 '
+  + '20:16:3 62:4:16 19:119:105 43:8:12 5:31:8 45:12:12 19:91:1-2 48:5:22-23 24:31:3 40:28:20 19:103:2 66:21:4 '
+  + '23:26:3 43:15:5 19:27:14 58:11:1 36:3:17 45:15:13 20:4:23 43:14:6 19:16:11 52:5:16-18 4:6:24-26 41:9:23 '
+  + '19:73:26 49:3:20 23:54:10 42:1:37 19:90:12 47:5:17 21:3:1 43:11:25 19:118:24 62:1:9 23:30:15 46:16:14 '
+  + '2:14:14 43:10:10 59:1:5 24:17:7 45:5:8 19:145:18 49:4:32 20:16:9 40:7:7 34:1:7 51:3:23 '
+  + '19:147:3 43:13:34 23:43:19 62:4:18 9:16:7 45:12:2 19:50:15 50:1:6 26:36:26 66:3:20 19:94:19 58:13:8 '
+  + '20:18:10 40:5:14 23:55:8-9 46:10:13 19:86:11 42:19:10 33:6:8 45:8:38-39 19:138:8 43:1:5 18:19:25 48:6:9 '
+  + '20:17:17 49:6:10 19:143:10 41:10:27 24:29:13 62:4:19 19:100:5 50:4:4 23:40:29 43:8:36 21:3:11 48:6:2 '
+  + '19:1:3 58:13:5 13:16:34 40:18:20 23:46:4 45:8:31 19:103:8 54:4:12 2:15:2 66:21:5 20:27:17 43:14:1 '
+  + '19:37:4 42:6:31 23:58:11 49:2:10 8:1:16 45:12:21 19:139:23-24 53:3:16 1:50:20 62:3:1 23:49:16 46:13:4 '
+  + '24:33:3 59:1:17 5:31:6 43:15:13 19:25:4 58:4:16 21:4:9-10 40:5:9 1:1:1 59:4:8 46:13:7 40:6:34 '
+  + '1:1:27 49:2:8-9 43:13:35').split(' ').map(s => { const [b, c, v] = s.split(':'); const [v1, v2] = v.split('-').map(Number); return { b: +b, c: +c, v1, v2: v2 || v1 }; });
+const vs = { off: 0, busy: false, err: '', cur: null, seq: 0 };
+const vsCfg = () => state.widgets.verse.cfg;
+const vsDayIdx = d => { const t = sod(d), e = new Date(2026, 0, 1); return Math.round((t - e) / DAY); };
+const vsPick = (d, off) => { const n = VS_LIST.length; return ((vsDayIdx(d) + off) % n + n) % n; };
+const vsRef = r => `${VS_BOOK[r.b] || 'Buch ' + r.b} ${r.c},${r.v1}${r.v2 > r.v1 ? '-' + r.v2 : ''}`;
+const vsLink = (r, tr) => `https://www.bibleserver.com/${(VS_TR[tr] || VS_TR.LUT).bs}/${encodeURIComponent((VS_BOOK[r.b] || '').replace(/\s/g, ''))}${r.c}%2C${r.v1}${r.v2 > r.v1 ? '-' + r.v2 : ''}`;
+/* Text säubern: Fußnoten, Lesarten in Klammern und Auszeichnungen raus */
+function vsClean(html) {
+  const s = String(html || '')
+    .replace(/<(sup|f)>[\s\S]*?<\/\1>/gi, '')
+    .replace(/<S>\d+<\/S>/g, '')
+    .replace(/\u2009?\[\d+\]/g, '')
+    .replace(/(\p{L})"s\b/gu, '$1’s')
+    .replace(/<i>\s*\([^<]*\)\s*<\/i>/gi, '')
+    .replace(/<br\s*\/?>/gi, ' ');
+  const t = new DOMParser().parseFromString(`<p>${s}</p>`, 'text/html').body.textContent || '';
+  return t.replace(/\s+/g, ' ').replace(/\s+([,.;:!?])/g, '$1').trim();
+}
+async function vsLoad(force) {
+  const tr = vsCfg().tr, now = new Date(), i = vsPick(now, vs.off), r = VS_LIST[i];
+  const key = `${ymd(now)}|${tr}|${i}`;
+  const c = lsGet(VS_CACHE);
+  if (!force && c && c.key === key && c.text) { vs.cur = c; vs.err = ''; renderVerseAll(); return; }
+  const seq = ++vs.seq;
+  vs.busy = true;
+  renderVerseAll();
+  try {
+    const list = await getJson(`https://bolls.life/get-text/${tr}/${r.b}/${r.c}/`, 12000);
+    if (seq !== vs.seq) return;
+    const parts = (Array.isArray(list) ? list : []).filter(x => x.verse >= r.v1 && x.verse <= r.v2).sort((a, b) => a.verse - b.verse).map(x => vsClean(x.text)).filter(Boolean);
+    if (!parts.length) throw new Error('leer');
+    vs.cur = { key, text: parts.join(' '), ref: vsRef(r), link: vsLink(r, tr), tr };
+    vs.err = '';
+    lsSet(VS_CACHE, vs.cur);
+  } catch {
+    if (seq !== vs.seq) return;
+    vs.err = 'Der Vers konnte gerade nicht geladen werden. Das Cockpit versucht es gleich nochmal.';
+    setTimeout(() => { if (!vs.cur || vs.cur.key !== key) vsLoad(); }, 3 * 6e4);
+  } finally {
+    if (seq === vs.seq) { vs.busy = false; renderVerseAll(); }
+  }
+}
+let vsDay = '';
+function renderVerse() {
+  const now = new Date(), tr = vsCfg().tr, i = vsPick(now, vs.off);
+  const want = `${ymd(now)}|${tr}|${i}`;
+  if (!vs.busy && (!vs.cur || vs.cur.key !== want) && !vs.err) { vsLoad(); return; }
+  const c = vs.cur && vs.cur.key === want ? vs.cur : null;
+  $('#vs-text').textContent = c ? c.text : vs.err || 'Vers wird geladen …';
+  $('#vs-text').classList.toggle('muted', !c);
+  const ref = $('#vs-ref');
+  ref.hidden = !c;
+  if (c) { ref.textContent = c.ref; ref.href = c.link; ref.title = `${c.ref} im Zusammenhang auf bibleserver.com lesen`; }
+  $('#vs-tr').textContent = (VS_TR[tr] || VS_TR.LUT).name;
+  $('#vs-more').disabled = vs.busy;
+  $('#vs-back').hidden = vs.off === 0;
+}
+function renderVerseAll() { if (views.has('verse')) renderVerse(); renderMirror(); }
+/* Neuer Tag: wieder beim Vers des Tages anfangen */
+function vsTick(now) {
+  const k = ymd(now);
+  if (k === vsDay) return;
+  const first = !vsDay;
+  vsDay = k;
+  if (!first) { vs.off = 0; vs.err = ''; if (views.has('verse')) renderVerse(); }
+}
+$('#vs-more').addEventListener('click', () => { vs.off++; vs.err = ''; vsLoad(); });
+$('#vs-back').addEventListener('click', () => { vs.off = 0; vs.err = ''; vsLoad(); });
+
+defineWidget('verse', {
+  render: renderVerse,
+  settings: {
+    render(box, w) {
+      box.innerHTML = `<label class="field"><span class="lbl">Übersetzung</span><select data-s="tr">${Object.entries(VS_TR).map(([k, t]) => `<option value="${k}"${k === w.cfg.tr ? ' selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label><p class="hint">Die Texte kommen von bolls.life. Unter dem Vers führt ein Link zur Stelle auf bibleserver.com, dort kannst du den ganzen Abschnitt lesen.</p>`;
+    },
+    save(box, w) { w.cfg.tr = box.querySelector('[data-s="tr"]').value; vs.err = ''; return null; }
+  }
+});
+
+/* 39-kalender.js */
+/* Kalender (gibt es nur einmal): öffentlich geteilte iCloud-Kalender als ICS-Abo.
+ * Apple schickt keine CORS-Freigabe, der Browser darf den Link also nicht direkt laden. Dafür gibt es eine kleine
+ * Weiterleitung als Cloudflare Worker (Code unten in CA_WORKER und im Repo unter tools/kalender-worker.js).
+ * Links und Weiterleitung bleiben nur in diesem Browser (jere-cockpit-kalender) und kommen nicht in die Sicherung.
+ * Zum Auslesen der Termine samt Wiederholungen und Zeitzonen wird ical.js nachgeladen, sobald ein Kalender da ist. */
+const CA_KEY = 'jere-cockpit-kalender', CA_CACHE = 'jere-cockpit-kalender-daten';
+const CA_COLORS = ['#3D7BE0', '#E5654B', '#2FA36B', '#8A5CD8', '#E8A126', '#D9488A', '#1A9AA0'];
+const CA_LIB = { src: 'https://unpkg.com/ical.js@2.2.1/dist/ical.es5.min.cjs', sri: 'sha384-ju8ozm4ZyuCTzjb4fvLmPUASX0zfc5jLOvyN9wadLx23y965jxfdbKTPMIeLrliP' };
+const CA_WORKER = `// Weiterleitung für Jeres Tagescockpit: holt einen öffentlich geteilten
+// iCloud-Kalender und gibt ihn mit CORS-Freigabe an den Browser weiter.
+// Aufruf: https://<dein-worker>.workers.dev/?url=<Kalender-Link>
+const ERLAUBT = /(^|\\.)icloud\\.com$/i; // nur iCloud, sonst wäre es ein offener Proxy
+
+export default {
+  async fetch(request) {
+    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS' };
+    if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
+    let ziel;
+    try {
+      ziel = new URL((new URL(request.url).searchParams.get('url') || '').replace(/^webcal:/i, 'https:'));
+    } catch {
+      return new Response('Parameter url fehlt', { status: 400, headers: cors });
+    }
+    if (ziel.protocol !== 'https:' || !ERLAUBT.test(ziel.hostname)) {
+      return new Response('Diese Adresse ist nicht erlaubt', { status: 403, headers: cors });
+    }
+    const antwort = await fetch(ziel, { headers: { 'User-Agent': 'Mozilla/5.0 (Kalender-Weiterleitung)' }, cf: { cacheTtl: 300 } });
+    return new Response(antwort.body, {
+      status: antwort.status,
+      headers: { ...cors, 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'max-age=300' }
+    });
+  }
+};
+`;
+const ca = { busy: false, err: '', feedErr: {}, data: lsGet(CA_CACHE), lib: null, seq: 0, more: false, draft: null, last: 0 };
+const caCfg = () => state.widgets.cal.cfg;
+function caSec() {
+  const s = lsGet(CA_KEY) || {};
+  const feeds = (Array.isArray(s.feeds) ? s.feeds : []).filter(f => f && typeof f.url === 'string' && f.url).slice(0, 6)
+    .map((f, i) => ({ id: String(f.id || uid()).slice(0, 16), name: String(f.name || `Kalender ${i + 1}`).slice(0, 30), url: f.url, color: CA_COLORS.includes(f.color) ? f.color : CA_COLORS[i % CA_COLORS.length] }));
+  return { proxy: typeof s.proxy === 'string' ? s.proxy : '', feeds };
+}
+function caSaveSec(sec) {
+  try { localStorage.setItem(CA_KEY, JSON.stringify(sec)); return true; } catch { return false; }
+}
+/* webcal:// und Leerzeichen raus, nur https */
+function caNormUrl(u) {
+  const s = String(u || '').trim().replace(/^webcal:\/\//i, 'https://');
+  try { const x = new URL(s); return x.protocol === 'https:' && x.hostname ? x.href : null; } catch { return null; }
+}
+function caFetchUrl(feed, proxy) {
+  const u = caNormUrl(feed.url);
+  if (!proxy) return u;
+  const p = new URL(proxy);
+  p.searchParams.set('url', u);
+  return p.href;
+}
+function caLoadLib() {
+  if (window.ICAL) return Promise.resolve(window.ICAL);
+  if (!ca.lib) {
+    ca.lib = new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = CA_LIB.src;
+      s.integrity = CA_LIB.sri;
+      s.crossOrigin = 'anonymous';
+      s.onload = () => (window.ICAL ? res(window.ICAL) : rej(new Error('lib')));
+      s.onerror = () => { ca.lib = null; s.remove(); rej(new Error('lib')); };
+      document.head.appendChild(s);
+    });
+  }
+  return ca.lib;
+}
+async function caFetch(url) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
+  try {
+    const r = await fetch(url, { signal: ctl.signal, cache: 'no-store' });
+    if (!r.ok) throw Object.assign(new Error('HTTP ' + r.status), { status: r.status });
+    return await r.text();
+  } finally { clearTimeout(timer); }
+}
+/* Alle Termine eines Kalenders im Zeitraum, Wiederholungen ausgerollt, verschobene und abgesagte Termine berücksichtigt */
+function caExpand(ICAL, text, feed, from, to) {
+  const comp = new ICAL.Component(ICAL.parse(text));
+  for (const tz of comp.getAllSubcomponents('vtimezone')) { try { ICAL.TimezoneService.register(tz); } catch { /* unbekannte Zone, dann eben ohne */ } }
+  const ves = comp.getAllSubcomponents('vevent');
+  const uidOf = v => String(v.getFirstPropertyValue('uid') || '');
+  const masters = new Set(ves.filter(v => !v.hasProperty('recurrence-id')).map(uidOf));
+  const ex = new Map();
+  for (const v of ves) if (v.hasProperty('recurrence-id') && masters.has(uidOf(v))) { const u = uidOf(v); if (!ex.has(u)) ex.set(u, []); ex.get(u).push(v); }
+  const out = [], seen = new Set(), until = +to + 7 * DAY;
+  const push = (item, st, en) => {
+    if (!st) return;
+    if (String(item.component.getFirstPropertyValue('status') || '').toUpperCase() === 'CANCELLED') return;
+    const allDay = !!st.isDate, S = st.toJSDate();
+    let E = en ? en.toJSDate() : null;
+    if (!E || E < S) E = allDay ? addDays(S, 1) : S;
+    if (allDay && +E === +S) E = addDays(S, 1);
+    if (S >= to || E <= from && !(+E === +S && S >= from)) return;
+    const id = `${feed.id}|${item.uid}|${+S}`;
+    if (seen.has(id)) return;
+    seen.add(id);
+    out.push({ id, f: feed.id, t: String(item.summary || '').trim() || 'Ohne Titel', l: String(item.location || '').replace(/\s*\n\s*/g, ', ').trim(), s: +S, e: +E, a: allDay });
+  };
+  for (const v of ves) {
+    const u = uidOf(v);
+    if (v.hasProperty('recurrence-id') && masters.has(u)) continue;
+    const ev = new ICAL.Event(v, { exceptions: ex.get(u) || [] });
+    if (!ev.isRecurring()) { push(ev, ev.startDate, ev.endDate); continue; }
+    const it = ev.iterator();
+    let t, n = 0;
+    while ((t = it.next()) && n++ < 20000) {
+      if (+t.toJSDate() >= until) break;
+      const d = ev.getOccurrenceDetails(t);
+      push(d.item, d.startDate, d.endDate);
+    }
+  }
+  return out;
+}
+const CA_ERR = {
+  cors: 'Apple lässt den Browser den Kalender nicht direkt laden. Trag über die Regler oben rechts in dieser Karte deine Weiterleitung ein.',
+  net: 'Keine Verbindung zum Kalender. Das Cockpit versucht es gleich nochmal.',
+  403: 'Die Weiterleitung lässt diesen Link nicht durch. Erlaubt sind nur iCloud-Adressen.',
+  404: 'Unter diesem Link gibt es keinen Kalender. Prüf, ob er in iCloud noch öffentlich geteilt ist.',
+  parse: 'Unter dem Link kam kein Kalender zurück. Prüf den Link und die Weiterleitung.',
+  lib: 'Der Kalender-Leser konnte nicht geladen werden. Das Cockpit versucht es gleich nochmal.'
+};
+async function caLoad() {
+  const sec = caSec();
+  if (!sec.feeds.length || ca.busy) return;
+  const seq = ++ca.seq;
+  ca.busy = true;
+  ca.last = Date.now();
+  renderCalAll();
+  const from = sod(new Date()), to = addDays(from, 31);
+  const feedErr = {}, events = [];
+  let ICAL = null;
+  try { ICAL = await caLoadLib(); } catch { ca.err = CA_ERR.lib; }
+  if (ICAL) {
+    await Promise.all(sec.feeds.map(async f => {
+      let text;
+      try { text = await caFetch(caFetchUrl(f, sec.proxy)); }
+      catch (e) { feedErr[f.id] = e.status === 403 ? CA_ERR[403] : e.status === 404 ? CA_ERR[404] : e.status ? `Der Kalender antwortet mit Fehler ${e.status}.` : sec.proxy ? CA_ERR.net : CA_ERR.cors; return; }
+      try {
+        if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error('kein ICS');
+        events.push(...caExpand(ICAL, text, f, from, to));
+      } catch { feedErr[f.id] = CA_ERR.parse; }
+    }));
+    ca.err = '';
+  }
+  if (seq !== ca.seq) return;
+  ca.busy = false;
+  ca.feedErr = feedErr;
+  const okIds = new Set(sec.feeds.filter(f => !feedErr[f.id]).map(f => f.id));
+  if (ICAL && okIds.size) {
+    // Kalender, die gerade nicht laden, behalten ihre alten Termine
+    const keep = ca.data && Array.isArray(ca.data.events) ? ca.data.events.filter(e => !okIds.has(e.f) && sec.feeds.some(f => f.id === e.f)) : [];
+    ca.data = { at: Date.now(), events: [...events, ...keep].sort((a, b) => a.s - b.s || b.a - a.a || a.t.localeCompare(b.t, 'de')) };
+    lsSet(CA_CACHE, ca.data);
+  }
+  if (!ICAL || Object.keys(feedErr).length) {
+    clearTimeout(ca.retry);
+    ca.retry = setTimeout(() => caLoad(), 3 * 6e4);
+  }
+  renderCalAll();
+}
+/* Termine eines Tages: ganztägige zuerst, dann nach Beginn */
+function caDay(d, list) {
+  const a = +sod(d), b = +addDays(sod(d), 1);
+  return list.filter(e => e.s < b && (e.e > a || (e.e === e.s && e.s >= a))).sort((x, y) => (y.a - x.a) || x.s - y.s || x.t.localeCompare(y.t, 'de'));
+}
+const caDayName = (d, now) => { const n = dayDiff(now, d); return n === 0 ? 'Heute' : n === 1 ? 'Morgen' : WDL[d.getDay()]; };
+/* Was als Nächstes kommt, für Kopf und Spiegel: läuft gerade oder beginnt in den nächsten 24 Stunden */
+function caNext(now) {
+  if (!ca.data || !caSec().feeds.length) return null;
+  const t = +now, list = ca.data.events.filter(e => !e.a && e.e > t && e.s < t + DAY);
+  if (!list.length) return null;
+  const e = list.sort((x, y) => x.s - y.s)[0], s = new Date(e.s), en = new Date(e.e);
+  if (e.s <= t) return { e, label: `Jetzt: ${e.t}`, sub: `bis ${hm(en)} Uhr` };
+  const same = dayDiff(now, s) === 0;
+  return { e, label: `${same ? '' : 'Morgen '}${hm(s)} ${e.t}`, sub: e.s - t < 2 * 36e5 ? `in ${dur(e.s - t)}` : same ? 'heute' : 'morgen' };
+}
+function caFeedColor(id) { const f = caSec().feeds.find(x => x.id === id); return f ? f.color : CA_COLORS[0]; }
+
+function renderCal() {
+  const sec = caSec(), c = caCfg(), now = new Date();
+  const formOpen = !$('#ca-form').hidden;
+  $('#ca-setup').hidden = formOpen || sec.feeds.length > 0;
+  $('#ca-live').hidden = formOpen || !sec.feeds.length;
+  $('#ca-refresh').hidden = formOpen || !sec.feeds.length;
+  $('#ca-refresh').disabled = ca.busy;
+  $('#ca-refresh').textContent = ca.busy ? 'Lädt …' : 'Aktualisieren';
+  if (!sec.feeds.length || formOpen) return;
+  // Automatisch aktualisieren, wenn die Daten älter als 15 Minuten sind
+  if (!ca.busy && (!ca.data || Date.now() - ca.data.at > 15 * 6e4) && Date.now() - ca.last > 6e4) setTimeout(caLoad, 300);
+  const evs = ca.data ? ca.data.events.filter(e => sec.feeds.some(f => f.id === e.f)) : [];
+  const ul = $('#ca-list'), t0 = sod(now);
+  const errs = sec.feeds.filter(f => ca.feedErr[f.id]).map(f => `${f.name}: ${ca.feedErr[f.id]}`);
+  $('#ca-err').textContent = ca.err || errs.join(' ');
+  $('#ca-err').hidden = !ca.err && !errs.length;
+  if (!ca.data) { ul.innerHTML = `<li class="empty">${ca.busy ? 'Termine werden geladen …' : 'Noch keine Termine geladen.'}</li>`; $('#ca-more').hidden = true; $('#ca-src').textContent = ''; return; }
+  const LIMIT = 9;
+  let html = '', shown = 0, total = 0, past = 0;
+  for (let i = 0; i < c.days; i++) {
+    const d = addDays(t0, i);
+    let list = caDay(d, evs);
+    if (i === 0) { const before = list.length; list = list.filter(e => e.a || e.e > +now || (e.e === e.s && e.s >= +now - 15 * 6e4)); past = before - list.length; }
+    if (!list.length) continue;
+    total += list.length;
+    if (!ca.more && shown >= LIMIT) continue;
+    html += `<li class="ca-day"><b>${caDayName(d, now)}</b><span>${i > 1 ? '' : WD[d.getDay()] + ' '}${d.getDate()}. ${MS[d.getMonth()]}</span></li>`;
+    for (const e of list) {
+      if (!ca.more && shown >= LIMIT) break;
+      shown++;
+      const s = new Date(e.s), en = new Date(e.e), live = !e.a && e.s <= +now && e.e > +now;
+      let tm, sub = '';
+      if (e.a) {
+        const span = dayDiff(s, en);
+        tm = 'Ganztags';
+        if (span > 1) sub = `Tag ${dayDiff(s, d) + 1} von ${span}`;
+      } else {
+        const startsToday = sod(s).getTime() === +d, endsToday = sod(new Date(e.e - 1)).getTime() === +d;
+        tm = startsToday ? hm(s) : 'weiter';
+        sub = endsToday ? (e.e > e.s ? `bis ${hm(en)}` : '') : `bis ${WD[en.getDay()]} ${hm(en)}`;
+      }
+      const where = c.loc && e.l ? e.l : '';
+      html += `<li class="ca-ev${live ? ' is-now' : ''}" style="--c:${caFeedColor(e.f)}"><span class="ca-t">${esc(tm)}${!e.a && sub ? `<small>${esc(sub)}</small>` : ''}</span><span class="ca-main"><b>${esc(e.t)}</b>${e.a && sub ? `<small>${esc(sub)}</small>` : ''}${where ? `<small>${esc(where)}</small>` : ''}</span>${live ? '<span class="ca-now">Jetzt</span>' : ''}</li>`;
+    }
+  }
+  if (!total) html = `<li class="empty">Keine Termine in den nächsten ${c.days} Tagen${past ? ', die von heute sind schon vorbei' : ''}.</li>`;
+  ul.innerHTML = html;
+  $('#ca-more').hidden = total <= LIMIT;
+  $('#ca-more').textContent = ca.more ? 'Weniger zeigen' : `Alle ${total} Termine zeigen`;
+  const names = sec.feeds.length > 1 ? sec.feeds.map(f => `<span class="ca-key" style="--c:${f.color}">${esc(f.name)}</span>`).join('') : '';
+  $('#ca-src').innerHTML = `${names}<span>Stand ${hm(new Date(ca.data.at))} Uhr${past ? `, ${past} ${past === 1 ? 'Termin' : 'Termine'} von heute schon vorbei` : ''}</span>`;
+}
+function renderCalAll() { if (views.has('cal')) renderCal(); renderSkyNext(); renderMirror(); }
+
+/* Einrichten: Formular mit Kalendern, Weiterleitung und Zeitraum. Erst beim Speichern wird etwas übernommen. */
+function caOpenForm() {
+  const sec = caSec(), c = caCfg();
+  ca.draft = sec.feeds.map(f => ({ ...f }));
+  $('#ca-proxy').value = sec.proxy;
+  $('#ca-days').value = String(c.days);
+  $('#ca-loc').checked = c.loc;
+  $('#ca-name').value = '';
+  $('#ca-url').value = '';
+  $('#ca-ferr').hidden = true;
+  $('#ca-code').textContent = CA_WORKER;
+  caRenderDraft();
+  $('#ca-form').hidden = false;
+  renderCal();
+  (ca.draft.length ? $('#ca-proxy') : $('#ca-url')).focus();
+}
+function caRenderDraft() {
+  const ul = $('#ca-feeds');
+  ul.innerHTML = ca.draft.map((f, i) => `<li><button type="button" class="ca-dot" data-cacol="${i}" style="--c:${f.color}" aria-label="Farbe von ${esc(f.name)} ändern" title="Farbe ändern"></button><div class="tx"><b>${esc(f.name)}</b><span>${esc(f.url.replace(/^(webcal|https):\/\//i, '').slice(0, 44))}…</span></div><button type="button" class="icon-btn" data-cadel="${i}" aria-label="${esc(f.name)} entfernen">${TRASH}</button></li>`).join('');
+  ul.hidden = !ca.draft.length;
+  $('#ca-add').disabled = ca.draft.length >= 6;
+  $('#ca-add').textContent = ca.draft.length >= 6 ? 'Maximal 6 Kalender' : '+ Kalender';
+  $('#ca-forget').hidden = !caSec().feeds.length;
+}
+function caAddDraft() {
+  const fail = m => { $('#ca-ferr').textContent = m; $('#ca-ferr').hidden = false; return false; };
+  const raw = $('#ca-url').value.trim();
+  if (!raw) return true;
+  const url = caNormUrl(raw);
+  if (!url) return fail('Der Link muss mit webcal:// oder https:// anfangen.');
+  if (ca.draft.some(f => caNormUrl(f.url) === url)) return fail('Diesen Kalender hast du schon drin.');
+  if (ca.draft.length >= 6) return fail('Mehr als 6 Kalender gehen nicht.');
+  const used = new Set(ca.draft.map(f => f.color));
+  ca.draft.push({ id: uid(), name: $('#ca-name').value.trim().slice(0, 30) || (ca.draft.length ? `Kalender ${ca.draft.length + 1}` : 'Privat'), url: raw.replace(/\s+/g, ''), color: CA_COLORS.find(x => !used.has(x)) || CA_COLORS[0] });
+  $('#ca-name').value = '';
+  $('#ca-url').value = '';
+  $('#ca-ferr').hidden = true;
+  caRenderDraft();
+  return true;
+}
+$('#ca-setup-btn').addEventListener('click', caOpenForm);
+$('#ca-set-btn').addEventListener('click', () => { if ($('#ca-form').hidden) caOpenForm(); else { $('#ca-form').hidden = true; renderCal(); } });
+$('#ca-add').addEventListener('click', () => { if (caAddDraft()) $('#ca-url').focus(); });
+$('#ca-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); caAddDraft(); } });
+$('#ca-feeds').addEventListener('click', e => {
+  const d = e.target.closest('[data-cadel]'), c = e.target.closest('[data-cacol]');
+  if (d) { ca.draft.splice(+d.dataset.cadel, 1); caRenderDraft(); }
+  if (c) { const f = ca.draft[+c.dataset.cacol]; f.color = CA_COLORS[(CA_COLORS.indexOf(f.color) + 1) % CA_COLORS.length]; caRenderDraft(); }
+});
+$('#ca-copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(CA_WORKER); toast('Worker-Code kopiert'); }
+  catch {
+    const r = document.createRange();
+    r.selectNodeContents($('#ca-code'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    toast('Code ist markiert, kopier ihn mit Strg+C oder Cmd+C');
+  }
+});
+$('#ca-cancel').addEventListener('click', () => { $('#ca-form').hidden = true; ca.draft = null; renderCal(); });
+$('#ca-forget').addEventListener('click', () => {
+  try { localStorage.removeItem(CA_KEY); localStorage.removeItem(CA_CACHE); } catch { /* egal */ }
+  ca.data = null; ca.feedErr = {}; ca.err = ''; ca.draft = null;
+  $('#ca-form').hidden = true;
+  renderCalAll();
+  toast('Kalender aus diesem Browser entfernt');
+});
+$('#ca-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const fail = m => { $('#ca-ferr').textContent = m; $('#ca-ferr').hidden = false; };
+  if ($('#ca-url').value.trim() && !caAddDraft()) return;
+  let proxy = $('#ca-proxy').value.trim();
+  if (proxy) {
+    if (!/^https?:\/\//i.test(proxy)) proxy = 'https://' + proxy;
+    try { const x = new URL(proxy); if (x.protocol !== 'https:') throw 0; proxy = x.href; } catch { return fail('Die Weiterleitung braucht eine Adresse, die mit https:// anfängt.'); }
+  }
+  if (!ca.draft.length) return fail('Füg zuerst den Link von mindestens einem Kalender ein.');
+  const old = caSec();
+  if (!caSaveSec({ proxy, feeds: ca.draft })) return fail('Dein Browser speichert hier nichts, zum Beispiel im privaten Fenster.');
+  const c = caCfg();
+  c.days = +$('#ca-days').value || 14;
+  c.loc = $('#ca-loc').checked;
+  $('#ca-form').hidden = true;
+  ca.draft = null;
+  ca.more = false;
+  const changed = old.proxy !== proxy || JSON.stringify(old.feeds.map(f => f.url)) !== JSON.stringify(caSec().feeds.map(f => f.url));
+  commit();
+  if (changed || !ca.data) { ca.feedErr = {}; ca.err = ''; ca.last = 0; caLoad(); }
+});
+$('#ca-refresh').addEventListener('click', () => { ca.last = 0; caLoad(); });
+$('#ca-more').addEventListener('click', () => { ca.more = !ca.more; renderCal(); layoutNow(); });
+/* Einmal pro Minute: alle 15 Minuten neu laden, auch wenn die Karte gerade nicht zu sehen ist (für Kopf und Spiegel) */
+function caTick(now) {
+  if (now.getSeconds() !== 7 || document.visibilityState !== 'visible' || ca.busy) return;
+  if (caSec().feeds.length && (!ca.data || Date.now() - ca.data.at > 15 * 6e4) && Date.now() - ca.last > 6e4) caLoad();
+  else if (views.has('cal') && !views.get('cal').el.hidden) renderCal();
+}
+
+defineWidget('cal', { render: renderCal });
+
+/* 40-himmel.js */
+/* Kopf mit Himmel: Die Farben folgen dem echten Sonnenstand an deinem Ort, bei Wolken oder Regen werden sie grauer.
+ * Der Bogen unten ist die Sonnenhöhe über den ganzen Tag (0 bis 24 Uhr), die Unterkante ist der Horizont.
+ * Im Winter ist er flach, im Sommer hoch. Der Punkt ist die Sonne jetzt. Alles wird lokal berechnet, ohne Dienst. */
+const sky = { key: '', day: null, minute: -1, w: 0 };
+const RAD = Math.PI / 180;
+/* Sonnenhöhe in Grad (vereinfachte NOAA-Formel, auf etwa ein halbes Grad genau) */
+function sunAlt(date, lat, lon) {
+  const d = date.getTime() / DAY + 2440587.5 - 2451545.0;
+  const g = (357.529 + 0.98560028 * d) * RAD;
+  const q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * RAD;
+  const e = (23.439 - 0.00000036 * d) * RAD;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
+  const dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const gmst = (18.697374558 + 24.06570982441908 * d) % 24;
+  const ha = (gmst * 15 + lon) * RAD - ra;
+  return Math.asin(Math.sin(lat * RAD) * Math.sin(dec) + Math.cos(lat * RAD) * Math.cos(dec) * Math.cos(ha)) / RAD;
+}
+function skyLoc() {
+  if (wx.loc) return wx.loc;
+  if (state.loc && state.loc.mode === 'fixed') return state.loc;
+  return lsGet(GEO_KEY) || HH;
+}
+/* Tagesverlauf alle 10 Minuten, dazu Auf- und Untergang (Sonnenmitte 0,83 Grad unter dem Horizont) */
+function sunDay(now, loc) {
+  const t0 = sod(now), pts = [];
+  for (let m = 0; m <= 1440; m += 10) pts.push([m, sunAlt(new Date(t0.getTime() + m * 6e4), +loc.lat, +loc.lon)]);
+  const cross = up => {
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1][1] + 0.833, b = pts[i][1] + 0.833;
+      if (up ? a < 0 && b >= 0 : a >= 0 && b < 0) {
+        let lo = pts[i - 1][0], hi = pts[i][0];
+        for (let k = 0; k < 12; k++) {
+          const mid = (lo + hi) / 2, v = sunAlt(new Date(t0.getTime() + mid * 6e4), +loc.lat, +loc.lon) + 0.833;
+          if ((v >= 0) === up) hi = mid; else lo = mid;
+        }
+        return new Date(t0.getTime() + Math.round(hi) * 6e4);
+      }
+    }
+    return null;
+  };
+  let max = pts[0];
+  for (const p of pts) if (p[1] > max[1]) max = p;
+  return { pts, rise: cross(true), set: cross(false), noon: new Date(t0.getTime() + max[0] * 6e4), max: max[1] };
+}
+
+/* Farben des Himmels je Sonnenhöhe: oben, Mitte, Horizont. Abends wärmer als morgens. */
+const SKY_AM = [
+  [-90, '#03060F', '#060B19', '#0A1226'], [-18, '#050A18', '#0A1328', '#111D3A'], [-12, '#0A1430', '#18244A', '#2A3462'],
+  [-6, '#132457', '#3A3C78', '#7A4E7E'], [-3, '#1D3672', '#5A5590', '#D27B78'], [0, '#2E4F8E', '#7C7FB4', '#F4A46A'],
+  [3, '#3F6CB0', '#93A6D0', '#F6C690'], [8, '#3F7CC8', '#86B2E0', '#CFE0EE'], [20, '#2F76D2', '#6FA7E6', '#B4D6F2'], [90, '#2569CC', '#5E9DE6', '#A6CFF4']
+];
+const SKY_PM = [
+  [-90, '#03060F', '#060B19', '#0A1226'], [-18, '#050A18', '#0A1328', '#111D3A'], [-12, '#0B1330', '#1C2148', '#33305E'],
+  [-6, '#14214F', '#3E3470', '#8A4A6A'], [-3, '#1E3168', '#6A4C80', '#E0705A'], [0, '#30487F', '#8C6E98', '#F59048'],
+  [3, '#3F64A6', '#A592B6', '#F7B46E'], [8, '#3F78C2', '#90AEDA', '#E8D6BE'], [20, '#2F76D2', '#6FA7E6', '#B4D6F2'], [90, '#2569CC', '#5E9DE6', '#A6CFF4']
+];
+const hex2rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const rgb2hex = c => '#' + c.map(x => Math.round(Math.max(0, Math.min(255, x))).toString(16).padStart(2, '0')).join('');
+const mixRgb = (a, b, t) => a.map((x, i) => x + (b[i] - x) * t);
+const lumOf = c => { const l = c.map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2]; };
+/* Wie bedeckt ist es? 0 klar bis 0.8 Gewitter, aus dem aktuellen Wettercode */
+function skyGrey() {
+  const c = wx.data && wx.data.current ? wx.data.current.weather_code : null;
+  if (c == null) return 0;
+  if (c <= 1) return 0;
+  if (c === 2) return 0.22;
+  if (c === 3) return 0.55;
+  if (c === 45 || c === 48) return 0.7;
+  if (c >= 95) return 0.75;
+  return 0.62;
+}
+function skyColors(alt, pm, grey) {
+  const K = pm ? SKY_PM : SKY_AM;
+  let i = 1;
+  while (i < K.length - 1 && alt > K[i][0]) i++;
+  const a = K[i - 1], b = K[i], t = Math.max(0, Math.min(1, (alt - a[0]) / (b[0] - a[0] || 1)));
+  return [1, 2, 3].map(k => {
+    let c = mixRgb(hex2rgb(a[k]), hex2rgb(b[k]), t);
+    if (grey) {
+      const y = Math.sqrt(lumOf(c)) * 255;
+      c = mixRgb(c, [y * 0.94, y * 0.98, y * 1.04], grey);
+    }
+    return c;
+  });
+}
+const ALT_MAX = 64;
+/* Sterne einmal zufällig, aber immer gleich verteilt */
+(() => {
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let dots = '';
+  for (let i = 0; i < 70; i++) dots += `<circle cx="${(rnd() * 1000).toFixed(1)}" cy="${(rnd() * 400).toFixed(1)}" r="${(0.5 + rnd() * rnd() * 1.4).toFixed(2)}" opacity="${(0.35 + rnd() * 0.65).toFixed(2)}"/>`;
+  $('.sky-stars').style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid slice"><g fill="#fff">${dots}</g></svg>`)}")`;
+})();
+
+function renderSky(now) {
+  const el = $('#sky'), loc = skyLoc();
+  const dk = `${ymd(now)}|${(+loc.lat).toFixed(2)}|${(+loc.lon).toFixed(2)}`;
+  if (dk !== sky.key) { sky.key = dk; sky.day = sunDay(now, loc); sky.w = 0; }
+  const D = sky.day, alt = sunAlt(now, +loc.lat, +loc.lon), pm = now > D.noon;
+  const grey = skyGrey(), on = state.ui.sky;
+  const [top, mid, low] = skyColors(alt, pm, grey);
+  const inkHi = lumOf(mixRgb(top, mid, 0.5)) > 0.36 ? '#0F1B2B' : '#FFFFFF';
+  const inkLo = lumOf(low) > 0.4 ? '#0F1B2B' : '#FFFFFF';
+  const xNow = (now - sod(now)) / DAY;
+  const sunUp = alt > -1, yNow = Math.max(0, alt) / ALT_MAX;
+  const glowA = alt < -6 ? 0 : alt < 0 ? (alt + 6) / 6 * 0.5 : alt < 12 ? 0.5 : Math.max(0.22, 0.5 - (alt - 12) / 60);
+  const glowC = alt < 10 ? '255,196,130' : '255,244,214';
+  const stars = Math.max(0, Math.min(1, (-alt - 5) / 8)) * (1 - grey) ** 2;
+  el.classList.toggle('plain', !on);
+  const v = on ? {
+    '--sky-top': rgb2hex(top), '--sky-mid': rgb2hex(mid), '--sky-low': rgb2hex(low),
+    '--sky-ink': inkHi, '--sky-ink-low': inkLo,
+    '--sky-glow': `rgba(${glowC},${(glowA * (1 - grey * 0.6)).toFixed(3)})`,
+    '--sky-stars': stars.toFixed(2)
+  } : {};
+  for (const k of ['--sky-top', '--sky-mid', '--sky-low', '--sky-ink', '--sky-ink-low', '--sky-glow', '--sky-stars']) {
+    if (v[k] !== undefined) el.style.setProperty(k, v[k]); else el.style.removeProperty(k);
+  }
+  el.style.setProperty('--sun-x', (xNow * 100).toFixed(2) + '%');
+  el.style.setProperty('--sun-f', yNow.toFixed(3));
+  el.dataset.night = alt < -6 ? '1' : '0';
+  const tc = document.querySelector('meta[name="theme-color"]');
+  if (tc && on) tc.content = rgb2hex(top);
+  // Bogen
+  const H = 100, toY = a => (H - Math.max(0, a) / ALT_MAX * (H - 6)).toFixed(1);
+  const nowM = xNow * 1440;
+  const line = list => list.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${toY(p[1])}`).join('');
+  const P = D.pts, done = P.filter(p => p[0] <= nowM);
+  if (done.length && done[done.length - 1][0] < nowM) done.push([nowM, alt]);
+  $('#arc-rest').setAttribute('d', line(P));
+  $('#arc-done').setAttribute('d', done.length > 1 ? line(done) : '');
+  const sun = $('#arc-sun');
+  sun.hidden = !sunUp;
+  const lbl = (id, t, txt) => {
+    const e = $(id);
+    e.hidden = !t;
+    if (!t) return;
+    e.textContent = txt;
+    e.style.left = ((t - sod(t)) / DAY * 100).toFixed(2) + '%';
+  };
+  lbl('#arc-rise', D.rise, D.rise ? hm(D.rise) : '');
+  lbl('#arc-set', D.set, D.set ? hm(D.set) : '');
+  // Text zur Sonne
+  let st = '';
+  if (D.rise && D.set) {
+    if (now < D.rise) st = `Sonnenaufgang um ${hm(D.rise)}, in ${dur(D.rise - now)}`;
+    else if (now < D.set) st = `Noch ${dur(D.set - now)} Tageslicht, Sonnenuntergang ${hm(D.set)}`;
+    else {
+      const tm = sunDay(addDays(sod(now), 1), loc);
+      st = tm.rise ? `Sonnenaufgang morgen um ${hm(tm.rise)}` : 'Die Sonne ist untergegangen';
+    }
+  }
+  $('#h-sun').textContent = st;
+}
+/* Wetterzeile im Kopf */
+function renderSkyWx() {
+  const e = $('#h-wx'), d = wx.data;
+  if (!d || !d.current) { e.hidden = true; return; }
+  const c = d.current, w = WMO[c.weather_code] || ['', 'cloud'];
+  const hi = d.daily && d.daily.temperature_2m_max ? Math.round(d.daily.temperature_2m_max[0]) : null, lo = d.daily && d.daily.temperature_2m_min ? Math.round(d.daily.temperature_2m_min[0]) : null;
+  e.innerHTML = `<b>${Number.isFinite(c.temperature_2m) ? Math.round(c.temperature_2m) + '°' : ''}</b> ${esc(w[0])}${hi != null ? `, heute ${lo}° bis ${hi}°` : ''}${wx.loc && wx.loc.name ? ` in ${esc(wx.loc.name)}` : ''}`;
+  e.hidden = false;
+}
+function renderSkyNext() {
+  const n = caNext(new Date()), e = $('#h-next');
+  e.hidden = !n;
+  if (n) e.innerHTML = `<b>${esc(n.label)}</b> <span>${esc(n.sub)}</span>`;
+}
+function skyTick(now) {
+  const m = Math.floor(now.getTime() / 6e4);
+  if (m === sky.minute) return;
+  sky.minute = m;
+  renderSky(now);
+  renderSkyWx();
+  renderSkyNext();
+}
+
+/* 41-spiegel.js */
+/* Spiegel-Modus: schwarzer Vollbild-Überblick für einen Smart Mirror oder einen Bildschirm an der Wand.
+ * Schwarz bleibt hinter Spiegelglas unsichtbar, deshalb nur helle Schrift ohne Flächen.
+ * Start über den Knopf oben, die Taste S oder die Adresse …/#spiegel. Beenden mit Esc oder S.
+ * Hält den Bildschirm wach (Wake Lock, wenn der Browser es kann) und verschiebt den Inhalt alle paar Minuten
+ * um ein paar Pixel, damit sich nichts einbrennt. */
+const mr = { on: false, fs: false, lock: null, idle: null, shift: -1, last: '' };
+function mirrorFromHash() { try { return decodeURIComponent(location.hash.slice(1)).toLowerCase() === 'spiegel'; } catch { return false; } }
+async function mirrorLock() {
+  if (!mr.on || !('wakeLock' in navigator) || mr.lock) return;
+  try { mr.lock = await navigator.wakeLock.request('screen'); mr.lock.addEventListener('release', () => { mr.lock = null; }); } catch { mr.lock = null; }
+}
+function mirrorOpen(gesture) {
+  if (mr.on) return;
+  mr.on = true;
+  $('#mirror').hidden = false;
+  document.documentElement.classList.add('mirror-on');
+  if (!mirrorFromHash()) history.replaceState(null, '', location.pathname + location.search + '#spiegel');
+  mr.fs = false;
+  if (gesture && document.documentElement.requestFullscreen && !document.fullscreenElement) document.documentElement.requestFullscreen().then(() => { mr.fs = true; }).catch(() => {});
+  mirrorLock();
+  mirrorWake();
+  mr.last = '';
+  if (!vs.cur || !vs.cur.key.startsWith(ymd(new Date()))) vsLoad();
+  renderMirror();
+}
+function mirrorClose() {
+  if (!mr.on) return;
+  mr.on = false;
+  $('#mirror').hidden = true;
+  document.documentElement.classList.remove('mirror-on');
+  if (mirrorFromHash()) history.replaceState(null, '', location.pathname + location.search);
+  if (mr.fs && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  mr.fs = false;
+  if (mr.lock) { mr.lock.release().catch(() => {}); mr.lock = null; }
+  $('#mirror-btn').focus();
+}
+/* Maus bewegt: Knopf zum Verlassen zeigen, nach 3 Sekunden wieder weg samt Mauszeiger */
+function mirrorWake() {
+  $('#mirror').classList.add('awake');
+  clearTimeout(mr.idle);
+  mr.idle = setTimeout(() => $('#mirror').classList.remove('awake'), 3000);
+}
+function renderMirror() {
+  if (!mr.on) return;
+  const now = new Date();
+  $('#m-time').innerHTML = `${pad(now.getHours())}<span class="colon">:</span>${pad(now.getMinutes())}`;
+  $('#m-date').textContent = `${WDL[now.getDay()]}, ${now.getDate()}. ${ML[now.getMonth()]}, KW ${isoWeek(now)}`;
+  // Wetter
+  const d = wx.data, c = d && d.current;
+  $('#m-wx').hidden = !c;
+  if (c) {
+    const w = WMO[c.weather_code] || ['', 'cloud'];
+    $('#m-wx-ico').innerHTML = icon(w[1], c.is_day !== 0);
+    $('#m-wx-temp').textContent = Number.isFinite(c.temperature_2m) ? `${Math.round(c.temperature_2m)}°` : '';
+    $('#m-wx-desc').textContent = w[0];
+    const hi = d.daily ? Math.round(d.daily.temperature_2m_max[0]) : null, lo = d.daily ? Math.round(d.daily.temperature_2m_min[0]) : null;
+    const D = sky.day, sun = D && D.rise && D.set ? `Sonne ${hm(D.rise)} bis ${hm(D.set)}` : '';
+    $('#m-wx-sub').textContent = [hi != null ? `${lo}° bis ${hi}°` : '', mirrorRain(d, now), sun].filter(Boolean).join('. ');
+  }
+  // Termine heute und morgen
+  const box = $('#m-cal');
+  const evs = ca.data && caSec().feeds.length ? ca.data.events : null;
+  box.hidden = !evs;
+  if (evs) {
+    let html = '', n = 0;
+    for (let i = 0; i < 2 && n < 7; i++) {
+      const day = addDays(sod(now), i);
+      const list = caDay(day, evs).filter(e => i > 0 || e.a || e.e > +now);
+      if (!list.length) continue;
+      html += `<h3>${i ? 'Morgen' : 'Heute'}</h3><ul>`;
+      for (const e of list) {
+        if (n++ >= 7) break;
+        const live = !e.a && e.s <= +now;
+        html += `<li style="--c:${caFeedColor(e.f)}"><span class="m-t">${e.a ? 'Ganztags' : live ? 'Jetzt' : hm(new Date(e.s))}</span><span>${esc(e.t)}</span></li>`;
+      }
+      html += '</ul>';
+    }
+    box.innerHTML = html || '<h3>Heute</h3><p class="m-dim">Keine Termine mehr heute und morgen.</p>';
+  }
+  // Countdowns aus den Kacheln
+  const cd = [];
+  for (const id of ['t-fa', 't-we', 't-ur']) {
+    const t = $('#' + id);
+    if (!t || !state.ui.tiles[id.slice(2)]) continue;
+    cd.push(`<li><span class="m-dim">${esc(t.querySelector('.t-label').textContent)}</span><b>${esc(t.querySelector('.t-val').textContent)}</b></li>`);
+  }
+  for (const c2 of state.ui.countdowns.slice(0, 2)) {
+    const t = $('#cd-' + c2.id);
+    if (t) cd.push(`<li><span class="m-dim">${esc(c2.name)}</span><b>${esc(t.querySelector('.t-val').textContent)}</b></li>`);
+  }
+  $('#m-cd').innerHTML = cd.length ? `<ul>${cd.join('')}</ul>` : '';
+  // Vers
+  const v = vs.cur && vs.cur.key && vs.cur.key.startsWith(ymd(now)) ? vs.cur : null;
+  $('#m-verse').hidden = !v;
+  if (v) { $('#m-verse-text').textContent = v.text; $('#m-verse-ref').textContent = v.ref; }
+}
+/* Regen in den nächsten 2 Stunden in einem Satz */
+function mirrorRain(d, now) {
+  const m = d.minutely_15;
+  if (!m || !m.time) return '';
+  const t = now.getTime() / 1000;
+  const next = m.time.map((x, i) => [x, m.precipitation[i]]).filter(([x]) => x >= t - 900 && x <= t + 7200);
+  if (!next.length) return '';
+  if (next[0][1] > 0.05) { const dry = next.find(([, p]) => p <= 0.05); return dry ? `Regen bis etwa ${hm(new Date(dry[0] * 1000))}` : 'Regen hält an'; }
+  const wet = next.find(([, p]) => p > 0.05);
+  return wet ? `Regen ab etwa ${hm(new Date(wet[0] * 1000))}` : 'Trocken in den nächsten 2 Stunden';
+}
+function mirrorTick(now) {
+  if (!mr.on) return;
+  const k = `${hm(now)}|${ymd(now)}`;
+  if (k !== mr.last) { mr.last = k; renderMirror(); }
+  const s = Math.floor(now.getTime() / 3e5);
+  if (s !== mr.shift) {
+    mr.shift = s;
+    const a = (s * 2.39996) % (2 * Math.PI);
+    $('#m-in').style.transform = reduceMotion ? '' : `translate(${(Math.cos(a) * 6).toFixed(1)}px,${(Math.sin(a) * 6).toFixed(1)}px)`;
+  }
+}
+$('#mirror-btn').addEventListener('click', () => mirrorOpen(true));
+$('#m-exit').addEventListener('click', mirrorClose);
+$('#mirror').addEventListener('mousemove', mirrorWake);
+$('#mirror').addEventListener('touchstart', mirrorWake, { passive: true });
+document.addEventListener('keydown', e => {
+  if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (mr.on && (e.key === 'Escape' || e.key === 's' || e.key === 'S')) { e.preventDefault(); mirrorClose(); return; }
+  if (mr.on || (e.key !== 's' && e.key !== 'S')) return;
+  if (dr.open || edit.on || document.querySelector('dialog[open]')) return;
+  const t = e.target;
+  if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+  e.preventDefault();
+  mirrorOpen(true);
+});
+// Wer den Vollbild-Modus mit Esc beendet, will raus aus dem Spiegel
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && mr.on && mr.fs) mirrorClose(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') mirrorLock(); });
+addEventListener('hashchange', () => { if (mirrorFromHash()) mirrorOpen(false); else if (mr.on) mirrorClose(); });
+
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.2';
+const VERSION = '2.3';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -5949,7 +6586,10 @@ function tick() {
   tickTiles(now);
   autoTick(now);
   tickPomo(now);
-  fxTick(now);
+  skyTick(now);
+  vsTick(now);
+  caTick(now);
+  mirrorTick(now);
   f1Tick(now);
   if (ymd(now) !== vacDayKey) renderVacation();
   if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
@@ -5977,11 +6617,13 @@ document.addEventListener('visibilitychange', () => {
   if (wx.live && Date.now() - wx.at > 10 * 6e4) loadWeather(wx.loc);
   if (cm.res && Date.now() - cm.res.at > 5 * 6e4) loadCommute();
   if (tdToken() && tkKeys().length && Date.now() - tk.stamp > 6e4) tdLoad();
+  if (caSec().feeds.length && (!ca.data || Date.now() - ca.data.at > 15 * 6e4) && Date.now() - ca.last > 6e4) caLoad();
 });
 /* Nach einem Update einmal zeigen, was neu ist. Mit Knopf, der eine Fokus-Seite einrichtet. */
 const NEWS = {
-  '2.1': ['Neu: Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
-  '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()]
+  '2.1': ['Neu: Pomodoro, Gewohnheiten und Lernfortschritt. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
+  '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()],
+  '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()]
 };
 function announceNew() {
   if (state.meta.seen === VERSION) return;
@@ -6005,6 +6647,16 @@ function setupSportPage() {
   layoutNow();
   toast(addFuel ? `Seite „${name}“ ist fertig, und die Spritpreise liegen auf „${work.name}“ neben dem Pendeln.` : `Seite „${name}“ ist fertig.`);
 }
+/* 2.3: Vers und Kalender auf die erste Seite, das Gleitzeit-Widget gibt es nicht mehr */
+function setupNews23() {
+  const p = state.pages[0], add = ['cal', 'verse'].filter(w => !p.items.some(x => x.w === w));
+  if (!add.length) { toast(`Kalender und Vers liegen schon auf „${p.name}“.`); return; }
+  p.items.splice(Math.min(1, p.items.length), 0, ...add.map(w => ({ w, s: 1 })));
+  if (state.page !== p.id) state.page = p.id;
+  commit();
+  layoutNow();
+  toast(`Liegt jetzt auf „${p.name}“. Den Kalender richtest du direkt im Widget ein.`);
+}
 function setupFocusPage() {
   if (state.pages.length >= 12) return;
   const cd = state.ui.countdowns.find(c => /prüfung|pruefung|klausur|exam/i.test(c.name));
@@ -6014,13 +6666,10 @@ function setupFocusPage() {
   do id = 'p' + uid(); while (pageById(id));
   const name = state.pages.some(p => p.name === 'Fokus') ? 'Fokus 2' : 'Fokus';
   state.pages.push({ id, name, tiles: false, items: [{ w: 'pomodoro', s: 1 }, { w: learn, s: 1 }, { w: habits, s: 1 }] });
-  const work = state.pages.find(p => pageSlug(p) === 'arbeit');
-  const addFlex = work && !work.items.some(x => x.w === 'flex');
-  if (addFlex) work.items.splice(Math.min(1, work.items.length), 0, { w: 'flex', s: 1 });
   state.page = id;
   commit();
   layoutNow();
-  toast(addFlex ? `Seite „${name}“ ist fertig, und die Gleitzeit liegt jetzt auf „${work.name}“.` : `Seite „${name}“ ist fertig.`);
+  toast(`Seite „${name}“ ist fertig.`);
 }
 /* Änderungen aus einem anderen Tab übernehmen. Jeder Tab behält dabei seine eigene offene Seite. */
 addEventListener('storage', e => {
@@ -6042,10 +6691,12 @@ state.page = startPageId() || state.page;
 persist();
 renderAll();
 announceNew();
+if (mirrorFromHash()) mirrorOpen(false);
 setInterval(tick, 1000);
 startWeather();
 loadCommute();
 initTasks();
+if (caSec().feeds.length) caLoad();
 })();
 </script>
 </body>

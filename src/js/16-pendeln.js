@@ -207,8 +207,7 @@ function renderCommute() {
   const now = new Date();
   const dl = [['Jetzt los', `an ${hm(new Date(now.getTime() + mins * 6e4))} Uhr`], ['Strecke', `${numDe(km, 1)} km${R.refs.length ? ' über ' + R.refs.join(', ') : ''}`], ['Verzögerung', delay >= 1 ? `+${Math.round(delay)} Min` : 'keine']];
   const wb = workBar();
-  const fxt = flexToday(now);
-  const endT = fxt && fxt.running ? fxt.end : wb && !freeReason(wb, now) ? at(now, wb.end) : null;
+  const endT = wb && !freeReason(wb, now) ? at(now, wb.end) : null;
   if (R.dir === 'home' && endT && now < endT) dl.splice(1, 0, [`Ab ${hm(endT)}`, `an ${hm(new Date(endT.getTime() + mins * 6e4))} Uhr`]);
   $('#cm-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   $('#cm-route').textContent = `${R.from.label || R.from.text} → ${R.to.label || R.to.text}`;
