@@ -199,7 +199,7 @@ function renderFootball(v) {
   const body = q('[data-r="body"]'), fav = q('[data-r="fav"]');
   if (!D.matches) {
     fav.innerHTML = '';
-    body.innerHTML = D.err && !D.busy ? '<div class="wx-off"><h3>Fußballdaten gerade nicht erreichbar</h3><p>OpenLigaDB antwortet nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.</p></div>' : '<p class="hint">Spiele und Tabelle werden geladen …</p>';
+    body.innerHTML = D.err && !D.busy ? '<div class="wx-off"><h3>Fußballdaten gerade nicht erreichbar</h3><p>OpenLigaDB antwortet nicht. In ein paar Minuten gibt es automatisch einen neuen Versuch.</p></div>' : `<ul class="sk-list">${skelRows(5, 'Spiele und Tabelle werden geladen')}</ul>`;
     q('[data-r="tabs"]').hidden = true;
     q('[data-r="src"]').textContent = '';
     return;

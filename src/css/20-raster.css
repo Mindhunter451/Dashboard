@@ -3,17 +3,56 @@
 .board:not(.flow)>.card{position:absolute;top:0;left:0}
 .board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
 @media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px clamp(16px,2vw,24px) 22px;display:flex;flex-direction:column;gap:16px;min-width:0;container-type:inline-size}
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-h2{margin:0;font:680 21px/1.15 var(--f-display);font-variation-settings:'wdth' 88;letter-spacing:-.012em}
-h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-spacing:0;font-variant-numeric:tabular-nums}
-.card{position:relative}
+.card{position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:16px clamp(16px,1.7vw,22px) 20px;display:flex;flex-direction:column;gap:14px;min-width:0;container-type:inline-size}
+/* Wichtige Karten (Wetter, Abfahrten, Kalender, Pendeln) schweben höher, ruhige (Schnellzugriff, Notizen, Vers) liegen flach */
+.card[data-tier="hero"]{background:var(--surface-hi);box-shadow:var(--shadow-2)}
+.card[data-tier="quiet"]{background:var(--quiet);box-shadow:none;--raise:var(--surface)}
+h2{margin:0;font:660 17px/1.25 var(--f-display);font-variation-settings:'wdth' 90;letter-spacing:-.008em}
+h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-spacing:0}
+
+/* Kartenkopf, überall gleich: Symbol, Titel und Status links, Knöpfe rechts. Der Titel klappt die Karte ein. */
+.card-head{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;min-height:32px}
+.card-head>h2{min-width:0;flex:0 1 auto;display:flex}
+.card-head>.actions,.card-head>.seg,.card-head>.icon-btn,.card-head>.btn-ghost{margin-left:auto}
+.card-head>.src{font-size:13px;line-height:1.3}
+.card-head .icon-btn{width:32px;height:32px;flex-basis:32px;border-radius:9px}
+.card-head .icon-btn svg{width:18px;height:18px}
+.card-head .btn-ghost{padding:5px 11px}
+/* Die negativen Ränder lassen die Klickfläche etwas größer werden, ohne dass sich Symbol und Text verschieben */
+.card-tg{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:calc(100% + 11px);margin:-3px -8px -3px -3px;padding:3px 8px 3px 3px;border:0;border-radius:11px;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:left}
+.card-tg:hover{background:color-mix(in srgb,var(--ink) 4.5%,transparent)}
+.card-tt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-ico{flex:0 0 28px;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--raise);color:var(--muted)}
+.card[data-tier="hero"] .card-ico{color:var(--ink)}
+.card[data-tier="quiet"] .card-ico{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.card-ico svg{width:16px;height:16px}
+.card-chev{flex:0 0 14px;width:14px;height:14px;margin-left:-3px;color:var(--muted);opacity:0;transition:opacity .15s,transform .25s var(--ease)}
+.card-tg:hover .card-chev,.card-tg:focus-visible .card-chev{opacity:1}
+@media (hover:none){.card-chev{opacity:.5}}
+.card-peek{display:none;flex:0 1 auto;margin-left:auto;min-width:0;font:600 14px/1.3 var(--f-body);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-peek small{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px}
+.card-peek .dp-line{font-size:12px;height:1.7em;min-width:2.5em;margin-left:5px;vertical-align:-1px}
+
+/* Eingeklappt: nur der Kopf mit einer Kurzinfo rechts */
+.board:not(.editing)>.card.is-collapsed{gap:0;padding-bottom:16px}
+.board:not(.editing)>.card.is-collapsed>:not(.card-head){display:none!important}
+.board:not(.editing)>.card.is-collapsed>.card-head{flex-wrap:nowrap}
+.board:not(.editing)>.card.is-collapsed>.card-head>:not(h2):not(.card-peek){display:none!important}
+.board:not(.editing)>.card.is-collapsed .card-peek{display:block}
+.board:not(.editing)>.card.is-collapsed>.card-head>h2{flex:0 0 auto;max-width:62%}
+.board:not(.editing)>.card.is-collapsed .card-chev{opacity:1;transform:rotate(-90deg)}
+.board:not(.editing)>.card.is-collapsed[data-tier="hero"]{box-shadow:var(--shadow-1)}
+
+/* Seitenwechsel: Karten kommen kurz nacheinander rein */
+.board.page-in>.card:not(.add-tile){animation:card-in .46s var(--ease) both;animation-delay:calc(var(--i,0) * 32ms)}
+@keyframes card-in{from{opacity:0;translate:0 12px}}
+@media (prefers-reduced-motion: reduce){.board.page-in>.card{animation:none}.card-chev{transition:none}}
 
 /* Leere Seite und Bearbeiten-Modus */
 .page-empty{border:2px dashed var(--line);border-radius:var(--r);padding:30px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted)}
 .page-empty h3{margin:0;color:var(--ink);font:700 20px/1.25 var(--f-display)}
 .page-empty p{margin:0;max-width:52ch}
-.add-tile{border:2px dashed var(--line);background:transparent;color:var(--muted);min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:700 17px/1.2 var(--f-display);text-align:center}
+.add-tile{border:2px dashed var(--line);box-shadow:none;background:transparent;color:var(--muted);min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:700 17px/1.2 var(--f-display);text-align:center}
 .add-tile:hover,.add-tile:focus-visible{border-color:var(--accent);color:var(--ink);background:color-mix(in srgb,var(--accent) 6%,transparent)}
 .add-tile span{font:500 13px/1.3 var(--f-body)}
 .board.editing>.card:not(.add-tile){min-height:236px}
@@ -21,7 +60,7 @@ h2 small{font:500 14px var(--f-data);color:var(--muted);margin-left:4px;letter-s
 .ed-box{position:sticky;top:16px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;max-width:100%}
 .ed-ico{width:42px;height:42px;border-radius:12px;background:var(--chip-bg);color:var(--accent-ink);display:grid;place-items:center}
 .ed-ico svg{width:22px;height:22px}
-.ed-type{margin:0;font:600 12.5px/1.3 var(--f-body);color:var(--muted)}
+.ed-type{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .ed-title{margin:0;font:700 19px/1.2 var(--f-display);overflow-wrap:anywhere}
 .ed-also{margin:0;font-size:12px;color:var(--muted)}
 .ed-tools{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px}

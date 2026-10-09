@@ -36,7 +36,7 @@ function renderHabits(v) {
   if (!items.length) {
     const li = document.createElement('li');
     li.className = 'habit empty';
-    li.innerHTML = '<p class="empty">Noch keine Gewohnheit. Leg mit „+ Gewohnheit“ eine an, zum Beispiel Sport, Lesen oder Vokabeln.</p>';
+    li.innerHTML = '<p class="empty">Noch keine Gewohnheit. Leg mit dem Plus oben eine an, zum Beispiel Sport, Lesen oder Vokabeln.</p>';
     ul.appendChild(li);
     return;
   }

@@ -51,7 +51,7 @@ async function fuLoad(manual) {
     fu.here = { lat: p.latitude, lon: p.longitude };
   }
   const A = fuArea(c.mode);
-  if (!A) { fu.err = c.mode === 'route' ? '' : 'Dafür fehlt deine Heimadresse. Trag sie im Pendeln-Widget unter „Adressen“ ein.'; renderFuel(); return; }
+  if (!A) { fu.err = c.mode === 'route' ? '' : 'Dafür fehlt deine Heimadresse. Trag sie im Pendeln-Widget über die Regler oben rechts ein.'; renderFuel(); return; }
   fu.busy = true;
   fu.last = Date.now();
   renderFuel();
@@ -68,7 +68,7 @@ async function fuLoad(manual) {
     lsSet(FU_CACHE, fu.data);
     fu.err = '';
   } catch (e) {
-    fu.err = e && e.api ? (/key|schl/i.test(e.message) ? 'Tankerkönig kennt diesen Key nicht. Prüf ihn unter „API-Key“.' : `Tankerkönig meldet: ${e.message}`) : 'Tankerkönig ist gerade nicht erreichbar. Versuch es gleich nochmal.';
+    fu.err = e && e.api ? (/key|schl/i.test(e.message) ? 'Tankerkönig kennt diesen Key nicht. Prüf ihn über die Regler oben rechts.' : `Tankerkönig meldet: ${e.message}`) : 'Tankerkönig ist gerade nicht erreichbar. Versuch es gleich nochmal.';
   } finally {
     fu.busy = false;
     renderFuel();
@@ -125,7 +125,7 @@ function renderFuel() {
     setTimeout(() => fuLoad(), 400 + Math.random() * 1600);
   }
   $('#fu-refresh').disabled = fu.busy;
-  $('#fu-refresh').textContent = fu.busy ? 'Lädt …' : 'Aktualisieren';
+  $('#fu-refresh').classList.toggle('spin', fu.busy);
   if (!R) {
     best.innerHTML = '';
     ul.textContent = '';

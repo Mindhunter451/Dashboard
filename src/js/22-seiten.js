@@ -28,7 +28,29 @@ function renderTabs() {
   const act = nav.querySelector('[aria-selected="true"]');
   if (act && had) act.focus();
   if (act && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = Math.max(0, act.offsetLeft - 24);
+  // Dieselben Seiten in der Mini-Leiste oben
+  const mb = $('#mb-tabs');
+  mb.innerHTML = state.pages.map(p => `<button type="button" class="tab" data-page="${esc(p.id)}"${p.id === cur.id ? ' aria-current="page"' : ''}>${esc(p.name)}</button>`).join('');
+  const ma = mb.querySelector('[aria-current]');
+  if (ma && mb.scrollWidth > mb.clientWidth) mb.scrollLeft = Math.max(0, ma.offsetLeft - 24);
 }
+/* Mini-Leiste: taucht auf, sobald die Seiten-Tabs oben aus dem Bild sind */
+function setMinibar(on) {
+  const m = $('#minibar');
+  if (m.classList.contains('on') === on) return;
+  m.classList.toggle('on', on);
+  m.inert = !on;
+  m.setAttribute('aria-hidden', String(!on));
+}
+if (typeof IntersectionObserver === 'function') new IntersectionObserver(es => { for (const e of es) setMinibar(!e.isIntersecting && e.boundingClientRect.top < 0); }).observe($('#tabs'));
+$('#mb-tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-page]');
+  if (!b) return;
+  const y = $('.wrap').getBoundingClientRect().top + scrollY - 6;
+  showPage(b.dataset.page, 'user');
+  if (scrollY > y) scrollTo({ top: y, behavior: 'instant' });
+});
+$('#mb-up').addEventListener('click', () => scrollTo({ top: 0, behavior: reduceMotion ? 'instant' : 'smooth' }));
 function showPage(id, how) {
   const p = pageById(id);
   if (!p) return;
@@ -41,6 +63,7 @@ function showPage(id, how) {
   persist();
   renderAll();
   layoutNow();
+  cardsIn();
 }
 $('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-page]'); if (b) showPage(b.dataset.page, 'user'); });
 $('#tabs').addEventListener('keydown', e => {

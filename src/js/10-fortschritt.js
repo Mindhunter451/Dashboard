@@ -75,13 +75,14 @@ function renderBars(v) {
   if (!bars.length) {
     const li = document.createElement('li');
     li.className = 'empty';
-    li.textContent = 'Noch keine Balken. Leg mit „+ Balken“ deinen ersten an.';
+    li.textContent = 'Noch keine Balken. Leg mit dem Plus oben deinen ersten an.';
     ul.appendChild(li);
     return;
   }
   for (const b of bars) {
     const li = document.createElement('li');
     li.className = 'bar';
+    li.dataset.kind = b.kind;
     li.innerHTML = `<div class="bar-top"><span class="bar-name"></span><span class="bar-meta"></span>${b.example ? '<span class="chip" title="Tipp auf den Stift und trag deine echten Werte ein">Beispiel</span>' : ''}<span class="bar-pct"></span><button type="button" class="icon-btn" data-edit="${esc(b.id)}">${PENCIL}</button></div><div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div><i class="tick" style="left:25%"></i><i class="tick" style="left:50%"></i><i class="tick" style="left:75%"></i></div><div class="bar-foot"><span class="l"></span><span class="bar-sub"></span><span class="r"></span></div>`;
     li.querySelector('.bar-name').textContent = b.name;
     li.querySelector('[data-edit]').setAttribute('aria-label', `${b.name} bearbeiten`);

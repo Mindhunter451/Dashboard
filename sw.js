@@ -3,7 +3,7 @@
  * Schriften und Bibliotheken: einmal laden, dann aus dem Speicher (die Adressen enthalten feste Versionen).
  * Wetter: ohne Netz die letzte Antwort, markiert mit _cockpitCache (Zeitpunkt), damit die Karte den alten Stand anzeigt.
  * Alles andere (Todoist, Tankerkönig, Abfahrten, Fußball …) geht ganz normal ins Netz. */
-const VERSION = '2.4';
+const VERSION = '2.5';
 const SHELL = 'cockpit-seite-' + VERSION, LIBS = 'cockpit-bibliotheken', DATA = 'cockpit-wetter';
 const PRE = ['./', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 const LIB_HOSTS = /^(fonts\.googleapis\.com|fonts\.gstatic\.com|unpkg\.com|cdnjs\.cloudflare\.com)$/;
