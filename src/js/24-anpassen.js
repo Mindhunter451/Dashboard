@@ -70,6 +70,7 @@ function renderDrawer() {
   segSet($('#dr-size'), u.size);
   renderSwatches();
   $('#dr-secs').checked = u.seconds;
+  $('#dr-sky').checked = u.sky;
   const tl = $('#dr-tiles');
   tl.textContent = '';
   for (const [k, n] of Object.entries(TILES)) {
@@ -140,6 +141,8 @@ $('#dr-size').addEventListener('click', e => {
 });
 $('#dr-accent').addEventListener('change', e => { if (e.target.name === 'dr-acc') { state.ui.accent = e.target.value; commit(); } });
 $('#dr-secs').addEventListener('change', e => { state.ui.seconds = e.target.checked; commit(); });
+$('#dr-sky').addEventListener('change', e => { state.ui.sky = e.target.checked; commit(); });
+$('#dr-mirror').addEventListener('click', () => { closeDrawer(); mirrorOpen(true); });
 $('#dr-tiles').addEventListener('change', e => {
   const k = e.target.dataset.tile;
   if (!k) return;

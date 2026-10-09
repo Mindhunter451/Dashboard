@@ -8,14 +8,8 @@ function setTile(id, val, sub, mode) {
 }
 function tickTiles(now) {
   const t = sod(now), wb = workBar();
-  // Feierabend (wenn heute in der Gleitzeit gestempelt: ab dann zählt das Soll)
-  const fxt = flexToday(now);
-  const way = cm.homeMins ? `, Heimweg ca. ${cm.homeMins} Min` : '';
-  if (fxt && fxt.running) {
-    if (now < fxt.end) setTile('#t-fa', `in ${dur(fxt.end - now, true)}`, `um ${hm(fxt.end)} Uhr ist dein Soll voll${way}`, 'hot');
-    else setTile('#t-fa', 'Soll erreicht', `seit ${hm(fxt.end)} Uhr, ab jetzt sammelst du Plus`, 'good');
-  } else if (fxt) setTile('#t-fa', 'Geschafft', `ausgestempelt um ${hm(fxt.end)} Uhr`, 'good');
-  else if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
+  // Feierabend
+  if (!wb) setTile('#t-fa', 'Keine Arbeitszeit', 'Leg einen Arbeitstag-Balken an');
   else {
     const why = freeReason(wb, now);
     const s = at(now, wb.start), e = at(now, wb.end);
@@ -77,10 +71,18 @@ function renderTiles() {
   box.hidden = !curPage().tiles || !box.querySelector('.tile:not([hidden])');
 }
 
+let headKey = '';
 function tickHeader(now) {
-  $('#h-time').innerHTML = state.ui.seconds ? `${hm(now)}<span class="sec">:${pad(now.getSeconds())}</span>` : hm(now);
-  $('#h-date').textContent = `${WDL[now.getDay()]}, ${now.getDate()}. ${ML[now.getMonth()]} ${now.getFullYear()}`;
-  $('#h-kw').textContent = pad(isoWeek(now));
+  const k = `${hm(now)}|${state.ui.seconds}`;
+  if (k !== headKey) {
+    headKey = k;
+    $('#h-time').innerHTML = `${pad(now.getHours())}<span class="colon">:</span>${pad(now.getMinutes())}${state.ui.seconds ? '<span class="sec"></span>' : ''}`;
+    $('#h-day').textContent = WDL[now.getDay()];
+    $('#h-date').textContent = `${now.getDate()}. ${ML[now.getMonth()]} ${now.getFullYear()}`;
+    $('#h-kw').textContent = isoWeek(now);
+  }
+  const s = $('#h-time .sec');
+  if (s) s.textContent = pad(now.getSeconds());
 }
 
 const themeStyle = document.createElement('style');
@@ -94,6 +96,8 @@ function applyUi() {
   themeStyle.textContent = `:root{${vars(p.l)}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${vars(p.d)}}}:root[data-theme="dark"]{${vars(p.d)}}`;
   $('#h-greet').textContent = u.greet.trim() || 'Moin';
   $('#foot-region').textContent = `Feiertage: ${REGIONS[u.region]}`;
+  headKey = '';
+  sky.minute = -1;
   const look = `${isDark()}|${u.accent}`;
   if (look !== lastLook) { lastLook = look; refreshMapLook(); }
 }

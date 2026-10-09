@@ -1,42 +1,30 @@
-  <header class="top">
-    <div>
-      <p class="eyebrow" id="h-date">&nbsp;</p>
-      <h1 id="h-greet">Moin Jere</h1>
+  <header class="sky" id="sky">
+    <div class="sky-stars" aria-hidden="true"></div>
+    <div class="sky-in">
+      <div class="sky-top">
+        <h1 class="greet" id="h-greet">Moin Jere</h1>
+        <nav class="tabs" id="tabs" role="tablist" aria-label="Seiten"></nav>
+        <div class="sky-tools">
+          <button type="button" class="sky-btn" id="mirror-btn" title="Spiegel-Modus (Taste S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/></svg><span>Spiegel</span></button>
+          <button type="button" class="sky-btn edit-btn" id="edit-btn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><span id="edit-btn-txt">Bearbeiten</span></button>
+          <button type="button" class="sky-btn cust-btn" id="cust-btn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Anpassen</span></button>
+        </div>
+      </div>
+      <div class="sky-main">
+        <p class="time" id="h-time" aria-live="off">00:00</p>
+        <div class="sky-side">
+          <p class="sky-day" id="h-day">&nbsp;</p>
+          <p class="sky-date"><span id="h-date">&nbsp;</span><span class="kw" title="Kalenderwoche">KW <b id="h-kw">00</b></span></p>
+          <p class="sky-line" id="h-wx" hidden></p>
+          <p class="sky-line" id="h-sun"></p>
+          <p class="sky-line sky-next" id="h-next" hidden></p>
+        </div>
+      </div>
     </div>
-    <div class="clock">
-      <div class="time" id="h-time" aria-live="off">00:00</div>
-      <div class="kw" title="Kalenderwoche"><span>KW</span><b id="h-kw">00</b></div>
-      <button type="button" class="btn-ghost cust-btn" id="cust-btn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Anpassen</button>
+    <div class="arc" id="arc" aria-hidden="true">
+      <svg class="arc-svg" viewBox="0 0 1440 100" preserveAspectRatio="none"><path class="arc-rest" id="arc-rest" d=""/><path class="arc-done" id="arc-done" d=""/></svg>
+      <span class="arc-sun" id="arc-sun"></span>
+      <span class="arc-lbl" id="arc-rise"></span>
+      <span class="arc-lbl" id="arc-set"></span>
     </div>
   </header>
-
-  <div class="pagebar">
-    <nav class="tabs" id="tabs" role="tablist" aria-label="Seiten"></nav>
-    <button type="button" class="btn-ghost edit-btn" id="edit-btn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><span id="edit-btn-txt">Bearbeiten</span></button>
-  </div>
-
-  <div class="editbar" id="editbar" hidden>
-    <label class="field"><span class="lbl">Name dieser Seite</span><input id="eb-name" type="text" maxlength="24" autocomplete="off"></label>
-    <div class="eb-tools">
-      <button type="button" class="icon-btn" id="eb-left" aria-label="Seite nach links schieben" title="Nach links"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
-      <button type="button" class="icon-btn" id="eb-right" aria-label="Seite nach rechts schieben" title="Nach rechts"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-      <label class="check-row"><input type="checkbox" id="eb-tiles"> Kacheln oben zeigen</label>
-      <button type="button" class="btn-ghost" id="eb-add">+ Neue Seite</button>
-      <button type="button" class="btn-danger" id="eb-del">Seite löschen</button>
-    </div>
-  </div>
-
-  <div class="notice" id="notice" role="status" hidden>
-    <p id="notice-text"></p>
-    <div class="form-row">
-      <button type="button" class="btn" id="notice-save">Jetzt sichern</button>
-      <button type="button" class="btn-ghost" id="notice-later">In einer Woche erinnern</button>
-    </div>
-  </div>
-
-  <section class="next" id="tiles" aria-label="Als Nächstes">
-    <div class="tile" id="t-fa"><p class="t-label">Feierabend</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
-    <div class="tile" id="t-we"><p class="t-label">Wochenende</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
-    <div class="tile" id="t-ft"><p class="t-label">Nächster Feiertag</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
-    <div class="tile" id="t-ur"><p class="t-label">Nächster Urlaub</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
-  </section>

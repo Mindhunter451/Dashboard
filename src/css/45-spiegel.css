@@ -1,0 +1,39 @@
+/* Spiegel-Modus: reines Schwarz, nur Schrift. Funktioniert hoch und quer. */
+.mirror{position:fixed;inset:0;z-index:200;background:#000;color:#F2F4F7;overflow:hidden;cursor:none;
+  --m-dim:#8B93A0;font-family:var(--f-body)}
+.mirror.awake{cursor:auto}
+html.mirror-on body{overflow:hidden}
+.m-in{position:absolute;inset:0;padding:clamp(28px,5vmin,72px);display:grid;gap:clamp(24px,4vmin,56px);
+  grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;
+  grid-template-areas:"clock wx" "cal cd" "cal cd" "verse verse";transition:transform 2s ease}
+.m-clock{grid-area:clock}
+.m-time{margin:0;font-family:var(--f-display);font-weight:250;font-variation-settings:'wdth' 75,'opsz' 96;font-size:clamp(96px,19vmin,260px);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.m-time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
+.m-date{margin:.7em 0 0;font:500 clamp(18px,2.6vmin,32px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-wx{grid-area:wx;justify-self:end;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.m-wx p{margin:0;font-size:clamp(17px,2.3vmin,28px);line-height:1.3}
+.m-wx-now{display:flex;align-items:center;gap:.3em;font-size:clamp(56px,10vmin,140px)}
+.m-wx-now b{font-family:var(--f-display);font-weight:300;font-variation-settings:'wdth' 80;line-height:.9;letter-spacing:-.03em}
+.m-wx-ico svg{width:.75em;height:.75em;display:block;color:#F2F4F7;--surface:#000}
+.m-dim{color:var(--m-dim)}
+.m-wx .m-dim{max-width:22em}
+.m-cal{grid-area:cal;min-height:0;overflow:hidden}
+.m-cal h3{margin:0 0 .4em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-cal h3:not(:first-child){margin-top:1em}
+.m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7vmin,34px);line-height:1.25}
+.m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c)}
+.m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-cd{grid-area:cd;justify-self:end;text-align:right}
+.m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9em}
+.m-cd li{display:flex;flex-direction:column;font-size:clamp(15px,2vmin,24px)}
+.m-cd b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.5em;line-height:1.15}
+.m-verse{grid-area:verse;margin:0 auto;max-width:46em;text-align:center}
+.m-verse blockquote{margin:0;font:italic 300 clamp(18px,2.6vmin,32px)/1.5 var(--f-serif);text-wrap:balance;color:#DADFE6}
+.m-verse figcaption{margin-top:.6em;color:var(--m-dim);font-size:clamp(14px,1.8vmin,20px)}
+.m-exit{position:absolute;top:16px;right:16px;opacity:0;pointer-events:none;transition:opacity .3s;border:1px solid #333;background:#111;color:#ddd;padding:8px 14px;border-radius:999px;font:600 14px var(--f-body)}
+.mirror.awake .m-exit,.m-exit:focus-visible{opacity:1;pointer-events:auto}
+@media (orientation:portrait){
+  .m-in{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"clock clock" "wx cd" "cal cal" "verse verse"}
+  .m-wx{justify-self:start;text-align:left;align-items:flex-start}
+}
+@media (prefers-reduced-motion: reduce){.m-in{transition:none}}

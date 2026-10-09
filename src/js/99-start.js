@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '2.2';
+const VERSION = '2.3';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -7,7 +7,10 @@ function tick() {
   tickTiles(now);
   autoTick(now);
   tickPomo(now);
-  fxTick(now);
+  skyTick(now);
+  vsTick(now);
+  caTick(now);
+  mirrorTick(now);
   f1Tick(now);
   if (ymd(now) !== vacDayKey) renderVacation();
   if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
@@ -35,11 +38,13 @@ document.addEventListener('visibilitychange', () => {
   if (wx.live && Date.now() - wx.at > 10 * 6e4) loadWeather(wx.loc);
   if (cm.res && Date.now() - cm.res.at > 5 * 6e4) loadCommute();
   if (tdToken() && tkKeys().length && Date.now() - tk.stamp > 6e4) tdLoad();
+  if (caSec().feeds.length && (!ca.data || Date.now() - ca.data.at > 15 * 6e4) && Date.now() - ca.last > 6e4) caLoad();
 });
 /* Nach einem Update einmal zeigen, was neu ist. Mit Knopf, der eine Fokus-Seite einrichtet. */
 const NEWS = {
-  '2.1': ['Neu: Pomodoro, Gewohnheiten, Lernfortschritt und Gleitzeit. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
-  '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()]
+  '2.1': ['Neu: Pomodoro, Gewohnheiten und Lernfortschritt. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
+  '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()],
+  '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()]
 };
 function announceNew() {
   if (state.meta.seen === VERSION) return;
@@ -63,6 +68,16 @@ function setupSportPage() {
   layoutNow();
   toast(addFuel ? `Seite „${name}“ ist fertig, und die Spritpreise liegen auf „${work.name}“ neben dem Pendeln.` : `Seite „${name}“ ist fertig.`);
 }
+/* 2.3: Vers und Kalender auf die erste Seite, das Gleitzeit-Widget gibt es nicht mehr */
+function setupNews23() {
+  const p = state.pages[0], add = ['cal', 'verse'].filter(w => !p.items.some(x => x.w === w));
+  if (!add.length) { toast(`Kalender und Vers liegen schon auf „${p.name}“.`); return; }
+  p.items.splice(Math.min(1, p.items.length), 0, ...add.map(w => ({ w, s: 1 })));
+  if (state.page !== p.id) state.page = p.id;
+  commit();
+  layoutNow();
+  toast(`Liegt jetzt auf „${p.name}“. Den Kalender richtest du direkt im Widget ein.`);
+}
 function setupFocusPage() {
   if (state.pages.length >= 12) return;
   const cd = state.ui.countdowns.find(c => /prüfung|pruefung|klausur|exam/i.test(c.name));
@@ -72,13 +87,10 @@ function setupFocusPage() {
   do id = 'p' + uid(); while (pageById(id));
   const name = state.pages.some(p => p.name === 'Fokus') ? 'Fokus 2' : 'Fokus';
   state.pages.push({ id, name, tiles: false, items: [{ w: 'pomodoro', s: 1 }, { w: learn, s: 1 }, { w: habits, s: 1 }] });
-  const work = state.pages.find(p => pageSlug(p) === 'arbeit');
-  const addFlex = work && !work.items.some(x => x.w === 'flex');
-  if (addFlex) work.items.splice(Math.min(1, work.items.length), 0, { w: 'flex', s: 1 });
   state.page = id;
   commit();
   layoutNow();
-  toast(addFlex ? `Seite „${name}“ ist fertig, und die Gleitzeit liegt jetzt auf „${work.name}“.` : `Seite „${name}“ ist fertig.`);
+  toast(`Seite „${name}“ ist fertig.`);
 }
 /* Änderungen aus einem anderen Tab übernehmen. Jeder Tab behält dabei seine eigene offene Seite. */
 addEventListener('storage', e => {
@@ -100,7 +112,9 @@ state.page = startPageId() || state.page;
 persist();
 renderAll();
 announceNew();
+if (mirrorFromHash()) mirrorOpen(false);
 setInterval(tick, 1000);
 startWeather();
 loadCommute();
 initTasks();
+if (caSec().feeds.length) caLoad();

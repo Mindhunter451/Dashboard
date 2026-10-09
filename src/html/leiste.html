@@ -1,0 +1,25 @@
+  <div class="editbar" id="editbar" hidden>
+    <label class="field"><span class="lbl">Name dieser Seite</span><input id="eb-name" type="text" maxlength="24" autocomplete="off"></label>
+    <div class="eb-tools">
+      <button type="button" class="icon-btn" id="eb-left" aria-label="Seite nach links schieben" title="Nach links"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="icon-btn" id="eb-right" aria-label="Seite nach rechts schieben" title="Nach rechts"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+      <label class="check-row"><input type="checkbox" id="eb-tiles"> Kacheln oben zeigen</label>
+      <button type="button" class="btn-ghost" id="eb-add">+ Neue Seite</button>
+      <button type="button" class="btn-danger" id="eb-del">Seite löschen</button>
+    </div>
+  </div>
+
+  <div class="notice" id="notice" role="status" hidden>
+    <p id="notice-text"></p>
+    <div class="form-row">
+      <button type="button" class="btn" id="notice-save">Jetzt sichern</button>
+      <button type="button" class="btn-ghost" id="notice-later">In einer Woche erinnern</button>
+    </div>
+  </div>
+
+  <section class="next" id="tiles" aria-label="Als Nächstes">
+    <div class="tile" id="t-fa"><p class="t-label">Feierabend</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-we"><p class="t-label">Wochenende</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-ft"><p class="t-label">Nächster Feiertag</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-ur"><p class="t-label">Nächster Urlaub</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+  </section>
