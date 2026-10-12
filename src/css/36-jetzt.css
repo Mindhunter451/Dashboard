@@ -1,0 +1,67 @@
+/* Jetzt wichtig: Hinweise als ruhige Zeilen, auf breiten Karten zweispaltig. Farbe nur, wenn es drängt. */
+#now{gap:12px}
+.nw-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:6px 10px}
+.nw-row{width:100%;min-height:54px;display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:8px 12px 8px 8px;border:0;border-radius:13px;background:var(--raise);color:inherit;font:inherit;text-align:left}
+button.nw-row{cursor:pointer;transition:background-color .15s}
+@media (hover:hover){button.nw-row:hover{background:color-mix(in srgb,var(--ink) 7%,var(--raise))}}
+button.nw-row:active{background:color-mix(in srgb,var(--ink) 10%,var(--raise))}
+.nw-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surface);color:var(--muted)}
+.nw-ico svg{width:18px;height:18px}
+.nw-row[data-lv="now"] .nw-ico{background:var(--accent);color:var(--on-accent)}
+.nw-row[data-lv="warn"] .nw-ico{background:color-mix(in srgb,var(--warn) 20%,var(--surface));color:var(--warn)}
+.nw-row[data-lv="bad"] .nw-ico{background:var(--bad);color:#fff}
+.nw-row .nw-ico[style]{background:var(--wc);color:#1A1203}
+.nw-row[data-lv="bad"] .nw-ico[style]{color:#fff}
+.nw-main{min-width:0;display:flex;flex-direction:column;gap:2px}
+.nw-main b{font-weight:650;font-size:15px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nw-main small{display:flex;flex-wrap:wrap;align-items:center;gap:2px 7px;color:var(--muted);font-size:13px;line-height:1.35;min-width:0}
+.nw-main small .dp-line{font-size:12px;height:1.65em;min-width:2.4em}
+.nw-main small .dp-late,.nw-main small .dp-x{font-size:13px}
+.nw-bin{font-style:normal;display:inline-flex;align-items:center;gap:5px;font-weight:600;color:var(--ink)}
+.nw-bin::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--c)}
+.nw-when{font:650 14px/1.2 var(--f-display);font-variation-settings:'wdth' 90;white-space:nowrap;color:var(--muted)}
+.nw-row[data-lv="now"] .nw-when{color:var(--accent-ink)}
+.nw-calm{grid-column:1/-1;display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:13px;background:var(--raise)}
+.nw-calm b{font:650 16px/1.3 var(--f-display);font-variation-settings:'wdth' 92}
+.nw-calm span{color:var(--muted);font-size:14px}
+.nw-more{align-self:flex-start}
+.nw-cap{display:flex;align-items:center;gap:6px;padding:3px 3px 3px 14px;border-radius:13px;background:var(--raise);border:1px solid transparent;transition:border-color .15s,background-color .15s}
+.nw-cap:focus-within{border-color:var(--sea);background:var(--surface)}
+.nw-cap input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:15px;color:var(--ink);padding:8px 0;outline:0}
+.nw-cap input::placeholder{color:var(--muted);opacity:1}
+.nw-cap .icon-btn{width:36px;height:36px;flex-basis:36px;border-radius:10px;background:var(--surface);color:var(--ink)}
+.nw-cap .icon-btn:disabled{opacity:.4;cursor:default}
+#nw-src{margin-top:-4px}
+@media (prefers-reduced-motion: reduce){button.nw-row,.nw-cap{transition:none}}
+
+/* Amtliche Wetterwarnungen in der Wetterkarte, Farbe nach Warnstufe des DWD */
+.wn-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.wn{border-radius:12px;background:color-mix(in srgb,var(--wc) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--wc) 50%,var(--line))}
+.wn summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:9px 12px;border-radius:11px}
+.wn summary::-webkit-details-marker{display:none}
+.wn-t::after{content:"";display:inline-block;width:6px;height:6px;margin:0 2px 3px 10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s}
+.wn[open] .wn-t::after{transform:rotate(-135deg);margin-bottom:-1px}
+.wn-lv{padding:1px 8px;border-radius:6px;background:var(--wc);color:#1A1203;font:700 12px/1.5 var(--f-body)}
+.wn[data-lv="3"] .wn-lv,.wn[data-lv="4"] .wn-lv{color:#fff}
+.wn summary b{font:650 15px/1.3 var(--f-display);font-variation-settings:'wdth' 92}
+.wn-t{margin-left:auto;color:var(--muted);font-size:13px;white-space:nowrap}
+.wn p{margin:0 12px 10px;font-size:14px;line-height:1.45;max-width:72ch}
+.wn .wn-ins{color:var(--muted)}
+.pk-warn{display:inline-block;padding:0 7px;margin-right:2px;border-radius:6px;background:var(--wc);color:#1A1203;font-size:12px;font-weight:700;line-height:1.6;vertical-align:1px}
+.pk-warn[data-lv="3"],.pk-warn[data-lv="4"]{color:#fff}
+
+/* Seiten neu ordnen: Vorschau */
+.pl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.pl-list li{padding:11px 13px;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:8px}
+.pl-list li.own{border-style:dashed}
+.pl-name{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.pl-name b{font:700 16px/1.25 var(--f-display)}
+.pl-name small{color:var(--muted);font-size:13px}
+.pl-ws{margin:0;display:flex;flex-wrap:wrap;gap:6px}
+.pl-ws small{color:var(--muted);font-size:13px}
+.pl-w{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 7px;border-radius:999px;background:var(--raise);font-size:13px;font-weight:600}
+.pl-w svg{width:15px;height:15px;color:var(--muted);flex:0 0 auto}
+
+/* Schnell notieren als Dialog (Taste N) */
+.dlg-cap{width:min(480px,calc(100% - 24px))}
+.dlg .field #cap-in{font-size:16px;padding:10px 12px}

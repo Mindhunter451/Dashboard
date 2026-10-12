@@ -1,6 +1,6 @@
 /* Pendeln (gibt es nur einmal): Route über OSRM, Meldungen der Autobahn GmbH, optional Live-Fahrzeit von TomTom */
 const TT_KEY = 'jere-cockpit-tomtom';
-const cm = { dir: new Date().getHours() < 11 ? 'work' : 'home', seq: 0, timer: null, res: null, homeMins: null, map: null, layer: null, abCache: new Map() };
+const cm = { dir: new Date().getHours() < 11 ? 'work' : 'home', seq: 0, timer: null, res: null, sum: null, homeMins: null, map: null, layer: null, abCache: new Map() };
 const ORDER = { closure: 0, jam: 1, slow: 2, warn: 3, works: 4 };
 const cmPlaces = () => cm.dir === 'home' ? [state.commute.work, state.commute.home] : [state.commute.home, state.commute.work];
 function cmPane(which) { for (const p of ['empty', 'off', 'live']) $('#cm-' + p).hidden = p !== which; }
@@ -212,6 +212,9 @@ function renderCommute() {
   $('#cm-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   $('#cm-route').textContent = `${R.from.label || R.from.text} → ${R.to.label || R.to.text}`;
   const closures = items.filter(i => i.k === 'closure').length, works = items.filter(i => i.k === 'works').length;
+  // Kurzfassung für „Jetzt wichtig“
+  cm.sum = { dir: R.dir, mins: rmins, delay, closures, live: !!tt, at: R.at };
+  nowDirty();
   let v, lv;
   if (closures) { v = `Achtung, ${closures === 1 ? 'eine Sperrung' : closures + ' Sperrungen'} auf deiner Strecke.`; lv = 'bad'; }
   else if (delay >= 10) { v = `Stau auf der Strecke, plan etwa ${Math.round(delay)} Min mehr ein.`; lv = 'warn'; }
@@ -384,6 +387,7 @@ $('#cm-form').addEventListener('submit', e => {
   try { if (k) localStorage.setItem(TT_KEY, k); else localStorage.removeItem(TT_KEY); } catch { /* Browser speichert nicht */ }
   $('#cm-form').hidden = true;
   cm.res = null;
+  cm.sum = null;
   cm.homeMins = null;
   commit();
   loadCommute();

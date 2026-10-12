@@ -13,7 +13,7 @@ function tkKeys() {
 function tkNamesTxt(keys) { const n = keys.map(([, t]) => `„${t}“`); return n.length > 1 ? `${n.slice(0, -1).join(', ')} oder ${n[n.length - 1]}` : n[0] || ''; }
 function tkReset() { tk.proj = {}; tk.tasks = {}; tk.open = {}; tk.projList = null; tk.projAt = 0; tk.stamp = 0; }
 function tasksReconfigure() { tk.projAt = 0; renderTasksAll(); if (tdToken()) tdLoad(); }
-const renderTasksAll = () => viewsOf('tasks').forEach(renderTaskView);
+const renderTasksAll = () => { viewsOf('tasks').forEach(renderTaskView); nowDirty(); };
 function tkMsg(text, btnLabel, fn) { tk.msg = text ? { text, btnLabel, fn } : null; renderTasksAll(); }
 function tdAsk(err) { tk.msg = null; tk.ask = { err: err || '', fail: '' }; tk.askSeq++; renderTasksAll(); }
 function tdAskClose() { tk.ask = null; if (!tdToken()) tkIdle(); else renderTasksAll(); }

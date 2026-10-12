@@ -32,7 +32,8 @@ function renderTabs() {
   const mb = $('#mb-tabs');
   mb.innerHTML = state.pages.map(p => `<button type="button" class="tab" data-page="${esc(p.id)}"${p.id === cur.id ? ' aria-current="page"' : ''}>${esc(p.name)}</button>`).join('');
   const ma = mb.querySelector('[aria-current]');
-  if (ma && mb.scrollWidth > mb.clientWidth) mb.scrollLeft = Math.max(0, ma.offsetLeft - 24);
+  // Abstand zum Rand der Leiste messen, nicht zum Seitenrand (sonst rutscht der erste Tab halb raus)
+  if (ma && mb.scrollWidth > mb.clientWidth) mb.scrollLeft = Math.max(0, mb.scrollLeft + ma.getBoundingClientRect().left - mb.getBoundingClientRect().left - 24);
 }
 /* Mini-Leiste: taucht auf, sobald die Seiten-Tabs oben aus dem Bild sind */
 function setMinibar(on) {

@@ -95,6 +95,7 @@
 .eb-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
 .eb-tools .check-row{margin-right:4px}
 .eb-tools .btn-danger{margin-left:0}
+.eb-hint{flex-basis:100%;max-width:80ch}
 
 /* Hinweis zur Sicherung */
 .notice{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;padding:12px 14px 12px 16px;border-radius:var(--r);background:var(--chip-bg);border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line))}

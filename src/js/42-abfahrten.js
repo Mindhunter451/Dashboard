@@ -159,7 +159,7 @@ function renderDep(v) {
   v.q('[data-r="src"]').innerHTML = dpSrcHtml(D, err);
 }
 const dpSrcHtml = (D, err) => `<span>Daten: <a href="${DP_SRC}" target="_blank" rel="noopener">Transitous und offene Fahrplandaten</a></span>${D ? `<span>Stand ${hm(new Date(D.at))}${err ? ', gerade ohne Verbindung' : ''}</span>` : ''}`;
-function renderDepAll() { for (const v of viewsOf('dep')) renderDep(v); renderMirror(); }
+function renderDepAll() { for (const v of viewsOf('dep')) renderDep(v); renderMirror(); nowDirty(); }
 
 /* Für den Spiegel: das erste Abfahrten-Widget mit Haltestelle, bevorzugt von der offenen Seite */
 function dpMirrorWidget() {

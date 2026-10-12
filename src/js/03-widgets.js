@@ -46,7 +46,8 @@ function syncBoard() {
   const page = curPage(), board = $('#board');
   for (const id of [...views.keys()]) if (!state.widgets[id]) dropView(id);
   const on = new Set();
-  for (const it of page.items) {
+  // Seiten mit „nach Tageszeit ordnen“ zeigen ihre Karten je nach Uhrzeit anders sortiert, beim Bearbeiten in der eigenen Reihenfolge
+  for (const it of page.smart && !edit.on ? smartOrder(page.items, new Date()) : page.items) {
     const v = ensureView(it.w);
     if (!v) continue;
     on.add(v.el);

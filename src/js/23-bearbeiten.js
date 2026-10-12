@@ -23,6 +23,8 @@ function renderEditBar() {
   $('#eb-left').disabled = i <= 0;
   $('#eb-right').disabled = i >= state.pages.length - 1;
   $('#eb-tiles').checked = p.tiles;
+  $('#eb-smart').checked = !!p.smart;
+  $('#eb-smart-hint').hidden = !p.smart;
   $('#eb-del').disabled = state.pages.length <= 1;
   $('#eb-del').title = state.pages.length <= 1 ? 'Die letzte Seite bleibt' : '';
   $('#eb-add').disabled = state.pages.length >= 12;
@@ -116,6 +118,7 @@ function movePage(d) {
 $('#eb-left').addEventListener('click', () => movePage(-1));
 $('#eb-right').addEventListener('click', () => movePage(1));
 $('#eb-tiles').addEventListener('change', e => { curPage().tiles = e.target.checked; commit(); });
+$('#eb-smart').addEventListener('change', e => { curPage().smart = e.target.checked; commit(); });
 $('#eb-add').addEventListener('click', () => {
   if (state.pages.length >= 12) return;
   let name = 'Neue Seite', k = 2, id;

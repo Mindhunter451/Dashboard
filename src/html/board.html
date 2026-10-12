@@ -1,4 +1,20 @@
 <main class="board flow" id="board" aria-live="off">
+  <!-- Jetzt wichtig -->
+  <section class="card" id="now" data-type="now" aria-labelledby="nw-h" hidden>
+    <div class="card-head">
+      <h2 id="nw-h"><span data-r="title">Jetzt wichtig</span></h2>
+      <span class="src" id="nw-ph"></span>
+    </div>
+    <ul class="nw-list" id="nw-list"></ul>
+    <button type="button" class="btn-ghost nw-more" id="nw-more" hidden>Mehr zeigen</button>
+    <form class="nw-cap" id="nw-cap" novalidate>
+      <label class="vh" for="nw-in">Schnell notieren</label>
+      <input id="nw-in" type="text" maxlength="500" autocomplete="off" enterkeyhint="send" placeholder="Schnell notieren …">
+      <button type="submit" class="icon-btn" id="nw-go" aria-label="Notieren" title="Notieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+    </form>
+    <p class="src" id="nw-src"></p>
+  </section>
+
   <!-- Pendeln -->
   <section class="card" id="commute" data-type="commute" aria-labelledby="cm-h">
     <div class="card-head">
@@ -92,6 +108,7 @@
     </form>
 
     <div id="wx-live" hidden>
+      <div class="wn-list" id="wx-warn" hidden></div>
       <div class="wx-top">
         <div class="wx-now">
           <div class="wx-main">

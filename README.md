@@ -1,6 +1,6 @@
 # Jeres Tagescockpit
 
-Persönliches Dashboard mit eigenen Seiten, zum Beispiel für Übersicht, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Drin sind Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, iCloud-Kalender, Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Vers des Tages, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu ein schwarzer Spiegel-Modus für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
+Persönliches Dashboard mit eigenen Seiten, zum Beispiel Heute, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Ganz vorn steht „Jetzt wichtig“ mit dem, was gerade zählt. Drin sind außerdem Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar und amtlichen Warnungen, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, iCloud-Kalender, Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Vers des Tages, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu ein schwarzer Spiegel-Modus für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
 
 Live: https://mindhunter451.github.io/Dashboard/
 
@@ -9,8 +9,10 @@ Live: https://mindhunter451.github.io/Dashboard/
 Oben wechselst du die Seiten, per Klick, mit den Tasten 1 bis 9 oder über die Adresse, zum Beispiel `…/Dashboard/#arbeit`.
 Ein Tipp auf den Titel einer Karte klappt sie ein. Dann bleibt nur der Kopf mit dem Wichtigsten stehen, zum Beispiel die nächste Abfahrt oder der nächste Termin. Welche Karten zu sind, merkt sich jedes Gerät selbst. Beim Scrollen erscheint oben eine schmale Leiste mit Uhrzeit und Seiten.
 Mit **Bearbeiten** legst du Seiten an, benennst sie um und sortierst sie. Auf jeder Karte kannst du dann verschieben, die Breite ändern, Einstellungen öffnen oder sie von der Seite nehmen. Über **Widget hinzufügen** legst du neue Widgets an oder holst vorhandene auf die Seite.
-Unter **Anpassen** sind Design, Akzentfarbe, Himmel an oder aus, Kacheln, Countdowns, Bundesland, die Startseite und die Sicherung.
-**Spiegel** (oder die Taste S) zeigt Uhr, Wetter, Termine, Abfahrten, Geburtstage, Müllabfuhr, Countdowns und den Vers auf Schwarz, im Vollbild. Mit `…/Dashboard/#spiegel` startet die Seite direkt so, praktisch für einen Kiosk-Browser am Smart Mirror. Raus geht es mit Esc.
+**Jetzt wichtig** sammelt aus allen Widgets, was gerade zählt, und sortiert es nach Dringlichkeit: Wetterwarnungen, der nächste Termin, wann du zur Bahn los musst, Stau auf dem Weg zur Arbeit, Regen, Frost, Müll, Geburtstage, fällige Aufgaben, die Prüfung und offene Gewohnheiten. Morgens zählt der Weg, abends das, was morgen ansteht. Ein Tipp auf einen Hinweis springt zur passenden Karte. Darunter ist ein Feld zum schnellen Notieren, von überall auch mit der Taste N: Mit Todoist landet es im Eingang (ein Datum wie „morgen 9 Uhr“ erkennt Todoist selbst), ohne Todoist in einer Notiz.
+Seiten mit **Nach Tageszeit ordnen** (Schalter beim Bearbeiten) stellen morgens Wetter, Abfahrten und Pendeln nach vorn, tagsüber Termine und Aufgaben, abends Müll, Termine und Geburtstage.
+Unter **Anpassen** sind Design, Akzentfarbe, Himmel an oder aus, Kacheln, Countdowns, Bundesland, die Startseite, die Sicherung und **Seiten neu ordnen**: Daraus werden Heute, Arbeit, Privat, Fokus und Sport. Vorher zeigt eine Vorschau, was wohin kommt, eigene Seiten bleiben, wie sie sind, und die alten Seiten lassen sich später zurückholen.
+**Spiegel** (oder die Taste S) zeigt Uhr, Wetter, Warnungen, Termine, Abfahrten, Geburtstage, Müllabfuhr, Countdowns und den Vers auf Schwarz, im Vollbild. Mit `…/Dashboard/#spiegel` startet die Seite direkt so, praktisch für einen Kiosk-Browser am Smart Mirror. Raus geht es mit Esc.
 
 ## Als App installieren
 
@@ -38,6 +40,10 @@ Die Abfahrten kommen von [Transitous](https://transitous.org), einer freien, nic
 Geburtstage trägst du selbst ein oder übernimmst sie als vCard-Datei aus den Kontakten (iPhone: Kontakte, Listen, „Alle Kontakte“ gedrückt halten, Exportieren). Ganztägige Termine mit „Geburtstag“ im Titel aus dem Kalender-Widget kommen dazu.
 Für die Müllabfuhr lädst du die ICS-Datei deines Entsorgers oder trägst pro Tonne einen Rhythmus ein. Am Vorabend erinnert das Cockpit ab einer Uhrzeit deiner Wahl, auf Wunsch auch als Mitteilung, solange es offen ist. Geburtstage und Abfuhrtermine stehen in der Sicherung.
 
+## Wetterwarnungen
+
+Die amtlichen Warnungen des Deutschen Wetterdienstes für den Ort des Wetter-Widgets kommen über [Bright Sky](https://brightsky.dev), das die offenen Daten des DWD frei und ohne Key anbietet. Sie stehen farbig nach Warnstufe oben in der Wetterkarte, in „Jetzt wichtig“ und im Spiegel. Das gilt nur für Orte in Deutschland. Alte Warnungen werden ohne Netz nicht aufgehoben, lieber keine als eine veraltete.
+
 ## Aufbau
 
 `index.html` ist die fertige Seite, die GitHub Pages ausliefert. Sie wird gebaut, deshalb nicht von Hand bearbeiten.
@@ -62,6 +68,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**2.6** (Oktober 2026)
+Neues Widget „Jetzt wichtig“: das Wichtigste aus allen Widgets in einer Karte, nach Tageszeit gewichtet, mit Sprung zur passenden Karte und einem Feld zum schnellen Notieren (Taste N), das in den Todoist-Eingang schreibt, ohne Todoist oder ohne Netz in eine Notiz. Amtliche Wetterwarnungen vom DWD in der Wetterkarte, in „Jetzt wichtig“ und im Spiegel. Seiten können sich nach Tageszeit ordnen. „Seiten neu ordnen“ macht aus den Standardseiten Heute, Arbeit, Privat, Fokus und Sport, mit Vorschau, Rückgängig und „Alte Seiten zurückholen“. Wer neu anfängt oder alles zurücksetzt, startet mit Heute, Arbeit und Privat.
 
 **2.5** (Oktober 2026)
 Feinschliff am Design: Jede Karte hat jetzt denselben Kopf mit Symbol, Titel und Status links und den Knöpfen rechts, als ruhige Symbole statt Text. Wetter, Abfahrten, Kalender und Pendeln schweben etwas höher, Schnellzugriff, Notizen und Vers liegen flacher. Die Akzentfarbe gibt es nur noch für jetzt, heute und Aktionen, der Rest ist ruhiger. Karten lassen sich per Tipp auf den Titel einklappen und zeigen dann eine Kurzinfo. Beim Scrollen bleibt oben eine schmale Leiste mit Uhrzeit und Seiten. Statt „wird geladen“ zeigen die Karten graue Platzhalter, beim Seitenwechsel kommen die Karten kurz nacheinander rein. Einrichten-Hinweise sind kompakt, Todoist zeigt ohne Token nur noch eine Zeile. Auf dem Handy ist das Regenradar erst zu und Kalender und Geburtstage zeigen weniger, die Übersicht ist dadurch rund ein Fünftel kürzer. Der nächste Termin von heute bekommt ein „in 19 Min“, die Farbe vom Horizont schimmert unter dem Himmel nach, der dunkle Modus hat etwas mehr Kontrast.

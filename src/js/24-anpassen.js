@@ -85,6 +85,7 @@ function renderDrawer() {
   if (!sel.options.length) for (const [k, n] of Object.entries(REGIONS)) sel.add(new Option(n, k));
   sel.value = u.region;
   renderBackupInfo();
+  renderPlanBtns();
   $('#dr-data-err').hidden = true;
 }
 function openDrawer() {
