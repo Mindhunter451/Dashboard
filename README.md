@@ -21,7 +21,7 @@ Auf iPhone und iPad hat die App vom Home-Bildschirm ihren eigenen Speicher. Die 
 
 ## Daten
 
-Alles, was du einstellst, liegt nur im Browser (localStorage), getrennt für jede Adresse und jeden Browser. Der Todoist-Token, ein TomTom-Key, der Tankerkönig-Key und die Kalender-Links stehen nie in der Datei und auch nicht in einer Sicherung.
+Alles, was du einstellst, liegt nur im Browser (localStorage), getrennt für jede Adresse und jeden Browser. Der Todoist-Token, ein TomTom-Key, der Tankerkönig-Key, die Kalender-Links und das Sync-Passwort stehen nie in der Datei und auch nicht in einer Sicherung.
 Mit **Anpassen, Einstellungen sichern** bekommst du eine JSON-Datei, mit **Sicherung laden** holst du sie zurück, auch auf einem anderen Rechner. Das Cockpit erinnert dich, wenn die letzte Sicherung länger als zwei Wochen her ist.
 
 ## Kalender einrichten
@@ -33,6 +33,22 @@ Der Kalender liest öffentlich geteilte iCloud-Kalender. Apple schickt dabei kei
 3. Im Cockpit im Kalender-Widget auf „Einrichten“, die Adresse des Workers und den Kalender-Link eintragen.
 
 Die Termine samt Wiederholungen, Ausnahmen und Zeitzonen liest [ical.js](https://github.com/kewisch/ical.js) (MPL 2.0), das erst nachgeladen wird, wenn ein Kalender eingetragen ist.
+
+## Sync zwischen Geräten
+
+Mit dem Sync bleiben Handy, Mac und Spiegel auf demselben Stand. Das Cockpit legt seinen Stand in einer eigenen kleinen Ablage in deinem Cloudflare-Konto ab (ein Worker mit KV, kostenlos), und die anderen Geräte holen ihn von dort. Der Worker antwortet nur auf dein Passwort. Einrichten unter **Anpassen, Sync zwischen Geräten**, die Schritte stehen dort auch:
+
+1. Auf dash.cloudflare.com unter „Storage & databases“ einen KV-Namespace anlegen.
+2. Unter „Workers & Pages“ einen Worker anlegen, den Code durch `tools/sync-worker.js` ersetzen (im Cockpit mit „Code kopieren“) und auf „Deploy“ klicken.
+3. Beim Worker unter „Settings“ den Namespace mit dem Namen `SYNC_KV` verbinden und ein Secret `SYNC_SECRET` anlegen. Das Passwort dafür erzeugt das Cockpit mit „Erzeugen“. Danach noch einmal „Deploy“.
+4. Im Cockpit Adresse und Passwort eintragen und auf „Verbinden“ klicken. Ist die Cloud noch leer, wandert der Stand dieses Geräts hoch. Liegt dort schon einer, fragt das Cockpit, ob du ihn holen oder deinen hochladen willst.
+5. Auf jedem weiteren Gerät dieselbe Adresse und dasselbe Passwort eintragen. Beides lässt sich im Cockpit kopieren.
+
+So arbeitet er: Eigene Änderungen gehen nach ein paar Sekunden Pause hoch, beim Verlassen des Tabs sofort. Offene Cockpits fragen alle zwei Minuten nach, beim Zurückkehren und wenn das Netz wieder da ist ebenfalls. Ändern zwei Geräte gleichzeitig etwas, gilt der spätere Stand. Der verdrängte bleibt als Kopie in diesem Browser (`jere-cockpit-vor-sync`) und lässt sich über den Hinweis „Zurückholen“ wieder holen. Ein Gerät mit älterer Version übernimmt keinen Stand einer neueren und lädt auch keinen hoch, bis es neu geladen wurde.
+
+Was wandert: Seiten, Widgets und ihre Einstellungen, Urlaub, Geburtstage, Müllabfuhr, Countdowns, Orte und Notizen. Was auf jedem Gerät für sich bleibt: die offene Seite, Design und Kartengröße, außerdem alles, was in eigenen Schlüsseln liegt, also Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links, Sync-Passwort und der laufende Pomodoro-Timer. Der Sync ersetzt keine Sicherung, denn er gibt auch Fehler an alle Geräte weiter.
+
+Grenzen: KV gleicht Änderungen zwischen Rechenzentren nicht sofort ab, es kann bis zu einer Minute dauern, bis ein Gerät eine Änderung sieht. Der kostenlose Plan erlaubt etwa 1.000 Schreibvorgänge pro Tag, das reicht für einen Nutzer locker, weil das Cockpit gebündelt speichert. Der Worker nimmt Stände bis etwa 1,9 MB an.
 
 ## Abfahrten, Geburtstage, Müllabfuhr
 
@@ -56,7 +72,7 @@ src/js/             Logik, ein Modul pro Thema (Zustand, Widgets, Seiten, Bearbe
 src/pwa/            Manifest und Service Worker für die Installation als App
 build.mjs           baut aus src/ die index.html, sw.js und manifest.webmanifest
 icons/              App-Icons
-tools/              Code für die Kalender-Weiterleitung (Cloudflare Worker)
+tools/              Code für die Kalender-Weiterleitung und die Sync-Ablage (Cloudflare Worker), der Sync-Code wird beim Bauen in 49-sync.js eingesetzt
 ```
 
 Bauen (Node 18 oder neuer, keine Pakete nötig):
@@ -68,6 +84,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**2.7** (Oktober 2026)
+Sync zwischen Geräten über einen eigenen Cloudflare Worker mit KV: Stand hochladen und holen, Konflikte nach dem Prinzip „der spätere Stand gilt“ mit Kopie und „Zurückholen“, Passwort nur in diesem Browser, Anzeige in der Fußzeile. Neu im Anpassen-Fenster: Abschnitt „Sync zwischen Geräten“ mit Anleitung, Worker-Code zum Kopieren und Passwort-Generator.
 
 **2.6** (Oktober 2026)
 Neues Widget „Jetzt wichtig“: das Wichtigste aus allen Widgets in einer Karte, nach Tageszeit gewichtet, mit Sprung zur passenden Karte und einem Feld zum schnellen Notieren (Taste N), das in den Todoist-Eingang schreibt, ohne Todoist oder ohne Netz in eine Notiz. Amtliche Wetterwarnungen vom DWD in der Wetterkarte, in „Jetzt wichtig“ und im Spiegel. Seiten können sich nach Tageszeit ordnen. „Seiten neu ordnen“ macht aus den Standardseiten Heute, Arbeit, Privat, Fokus und Sport, mit Vorschau, Rückgängig und „Alte Seiten zurückholen“. Wer neu anfängt oder alles zurücksetzt, startet mit Heute, Arbeit und Privat.

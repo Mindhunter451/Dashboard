@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '2.6';
+const VERSION = '2.7';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -53,7 +53,8 @@ const NEWS = {
   '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()],
   '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
   '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null],
-  '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau']
+  '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau'],
+  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => { openDrawer(); $('#dr-sync').scrollIntoView({ block: 'start' }); }, 'Zeigen']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {
@@ -128,6 +129,7 @@ addEventListener('storage', e => {
   const old = state, page = state.page;
   state = normalize(raw);
   if (pageById(page)) state.page = page;
+  syRebase();
   renderAll();
   afterStateSwap(old);
   if (dr.open && !$('#drawer').contains(document.activeElement)) renderDrawer();
@@ -150,3 +152,4 @@ startWeather();
 loadCommute();
 initTasks();
 if (caSec().feeds.length) caLoad();
+syInit();

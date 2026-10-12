@@ -881,6 +881,25 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .ws-remind input[type=time]{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
 .bd-import .form-row,.ws-form > div > .form-row{margin-top:10px}
 
+/* 35-sync.css */
+/* Sync zwischen Geräten */
+.sy-box{display:flex;flex-direction:column;gap:12px}
+.sy-steps-box summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--sea)}
+.sy-steps-box[open] summary{margin-bottom:10px}
+.sy-steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
+.sy-steps li::marker{font-weight:700;color:var(--muted)}
+.sy-steps b{font-weight:700}
+.sy-steps code{font:500 12.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;padding:1px 5px;border-radius:5px;background:var(--raise);overflow-wrap:anywhere}
+.sy-steps-box .hint{margin-top:10px}
+.sy-state[data-s="err"]{color:var(--bad);font-weight:600}
+.sy-addr{margin:0;font:500 13px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace;overflow-wrap:anywhere}
+.sy-choice{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:12px;background:var(--raise);border:1px solid var(--line)}
+.sy-choice p{margin:0}
+.sy-choice #sy-choice-txt{font-size:14px;line-height:1.45;font-weight:600}
+.sync[data-mode="cloud"]::before{background:var(--good)}
+.sync[data-mode="cloudwait"]::before,.sync[data-mode="cloudbusy"]::before{background:var(--warn)}
+.sync[data-mode="clouderr"]::before{background:var(--bad)}
+
 /* 36-jetzt.css */
 /* Jetzt wichtig: Hinweise als ruhige Zeilen, auf breiten Karten zweispaltig. Farbe nur, wenn es drängt. */
 #now{gap:12px}
@@ -1723,9 +1742,62 @@ html.mirror-on body{overflow:hidden}
       <p class="hint">Gilt für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</p>
     </section>
 
+    <section class="dr-sec" id="dr-sync">
+      <h3>Sync zwischen Geräten</h3>
+      <div class="sy-box" id="sy-on" hidden>
+        <p class="hint sy-state" id="sy-state" data-s="ok"></p>
+        <div class="form-row">
+          <button type="button" class="btn-ghost" id="sy-now">Jetzt abgleichen</button>
+          <button type="button" class="btn-danger" id="sy-off" style="margin-left:0">Trennen</button>
+        </div>
+        <p class="hint">Auf einem weiteren Gerät öffnest du das Cockpit, gehst auf Anpassen und trägst dort dieselbe Adresse und dasselbe Passwort ein.</p>
+        <p class="sy-addr" id="sy-addr"></p>
+        <div class="form-row">
+          <button type="button" class="btn-ghost" id="sy-addr-copy">Adresse kopieren</button>
+          <button type="button" class="btn-ghost" id="sy-pass-copy2">Passwort kopieren</button>
+        </div>
+        <p class="sy-addr" id="sy-pass-view" hidden></p>
+      </div>
+      <div class="sy-box" id="sy-setup">
+        <p class="hint">Dein Cockpit legt seinen Stand in einer eigenen kleinen Ablage bei Cloudflare ab, und deine anderen Geräte holen ihn sich von dort. Das ist kostenlos, liegt in deinem eigenen Konto und ist nur mit deinem Passwort erreichbar. Todoist-Token, Keys, Kalender-Links und der laufende Pomodoro-Timer bleiben auf jedem Gerät für sich.</p>
+        <details class="sy-steps-box">
+          <summary>So richtest du es ein</summary>
+          <ol class="sy-steps">
+            <li><b>Ablage anlegen.</b> Auf dash.cloudflare.com links unter „Storage &amp; databases“ den Bereich „KV“ öffnen und einen Namespace anlegen, zum Beispiel mit dem Namen cockpit.</li>
+            <li><b>Worker anlegen.</b> Unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“ anlegen, den Code durch den Code unten ersetzen und auf „Deploy“ klicken.
+              <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="sy-code"></pre><button type="button" class="btn-ghost" id="sy-copy">Code kopieren</button></details>
+            </li>
+            <li><b>Ablage und Passwort verbinden.</b> Beim Worker unter „Settings“, „Bindings“ eine Verbindung zu deinem KV-Namespace hinzufügen, mit dem Namen <code>SYNC_KV</code>. Unter „Variables and secrets“ ein Secret mit dem Namen <code>SYNC_SECRET</code> anlegen und als Wert das Passwort eintragen, das du unten mit „Erzeugen“ bekommst. Danach noch einmal „Deploy“.</li>
+            <li><b>Hier eintragen.</b> Adresse des Workers und Passwort unten eintragen und auf „Verbinden“ klicken.</li>
+          </ol>
+          <p class="hint">Cloudflare benennt Menüpunkte manchmal um, die Namen können leicht abweichen.</p>
+        </details>
+        <form class="sy-box" id="sy-form" novalidate>
+          <div class="field"><label for="sy-url">Adresse des Workers</label><input id="sy-url" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://cockpit-sync.dein-name.workers.dev"></div>
+          <div class="field"><label for="sy-pass">Passwort</label><input id="sy-pass" type="password" maxlength="100" autocomplete="off" spellcheck="false"></div>
+          <div class="form-row">
+            <button type="button" class="btn-ghost" id="sy-gen">Erzeugen</button>
+            <button type="button" class="btn-ghost" id="sy-show">Anzeigen</button>
+            <button type="button" class="btn-ghost" id="sy-pass-copy">Kopieren</button>
+          </div>
+          <p class="err" id="sy-err" hidden></p>
+          <div class="form-row"><button type="submit" class="btn" id="sy-go">Verbinden</button></div>
+        </form>
+        <div class="sy-choice" id="sy-choice" hidden>
+          <p id="sy-choice-txt"></p>
+          <p class="hint">Auf einem neuen Gerät nimmst du meist den Stand aus der Cloud, dann bleibt eine Kopie deines bisherigen Standes in diesem Browser liegen. Auf deinem Hauptgerät lädst du den eigenen Stand hoch, dann wird der in der Cloud ersetzt.</p>
+          <div class="form-row">
+            <button type="button" class="btn" id="sy-take-cloud">Stand aus der Cloud holen</button>
+            <button type="button" class="btn-ghost" id="sy-take-mine">Meinen Stand hochladen</button>
+            <button type="button" class="btn-ghost" id="sy-choice-cancel">Abbrechen</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="dr-sec" id="dr-data">
       <h3>Daten</h3>
-      <p class="hint">Deine Einstellungen liegen nur in diesem Browser. Sicher sie ab und zu als Datei. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key, Tankerkönig-Key und deine Kalender-Links sind nicht mit drin.</p>
+      <p class="hint">Deine Einstellungen liegen in diesem Browser, mit dem Sync oben auch in deiner Cloud. Sicher sie trotzdem ab und zu als Datei, denn der Sync gibt auch Fehler an alle Geräte weiter. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
       <p class="hint" id="dr-backup-at"></p>
       <div class="form-row">
         <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>
@@ -2564,19 +2636,26 @@ let state = loadState();
 
 const SYNC_TXT = {
   local: 'Gespeichert in diesem Browser.',
-  none: 'Dieser Browser speichert hier nichts, zum Beispiel im privaten Fenster. Änderungen sind nach dem Neuladen weg.'
+  none: 'Dieser Browser speichert hier nichts, zum Beispiel im privaten Fenster. Änderungen sind nach dem Neuladen weg.',
+  cloud: 'Gespeichert in diesem Browser und in deiner Cloud.',
+  cloudwait: 'Gespeichert in diesem Browser, der Abgleich mit der Cloud folgt gleich.',
+  cloudbusy: 'Gleicht mit der Cloud ab …',
+  clouderr: 'Der Abgleich mit der Cloud klappt gerade nicht. Deine Änderungen bleiben in diesem Browser.'
 };
 function setSync(m) { const el = $('#sync'); el.dataset.mode = m; el.textContent = SYNC_TXT[m]; }
+/* Haken für den Abgleich zwischen Geräten (49-sync.js hängt sich hier ein): wird bei jedem Speichern gerufen und sagt, wie die Fußzeile heißen soll */
+let syncHook = null, syncMode = () => 'local';
 /* Jede Änderung: speichern, merken wann, alles neu zeichnen */
 function commit() {
   state.edited = true;
   state.meta.changedAt = new Date().toISOString();
   lsSet(LS_KEY, state);
+  if (syncHook) syncHook();
   renderAll();
-  setSync(lsOk ? 'local' : 'none');
+  setSync(lsOk ? syncMode() : 'none');
 }
 /* Nur speichern, ohne als Änderung zu zählen (z. B. welche Seite offen ist) */
-function persist() { lsSet(LS_KEY, state); }
+function persist() { lsSet(LS_KEY, state); if (syncHook) syncHook(); }
 
 /* Toast mit Rückgängig */
 let toastTimer = null, undoFn = null;
@@ -5147,6 +5226,7 @@ function renderDrawer() {
   sel.value = u.region;
   renderBackupInfo();
   renderPlanBtns();
+  renderSync();
   $('#dr-data-err').hidden = true;
 }
 function openDrawer() {
@@ -5309,9 +5389,10 @@ function checkBackup() {
   const base = last || Date.parse(m.since) || now;
   const due = changed > last && now - base > BACKUP_DAYS * DAY && !(m.snooze && Date.parse(m.snooze) > now);
   $('#notice').hidden = !due;
+  const cloud = syncMode().startsWith('cloud');
   if (due) $('#notice-text').innerHTML = last
-    ? `<b>Deine letzte Sicherung ist ${agoTxt(last)} her.</b> Seitdem hast du einiges geändert, und alles liegt nur in diesem Browser.`
-    : '<b>Du hast deine Einstellungen noch nie gesichert.</b> Alles liegt nur in diesem Browser. Ein Klick, und du hast eine Kopie als Datei.';
+    ? `<b>Deine letzte Sicherung ist ${agoTxt(last)} her.</b> Seitdem hast du einiges geändert${cloud ? ', und der Sync ersetzt keine Sicherung.' : ', und alles liegt nur in diesem Browser.'}`
+    : `<b>Du hast deine Einstellungen noch nie gesichert.</b> ${cloud ? 'Der Sync ersetzt keine Sicherung, denn er gibt auch Fehler an alle Geräte weiter.' : 'Alles liegt nur in diesem Browser.'} Ein Klick, und du hast eine Kopie als Datei.`;
 }
 function renderBackupInfo() {
   const t = state.meta.backupAt;
@@ -8817,9 +8898,410 @@ $('#dr-plan').addEventListener('click', openPlan);
 $('#dr-plan-back').addEventListener('click', planBack);
 $('#pl-ok').addEventListener('click', applyPlan);
 
+/* 49-sync.js */
+/* Sync zwischen Geräten: Der Stand liegt in einer eigenen kleinen Ablage (Cloudflare Worker mit KV), erreichbar nur mit deinem Passwort.
+ * Adresse und Passwort bleiben nur in diesem Browser (jere-cockpit-sync) und kommen nicht in die Sicherung.
+ * Eigene Änderungen gehen nach ein paar Sekunden hoch, sonst fragt das Cockpit regelmäßig nach.
+ * Ändern zwei Geräte gleichzeitig etwas, gilt der spätere Stand. Der verdrängte bleibt als Kopie liegen (jere-cockpit-vor-sync).
+ * Pro Gerät bleiben Seite, Design und Kartengröße, außerdem alles, was in einem eigenen Schlüssel liegt (Tokens, Keys, Kalender-Links, Timer). */
+const SY_KEY = 'jere-cockpit-sync', SY_BACKUP = 'jere-cockpit-vor-sync';
+const SY_WORKER = "// Ablage für Jeres Tagescockpit: hält den Stand des Cockpits in Cloudflare KV,\n// damit sich deine Geräte abgleichen können. Erreichbar nur mit deinem Passwort.\n// Einrichtung: einen KV-Namespace unter dem Namen SYNC_KV an den Worker binden\n// und ein Secret SYNC_SECRET mit deinem Passwort anlegen.\nconst MAX_ZEICHEN = 1900000;\n\nasync function hash(text) {\n  return new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)));\n}\n// Vergleich ohne Abkürzung, damit die Antwortzeit nichts über das Passwort verrät\nasync function gleich(a, b) {\n  const x = await hash(a), y = await hash(b);\n  let d = 0;\n  for (let i = 0; i < x.length; i++) d |= x[i] ^ y[i];\n  return d === 0;\n}\n\nexport default {\n  async fetch(request, env) {\n    const cors = {\n      'Access-Control-Allow-Origin': '*',\n      'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',\n      'Access-Control-Allow-Headers': 'Authorization, Content-Type',\n      'Access-Control-Max-Age': '86400',\n      'Cache-Control': 'no-store'\n    };\n    const antwort = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json; charset=utf-8' } });\n    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });\n    if (!env.SYNC_KV || !env.SYNC_SECRET) {\n      return antwort({ error: 'setup', missing: [!env.SYNC_KV && 'SYNC_KV', !env.SYNC_SECRET && 'SYNC_SECRET'].filter(Boolean) }, 500);\n    }\n    const gegeben = (request.headers.get('Authorization') || '').replace(/^Bearer\\s+/i, '');\n    if (!(await gleich(gegeben, env.SYNC_SECRET))) {\n      await new Promise(r => setTimeout(r, 500));\n      return antwort({ error: 'auth' }, 401);\n    }\n    if (request.method === 'GET') {\n      return antwort((await env.SYNC_KV.get('stand', 'json')) || { rev: 0 });\n    }\n    if (request.method === 'PUT') {\n      const text = await request.text();\n      if (text.length > MAX_ZEICHEN) return antwort({ error: 'size' }, 413);\n      let b;\n      try { b = JSON.parse(text); } catch { return antwort({ error: 'format' }, 400); }\n      if (!b || typeof b !== 'object' || !b.state || typeof b.state !== 'object' || Array.isArray(b.state) || Number.isNaN(Date.parse(b.at))) {\n        return antwort({ error: 'format' }, 400);\n      }\n      const jetzt = (await env.SYNC_KV.get('stand', 'json')) || { rev: 0 };\n      // Ein anderes Gerät war schneller: den aktuellen Stand zurückgeben, das Cockpit entscheidet dann\n      if (!b.force && b.base !== jetzt.rev) return antwort({ error: 'conflict', ...jetzt }, 409);\n      const neu = { rev: jetzt.rev + 1, at: b.at, ver: String(b.ver || ''), state: b.state };\n      try {\n        await env.SYNC_KV.put('stand', JSON.stringify(neu));\n      } catch (e) {\n        return antwort({ error: 'kv', message: String((e && e.message) || e).slice(0, 200) }, 503);\n      }\n      return antwort({ rev: neu.rev, at: neu.at });\n    }\n    return antwort({ error: 'method' }, 405);\n  }\n};";
+const sy = { on: false, busy: false, again: false, waiting: false, said: false, seen: '', touch: 0, noteT: null, pushT: null, last: 0, err: '', errKind: '', told: '', choice: null };
+
+/* Gespeicherte Zugangsdaten und Zählerstand: { url, pass, rev, dirty, localAt, lastOk } */
+function syCfg() {
+  const c = lsGet(SY_KEY);
+  return c && typeof c.url === 'string' && c.url && typeof c.pass === 'string' && c.pass ? c : null;
+}
+const sySave = c => lsSet(SY_KEY, c);
+
+/* Was zwischen Geräten wandert: alles außer der offenen Seite, den Merkzetteln dieses Browsers und Design und Größe */
+function syView(s) {
+  const v = { ...s, ui: { ...s.ui } };
+  delete v.page;
+  delete v.meta;
+  delete v.ui.theme;
+  delete v.ui.size;
+  return v;
+}
+const syCanon = v => Array.isArray(v) ? `[${v.map(syCanon).join(',')}]`
+  : v && typeof v === 'object' ? `{${Object.keys(v).filter(k => v[k] !== undefined).sort().map(k => `${JSON.stringify(k)}:${syCanon(v[k])}`).join(',')}}`
+  : JSON.stringify(v);
+function syHashStr(str) {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+const syHash = () => syHashStr(syCanon(syView(state)));
+/* Läuft auf einem anderen Gerät schon eine neuere Version, würde diese hier Felder verlieren */
+const syNewer = r => !!r.ver && verNum(r.ver) > verNum(VERSION);
+const syErr = (kind, msg) => Object.assign(new Error(msg), { kind });
+const SY_OLD = 'Auf einem anderen Gerät läuft eine neuere Version. Lad dieses Cockpit neu (Strg+F5, am Mac Cmd+Shift+R).';
+
+/* Ein Aufruf beim Worker. Gibt die Antwort zurück, bei Konflikt (409) mit conflict: true. */
+async function syCall(url, pass, method, body, keepalive) {
+  let res;
+  try {
+    res = await fetch(url, {
+      method, body, cache: 'no-store', keepalive: !!keepalive && !!body && body.length < 6e4,
+      headers: { Authorization: `Bearer ${pass}`, ...(body ? { 'Content-Type': 'text/plain;charset=UTF-8' } : {}) }
+    });
+  } catch { throw syErr('net', 'Der Worker ist nicht erreichbar. Prüf die Adresse und deine Verbindung.'); }
+  let j = null;
+  try { j = await res.json(); } catch { /* keine Antwort im erwarteten Format */ }
+  if (res.ok) {
+    if (!j || typeof j !== 'object' || typeof j.rev !== 'number') throw syErr('bad', 'Unter dieser Adresse antwortet kein Cockpit-Worker.');
+    return j;
+  }
+  if (res.status === 401) throw syErr('auth', 'Das Passwort stimmt nicht mit dem im Worker überein.');
+  if (res.status === 409 && j && typeof j.rev === 'number') return { ...j, conflict: true };
+  if (res.status === 500 && j && j.error === 'setup') {
+    const was = { SYNC_KV: 'die Ablage (SYNC_KV)', SYNC_SECRET: 'das Passwort (SYNC_SECRET)' };
+    throw syErr('setup', `Dem Worker fehlt noch ${(Array.isArray(j.missing) ? j.missing : []).map(k => was[k] || k).join(' und ') || 'etwas'}. Schau in die Schritte oben.`);
+  }
+  if (res.status === 413) throw syErr('size', 'Dein Stand ist zu groß für die Ablage.');
+  if (res.status === 503 && j && j.error === 'kv') throw syErr('kv', 'Die Ablage nimmt gerade nichts an, vielleicht ist das Tageslimit erreicht. Später klappt es wieder.');
+  throw syErr('http', `Der Worker antwortet mit Fehler ${res.status}.`);
+}
+
+/* Prüft eine Antwort der Ablage, bevor man sie übernimmt */
+function syCheckRemote(r) {
+  if (syNewer(r)) throw syErr('old', SY_OLD);
+  if (r.rev && (!r.state || typeof r.state !== 'object' || Array.isArray(r.state))) throw syErr('bad', 'Die Ablage enthält keinen gültigen Stand.');
+}
+/* Den Stand aus der Ablage übernehmen. how: 'pull' (hier war nichts Neues), 'conflict' (ein anderes Gerät war schneller) oder 'connect' (Cloud-Stand beim Verbinden).
+ * Gibt false zurück, wenn gerade getippt oder bearbeitet wird, dann klappt es beim nächsten Abgleich.
+ * Bei 'conflict' und 'connect' wird der verdrängte eigene Stand als Kopie aufgehoben und lässt sich über den Toast zurückholen. */
+function syApply(r, how) {
+  const a = document.activeElement;
+  if (edit.on || (a && a.matches && a.matches('input:not([type=button]), textarea, select, [contenteditable="true"]'))) return false;
+  const old = state, hb = syHash();
+  if (how !== 'pull') lsSet(SY_BACKUP, state);
+  state = normalize({ ...r.state, ui: { ...(r.state.ui || {}), theme: old.ui.theme, size: old.ui.size }, page: old.page, meta: old.meta });
+  persist();
+  sy.seen = syHash();
+  renderAll();
+  afterStateSwap(old);
+  layoutNow();
+  if (dr.open) renderDrawer();
+  const changed = sy.seen !== hb;
+  sy.said = how === 'connect' || changed;
+  if (how === 'pull') { if (changed) toast('Stand von deinem anderen Gerät übernommen.', null, { ms: 3500 }); }
+  else if (!changed) { if (how === 'connect') toast('Verbunden.'); }
+  else toast(how === 'connect' ? 'Verbunden. Der Stand aus der Cloud ist jetzt hier, deinen bisherigen kannst du zurückholen.'
+    : 'Ein anderes Gerät war schneller. Sein Stand ist jetzt hier, deine letzten Änderungen kannst du zurückholen.', () => syRestore(old), { label: 'Zurückholen', ms: 20000 });
+  return true;
+}
+function syRestore(prev) {
+  const cur = state;
+  state = prev;
+  commit();
+  afterStateSwap(cur);
+  layoutNow();
+  if (dr.open) renderDrawer();
+}
+
+async function syPull(c) {
+  const r = await syCall(c.url, c.pass, 'GET');
+  syCheckRemote(r);
+  if (!r.rev) {
+    // Die Ablage ist leer, zum Beispiel weil sie geleert wurde: dieser Stand ist die Quelle
+    if (c.rev) { c.rev = 0; c.dirty = true; c.localAt = c.localAt || new Date().toISOString(); sySave(c); }
+    return '';
+  }
+  if (r.rev === c.rev) return '';
+  if (!syApply(r, 'pull')) return 'wait';
+  const cur = syCfg() || c;
+  cur.rev = r.rev;
+  cur.dirty = false;
+  sySave(cur);
+  return '';
+}
+async function syPush(c, force, keepalive) {
+  const body = JSON.stringify({ base: c.rev, at: c.localAt || new Date().toISOString(), ver: VERSION, force: !!force, state: syView(state) });
+  const h = syHash();
+  const r = await syCall(c.url, c.pass, 'PUT', body, keepalive);
+  if (!r.conflict) {
+    const cur = syCfg() || c;
+    cur.rev = r.rev;
+    if (syHash() === h) cur.dirty = false;
+    sySave(cur);
+    return '';
+  }
+  syCheckRemote(r);
+  // Ein anderes Gerät war schneller. Der spätere Stand gewinnt, bei Gleichstand dieses Gerät.
+  if (r.rev && Date.parse(r.at) > (Date.parse(c.localAt || '') || Date.now())) {
+    if (!syApply(r, 'conflict')) return 'wait';
+    const cur = syCfg() || c;
+    cur.rev = r.rev;
+    cur.dirty = false;
+    sySave(cur);
+    return '';
+  }
+  c.rev = r.rev || 0;
+  sySave(c);
+  return syPush(c, true, keepalive);
+}
+
+/* Ein Abgleich: erst hochladen, was hier neu ist, sonst nachsehen, ob drüben etwas neu ist */
+async function syRun(why, opts = {}) {
+  if (!sy.on) return;
+  if (sy.busy) { sy.again = true; return; }
+  clearTimeout(sy.noteT);
+  syCheck();
+  clearTimeout(sy.pushT);
+  const c = syCfg();
+  if (!c) return;
+  sy.busy = true;
+  syShow();
+  const run = async () => {
+    try {
+      const wait = c.dirty ? await syPush(c, false, opts.keepalive) : await syPull(c);
+      sy.waiting = !!wait;
+      sy.err = '';
+      sy.errKind = '';
+      sy.told = '';
+      if (!wait) { const cur = syCfg(); if (cur) { cur.lastOk = new Date().toISOString(); sySave(cur); } }
+    } catch (e) {
+      sy.err = e.message || 'Der Abgleich hat nicht geklappt.';
+      sy.errKind = e.kind || 'x';
+      // Fehler, die sich nicht von selbst lösen, einmal melden
+      if (['auth', 'setup', 'old'].includes(sy.errKind) && sy.told !== sy.errKind) { sy.told = sy.errKind; toast(sy.err, null, { ms: 9000 }); }
+    }
+  };
+  try {
+    if (navigator.locks && !opts.keepalive) await navigator.locks.request('jere-cockpit-sync', { ifAvailable: true }, lock => lock ? run() : undefined);
+    else await run();
+  } finally {
+    sy.busy = false;
+    // Wurde nichts übernommen, weil gerade getippt wird, fragt das Cockpit schon in einer halben Minute wieder nach
+    sy.last = Date.now() - (sy.waiting ? 100000 : 0);
+    sy.waiting = false;
+    syShow();
+  }
+  if (sy.again) { sy.again = false; syRun('again'); }
+}
+
+/* Jedes Speichern meldet sich hier. Nach einer kurzen Pause wird geprüft, ob sich wirklich etwas Mitzunehmendes geändert hat. */
+function syNote() {
+  if (!sy.on) return;
+  sy.touch = Date.now();
+  clearTimeout(sy.noteT);
+  sy.noteT = setTimeout(syCheck, 2500);
+}
+function syCheck() {
+  const c = sy.on && syCfg();
+  if (!c) return;
+  const h = syHash();
+  if (h === sy.seen) return;
+  sy.seen = h;
+  c.dirty = true;
+  c.localAt = new Date(sy.touch || Date.now()).toISOString();
+  sySave(c);
+  clearTimeout(sy.pushT);
+  sy.pushT = setTimeout(() => syRun('push'), 6000);
+  syShow();
+}
+/* Ein anderer Tab hat etwas geändert und gesichert: das ist dann keine eigene Änderung dieses Tabs */
+function syRebase() { if (sy.on) sy.seen = syHash(); }
+
+/* Fußzeile und Anzeige im Anpassen-Fenster */
+function syMode() {
+  if (!sy.on) return 'local';
+  if (sy.busy) return 'cloudbusy';
+  if (sy.err) return 'clouderr';
+  const c = syCfg();
+  return c && c.dirty ? 'cloudwait' : 'cloud';
+}
+function syShow() {
+  setSync(lsOk ? syMode() : 'none');
+  renderSyncState();
+}
+function renderSyncState() {
+  const c = syCfg(), el = $('#sy-state');
+  if (!c) return;
+  const t = c.lastOk ? new Date(c.lastOk) : null;
+  el.dataset.s = sy.err && !sy.busy ? 'err' : 'ok';
+  el.textContent = sy.busy ? 'Gleicht gerade ab …'
+    : sy.err ? sy.err
+    : c.dirty ? 'Änderungen warten auf den Abgleich.'
+    : t ? `Verbunden. Letzter Abgleich ${dayDiff(t, new Date()) === 0 ? 'heute' : `am ${dmy(t)}`} um ${hm(t)} Uhr.` : 'Verbunden.';
+}
+function renderSyncChoice() {
+  const ch = sy.choice;
+  $('#sy-choice').hidden = !ch;
+  $('#sy-form').hidden = !!ch;
+  if (ch) {
+    const d = new Date(ch.r.at);
+    $('#sy-choice-txt').textContent = `In deiner Cloud liegt schon ein Stand, zuletzt geändert am ${dmy(d)} um ${hm(d)} Uhr.`;
+  }
+}
+function renderSync() {
+  const c = syCfg();
+  $('#sy-on').hidden = !c;
+  $('#sy-setup').hidden = !!c;
+  $('#sy-pass-view').hidden = true;
+  if (c) $('#sy-addr').textContent = c.url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  else { $('#sy-code').textContent = SY_WORKER; renderSyncChoice(); }
+  renderSyncState();
+}
+
+/* Verbinden: erst ausprobieren, dann entscheiden, wessen Stand gilt */
+const syNormUrl = raw => {
+  let s = String(raw || '').trim();
+  if (!s) return null;
+  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(s) && !/^https?:\/\//i.test(s)) return null;
+  if (!/^https?:\/\//i.test(s)) s = `https://${s}`;
+  try {
+    const x = new URL(s);
+    if (x.protocol !== 'https:' && !['localhost', '127.0.0.1', '[::1]'].includes(x.hostname)) return null;
+    x.search = '';
+    x.hash = '';
+    return x.href;
+  } catch { return null; }
+};
+function syGenPass() {
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; // 56 Zeichen ohne verwechselbare
+  let out = '';
+  while (out.length < 32) for (const b of crypto.getRandomValues(new Uint8Array(48))) if (b < 224 && out.length < 32) out += A[b % 56];
+  return out;
+}
+async function syCopy(text, ok, fallback) {
+  try { await navigator.clipboard.writeText(text); toast(ok); }
+  catch { if (fallback) fallback(); else toast('Kopieren hat nicht geklappt. Markier den Text und kopier ihn von Hand.'); }
+}
+/* mode: 'up' lädt diesen Stand hoch, 'down' übernimmt den der Cloud, 'new' heißt: die Cloud ist leer */
+async function syStart(url, pass, r, mode) {
+  const c = { url, pass, rev: r.rev, dirty: mode !== 'down', localAt: new Date().toISOString(), lastOk: null };
+  sy.choice = null;
+  if (mode === 'down') {
+    if (!syApply(r, 'connect')) { toast('Klick erst aus dem Feld, in dem du gerade tippst, und versuch es nochmal.'); return false; }
+    c.dirty = false;
+    c.lastOk = new Date().toISOString();
+  }
+  sySave(c);
+  sy.on = true;
+  sy.err = '';
+  sy.errKind = '';
+  sy.told = '';
+  sy.seen = syHash();
+  sy.last = 0;
+  renderSync();
+  syShow();
+  if (mode !== 'down') {
+    await syRun('connect');
+    if (!sy.err) toast('Verbunden. Dein Stand liegt jetzt in der Cloud.');
+  }
+  return true;
+}
+$('#sy-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const fail = m => { $('#sy-err').textContent = m; $('#sy-err').hidden = false; };
+  $('#sy-err').hidden = true;
+  const url = syNormUrl($('#sy-url').value), pass = $('#sy-pass').value.trim();
+  if (!url) return fail('Die Adresse braucht https:// am Anfang, zum Beispiel https://cockpit-sync.dein-name.workers.dev');
+  if (pass.length < 16) return fail('Das Passwort ist zu kurz. Mit „Erzeugen“ bekommst du ein langes.');
+  if (!lsOk) return fail('Dein Browser speichert hier nichts, zum Beispiel im privaten Fenster.');
+  const btn = $('#sy-go');
+  btn.disabled = true;
+  btn.textContent = 'Verbinde …';
+  try {
+    const r = await syCall(url, pass, 'GET');
+    syCheckRemote(r);
+    if (!r.rev) await syStart(url, pass, r, 'new');
+    else { sy.choice = { url, pass, r }; renderSyncChoice(); }
+  } catch (err) { fail(err.message); }
+  btn.disabled = false;
+  btn.textContent = 'Verbinden';
+});
+$('#sy-take-cloud').addEventListener('click', () => { const ch = sy.choice; if (ch) syStart(ch.url, ch.pass, ch.r, 'down'); });
+$('#sy-take-mine').addEventListener('click', () => { const ch = sy.choice; if (ch) syStart(ch.url, ch.pass, ch.r, 'up'); });
+$('#sy-choice-cancel').addEventListener('click', () => { sy.choice = null; renderSyncChoice(); });
+$('#sy-gen').addEventListener('click', () => {
+  $('#sy-pass').value = syGenPass();
+  $('#sy-pass').type = 'text';
+  $('#sy-show').textContent = 'Verbergen';
+  toast('Passwort erzeugt. Kopier es jetzt, du brauchst es gleich im Worker.');
+});
+$('#sy-show').addEventListener('click', () => {
+  const p = $('#sy-pass'), hide = p.type === 'text';
+  p.type = hide ? 'password' : 'text';
+  $('#sy-show').textContent = hide ? 'Anzeigen' : 'Verbergen';
+});
+$('#sy-pass-copy').addEventListener('click', () => { if ($('#sy-pass').value) syCopy($('#sy-pass').value, 'Passwort kopiert'); });
+$('#sy-copy').addEventListener('click', () => syCopy(SY_WORKER, 'Worker-Code kopiert', () => {
+  const r = document.createRange();
+  r.selectNodeContents($('#sy-code'));
+  const s = getSelection();
+  s.removeAllRanges();
+  s.addRange(r);
+  toast('Code ist markiert, kopier ihn mit Strg+C oder Cmd+C');
+}));
+
+/* Verbunden: abgleichen, Adresse und Passwort für ein weiteres Gerät kopieren, trennen */
+$('#sy-now').addEventListener('click', async () => {
+  sy.last = 0;
+  sy.said = false;
+  await syRun('manual');
+  if (!sy.err && !sy.said) toast('Abgeglichen.');
+});
+$('#sy-addr-copy').addEventListener('click', () => { const c = syCfg(); if (c) syCopy(c.url, 'Adresse kopiert'); });
+$('#sy-pass-copy2').addEventListener('click', () => {
+  const c = syCfg();
+  if (c) syCopy(c.pass, 'Passwort kopiert', () => { $('#sy-pass-view').textContent = c.pass; $('#sy-pass-view').hidden = false; });
+});
+$('#sy-off').addEventListener('click', () => {
+  try { localStorage.removeItem(SY_KEY); } catch { /* egal */ }
+  clearTimeout(sy.noteT);
+  clearTimeout(sy.pushT);
+  sy.on = false;
+  sy.err = '';
+  sy.errKind = '';
+  sy.told = '';
+  renderSync();
+  syShow();
+  toast('Sync getrennt. Dein Stand bleibt in diesem Browser, in der Cloud bleibt er auch liegen.');
+});
+
+/* Start, regelmäßiges Nachfragen und Hochladen beim Verlassen */
+function syInit() {
+  sy.on = !!syCfg();
+  if (!sy.on) return;
+  sy.seen = syHash();
+  syShow();
+  syRun('start');
+}
+setInterval(() => {
+  if (!sy.on || sy.busy || document.visibilityState !== 'visible' || navigator.onLine === false) return;
+  const c = syCfg();
+  if (!c) return;
+  if (c.dirty) { if (sy.err && Date.now() - sy.last > 60000) syRun('retry'); }
+  else if (Date.now() - sy.last > 120000) syRun('poll');
+}, 15000);
+document.addEventListener('visibilitychange', () => {
+  if (!sy.on) return;
+  if (document.visibilityState === 'hidden') {
+    syCheck();
+    const c = syCfg();
+    if (c && c.dirty) syRun('hide', { keepalive: true });
+  } else if (Date.now() - sy.last > 20000) syRun('visible');
+});
+addEventListener('online', () => { if (sy.on) syRun('online'); });
+addEventListener('pagehide', syCheck);
+/* Adresse oder Passwort wurden in einem anderen Tab geändert oder gelöscht */
+addEventListener('storage', e => { if (e.key === SY_KEY) { sy.on = !!syCfg(); if (sy.on) syRebase(); syShow(); if (dr.open) renderSync(); } });
+syncHook = syNote;
+syncMode = syMode;
+
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.6';
+const VERSION = '2.7';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -8873,7 +9355,8 @@ const NEWS = {
   '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()],
   '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
   '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null],
-  '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau']
+  '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau'],
+  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => { openDrawer(); $('#dr-sync').scrollIntoView({ block: 'start' }); }, 'Zeigen']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {
@@ -8948,6 +9431,7 @@ addEventListener('storage', e => {
   const old = state, page = state.page;
   state = normalize(raw);
   if (pageById(page)) state.page = page;
+  syRebase();
   renderAll();
   afterStateSwap(old);
   if (dr.open && !$('#drawer').contains(document.activeElement)) renderDrawer();
@@ -8970,6 +9454,7 @@ startWeather();
 loadCommute();
 initTasks();
 if (caSec().feeds.length) caLoad();
+syInit();
 })();
 </script>
 </body>

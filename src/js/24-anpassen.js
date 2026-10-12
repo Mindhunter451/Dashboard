@@ -86,6 +86,7 @@ function renderDrawer() {
   sel.value = u.region;
   renderBackupInfo();
   renderPlanBtns();
+  renderSync();
   $('#dr-data-err').hidden = true;
 }
 function openDrawer() {
