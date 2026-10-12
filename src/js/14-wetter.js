@@ -67,6 +67,8 @@ async function loadWeather(loc, seq) {
     sky.minute = -1;
     skyTick(new Date());
     renderMirror();
+    nowDirty();
+    if (!wx.offline) wnLoad(loc);
     ensureRadar(loc);
     clearTimeout(wx.timer);
     wx.timer = setTimeout(() => loadWeather(wx.loc), (wx.offline ? 3 : 10) * 6e4);
@@ -157,8 +159,12 @@ function renderWeather() {
       hours.appendChild(el);
     }
   }
+  renderWarn();
+  $('#wx-src').textContent = wxSrcText();
+}
+function wxSrcText() {
   const wa = new Date(wx.at), old = dayDiff(wa, new Date());
-  $('#wx-src').textContent = `Stand ${old ? `${dm(wa)} ` : ''}${hm(wa)} Uhr${wx.offline ? ', ohne Netz' : ''} · Wetterdaten: Open-Meteo · Radar: RainViewer`;
+  return `Stand ${old ? `${dm(wa)} ` : ''}${hm(wa)} Uhr${wx.offline ? ', ohne Netz' : ''} · Wetterdaten: Open-Meteo · Radar: RainViewer${wn.de && wn.at ? ' · Warnungen: DWD' : ''}`;
 }
 
 /* Ort ändern */

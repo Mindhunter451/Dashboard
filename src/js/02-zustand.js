@@ -1,6 +1,7 @@
 /* Zustand: Datenmodell mit Seiten und Widgets, Umzug vom alten Format, Speichern im Browser
  *
- * state.pages    Seiten in Tab-Reihenfolge: { id, name, tiles, items: [{ w: Widget-ID, s: Breite 1 bis 3 }] }
+ * state.pages    Seiten in Tab-Reihenfolge: { id, name, tiles, smart, items: [{ w: Widget-ID, s: Breite 1 bis 3 }] }
+ *                smart: Karten nach Tageszeit ordnen (die Reihenfolge in items gilt, wenn es aus ist)
  * state.widgets  alle Widgets: { [id]: { type, title, cfg } }. Ein Widget kann auf mehreren Seiten liegen.
  *                Pendeln, Wetter und Urlaub gibt es genau einmal (ID = Typ), den Rest beliebig oft.
  * state.page     zuletzt geöffnete Seite
@@ -25,6 +26,7 @@ const SIZES = { s: 320, m: 380, l: 470 };
 
 /* Widget-Typen. multi: kann es mehrfach geben, jede Kopie hat eigene Daten. w: Standardbreite in Spalten */
 const TYPES = {
+  now:      { name: 'Jetzt wichtig', multi: false, w: 2, since: '2.6', desc: 'Das Wichtigste aus allen Widgets auf einen Blick, je nach Tageszeit: Warnungen, Termine, Abfahrten, Müll und mehr. Dazu ein Feld zum schnellen Notieren.' },
   tasks:    { name: 'Aufgaben', multi: true, w: 1, desc: 'Deine Todoist-Projekte zum Abhaken. Pro Widget legst du fest, welche Projekte es zeigt.' },
   progress: { name: 'Fortschritt', multi: true, w: 1, desc: 'Balken für Arbeitstag, Arbeitswoche, Monat, Jahr oder eigene Zeiträume.' },
   vacation: { name: 'Urlaub', multi: false, w: 1, desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
@@ -59,6 +61,7 @@ const VS_TR = {
 const DP_CATS = { s: 'S-Bahn', u: 'U-Bahn', bus: 'Bus', tram: 'Straßenbahn', ferry: 'Fähre', re: 'Regionalzug', fv: 'Fernzug' };
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
 const TICON = {
+  now: svgIco('<path d="M13.2 2.8L5.4 13.2h5.9l-1 8 7.9-10.6h-6z"/>'),
   tasks: svgIco('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M8.2 12.3l2.6 2.6 5-5.4"/>'),
   progress: svgIco('<rect x="3.5" y="5.5" width="17" height="4.5" rx="2.25"/><rect x="3.5" y="14" width="17" height="4.5" rx="2.25"/><path d="M6 7.75h7M6 16.25h10"/>'),
   vacation: svgIco('<circle cx="12" cy="10" r="3.6"/><path d="M12 3v1.4M5 10H3.6M20.4 10H19M7 5l1 1M17 5l-1 1M3 18.5c3-2 6-2 9 0s6 2 9 0"/>'),
@@ -219,6 +222,7 @@ function normWaste(o) {
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
+    case 'now': return { n: [3, 4, 6, 8].includes(+c.n) ? +c.n : 6, cap: c.cap !== false };
     case 'pomodoro': return { focus: intIn(c.focus, 1, 120, 25), short: intIn(c.short, 1, 60, 5), long: intIn(c.long, 1, 90, 15), every: intIn(c.every, 2, 8, 4), sound: c.sound !== false, auto: !!c.auto };
     case 'habits': return { items: normHabits(c.items) };
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
@@ -323,7 +327,7 @@ function normalize(s) {
       seen.add(it.w);
       items.push({ w: it.w, s: [1, 2, 3].includes(+it.s) ? +it.s : 1 });
     }
-    pages.push({ id, name: String(p.name || '').trim().slice(0, 24) || 'Seite', tiles: p.tiles !== false, items });
+    pages.push({ id, name: String(p.name || '').trim().slice(0, 24) || 'Seite', tiles: p.tiles !== false, smart: !!p.smart, items });
   }
   if (!pages.length) pages.push({ id: 'home', name: 'Übersicht', tiles: true, items: [] });
   const m = s.meta && typeof s.meta === 'object' ? s.meta : {};
@@ -352,7 +356,8 @@ function normalize(s) {
     meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
 }
-const DEFAULTS = () => normalize(null);
+/* Ausgangslage für neue Nutzer und „Alles zurücksetzen“: die Seiten Heute, Arbeit und Privat (planFresh steht in 48-ordnen.js) */
+const DEFAULTS = () => planFresh(normalize(null));
 
 /* Speichern im Browser. Vor dem ersten Umzug aufs neue Format wird der alte Stand extra abgelegt. */
 const LS_KEY = 'jere-cockpit-v1', GEO_KEY = 'jere-cockpit-geo', LS_OLD = 'jere-cockpit-v1-vor-seiten';

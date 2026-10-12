@@ -77,8 +77,8 @@ function renderMirror() {
     }
     box.innerHTML = html || '<h3>Heute</h3><p class="m-dim">Keine Termine mehr heute und morgen.</p>';
   }
-  // Hinweise unter dem Datum: Geburtstage und Müllabfuhr von heute und morgen
-  const notes = [...bdMirror(now).map(t => ({ t, c: '#F0B040' })), ...wsMirror(now)];
+  // Hinweise unter dem Datum: Wetterwarnungen, Geburtstage und Müllabfuhr von heute und morgen
+  const notes = [...wnMirror(now), ...bdMirror(now).map(t => ({ t, c: '#F0B040' })), ...wsMirror(now)];
   $('#m-notes').innerHTML = notes.map(n => `<li style="--c:${n.c}">${esc(n.t)}</li>`).join('');
   // Abfahrten der ersten Haltestelle
   const dep = dpMirror(now), dbox = $('#m-dep');

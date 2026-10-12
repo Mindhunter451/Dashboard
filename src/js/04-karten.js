@@ -6,7 +6,7 @@ const zu = new Set((Array.isArray(lsGet(ZU_KEY)) ? lsGet(ZU_KEY) : []).map(Strin
 const narrowMq = matchMedia('(max-width: 720px)');
 const isNarrow = () => narrowMq.matches;
 /* Wichtige Karten schweben etwas höher, ruhige liegen flach */
-const TIER = { weather: 'hero', dep: 'hero', cal: 'hero', commute: 'hero', links: 'quiet', notes: 'quiet', verse: 'quiet' };
+const TIER = { now: 'hero', weather: 'hero', dep: 'hero', cal: 'hero', commute: 'hero', links: 'quiet', notes: 'quiet', verse: 'quiet' };
 const CHEV = '<svg class="card-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 
 /* Aus dem Titel wird ein Knopf zum Einklappen, davor das Symbol des Widgets, dahinter Platz für die Kurzinfo */
@@ -59,7 +59,12 @@ const PEEK = {
   weather() {
     const c = wx.data && wx.data.current;
     if (!c || !Number.isFinite(c.temperature_2m)) return '';
-    return `${Math.round(c.temperature_2m)}° <small>${esc((WMO[c.weather_code] || [''])[0])}</small>`;
+    const w = wnActive(new Date())[0];
+    return `${w ? `<span class="pk-warn" data-lv="${w.lv}" style="--wc:${WN_COLOR[w.lv]}">${esc(w.ev)}</span> ` : ''}${Math.round(c.temperature_2m)}° <small>${esc((WMO[c.weather_code] || [''])[0])}</small>`;
+  },
+  now(v) {
+    const it = nwItems(new Date(), false)[0];
+    return it ? `${esc(it.t)}${it.w ? ` <small>${esc(it.w)}</small>` : ''}` : '<small>Alles ruhig</small>';
   },
   dep(v) {
     const c = state.widgets[v.id].cfg, D = c.stop && dp.data[c.stop.id];

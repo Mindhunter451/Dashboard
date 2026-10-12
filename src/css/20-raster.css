@@ -3,7 +3,7 @@
 .board:not(.flow)>.card{position:absolute;top:0;left:0}
 .board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
 @media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
-.card{position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:16px clamp(16px,1.7vw,22px) 20px;display:flex;flex-direction:column;gap:14px;min-width:0;container-type:inline-size}
+.card{scroll-margin-top:72px;position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:16px clamp(16px,1.7vw,22px) 20px;display:flex;flex-direction:column;gap:14px;min-width:0;container-type:inline-size}
 /* Wichtige Karten (Wetter, Abfahrten, Kalender, Pendeln) schweben höher, ruhige (Schnellzugriff, Notizen, Vers) liegen flach */
 .card[data-tier="hero"]{background:var(--surface-hi);box-shadow:var(--shadow-2)}
 .card[data-tier="quiet"]{background:var(--quiet);box-shadow:none;--raise:var(--surface)}

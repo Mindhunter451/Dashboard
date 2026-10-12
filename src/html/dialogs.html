@@ -26,6 +26,35 @@
   </form>
 </dialog>
 
+<dialog class="dlg dlg-cap" id="dlg-cap" aria-labelledby="cap-h">
+  <form id="cap-form" novalidate>
+    <div class="dlg-head">
+      <h2 id="cap-h">Schnell notieren</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body">
+      <div class="field"><label for="cap-in" class="vh">Was willst du notieren?</label><input id="cap-in" type="text" maxlength="500" autocomplete="off" enterkeyhint="send" placeholder="Was dir gerade einfällt"></div>
+      <p class="hint" id="cap-hint"></p>
+    </div>
+    <div class="dlg-foot">
+      <button type="submit" class="btn" id="cap-ok">Notieren</button>
+      <button type="button" class="btn-ghost" data-close>Abbrechen</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="dlg" id="dlg-plan" aria-labelledby="pl-h">
+  <div class="dlg-head">
+    <h2 id="pl-h">Seiten neu ordnen</h2>
+    <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="dlg-body" id="pl-body"></div>
+  <div class="dlg-foot">
+    <button type="button" class="btn" id="pl-ok">Übernehmen</button>
+    <button type="button" class="btn-ghost" data-close>Abbrechen</button>
+  </div>
+</dialog>
+
 <dialog class="dlg dlg-info" id="dlg-info" aria-labelledby="info-h">
   <div class="dlg-head">
     <h2 id="info-h">Info</h2>
