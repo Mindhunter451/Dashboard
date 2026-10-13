@@ -28,13 +28,43 @@ function renderTabs() {
   const act = nav.querySelector('[aria-selected="true"]');
   if (act && had) act.focus();
   if (act && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = Math.max(0, act.offsetLeft - 24);
+  placePill(nav);
   // Dieselben Seiten in der Mini-Leiste oben
   const mb = $('#mb-tabs');
   mb.innerHTML = state.pages.map(p => `<button type="button" class="tab" data-page="${esc(p.id)}"${p.id === cur.id ? ' aria-current="page"' : ''}>${esc(p.name)}</button>`).join('');
   const ma = mb.querySelector('[aria-current]');
   // Abstand zum Rand der Leiste messen, nicht zum Seitenrand (sonst rutscht der erste Tab halb raus)
   if (ma && mb.scrollWidth > mb.clientWidth) mb.scrollLeft = Math.max(0, mb.scrollLeft + ma.getBoundingClientRect().left - mb.getBoundingClientRect().left - 24);
+  placePill(mb);
 }
+/* Gleitende Pille unter dem aktiven Tab. Die Tabs werden bei jedem Rendern neu gebaut, die Pille startet dann
+ * an der alten Stelle und gleitet zur neuen. Ist die Leiste unsichtbar, wird sie beim Auftauchen nachgezogen. */
+const pillAt = new WeakMap();
+function placePill(nav, still) {
+  let ind = nav.querySelector('.tab-ind');
+  if (!ind) {
+    ind = document.createElement('span');
+    ind.className = 'tab-ind';
+    ind.setAttribute('aria-hidden', 'true');
+    nav.prepend(ind);
+  }
+  const act = nav.querySelector('[aria-selected="true"],[aria-current="page"]');
+  if (!act || !act.offsetWidth) { ind.style.opacity = '0'; pillAt.delete(nav); return; }
+  const x = act.offsetLeft, w = act.offsetWidth, prev = pillAt.get(nav);
+  const from = prev && !still && !reduceMotion ? prev : { x, w };
+  ind.style.transition = 'none';
+  ind.style.transform = `translateX(${from.x}px)`;
+  ind.style.width = `${from.w}px`;
+  ind.style.opacity = '1';
+  void ind.offsetWidth;
+  ind.style.transition = '';
+  ind.style.transform = `translateX(${x}px)`;
+  ind.style.width = `${w}px`;
+  pillAt.set(nav, { x, w });
+}
+const placePills = () => { placePill($('#tabs'), true); placePill($('#mb-tabs'), true); };
+addEventListener('resize', () => requestAnimationFrame(placePills));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePills);
 /* Mini-Leiste: taucht auf, sobald die Seiten-Tabs oben aus dem Bild sind */
 function setMinibar(on) {
   const m = $('#minibar');
@@ -42,6 +72,7 @@ function setMinibar(on) {
   m.classList.toggle('on', on);
   m.inert = !on;
   m.setAttribute('aria-hidden', String(!on));
+  if (on) placePill($('#mb-tabs'), true);
 }
 if (typeof IntersectionObserver === 'function') new IntersectionObserver(es => { for (const e of es) setMinibar(!e.isIntersecting && e.boundingClientRect.top < 0); }).observe($('#tabs'));
 $('#mb-tabs').addEventListener('click', e => {

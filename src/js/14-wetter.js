@@ -315,7 +315,7 @@ defineWidget('weather', {
   },
   settings: {
     render(box, w) {
-      box.innerHTML = `<label class="check-row"><input type="checkbox" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
+      box.innerHTML = `<label class="check-row"><input type="checkbox" class="switch" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
     },
     save(box, w) {
       w.cfg.hours = box.querySelector('[data-s="hours"]').checked;

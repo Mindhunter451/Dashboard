@@ -1,148 +1,206 @@
 <div class="scrim" id="scrim" hidden></div>
+<!-- Anpassen: schwebendes Fenster rechts, auf dem Handy ein Blatt von unten. Das Cockpit bleibt dahinter sichtbar, jede Änderung wirkt sofort. -->
 <aside class="drawer" id="drawer" hidden aria-labelledby="dr-h" role="dialog" aria-modal="true">
-  <div class="dr-head">
+  <div class="dr-grab" id="dr-grab" aria-hidden="true"><span></span></div>
+  <div class="dr-head" id="dr-head">
     <h2 id="dr-h">Anpassen</h2>
-    <button type="button" class="btn" id="dr-close">Fertig</button>
+    <button type="button" class="dr-x" id="dr-close" aria-label="Schließen" title="Schließen (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
   </div>
-  <div class="dr-body">
-    <section class="dr-sec">
-      <h3>Ansicht</h3>
-      <div class="field"><label for="dr-greet">Begrüßung</label><input id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
-      <div class="dr-row"><span class="lbl">Design</span>
-        <div class="seg sm" role="group" aria-label="Design" id="dr-theme">
-          <button type="button" data-v="auto">Automatisch</button><button type="button" data-v="light">Hell</button><button type="button" data-v="dark">Dunkel</button>
+  <div class="dr-tabs" role="tablist" aria-label="Bereiche" id="dr-tabs">
+    <span class="dr-tab-ind" aria-hidden="true"></span>
+    <button type="button" role="tab" id="dr-t-look" data-tab="look" aria-controls="dr-p-look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.9-.8 1.9-1.8 0-1.3-1-1.6-1-2.8 0-1 .8-1.7 1.8-1.7h2.1a3.7 3.7 0 0 0 3.7-3.7C20.5 6.7 16.7 3.5 12 3.5z"/><circle cx="7.6" cy="11.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.4" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="7.8" r="1.1" fill="currentColor" stroke="none"/></svg><span>Aussehen</span></button>
+    <button type="button" role="tab" id="dr-t-pages" data-tab="pages" aria-controls="dr-p-pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="9" rx="2"/><rect x="13" y="3.5" width="7.5" height="5.5" rx="2"/><rect x="3.5" y="14.5" width="7.5" height="6" rx="2"/><rect x="13" y="11" width="7.5" height="9.5" rx="2"/></svg><span>Seiten</span></button>
+    <button type="button" role="tab" id="dr-t-devices" data-tab="devices" aria-controls="dr-p-devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="13" height="10" rx="2"/><path d="M6 19h6M9 15v4"/><rect x="16.5" y="9" width="5" height="10.5" rx="1.5"/></svg><span>Geräte</span></button>
+    <button type="button" role="tab" id="dr-t-data" data-tab="data" aria-controls="dr-p-data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6"/><path d="M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg><span>Daten</span></button>
+  </div>
+  <div class="dr-body" id="dr-body">
+
+    <!-- Aussehen -->
+    <section class="dr-pane" id="dr-p-look" role="tabpanel" aria-labelledby="dr-t-look">
+      <h3 class="dr-gh" id="dr-theme-l">Design</h3>
+      <div class="theme-pick" role="group" aria-labelledby="dr-theme-l" id="dr-theme">
+        <button type="button" data-v="light"><span class="tp-prev" data-pv="light" aria-hidden="true"><i></i><i></i></span><span class="tp-name">Hell</span></button>
+        <button type="button" data-v="dark"><span class="tp-prev" data-pv="dark" aria-hidden="true"><i></i><i></i></span><span class="tp-name">Dunkel</span></button>
+        <button type="button" data-v="auto"><span class="tp-prev" data-pv="auto" aria-hidden="true"><i></i><i></i></span><span class="tp-name">Wie das System</span></button>
+      </div>
+      <div class="dr-group">
+        <div class="dr-line"><span class="dr-lt" id="dr-dark-l">Dunkel in<small>Schwarz spart Strom auf OLED-Bildschirmen und verschwindet hinter Spiegelglas.</small></span>
+          <div class="seg" role="group" aria-labelledby="dr-dark-l" id="dr-dark"><button type="button" data-v="graphite">Graphit</button><button type="button" data-v="oled">Schwarz</button></div>
         </div>
       </div>
-      <div class="dr-row"><span class="lbl">Kartengröße</span>
-        <div class="seg sm" role="group" aria-label="Kartengröße" id="dr-size">
-          <button type="button" data-v="s">Kompakt</button><button type="button" data-v="m">Normal</button><button type="button" data-v="l">Groß</button>
+
+      <h3 class="dr-gh" id="dr-acc-l">Akzentfarbe</h3>
+      <div class="dr-group dr-pad">
+        <div class="acc" id="dr-accent" role="group" aria-labelledby="dr-acc-l"></div>
+        <p class="acc-now" id="dr-acc-now" aria-live="polite"></p>
+      </div>
+
+      <h3 class="dr-gh">Form</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-radius">Ecken</label>
+          <div class="range-row"><input type="range" class="range" id="dr-radius" min="4" max="28" step="2"><output id="dr-radius-v" for="dr-radius"></output></div>
+        </div>
+        <div class="dr-line"><span class="dr-lt" id="dr-density-l">Abstände</span>
+          <div class="seg" role="group" aria-labelledby="dr-density-l" id="dr-density"><button type="button" data-v="tight">Dicht</button><button type="button" data-v="normal">Normal</button><button type="button" data-v="airy">Luftig</button></div>
+        </div>
+        <div class="dr-line"><span class="dr-lt" id="dr-size-l">Kartenbreite</span>
+          <div class="seg" role="group" aria-labelledby="dr-size-l" id="dr-size"><button type="button" data-v="s">Schmal</button><button type="button" data-v="m">Normal</button><button type="button" data-v="l">Breit</button></div>
         </div>
       </div>
-      <div class="field"><span class="lbl" id="dr-acc-l">Akzentfarbe</span><div class="swatches" id="dr-accent" role="radiogroup" aria-labelledby="dr-acc-l"></div></div>
-      <label class="check-row"><input type="checkbox" id="dr-secs"> Sekunden an der Uhr zeigen</label>
-      <label class="check-row"><input type="checkbox" id="dr-sky"> Himmel oben nach dem echten Sonnenstand färben</label>
-    </section>
 
-    <section class="dr-sec">
-      <h3>Spiegel-Modus</h3>
-      <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Abfahrten, Countdowns und Vers, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
-    </section>
-
-    <section class="dr-sec" id="dr-app">
-      <h3>Als App</h3>
-      <p class="hint" id="dr-app-txt">Das Cockpit lässt sich wie eine App installieren. Es startet dann ohne Browserleiste in einem eigenen Fenster und öffnet auch ohne Netz.</p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-install" hidden>Als App installieren</button></div>
-      <p class="hint" id="dr-app-ios" hidden></p>
-    </section>
-
-    <section class="dr-sec">
-      <h3>Seiten</h3>
-      <div class="field"><label for="dr-start">Beim Öffnen zeigen</label>
-        <select id="dr-start">
-          <option value="last">Die zuletzt geöffnete Seite</option>
-          <option value="fixed">Immer dieselbe Seite</option>
-          <option value="auto">Automatisch nach Arbeitszeit</option>
-        </select>
+      <h3 class="dr-gh">Kopf</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-greet">Begrüßung</label><input class="dr-in" id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
+        <label class="dr-line"><span class="dr-lt">Sekunden an der Uhr</span><input type="checkbox" class="switch" id="dr-secs"></label>
+        <label class="dr-line"><span class="dr-lt">Himmel nach Sonnenstand<small>Oben färbt sich alles wie der echte Himmel an deinem Ort, bei Wolken grauer.</small></span><input type="checkbox" class="switch" id="dr-sky"></label>
       </div>
-      <div class="field" id="dr-start-fixed"><label for="dr-start-page">Seite</label><select id="dr-start-page"></select></div>
-      <div class="grid2" id="dr-start-auto">
-        <div class="field"><label for="dr-start-work">Während der Arbeitszeit</label><select id="dr-start-work"></select></div>
-        <div class="field"><label for="dr-start-free">Sonst</label><select id="dr-start-free"></select></div>
+      <p class="dr-note">Design, Schwarz, Abstände und Kartenbreite gelten nur auf diesem Gerät. Akzentfarbe und Ecken nimmt der Sync auf alle Geräte mit.</p>
+    </section>
+
+    <!-- Seiten -->
+    <section class="dr-pane" id="dr-p-pages" role="tabpanel" aria-labelledby="dr-t-pages" hidden>
+      <h3 class="dr-gh">Beim Öffnen</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <div class="field"><label for="dr-start">Diese Seite zeigen</label>
+          <select id="dr-start">
+            <option value="last">Die zuletzt geöffnete Seite</option>
+            <option value="fixed">Immer dieselbe Seite</option>
+            <option value="auto">Automatisch nach Arbeitszeit</option>
+          </select>
+        </div>
+        <div class="field" id="dr-start-fixed"><label for="dr-start-page">Seite</label><select id="dr-start-page"></select></div>
+        <div class="grid2" id="dr-start-auto">
+          <div class="field"><label for="dr-start-work">Während der Arbeitszeit</label><select id="dr-start-work"></select></div>
+          <div class="field"><label for="dr-start-free">Sonst</label><select id="dr-start-free"></select></div>
+        </div>
+        <p class="hint" id="dr-start-hint"></p>
       </div>
-      <p class="hint" id="dr-start-hint"></p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-edit">Seiten und Widgets bearbeiten</button></div>
-      <p class="hint">Aufräumen auf Knopfdruck: Aus deinen Seiten werden Heute, Arbeit, Privat, Fokus und Sport. Vorher siehst du, was wohin kommt, und eigene Seiten bleiben, wie sie sind.</p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-plan">Seiten neu ordnen</button><button type="button" class="btn-ghost" id="dr-plan-back" hidden>Alte Seiten zurückholen</button></div>
-    </section>
 
-    <section class="dr-sec">
-      <h3>Kacheln oben</h3>
-      <div id="dr-tiles" style="display:flex;flex-direction:column;gap:8px"></div>
-      <p class="lbl" style="margin:6px 0 0">Eigene Countdowns</p>
-      <ul class="cd-list" id="dr-cd-list"></ul>
-      <form id="dr-cd-form" novalidate style="display:flex;flex-direction:column;gap:8px">
-        <div class="grid3">
-          <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
-          <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
-          <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
-        </div>
-        <p class="err" id="cd-err" hidden></p>
-        <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
-      </form>
-      <p class="hint">Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
-    </section>
-
-    <section class="dr-sec">
-      <h3>Feiertage</h3>
-      <div class="field"><label for="dr-region">Bundesland</label><select id="dr-region"></select></div>
-      <p class="hint">Gilt für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</p>
-    </section>
-
-    <section class="dr-sec" id="dr-sync">
-      <h3>Sync zwischen Geräten</h3>
-      <div class="sy-box" id="sy-on" hidden>
-        <p class="hint sy-state" id="sy-state" data-s="ok"></p>
-        <div class="form-row">
-          <button type="button" class="btn-ghost" id="sy-now">Jetzt abgleichen</button>
-          <button type="button" class="btn-danger" id="sy-off" style="margin-left:0">Trennen</button>
-        </div>
-        <p class="hint">Auf einem weiteren Gerät öffnest du das Cockpit, gehst auf Anpassen und trägst dort dieselbe Adresse und dasselbe Passwort ein.</p>
-        <p class="sy-addr" id="sy-addr"></p>
-        <div class="form-row">
-          <button type="button" class="btn-ghost" id="sy-addr-copy">Adresse kopieren</button>
-          <button type="button" class="btn-ghost" id="sy-pass-copy2">Passwort kopieren</button>
-        </div>
-        <p class="sy-addr" id="sy-pass-view" hidden></p>
+      <h3 class="dr-gh">Seiten und Widgets</h3>
+      <div class="dr-group">
+        <button type="button" class="dr-act" id="dr-edit"><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></span><span class="dr-lt">Seiten und Widgets bearbeiten<small>Karten verschieben, breiter machen, hinzufügen oder entfernen.</small></span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="dr-act" id="dr-plan"><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11M4 12h7M4 17h11"/><path d="M17 10l3 2-3 2"/></svg></span><span class="dr-lt">Seiten neu ordnen<small>Heute, Arbeit, Privat, Fokus und Sport. Vorher siehst du, was wohin kommt, eigene Seiten bleiben.</small></span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="dr-act" id="dr-plan-back" hidden><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span><span class="dr-lt">Alte Seiten zurückholen</span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
-      <div class="sy-box" id="sy-setup">
-        <p class="hint">Dein Cockpit legt seinen Stand in einer eigenen kleinen Ablage bei Cloudflare ab, und deine anderen Geräte holen ihn sich von dort. Das ist kostenlos, liegt in deinem eigenen Konto und ist nur mit deinem Passwort erreichbar. Todoist-Token, Keys, Kalender-Links und der laufende Pomodoro-Timer bleiben auf jedem Gerät für sich.</p>
-        <details class="sy-steps-box">
-          <summary>So richtest du es ein</summary>
-          <ol class="sy-steps">
-            <li><b>Ablage anlegen.</b> Auf dash.cloudflare.com links unter „Storage &amp; databases“ den Bereich „KV“ öffnen und einen Namespace anlegen, zum Beispiel mit dem Namen cockpit.</li>
-            <li><b>Worker anlegen.</b> Unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“ anlegen, den Code durch den Code unten ersetzen und auf „Deploy“ klicken.
-              <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="sy-code"></pre><button type="button" class="btn-ghost" id="sy-copy">Code kopieren</button></details>
-            </li>
-            <li><b>Ablage und Passwort verbinden.</b> Beim Worker unter „Settings“, „Bindings“ eine Verbindung zu deinem KV-Namespace hinzufügen, mit dem Namen <code>SYNC_KV</code>. Unter „Variables and secrets“ ein Secret mit dem Namen <code>SYNC_SECRET</code> anlegen und als Wert das Passwort eintragen, das du unten mit „Erzeugen“ bekommst. Danach noch einmal „Deploy“.</li>
-            <li><b>Hier eintragen.</b> Adresse des Workers und Passwort unten eintragen und auf „Verbinden“ klicken.</li>
-          </ol>
-          <p class="hint">Cloudflare benennt Menüpunkte manchmal um, die Namen können leicht abweichen.</p>
-        </details>
-        <form class="sy-box" id="sy-form" novalidate>
-          <div class="field"><label for="sy-url">Adresse des Workers</label><input id="sy-url" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://cockpit-sync.dein-name.workers.dev"></div>
-          <div class="field"><label for="sy-pass">Passwort</label><input id="sy-pass" type="password" maxlength="100" autocomplete="off" spellcheck="false"></div>
-          <div class="form-row">
-            <button type="button" class="btn-ghost" id="sy-gen">Erzeugen</button>
-            <button type="button" class="btn-ghost" id="sy-show">Anzeigen</button>
-            <button type="button" class="btn-ghost" id="sy-pass-copy">Kopieren</button>
+
+      <h3 class="dr-gh">Kacheln oben</h3>
+      <div class="dr-group" id="dr-tiles"></div>
+      <p class="dr-note">Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
+
+      <h3 class="dr-gh">Eigene Countdowns</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <ul class="cd-list" id="dr-cd-list"></ul>
+        <form id="dr-cd-form" novalidate class="dr-stack">
+          <div class="grid3">
+            <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
+            <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
+            <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
           </div>
-          <p class="err" id="sy-err" hidden></p>
-          <div class="form-row"><button type="submit" class="btn" id="sy-go">Verbinden</button></div>
+          <p class="err" id="cd-err" hidden></p>
+          <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
         </form>
-        <div class="sy-choice" id="sy-choice" hidden>
-          <p id="sy-choice-txt"></p>
-          <p class="hint">Auf einem neuen Gerät nimmst du meist den Stand aus der Cloud, dann bleibt eine Kopie deines bisherigen Standes in diesem Browser liegen. Auf deinem Hauptgerät lädst du den eigenen Stand hoch, dann wird der in der Cloud ersetzt.</p>
-          <div class="form-row">
-            <button type="button" class="btn" id="sy-take-cloud">Stand aus der Cloud holen</button>
-            <button type="button" class="btn-ghost" id="sy-take-mine">Meinen Stand hochladen</button>
-            <button type="button" class="btn-ghost" id="sy-choice-cancel">Abbrechen</button>
-          </div>
-        </div>
+      </div>
+
+      <h3 class="dr-gh">Feiertage</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-region">Bundesland<small>Für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</small></label><select class="dr-in" id="dr-region"></select></div>
       </div>
     </section>
 
-    <section class="dr-sec" id="dr-data">
-      <h3>Daten</h3>
-      <p class="hint">Deine Einstellungen liegen in diesem Browser, mit dem Sync oben auch in deiner Cloud. Sicher sie trotzdem ab und zu als Datei, denn der Sync gibt auch Fehler an alle Geräte weiter. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
-      <p class="hint" id="dr-backup-at"></p>
-      <div class="form-row">
-        <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>
-        <button type="button" class="btn-ghost" id="dr-import">Sicherung laden</button>
-        <input type="file" id="dr-file" accept="application/json,.json" hidden>
+    <!-- Geräte -->
+    <section class="dr-pane" id="dr-p-devices" role="tabpanel" aria-labelledby="dr-t-devices" hidden>
+      <h3 class="dr-gh">Sync zwischen Geräten</h3>
+      <div class="dr-group dr-pad dr-stack" id="dr-sync">
+        <div class="sy-box" id="sy-on" hidden>
+          <p class="hint sy-state" id="sy-state" data-s="ok"></p>
+          <div class="form-row">
+            <button type="button" class="btn" id="sy-now">Jetzt abgleichen</button>
+            <button type="button" class="btn-danger" id="sy-off" style="margin-left:0">Trennen</button>
+          </div>
+          <p class="hint">Auf einem weiteren Gerät öffnest du das Cockpit, gehst auf Anpassen, Geräte und trägst dort dieselbe Adresse und dasselbe Passwort ein.</p>
+          <p class="sy-addr" id="sy-addr"></p>
+          <div class="form-row">
+            <button type="button" class="btn-ghost" id="sy-addr-copy">Adresse kopieren</button>
+            <button type="button" class="btn-ghost" id="sy-pass-copy2">Passwort kopieren</button>
+          </div>
+          <p class="sy-addr" id="sy-pass-view" hidden></p>
+        </div>
+        <div class="sy-box" id="sy-setup">
+          <p class="hint">Dein Cockpit legt seinen Stand in einer eigenen kleinen Ablage bei Cloudflare ab, und deine anderen Geräte holen ihn sich von dort. Das ist kostenlos, liegt in deinem eigenen Konto und ist nur mit deinem Passwort erreichbar. Todoist-Token, Keys, Kalender-Links und der laufende Pomodoro-Timer bleiben auf jedem Gerät für sich.</p>
+          <details class="sy-steps-box">
+            <summary>So richtest du es ein</summary>
+            <ol class="sy-steps">
+              <li><b>Ablage anlegen.</b> Auf dash.cloudflare.com links unter „Storage &amp; databases“ den Bereich „KV“ öffnen und einen Namespace anlegen, zum Beispiel mit dem Namen cockpit.</li>
+              <li><b>Worker anlegen.</b> Unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“ anlegen, den Code durch den Code unten ersetzen und auf „Deploy“ klicken.
+                <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="sy-code"></pre><button type="button" class="btn-ghost" id="sy-copy">Code kopieren</button></details>
+              </li>
+              <li><b>Ablage und Passwort verbinden.</b> Beim Worker unter „Settings“, „Bindings“ eine Verbindung zu deinem KV-Namespace hinzufügen, mit dem Namen <code>SYNC_KV</code>. Unter „Variables and secrets“ ein Secret mit dem Namen <code>SYNC_SECRET</code> anlegen und als Wert das Passwort eintragen, das du unten mit „Erzeugen“ bekommst. Danach noch einmal „Deploy“.</li>
+              <li><b>Hier eintragen.</b> Adresse des Workers und Passwort unten eintragen und auf „Verbinden“ klicken.</li>
+            </ol>
+            <p class="hint">Cloudflare benennt Menüpunkte manchmal um, die Namen können leicht abweichen.</p>
+          </details>
+          <form class="sy-box" id="sy-form" novalidate>
+            <div class="field"><label for="sy-url">Adresse des Workers</label><input id="sy-url" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://cockpit-sync.dein-name.workers.dev"></div>
+            <div class="field"><label for="sy-pass">Passwort</label><input id="sy-pass" type="password" maxlength="100" autocomplete="off" spellcheck="false"></div>
+            <div class="form-row">
+              <button type="button" class="btn-ghost" id="sy-gen">Erzeugen</button>
+              <button type="button" class="btn-ghost" id="sy-show">Anzeigen</button>
+              <button type="button" class="btn-ghost" id="sy-pass-copy">Kopieren</button>
+            </div>
+            <p class="err" id="sy-err" hidden></p>
+            <div class="form-row"><button type="submit" class="btn" id="sy-go">Verbinden</button></div>
+          </form>
+          <div class="sy-choice" id="sy-choice" hidden>
+            <p id="sy-choice-txt"></p>
+            <p class="hint">Auf einem neuen Gerät nimmst du meist den Stand aus der Cloud, dann bleibt eine Kopie deines bisherigen Standes in diesem Browser liegen. Auf deinem Hauptgerät lädst du den eigenen Stand hoch, dann wird der in der Cloud ersetzt.</p>
+            <div class="form-row">
+              <button type="button" class="btn" id="sy-take-cloud">Stand aus der Cloud holen</button>
+              <button type="button" class="btn-ghost" id="sy-take-mine">Meinen Stand hochladen</button>
+              <button type="button" class="btn-ghost" id="sy-choice-cancel">Abbrechen</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <p class="err" id="dr-data-err" hidden></p>
-      <div class="form-row"><button type="button" class="btn-danger" id="dr-reset" style="margin-left:0">Alles zurücksetzen</button></div>
+
+      <h3 class="dr-gh">Als App</h3>
+      <div class="dr-group dr-pad dr-stack" id="dr-app">
+        <p class="hint" id="dr-app-txt">Das Cockpit lässt sich wie eine App installieren. Es startet dann ohne Browserleiste in einem eigenen Fenster und öffnet auch ohne Netz.</p>
+        <div class="form-row"><button type="button" class="btn" id="dr-install" hidden>Als App installieren</button></div>
+        <p class="hint" id="dr-app-ios" hidden></p>
+      </div>
+
+      <h3 class="dr-gh">Spiegel-Modus</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Abfahrten, Countdowns und Vers, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
+        <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
+      </div>
+    </section>
+
+    <!-- Daten -->
+    <section class="dr-pane" id="dr-p-data" role="tabpanel" aria-labelledby="dr-t-data" hidden>
+      <h3 class="dr-gh">Sicherung als Datei</h3>
+      <div class="dr-group dr-pad dr-stack" id="dr-data">
+        <p class="hint">Mit der Datei bekommst du auf jedem Rechner genau dasselbe Cockpit, auch ohne Sync. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
+        <p class="dr-meta" id="dr-backup-at"></p>
+        <div class="form-row">
+          <button type="button" class="btn" id="dr-export">Sicherung speichern</button>
+          <button type="button" class="btn-ghost" id="dr-import">Sicherung laden</button>
+          <input type="file" id="dr-file" accept="application/json,.json" hidden>
+        </div>
+        <p class="err" id="dr-data-err" hidden></p>
+      </div>
+
+      <h3 class="dr-gh">Zwischenstände</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <p class="hint" id="dr-snap-txt"></p>
+        <ul class="snap-list" id="dr-snaps"></ul>
+      </div>
+
+      <h3 class="dr-gh">Zurücksetzen</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <p class="hint">Setzt alle Seiten, Widgets und Einstellungen auf den Anfang. Direkt danach kannst du es noch rückgängig machen.</p>
+        <div class="form-row"><button type="button" class="btn-danger" id="dr-reset" style="margin-left:0">Alles zurücksetzen</button></div>
+      </div>
     </section>
   </div>
 </aside>

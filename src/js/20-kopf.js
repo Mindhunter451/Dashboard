@@ -90,16 +90,22 @@ function tickHeader(now) {
 const themeStyle = document.createElement('style');
 document.head.appendChild(themeStyle);
 let lastLook = '';
+/* Akzent neu setzen, nur wenn sich etwas geändert hat (bei „Mit dem Tag“ jede Minute geprüft) */
+function applyAccent() {
+  const css = accentCss(state.ui);
+  if (css !== themeStyle.textContent) themeStyle.textContent = css;
+}
 function applyUi() {
   const u = state.ui, root = document.documentElement;
   if (u.theme === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', u.theme);
-  const p = ACCENTS[u.accent] || ACCENTS.amber;
-  const vars = a => `--accent:${a[0]};--accent-ink:${a[1]};--chip-bg:${a[2]};--on-accent:${a[3]};`;
-  themeStyle.textContent = `:root{${vars(p.l)}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${vars(p.d)}}}:root[data-theme="dark"]{${vars(p.d)}}`;
+  if (u.dark === 'oled') root.setAttribute('data-dark', 'oled'); else root.removeAttribute('data-dark');
+  if (u.density === 'normal') root.removeAttribute('data-density'); else root.setAttribute('data-density', u.density);
+  root.style.setProperty('--r', u.radius + 'px');
+  applyAccent();
   $('#h-greet').textContent = u.greet.trim() || 'Moin';
   $('#foot-region').textContent = `Feiertage: ${REGIONS[u.region]}`;
   headKey = '';
   sky.minute = -1;
-  const look = `${isDark()}|${u.accent}`;
+  const look = `${isDark()}|${u.accent}|${u.accentHex}|${u.dark}`;
   if (look !== lastLook) { lastLook = look; refreshMapLook(); }
 }

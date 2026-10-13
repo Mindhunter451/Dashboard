@@ -3,7 +3,7 @@
 .board:not(.flow)>.card{position:absolute;top:0;left:0}
 .board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
 @media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
-.card{scroll-margin-top:72px;position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:16px clamp(16px,1.7vw,22px) 20px;display:flex;flex-direction:column;gap:14px;min-width:0;container-type:inline-size}
+.card{scroll-margin-top:72px;position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:var(--pad-t) var(--pad-x) var(--pad-b);display:flex;flex-direction:column;gap:var(--card-gap);min-width:0;container-type:inline-size}
 /* Wichtige Karten (Wetter, Abfahrten, Kalender, Pendeln) schweben höher, ruhige (Schnellzugriff, Notizen, Vers) liegen flach */
 .card[data-tier="hero"]{background:var(--surface-hi);box-shadow:var(--shadow-2)}
 .card[data-tier="quiet"]{background:var(--quiet);box-shadow:none;--raise:var(--surface)}
@@ -22,7 +22,7 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .card-tg{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:calc(100% + 11px);margin:-3px -8px -3px -3px;padding:3px 8px 3px 3px;border:0;border-radius:11px;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:left}
 .card-tg:hover{background:color-mix(in srgb,var(--ink) 4.5%,transparent)}
 .card-tt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card-ico{flex:0 0 28px;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--raise);color:var(--muted)}
+.card-ico{flex:0 0 28px;width:28px;height:28px;border-radius:min(9px,var(--r2));display:grid;place-items:center;background:var(--raise);color:var(--muted)}
 .card[data-tier="hero"] .card-ico{color:var(--ink)}
 .card[data-tier="quiet"] .card-ico{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .card-ico svg{width:16px;height:16px}
@@ -34,7 +34,7 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .card-peek .dp-line{font-size:12px;height:1.7em;min-width:2.5em;margin-left:5px;vertical-align:-1px}
 
 /* Eingeklappt: nur der Kopf mit einer Kurzinfo rechts */
-.board:not(.editing)>.card.is-collapsed{gap:0;padding-bottom:16px}
+.board:not(.editing)>.card.is-collapsed{gap:0;padding-bottom:var(--pad-t)}
 .board:not(.editing)>.card.is-collapsed>:not(.card-head){display:none!important}
 .board:not(.editing)>.card.is-collapsed>.card-head{flex-wrap:nowrap}
 .board:not(.editing)>.card.is-collapsed>.card-head>:not(h2):not(.card-peek){display:none!important}

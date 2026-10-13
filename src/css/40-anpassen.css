@@ -1,29 +1,180 @@
-/* Anpassen */
-.scrim{position:fixed;inset:0;background:rgba(6,12,18,.42);z-index:2900}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:-14px 0 44px rgba(0,0,0,.22);z-index:3000;display:flex;flex-direction:column}
-.dr-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
-.dr-head h2{font-size:22px}
-.dr-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 20px 32px}
-.dr-sec{padding:18px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
-.dr-sec:last-child{border-bottom:0}
-.dr-sec>h3{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
-.dr-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.dr-row>.lbl{font-size:14px;color:var(--ink);font-weight:600}
-.swatches{display:flex;flex-wrap:wrap;gap:10px}
-.swatch{position:relative;display:block}
+/* Anpassen: schwebendes Glas-Fenster rechts, das Cockpit bleibt dahinter sichtbar und zeigt jede Änderung sofort.
+   Auf dem Handy ein Blatt von unten, das sich nach unten wegziehen lässt. */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:2900;animation:fade-in .25s ease}
+.scrim.closing{animation:fade-out .2s ease forwards}
+@media (min-width:900px){.scrim{background:color-mix(in srgb,var(--scrim) 30%,transparent)}}
+@keyframes fade-in{from{opacity:0}}
+@keyframes fade-out{to{opacity:0}}
+.drawer{position:fixed;z-index:3000;top:12px;right:12px;bottom:12px;width:min(424px,calc(100% - 24px));display:flex;flex-direction:column;
+  background:var(--glass);-webkit-backdrop-filter:blur(30px) saturate(1.6);backdrop-filter:blur(30px) saturate(1.6);
+  border:1px solid var(--glass-line);border-radius:min(28px,calc(var(--r) + 10px));box-shadow:var(--pop);overflow:hidden;
+  animation:dr-in .34s var(--ease)}
+.drawer.closing{animation:dr-out .2s ease forwards}
+@keyframes dr-in{from{opacity:0;transform:translateX(28px) scale(.985)}}
+@keyframes dr-out{to{opacity:0;transform:translateX(28px) scale(.985)}}
+.dr-grab{display:none}
+.dr-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 16px 14px 22px}
+.dr-head h2{font:680 25px/1.1 var(--f-display);font-variation-settings:'wdth' 86;letter-spacing:-.018em}
+.dr-x{flex:0 0 34px;width:34px;height:34px;border:0;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.dr-x:hover{background:color-mix(in srgb,var(--ink) 14%,transparent)}
+.dr-x svg{width:18px;height:18px}
+
+/* Bereiche: Pille gleitet unter den aktiven Reiter */
+.dr-tabs{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 16px 6px;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.dr-tabs button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:8px 4px;border:0;border-radius:999px;background:none;color:var(--muted);font:600 13px/1.2 var(--f-body);transition:color .2s}
+.dr-tabs button:hover{color:var(--ink)}
+.dr-tabs button[aria-selected="true"]{color:var(--ink)}
+.dr-tabs svg{width:16px;height:16px;flex:0 0 16px}
+.dr-tabs span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-tab-ind{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px) / 4);border-radius:999px;background:var(--surface);
+  box-shadow:0 1px 2px rgba(0,0,0,.1),0 2px 8px -2px rgba(0,0,0,.12);transform:translateX(calc(var(--i,0) * 100%));transition:transform .38s var(--spring)}
+@media (max-width:460px){.dr-tabs svg{display:none}}
+
+.dr-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 16px calc(28px + env(safe-area-inset-bottom,0px));scrollbar-width:thin}
+.dr-pane{animation:pane-in .28s var(--ease)}
+@keyframes pane-in{from{opacity:0;transform:translateY(6px)}}
+.dr-gh{margin:22px 6px 8px;font:600 13px/1.3 var(--f-body);color:var(--muted)}
+.dr-pane>.dr-gh:first-child{margin-top:12px}
+/* Gruppen: Zeilen mit Text links und Schalter rechts, durch feine Linien getrennt */
+.dr-group{border-radius:min(18px,calc(var(--r) * .8 + 2px));background:color-mix(in srgb,var(--surface) 62%,transparent);border:1px solid var(--glass-line);padding:2px 14px}
+.dr-group.dr-pad{padding:14px}
+.dr-stack{display:flex;flex-direction:column;gap:12px}
+.dr-line{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:52px;padding:9px 0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent)}
+label.dr-line{cursor:pointer}
+.dr-group>.dr-line:first-child,.dr-group>.dr-act:first-child{border-top:0}
+.dr-lt{display:flex;flex-direction:column;gap:2px;min-width:0;font:600 14px/1.3 var(--f-body);color:var(--ink)}
+.dr-lt small{font:400 12.5px/1.4 var(--f-body);color:var(--muted)}
+.dr-in{font:inherit;font-size:14px;color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent);border:1px solid transparent;border-radius:10px;padding:8px 11px;width:min(200px,52%);min-width:0}
+.dr-in:focus{border-color:color-mix(in srgb,var(--accent) 60%,transparent);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.dr-note{margin:8px 6px 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.dr-meta{margin:0;font-size:13px;font-weight:600}
+.drawer .hint{font-size:13px;line-height:1.5}
+.drawer .field input,.drawer .field select{font-size:14px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.drawer .seg{background:color-mix(in srgb,var(--ink) 7%,transparent);border-color:transparent;flex:0 0 auto}
+.drawer .seg button{padding:6px 11px;font-size:13px}
+.drawer .seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12),0 2px 6px -2px rgba(0,0,0,.14)}
+.drawer .btn,.drawer .btn-ghost{padding:8px 14px;font-size:13px}
+.drawer .btn-ghost{background:color-mix(in srgb,var(--surface) 60%,transparent)}
+
+/* Aktionen als Zeile mit Symbol und Pfeil */
+.dr-act{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 0;border:0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent);background:none;text-align:left;color:var(--ink)}
+.dr-act[hidden]{display:none}
+.dr-act-ico{flex:0 0 32px;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--chip-bg);color:var(--accent-ink)}
+.dr-act-ico svg{width:17px;height:17px}
+.dr-act .dr-lt{flex:1}
+.dr-chev{flex:0 0 16px;width:16px;height:16px;color:var(--muted);transition:transform .2s var(--ease)}
+.dr-act:hover .dr-chev{transform:translateX(3px);color:var(--ink)}
+
+/* Design-Auswahl mit kleiner Vorschau */
+.theme-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.theme-pick button{display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:6px 6px 8px;border:1px solid var(--glass-line);border-radius:min(16px,calc(var(--r) * .7 + 4px));background:color-mix(in srgb,var(--surface) 62%,transparent);color:var(--muted);font:600 13px/1.2 var(--f-body);text-align:center;transition:border-color .2s,color .2s}
+.theme-pick button:hover{color:var(--ink)}
+.theme-pick button[aria-pressed="true"]{border-color:transparent;color:var(--ink);box-shadow:0 0 0 2px var(--accent)}
+.tp-prev{position:relative;display:block;aspect-ratio:16/10;border-radius:min(11px,calc(var(--r) * .5 + 2px));overflow:hidden;
+  --pv-bg:#E8EDF2;--pv-card:#FFFFFF;--pv-sky:linear-gradient(180deg,#4F8FDF,#A6CFF4);--pv-line:rgba(15,27,43,.08);
+  background:var(--pv-bg);box-shadow:inset 0 0 0 1px var(--pv-line)}
+.tp-prev[data-pv="dark"]{--pv-bg:#11100F;--pv-card:#1F1E1D;--pv-sky:linear-gradient(180deg,#0E0E10,#1D1C22);--pv-line:rgba(255,255,255,.1)}
+.tp-prev[data-pv="dark"][data-oled]{--pv-bg:#000;--pv-card:#141414;--pv-sky:#000}
+.tp-prev::before{content:"";position:absolute;left:0;right:0;top:0;height:36%;background:var(--pv-sky)}
+.tp-prev i{position:absolute;top:47%;bottom:12%;border-radius:4px;background:var(--pv-card);box-shadow:0 0 0 1px var(--pv-line)}
+.tp-prev i:first-of-type{left:9%;width:50%}
+.tp-prev i:last-of-type{right:9%;width:26%;background:var(--accent-fill)}
+/* Wie das System: links hell, rechts dunkel */
+.tp-prev[data-pv="auto"]::after{content:"";position:absolute;inset:0;clip-path:polygon(58% 0,100% 0,100% 100%,42% 100%);
+  background:linear-gradient(180deg,#0E0E10,#1D1C22) 0 0/100% 36% no-repeat,#11100F}
+.tp-prev[data-pv="auto"][data-oled]::after{background:#000}
+.tp-prev[data-pv="auto"] i{z-index:1}
+
+/* Akzentfarben */
+.acc{display:flex;flex-direction:column;gap:10px}
+.acc-sub{margin:4px 0 -2px;font:600 12px/1.3 var(--f-body);color:var(--muted)}
+.acc-sub:first-child{margin-top:0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:10px 8px;justify-items:center}
+.swatch{position:relative;display:block;cursor:pointer}
 .swatch input{position:absolute;opacity:0;width:1px;height:1px}
-.swatch span{display:block;width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14);cursor:pointer}
+.swatch span{position:relative;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:transform .2s var(--spring)}
+.swatch:hover span{transform:scale(1.08)}
 .swatch input:checked+span{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
 .swatch input:focus-visible+span{outline:2px solid var(--sea);outline-offset:5px}
-.seg.sm button{padding:4px 9px;font-size:12px}
+.swatch span svg{width:16px;height:16px;opacity:0;color:var(--on,#fff);transition:opacity .15s}
+.swatch input:checked+span svg{opacity:1}
+/* Eigene Farbe: Regenbogenring mit der gewählten Farbe in der Mitte, öffnet den Farbwähler */
+.sw-custom input[type="color"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw-custom span{background:radial-gradient(circle,var(--c) 0 46%,transparent 49%),conic-gradient(from 90deg,#F06A5A,#F3B33D,#B8D64B,#3FC2A8,#4A8FEA,#9B6BE8,#E35BA6,#F06A5A)}
+.sw-custom.on span{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
+.sw-custom input[type="color"]:focus-visible+span{outline:2px solid var(--sea);outline-offset:5px}
+/* Mit dem Tag: breite Pille mit dem Tagesverlauf */
+.sw-sun{grid-column:1/-1;justify-self:stretch}
+.swatch.sw-sun span{width:100%;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 14px;font:650 13px/1 var(--f-body);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25);
+  background:linear-gradient(90deg,#6E4FC2,#C7468A 22%,#E5654B 38%,#E8A126 55%,#1A9AA0 78%,#3D7BE0)}
+.sw-sun span b{font-weight:650;letter-spacing:.01em}
+.sw-sun span em{width:28px;height:28px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(255,255,255,.85);flex:0 0 28px}
+.sw-sun span svg{display:none}
+.sw-sun:hover span{transform:none;filter:brightness(1.05)}
+.acc-now{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.acc-now b{color:var(--ink);font-weight:600}
+
+/* Schalter statt Häkchen */
+.switch{-webkit-appearance:none;appearance:none;position:relative;flex:0 0 44px;width:44px;height:26px;margin:0;border-radius:999px;cursor:pointer;
+  background:color-mix(in srgb,var(--ink) 20%,transparent);transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .28s var(--spring)}
+.switch:checked{background:var(--accent-fill)}
+.switch:checked::after{transform:translateX(18px)}
+.switch:focus-visible{outline:2px solid var(--sea);outline-offset:3px}
+/* In Formularzeilen etwas kleiner, Text rechts daneben */
+.check-row .switch{flex-basis:38px;width:38px;height:22px}
+.check-row .switch::after{width:16px;height:16px}
+.check-row .switch:checked::after{transform:translateX(16px)}
+
+/* Regler für die Ecken */
+.range-row{display:flex;align-items:center;gap:10px;flex:0 1 220px;min-width:0}
+.range-row output{flex:0 0 3.2em;font:600 13px/1 var(--f-data);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.range{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:26px;margin:0;background:transparent;cursor:pointer;--p:50%}
+.range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent) var(--p),color-mix(in srgb,var(--ink) 16%,transparent) var(--p))}
+.range::-moz-range-track{height:6px;border-radius:3px;background:color-mix(in srgb,var(--ink) 16%,transparent)}
+.range::-moz-range-progress{height:6px;border-radius:3px;background:var(--accent)}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-8px;border-radius:50%;background:#FFFFFF;border:0;box-shadow:0 1px 4px rgba(0,0,0,.32),0 0 0 1px rgba(0,0,0,.06);transition:transform .2s var(--spring)}
+.range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:0;box-shadow:0 1px 4px rgba(0,0,0,.32)}
+.range:active::-webkit-slider-thumb{transform:scale(1.12)}
+.range:focus-visible{outline:2px solid var(--sea);outline-offset:3px;border-radius:6px}
+
+/* Zwischenstände */
+.snap-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.snap-list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent)}
+.snap-list li:first-child{border-top:0;padding-top:0}
+.snap-list .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:14px}
+.snap-list .tx b{font-weight:600}
+.snap-list .tx span{font-size:12.5px;color:var(--muted)}
+
+/* Handy: Blatt von unten mit Griff zum Wegziehen */
+@media (max-width:640px){
+  .drawer{top:auto;left:0;right:0;bottom:0;width:100%;height:min(88dvh,calc(100% - 28px));border-radius:24px 24px 0 0;border-bottom:0;animation-name:sheet-in;animation-duration:.4s;touch-action:auto}
+  .drawer.closing{animation-name:sheet-out;animation-duration:.24s}
+  .drawer.dragging{animation:none;transition:none}
+  .drawer.settle{transition:transform .3s var(--ease)}
+  .dr-grab{display:flex;justify-content:center;padding:8px 0 0;cursor:grab;touch-action:none}
+  .dr-grab span{width:38px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+  .dr-head{padding:8px 14px 12px 20px;touch-action:none}
+  .dr-head h2{font-size:22px}
+  .dr-in{width:min(180px,50%)}
+  .range-row{flex-basis:170px}
+}
+@keyframes sheet-in{from{transform:translateY(100%)}}
+@keyframes sheet-out{to{transform:translateY(100%)}}
+@media (prefers-reduced-motion: reduce){
+  .drawer,.drawer.closing,.scrim,.scrim.closing,.dr-pane{animation:none}
+  .dr-tab-ind,.switch::after,.swatch span{transition:none}
+}
+
 .cd-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.cd-list li{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--line)}
+.cd-list:empty{display:none}
+.cd-list li{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent)}
+.cd-list li:first-child{border-top:0;padding-top:0}
 .cd-list .tx{flex:1;min-width:0;font-size:14px}
 .cd-list .tx b{font-weight:600}
 .cd-list .tx span{color:var(--muted);font:400 12px var(--f-data);margin-left:6px;font-variant-numeric:tabular-nums}
 .grid3{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.8fr);gap:8px}
 @media (max-width:420px){.grid3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid3>:first-child{grid-column:1/-1}}
-.drawer .field input,.drawer .field select{font-size:14px;padding:7px 9px}
 
 /* Fuß und Toast */
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:12px;padding-top:4px}
@@ -34,9 +185,9 @@
 @media (prefers-reduced-motion: reduce){.fill{transition:none}}
 
 /* Dialoge: Widget-Galerie und Widget-Einstellungen */
-.dlg{border:1px solid var(--line);border-radius:18px;padding:0;background:var(--surface);color:var(--ink);width:min(620px,calc(100% - 24px));max-height:min(88vh,860px);box-shadow:0 24px 70px rgba(0,0,0,.32)}
+.dlg{border:1px solid var(--line);border-radius:min(24px,calc(var(--r) + 4px));padding:0;background:var(--surface);color:var(--ink);width:min(620px,calc(100% - 24px));max-height:min(88vh,860px);box-shadow:0 24px 70px rgba(0,0,0,.32)}
 .dlg[open]{display:flex;flex-direction:column}
-.dlg::backdrop{background:rgba(6,12,18,.48)}
+.dlg::backdrop{background:var(--scrim)}
 .dlg>form{display:flex;flex-direction:column;min-height:0;flex:1}
 .dlg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 14px 20px;border-bottom:1px solid var(--line)}
 .dlg-head h2{font-size:21px}

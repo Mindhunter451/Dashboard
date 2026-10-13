@@ -85,6 +85,11 @@ function skyColors(alt, pm, grey) {
   });
 }
 const ALT_MAX = 64;
+/* Eine Himmelsfarbe Richtung Grau mit derselben Helligkeit schieben, mit deep zusätzlich abdunkeln */
+function skyNeutral(c, n, deep) {
+  const y = Math.sqrt(lumOf(c)) * 255 * (deep ? 1 - n * 0.6 : 1);
+  return mixRgb(c, [y * 1.02, y, y * 0.97], n);
+}
 /* Sterne einmal zufällig, aber immer gleich verteilt */
 (() => {
   let seed = 7;
@@ -100,7 +105,10 @@ function renderSky(now) {
   if (dk !== sky.key) { sky.key = dk; sky.day = sunDay(now, loc); sky.w = 0; }
   const D = sky.day, alt = sunAlt(now, +loc.lat, +loc.lon), pm = now > D.noon;
   const grey = skyGrey(), on = state.ui.sky;
-  const [top, mid, low] = skyColors(alt, pm, grey);
+  let [top, mid, low] = skyColors(alt, pm, grey);
+  // Im dunklen Design wird die Nacht neutraler, damit der Himmel zu den Graphit-Karten passt. In Schwarz (OLED) fast schwarz mit Sternen.
+  const dkTh = isDark(), oled = dkTh && state.ui.dark === 'oled', night = dkTh ? clamp01((-alt - 1) / 9) * (oled ? 0.92 : 0.6) : 0;
+  if (night) [top, mid, low] = [top, mid, low].map(c => skyNeutral(c, night, oled));
   const inkHi = lumOf(mixRgb(top, mid, 0.5)) > 0.36 ? '#0F1B2B' : '#FFFFFF';
   const inkLo = lumOf(low) > 0.4 ? '#0F1B2B' : '#FFFFFF';
   const xNow = (now - sod(now)) / DAY;
@@ -124,7 +132,10 @@ function renderSky(now) {
   el.style.setProperty('--sun-f', yNow.toFixed(3));
   el.dataset.night = alt < -6 ? '1' : '0';
   const tc = document.querySelector('meta[name="theme-color"]');
-  if (tc && on) tc.content = rgb2hex(top);
+  if (tc) tc.content = on ? rgb2hex(top) : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#11100F';
+  // Akzent „Mit dem Tag“ folgt der Sonne. Gerechnet wird immer, damit die Auswahl im Anpassen-Fenster den Ton von jetzt zeigt.
+  const sh = sunAccentHex(alt, pm, D.max);
+  if (sh !== acc.sunHex) { acc.sunHex = sh; if (state.ui.accent === 'sun') applyAccent(); }
   // Bogen
   const H = 100, toY = a => (H - Math.max(0, a) / ALT_MAX * (H - 6)).toFixed(1);
   const nowM = xNow * 1440;

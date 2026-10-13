@@ -187,7 +187,7 @@
         <div class="field"><label for="vs-allow">Tage pro Jahr</label><input id="vs-allow" type="number" min="0" max="60" step="0.5" inputmode="decimal"></div>
         <div class="field"><label for="vs-carry">Resturlaub aus dem Vorjahr</label><input id="vs-carry" type="number" min="0" max="60" step="0.5" inputmode="decimal"></div>
       </div>
-      <label class="check-row"><input type="checkbox" id="vs-xmas"> 24.12. und 31.12. zählen als halbe Urlaubstage</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="vs-xmas"> 24.12. und 31.12. zählen als halbe Urlaubstage</label>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
         <button type="button" class="btn-ghost" id="vs-cancel">Abbrechen</button>
@@ -200,7 +200,7 @@
         <div class="field"><label for="vf-from">Erster Urlaubstag</label><input id="vf-from" type="date"></div>
         <div class="field"><label for="vf-to">Letzter Urlaubstag</label><input id="vf-to" type="date"></div>
       </div>
-      <label class="check-row" id="vf-half-row" hidden><input type="checkbox" id="vf-half"> Nur ein halber Tag</label>
+      <label class="check-row" id="vf-half-row" hidden><input type="checkbox" class="switch" id="vf-half"> Nur ein halber Tag</label>
       <div class="field"><label for="vf-label">Bezeichnung (optional)</label><input id="vf-label" type="text" maxlength="40" placeholder="z. B. Mallorca" autocomplete="off"></div>
       <p class="preview" id="vf-preview"></p>
       <p class="err" id="vf-err" hidden></p>
@@ -229,8 +229,8 @@
         <div class="field"><label for="po-long">Lange Pause</label><input id="po-long" type="number" min="1" max="90" inputmode="numeric"></div>
         <div class="field"><label for="po-every">Lange Pause nach Runden</label><input id="po-every" type="number" min="2" max="8" inputmode="numeric"></div>
       </div>
-      <label class="check-row"><input type="checkbox" id="po-sound"> Ton am Ende einer Phase</label>
-      <label class="check-row"><input type="checkbox" id="po-auto"> Nächste Phase automatisch starten</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="po-sound"> Ton am Ende einer Phase</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="po-auto"> Nächste Phase automatisch starten</label>
       <p class="err" id="po-err" hidden></p>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
@@ -358,7 +358,7 @@
       <div class="form-row"><button type="button" class="btn-ghost" id="ca-add">+ Kalender</button></div>
       <div class="grid2">
         <div class="field"><label for="ca-days">Zeitraum</label><select id="ca-days"><option value="7">Nächste 7 Tage</option><option value="14">Nächste 14 Tage</option><option value="30">Nächste 30 Tage</option></select></div>
-        <label class="check-row ca-locrow"><input type="checkbox" id="ca-loc"> Ort unter dem Termin zeigen</label>
+        <label class="check-row ca-locrow"><input type="checkbox" class="switch" id="ca-loc"> Ort unter dem Termin zeigen</label>
       </div>
       <p class="hint">Links und Weiterleitung bleiben nur in diesem Browser und kommen nicht mit in die Sicherung.</p>
       <p class="err" id="ca-ferr" hidden></p>
@@ -421,7 +421,7 @@
       <ul class="ca-feeds bd-all" id="bd-all" hidden></ul>
       <div class="grid2">
         <div class="field"><label for="bd-n">In der Karte zeigen</label><select id="bd-n"><option value="4">4 Geburtstage</option><option value="6">6 Geburtstage</option><option value="8">8 Geburtstage</option><option value="12">12 Geburtstage</option></select></div>
-        <label class="check-row ca-locrow"><input type="checkbox" id="bd-cal"> Geburtstage aus dem Kalender mitzeigen</label>
+        <label class="check-row ca-locrow"><input type="checkbox" class="switch" id="bd-cal"> Geburtstage aus dem Kalender mitzeigen</label>
       </div>
       <p class="hint">Die Geburtstage kommen mit in deine Sicherung.</p>
       <div class="form-row">
@@ -465,7 +465,7 @@
       </div>
       <div class="form-row"><button type="button" class="btn-ghost" id="ws-add">+ Tonne</button></div>
       <div class="ws-remind">
-        <label class="check-row"><input type="checkbox" id="ws-remind"> Am Vorabend erinnern ab</label>
+        <label class="check-row"><input type="checkbox" class="switch" id="ws-remind"> Am Vorabend erinnern ab</label>
         <input id="ws-at" type="time" aria-label="Uhrzeit der Erinnerung">
         <button type="button" class="btn-ghost" id="ws-notify" hidden>Auch als Mitteilung</button>
         <span class="hint" id="ws-notify-on" hidden>Mitteilungen sind erlaubt.</span>

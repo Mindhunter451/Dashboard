@@ -62,3 +62,15 @@
   </div>
   <div class="dlg-body" id="info-body"></div>
 </dialog>
+
+<!-- Schnellsuche: Strg+K oder Cmd+K -->
+<dialog class="dlg cmd" id="dlg-cmd" aria-label="Schnellsuche">
+  <div class="cmd-in">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/></svg>
+    <input id="cmd-q" type="text" role="combobox" aria-expanded="true" aria-controls="cmd-list" aria-autocomplete="list" aria-label="Seite, Widget oder Aktion suchen" placeholder="Seite, Widget oder Aktion suchen" autocomplete="off" spellcheck="false" enterkeyhint="go">
+    <button type="button" class="cmd-esc" data-close aria-label="Schließen">Esc</button>
+  </div>
+  <ul class="cmd-list" id="cmd-list" role="listbox" aria-label="Treffer"></ul>
+  <p class="cmd-empty" id="cmd-empty" hidden></p>
+  <div class="cmd-foot" aria-hidden="true"><span><kbd>↑</kbd><kbd>↓</kbd> wählen</span><span><kbd>Enter</kbd> ausführen</span><span><kbd>Esc</kbd> schließen</span></div>
+</dialog>

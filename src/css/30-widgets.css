@@ -9,7 +9,7 @@
 .track{position:relative;height:10px;border-radius:5px;background:var(--raise);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;margin-top:7px}
 .fill{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:5px;background:var(--fill-n);transition:width .9s var(--ease)}
 /* Nur der laufende Arbeitstag ist „jetzt“ und bekommt die Akzentfarbe */
-.bar[data-kind="day"][data-state="run"] .fill{background:var(--accent)}
+.bar[data-kind="day"][data-state="run"] .fill{background:var(--accent-fill)}
 .tick{position:absolute;top:2px;bottom:2px;width:1px;background:color-mix(in srgb,var(--ink) 18%,transparent)}
 .bar[data-state="done"] .fill{background:var(--good)}
 .bar[data-state="off"] .fill{background:var(--muted);opacity:.35}
@@ -56,7 +56,7 @@
 .wx-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;margin:0;font-size:13px}
 .wx-dl dt{color:var(--muted)}
 .wx-dl dd{margin:0;font-family:var(--f-data);font-variant-numeric:tabular-nums}
-.wx-rain{background:var(--raise);border-radius:12px;padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.wx-rain{background:var(--raise);border-radius:var(--r2);padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .sub-h{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .rainbars{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;height:72px;align-items:end;border-bottom:1px solid var(--line)}
 .rb{height:var(--h);min-height:2px;background:var(--line);border-radius:3px 3px 0 0}
@@ -129,6 +129,7 @@
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--raise)}
 .seg button{border:0;background:transparent;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.seg.sm button{padding:4px 9px;font-size:12px}
 .cm-route{margin:0;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
 .verdict{margin:0;font-weight:700;font-size:15px;line-height:1.35}
 .verdict[data-lv="bad"]{color:var(--bad)}
@@ -226,7 +227,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .hb-check{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);background:transparent;display:grid;place-items:center;color:transparent;padding:0;margin-top:2px}
 .hb-check svg{width:17px;height:17px}
 .hb-check:hover{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent-ink)}
-.hb-check[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.hb-check[aria-pressed="true"]{background:var(--accent-fill);color:var(--on-accent)}
 .hb-main{min-width:0}
 .hb-top{display:flex;align-items:center;gap:8px;min-width:0}
 .hb-name{font-weight:700;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

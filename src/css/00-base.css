@@ -8,10 +8,13 @@
   --ink:#0F1B2B;
   --muted:#5B6B7D;
   --line:#DCE3EA;
+  /* Akzent: setzt 20-kopf.js aus der gewählten Farbe, das hier ist nur der Start */
   --accent:#E8A126;
+  --accent-2:var(--accent);
+  --accent-fill:var(--accent);
   --accent-ink:#8A5604;
   --on-accent:#1D1404;
-  --chip-bg:#FCEFD3;
+  --chip-bg:color-mix(in oklab,var(--accent) 15%,var(--surface));
   --sea:#2B66A0;
   --rain:#3A86CF;
   --good:#2F8458;
@@ -21,8 +24,15 @@
   --f-body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-data:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-serif:"Literata", Georgia, "Times New Roman", serif;
+  /* Ecken: --r kommt aus Anpassen (4 bis 28 px), innere Flächen runden etwas weniger */
   --r:18px;
+  --r2:clamp(4px,calc(var(--r) * .66),16px);
+  /* Abstände: Dicht, Normal oder Luftig (data-density am Wurzelelement) */
   --gap:clamp(14px,1.8vw,22px);
+  --pad-t:16px;
+  --pad-x:clamp(16px,1.7vw,22px);
+  --pad-b:20px;
+  --card-gap:14px;
   --arc-h:96px;
   /* Ebenen: ruhige Karten liegen flach, normale leicht erhaben, wichtige Karten schweben etwas höher */
   --card-line:rgba(15,27,43,.075);
@@ -32,33 +42,61 @@
   --quiet:color-mix(in srgb,var(--surface) 48%,var(--bg));
   /* Füllung für Balken, die nicht „jetzt“ sind. Die Akzentfarbe bleibt für jetzt, heute und Aktionen. */
   --fill-n:color-mix(in srgb,var(--ink) 52%,var(--surface));
+  /* Glas für schwebende Fenster (Anpassen, Suche) und der Schleier dahinter */
+  --glass:color-mix(in srgb,var(--surface) 86%,transparent);
+  --glass-line:rgba(15,27,43,.09);
+  --scrim:rgba(14,18,24,.34);
+  --pop:0 1px 1px rgba(15,27,43,.04),0 24px 60px -18px rgba(15,27,43,.38);
   --ease:cubic-bezier(.2,.7,.2,1);
+  --spring:cubic-bezier(.3,1.25,.5,1);
 }
+:root[data-density="tight"]{--gap:clamp(10px,1.2vw,14px);--pad-t:12px;--pad-x:14px;--pad-b:14px;--card-gap:10px}
+:root[data-density="airy"]{--gap:clamp(18px,2.4vw,32px);--pad-t:20px;--pad-x:clamp(20px,2.2vw,28px);--pad-b:26px;--card-gap:18px}
+/* Dunkel: Graphit, fast schwarz mit einem Hauch Wärme, statt Nachtblau. Karten heben sich durch eine feine Linie ab, nicht durch Schatten.
+   Mit data-dark="oled" echtes Schwarz, praktisch für OLED-Bildschirme und den Spiegel. */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
-    --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
-    --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+    --bg:#11100F; --surface:#1A1918; --raise:#242321; --ink:#ECE9E5; --muted:#A7A49F; --line:#2C2B29;
+    --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
     --card-line:rgba(255,255,255,.065);
-    --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
-    --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
-    --surface-hi:#142039;
+    --shadow-1:none;
+    --shadow-2:inset 0 1px 0 rgba(255,255,255,.045);
+    --surface-hi:#1F1E1D;
     --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
-    --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
+    --fill-n:color-mix(in srgb,var(--ink) 46%,var(--surface));
+    --chip-bg:color-mix(in oklab,var(--accent) 17%,var(--surface));
+    --glass:color-mix(in srgb,var(--surface) 86%,transparent);
+    --glass-line:rgba(255,255,255,.09);
+    --scrim:rgba(0,0,0,.42);
+    --pop:inset 0 1px 0 rgba(255,255,255,.05),0 30px 70px -20px rgba(0,0,0,.75);
     color-scheme:dark;
+  }
+  :root:not([data-theme="light"])[data-dark="oled"]{
+    --bg:#000000; --surface:#0D0D0D; --raise:#171717; --ink:#E8E6E2; --muted:#9B9893; --line:#222222;
+    --card-line:rgba(255,255,255,.075); --surface-hi:#131313; --quiet:#080808;
+    --glass:color-mix(in srgb,#0D0D0D 88%,transparent);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
-  --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
-  --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+  --bg:#11100F; --surface:#1A1918; --raise:#242321; --ink:#ECE9E5; --muted:#A7A49F; --line:#2C2B29;
+  --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
   --card-line:rgba(255,255,255,.065);
-  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
-  --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
-  --surface-hi:#142039;
+  --shadow-1:none;
+  --shadow-2:inset 0 1px 0 rgba(255,255,255,.045);
+  --surface-hi:#1F1E1D;
   --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
-  --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
+  --fill-n:color-mix(in srgb,var(--ink) 46%,var(--surface));
+  --chip-bg:color-mix(in oklab,var(--accent) 17%,var(--surface));
+  --glass:color-mix(in srgb,var(--surface) 86%,transparent);
+  --glass-line:rgba(255,255,255,.09);
+  --scrim:rgba(0,0,0,.42);
+  --pop:inset 0 1px 0 rgba(255,255,255,.05),0 30px 70px -20px rgba(0,0,0,.75);
   color-scheme:dark;
+}
+:root[data-theme="dark"][data-dark="oled"]{
+  --bg:#000000; --surface:#0D0D0D; --raise:#171717; --ink:#E8E6E2; --muted:#9B9893; --line:#222222;
+  --card-line:rgba(255,255,255,.075); --surface-hi:#131313; --quiet:#080808;
+  --glass:color-mix(in srgb,#0D0D0D 88%,transparent);
 }
 @media (max-width:720px){:root{--arc-h:70px}}
 *,*::before,*::after{box-sizing:border-box}
@@ -69,7 +107,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-bo
 /* Unter dem Horizont schimmert die Farbe des Himmels noch ein Stück nach */
 .wrap{position:relative;isolation:isolate;max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
 .wrap::before{content:"";position:absolute;z-index:-1;top:0;left:calc(50% - 50vw);width:100vw;height:clamp(200px,24vw,340px);pointer-events:none;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--horizon,var(--bg)) 20%,transparent),transparent)}
+  background:linear-gradient(180deg,color-mix(in srgb,var(--horizon,var(--bg)) var(--glow,20%),transparent),transparent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wrap{--glow:9%}}
+:root[data-theme="dark"] .wrap{--glow:9%}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -109,7 +149,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @media (prefers-reduced-motion: reduce){.sk-row i,.sk-lines i,.is-loading::before{animation:none}.icon-btn.spin svg{animation-duration:3s}}
 
 /* Einrichten-Hinweis in einer Karte: kompakt, eine Zeile Text und ein Knopf */
-.setup{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;padding:12px 12px 12px 14px;border-radius:12px;background:var(--raise);border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent)}
+.setup{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;padding:12px 12px 12px 14px;border-radius:var(--r2);background:var(--raise);border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent)}
 .setup h3{margin:0;font:650 15px/1.3 var(--f-display);font-variation-settings:'wdth' 92;grid-column:1}
 .setup p{margin:0;grid-column:1;font-size:13px;line-height:1.45;color:var(--muted);max-width:none}
 .setup .form-row{grid-column:2;grid-row:1/span 2;flex-wrap:nowrap}
@@ -117,7 +157,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @container (max-width:330px){.setup{grid-template-columns:minmax(0,1fr)}.setup .form-row{grid-column:1;grid-row:auto;margin-top:8px}}
 
 /* Formulare */
-.panel{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.panel{background:var(--raise);border:1px solid var(--line);border-radius:var(--r2);padding:14px;display:flex;flex-direction:column;gap:12px}
 .panel h3{margin:0;font:700 16px/1.2 var(--f-display)}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @container (max-width:400px){.grid2{grid-template-columns:minmax(0,1fr)}}
@@ -131,7 +171,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .days label{position:relative}
 .days input{position:absolute;opacity:0;width:1px;height:1px}
 .days span{display:inline-block;padding:4px 11px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:600;background:var(--surface);cursor:pointer;user-select:none}
-.days input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.days input:checked + span{background:var(--accent-fill);border-color:transparent;color:var(--on-accent)}
 .days input:focus-visible + span{outline:2px solid var(--sea);outline-offset:2px}
 .form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .err{margin:0;color:var(--bad);font-size:13px;font-weight:600}
