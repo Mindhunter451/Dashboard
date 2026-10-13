@@ -65,13 +65,16 @@ function cmdBuild() {
   for (const [k, n] of [['s', 'Schmal'], ['m', 'Normal'], ['l', 'Breit']]) add('Aussehen', `Kartenbreite: ${n}`, () => cmdSetUi({ size: k }), { ico: CMD_ICO.grid, on: u.size === k, words: 'karten groesse spalten' });
   add('Aussehen', u.seconds ? 'Sekunden ausblenden' : 'Sekunden zeigen', () => cmdSetUi({ seconds: !u.seconds }), { ico: CMD_ICO.clock, words: 'uhr zeit' });
   add('Aussehen', u.sky ? 'Himmel ausschalten' : 'Himmel nach Sonnenstand färben', () => cmdSetUi({ sky: !u.sky }), { ico: CMD_ICO.sky, words: 'kopf sonne farbe' });
+  for (const [k, [n]] of Object.entries(HEAD_STYLES)) add('Aussehen', `Uhr: ${n}`, () => cmdSetUi({ head: { ...u.head, style: k, weight: HEAD_STYLES[k][1], size: 100 } }), { ico: CMD_ICO.clock, on: u.head.style === k, words: 'kopf stil uhrzeit' });
   add('Aussehen', 'Ecken einstellen', () => { openDrawer('look'); setTimeout(() => $('#dr-radius').focus(), 60); }, { ico: CMD_ICO.tune, words: 'rund radius form' });
 
   add('Einstellungen', 'Startseite festlegen', () => openDrawer('pages'), { ico: CMD_ICO.page, words: 'beim oeffnen arbeitszeit automatisch' });
-  add('Einstellungen', 'Countdown anlegen', () => { openDrawer('pages'); setTimeout(() => { const n = $('#cd-name'); n.scrollIntoView({ block: 'center' }); n.focus({ preventScroll: true }); }, 60); }, { ico: CMD_ICO.flag, words: 'kachel pruefung termin zaehlen' });
-  add('Einstellungen', 'Kacheln oben ein- und ausschalten', () => openDrawer('pages'), { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub' });
-  add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('devices'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });
-  add('Einstellungen', 'Als App installieren', () => openDrawer('devices'), { ico: CMD_ICO.plus, words: 'pwa homescreen dock' });
+  add('Einstellungen', 'Uhr und Kopf anpassen', () => openDrawer('head'), { ico: CMD_ICO.clock, words: 'groesse schrift datum kalenderwoche begruessung sekunden' });
+  add('Einstellungen', 'Spiegel einrichten', () => openDrawer('mirror'), { ico: CMD_ICO.mirror, words: 'smart mirror bausteine dimmen nachts vorschau' });
+  add('Einstellungen', 'Countdown anlegen', () => { openDrawer('head'); setTimeout(() => { const n = $('#cd-name'); n.scrollIntoView({ block: 'center' }); n.focus({ preventScroll: true }); }, 60); }, { ico: CMD_ICO.flag, words: 'kachel pruefung termin zaehlen' });
+  add('Einstellungen', 'Kacheln oben wählen und sortieren', () => { openDrawer('head'); setTimeout(() => $('#dr-tiles').scrollIntoView({ block: 'start' }), 60); }, { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub reihenfolge termin sonne' });
+  add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('data'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });
+  add('Einstellungen', 'Als App installieren', () => openDrawer('data'), { ico: CMD_ICO.plus, words: 'pwa homescreen dock' });
   add('Einstellungen', 'Zwischenstand zurückholen', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'rueckgaengig wiederherstellen backup gestern' });
   add('Einstellungen', 'Sicherung laden', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'import datei backup' });
   return out;

@@ -288,7 +288,7 @@ option,optgroup{background-color:var(--surface);color:var(--ink)}
 
 /* Uhr und Tagesinfos */
 .sky-main{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 40px;flex-wrap:wrap}
-.time{margin:0 0 0 -.03em;font-family:var(--f-display);font-weight:220;font-variation-settings:'wdth' 75,'opsz' 96;font-size:clamp(92px,14vw,236px);line-height:.78;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.time{margin:0 0 0 -.03em;font-family:var(--f-display);font-weight:var(--clock-w,220);font-variation-settings:'wdth' 75,'opsz' 96;font-size:calc(clamp(92px,14vw,236px) * var(--clock-k,1));line-height:.78;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
 .time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
 .time .sec{display:inline-block;font-size:.17em;font-weight:400;font-variation-settings:'wdth' 85;letter-spacing:0;margin-left:.45em;opacity:.65;vertical-align:top;line-height:1;transform:translateY(.2em)}
 .sky-side{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right;min-width:0;max-width:48ch;padding-bottom:.2em}
@@ -301,8 +301,46 @@ option,optgroup{background-color:var(--surface);color:var(--ink)}
 .sky-next{margin-top:4px;padding:5px 12px;border-radius:12px;background:color-mix(in srgb,var(--sky-ink) 10%,transparent);opacity:1}
 .sky-next span{opacity:.8}
 @media (max-width:720px){
-  .time{font-size:min(31vw,150px)}
+  .time{font-size:min(calc(31vw * var(--clock-k,1)),42vw,200px)}
   .sky-side{align-items:flex-start;text-align:left}
+}
+
+/* Stile für Uhr und Tagesinfos (Anpassen, Kopf). Klassisch ist alles oben drüber. */
+/* Riesig: Uhr über die Breite, darunter klein Tag, Datum und die Zeilen */
+:root[data-head="giant"] .sky-main{flex-direction:column;align-items:flex-start;gap:clamp(12px,1.6vw,22px)}
+:root[data-head="giant"] .time{font-size:calc(clamp(112px,19vw,330px) * var(--clock-k,1));margin-left:-.05em}
+:root[data-head="giant"] .sky-side{flex-direction:row;flex-wrap:wrap;align-items:baseline;justify-content:flex-start;text-align:left;column-gap:.5em;row-gap:3px;max-width:min(100%,92ch);padding:0}
+:root[data-head="giant"] .sky-day{font:600 clamp(16px,1.35vw,20px)/1.35 var(--f-body);letter-spacing:0}
+:root[data-head="giant"] .sky-day:not([hidden])+.sky-date #h-date:not([hidden])::before{content:", ";margin-left:-.5em}
+:root[data-head="giant"] .sky-date{margin:0;font-size:clamp(16px,1.35vw,20px);opacity:.92}
+:root[data-head="giant"] .sky-line{flex-basis:100%}
+:root[data-head="giant"] #h-wx{margin-top:6px}
+/* Kompakt: alles in einem Streifen, Uhr links, Wetter und Termin rechts, flacher Himmel */
+:root[data-head="compact"] .sky{--arc-h:54px}
+:root[data-head="compact"] .sky-in{gap:clamp(12px,1.8vw,22px)}
+:root[data-head="compact"] .sky-main{flex-wrap:nowrap;align-items:center;gap:12px clamp(18px,2.6vw,40px)}
+:root[data-head="compact"] .time{font-size:calc(clamp(56px,6.4vw,104px) * var(--clock-k,1));line-height:.84}
+:root[data-head="compact"] .time .sec{font-size:.3em;transform:translateY(.12em)}
+:root[data-head="compact"] .sky-side{flex:1;display:grid;grid-auto-flow:dense;grid-template-columns:auto minmax(0,1fr);column-gap:clamp(16px,3vw,48px);row-gap:2px;align-items:center;text-align:left;max-width:none;padding:0}
+:root[data-head="compact"] .sky-day{grid-column:1;font-size:clamp(20px,1.9vw,27px)}
+:root[data-head="compact"] .sky-date{grid-column:1;margin:0}
+:root[data-head="compact"] .sky-line{grid-column:2;justify-self:end;text-align:right}
+:root[data-head="compact"] .sky-next{margin-top:2px}
+/* Zentriert: wie ein Sperrbildschirm, Tag und Datum über der Uhr */
+:root[data-head="center"] .sky-main{flex-direction:column;flex-wrap:nowrap;align-items:center;justify-content:flex-start;text-align:center;gap:4px}
+:root[data-head="center"] .sky-side{display:contents}
+:root[data-head="center"] .sky-day{order:-2;font-size:clamp(20px,1.8vw,27px)}
+:root[data-head="center"] .sky-date{order:-1;justify-content:center;margin:0 0 clamp(8px,1.2vw,16px)}
+:root[data-head="center"] .time{margin:0;font-size:calc(clamp(96px,15vw,270px) * var(--clock-k,1))}
+:root[data-head="center"] .sky-line{text-align:center;max-width:62ch}
+:root[data-head="center"] #h-wx{margin-top:clamp(10px,1.4vw,18px)}
+@media (max-width:720px){
+  :root[data-head="giant"] .time{font-size:min(calc(36vw * var(--clock-k,1)),46vw,230px)}
+  :root[data-head="compact"] .sky-main{flex-wrap:wrap}
+  :root[data-head="compact"] .time{font-size:min(calc(19vw * var(--clock-k,1)),26vw,120px)}
+  :root[data-head="compact"] .sky-side{flex-basis:100%;grid-template-columns:minmax(0,1fr)}
+  :root[data-head="compact"] .sky-line{grid-column:1;justify-self:start;text-align:left}
+  :root[data-head="center"] .time{font-size:min(calc(32vw * var(--clock-k,1)),44vw,210px)}
 }
 
 /* Sonnenbogen: Sonnenhöhe von 0 bis 24 Uhr, die Unterkante ist der Horizont */
@@ -326,6 +364,15 @@ option,optgroup{background-color:var(--surface);color:var(--ink)}
 .tile[data-hot] .t-val{color:var(--accent-ink)}
 .tile[data-good] .t-val{color:var(--good)}
 .t-sub{margin:0;color:var(--muted);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
+/* Bearbeiten: Kacheln direkt hier verschieben */
+.next.sortable{overflow:visible}
+.next.sortable .tile{cursor:grab;touch-action:none;user-select:none;border-radius:12px;transition:background-color .2s,box-shadow .2s}
+.next.sortable .tile:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.next.sortable .tile:focus-visible{outline:2px solid var(--sea);outline-offset:-2px}
+.next .tile.sort-drag{cursor:grabbing;background:var(--surface);box-shadow:var(--shadow-2),0 0 0 2px var(--accent);border-left-color:transparent;z-index:2;position:relative}
+.tiles-edit{align-self:center;justify-self:start;display:inline-flex;align-items:center;gap:7px;margin-left:clamp(14px,1.8vw,24px);padding:7px 13px;border-radius:999px;border:1.5px dashed color-mix(in srgb,var(--accent) 70%,transparent);background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--ink);font:600 13px/1.2 var(--f-body);white-space:nowrap}
+.tiles-edit svg{width:16px;height:16px}
+.tiles-edit:hover{background:color-mix(in srgb,var(--accent) 16%,transparent)}
 
 .editbar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 18px;padding:14px 16px;border:1.5px dashed var(--accent);border-radius:var(--r);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
 .editbar .field{flex:1 1 200px;max-width:320px}
@@ -487,6 +534,28 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .hr b{font:600 14px var(--f-data);color:var(--ink);font-variant-numeric:tabular-nums}
 .hr .pp{color:var(--rain);font:500 11px var(--f-data);font-variant-numeric:tabular-nums}
 .radar-box{display:flex;flex-direction:column;margin-top:14px;padding-top:6px;border-top:1px solid var(--line)}
+.wx-hours-box{margin-top:16px}
+.wx-hilo{display:none;color:var(--muted);font-size:13px}
+/* Aufklappen im Kompaktmodus (Wetter, Pendeln) */
+.more-tg{display:flex;align-items:center;gap:6px;margin-top:10px;padding:5px 0;border:0;background:none;color:var(--muted);font:600 13px/1.3 var(--f-body)}
+.more-tg:hover{color:var(--ink)}
+.more-tg svg{width:14px;height:14px;flex:0 0 14px;transition:transform .25s var(--ease)}
+.more-tg[aria-expanded="true"] svg{transform:rotate(180deg)}
+/* Wetter kompakt: jetzt und Regen nebeneinander, darunter die Stunden. Details und Radar per Tipp. */
+#weather.is-compact .wx-dl,#weather.is-compact .radar-box,#weather.is-compact .rainlbl,#weather.is-compact .wx-rain .sub-h,#weather.is-compact .wx-hours-box .sub-h{display:none}
+#weather.is-compact .wx-hilo{display:block}
+#weather.is-compact .wx-top{grid-template-columns:auto minmax(0,1fr);align-items:center;gap:12px 22px}
+#weather.is-compact .wx-main{gap:10px}
+#weather.is-compact .wx-icon svg{width:50px;height:50px}
+#weather.is-compact .wx-temp{font-size:clamp(46px,7cqi,58px)}
+#weather.is-compact .wx-desc{margin-top:2px;font-size:14px}
+#weather.is-compact .wx-rain{padding:10px 12px;gap:7px;align-self:stretch;justify-content:center}
+#weather.is-compact .rainbars{height:28px}
+#weather.is-compact .rain-txt{font-size:13px}
+#weather.is-compact .wx-hours-box{margin-top:12px}
+#weather.is-compact .hr{min-width:46px;padding:5px 2px;gap:1px}
+#weather.is-compact .hr svg{width:22px;height:22px}
+@container (max-width:380px){#weather.is-compact .wx-top{grid-template-columns:minmax(0,1fr)}}
 .sub-tg{display:flex;align-items:center;gap:6px;width:100%;padding:6px 0;border:0;background:none;color:var(--muted);font:600 13px/1.3 var(--f-body);text-align:left}
 .sub-tg:hover{color:var(--ink)}
 .sub-tg svg{width:14px;height:14px;flex:0 0 14px;transition:transform .25s var(--ease)}
@@ -548,6 +617,12 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
 .seg.sm button{padding:4px 9px;font-size:12px}
 .cm-route{margin:0;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+/* Pendeln kompakt: Fahrzeit, Lage, los um. Karte und Meldungen per Tipp. */
+#commute.is-compact .cm-route,#commute.is-compact .incidents,#commute.is-compact .cm-wrap,#commute.is-compact .cm-legend{display:none}
+#commute.is-compact #cm-live{gap:8px!important}
+#commute.is-compact .big b{font-size:52px}
+#commute.is-compact .more-tg{margin-top:0}
+#commute.is-compact #cm-hint[data-k="info"]{display:none}
 .verdict{margin:0;font-weight:700;font-size:15px;line-height:1.35}
 .verdict[data-lv="bad"]{color:var(--bad)}
 .verdict[data-lv="warn"]{color:var(--accent-ink)}
@@ -1065,15 +1140,54 @@ button.nw-row:active{background:color-mix(in srgb,var(--ink) 10%,var(--raise))}
 .dr-x svg{width:18px;height:18px}
 
 /* Bereiche: Pille gleitet unter den aktiven Reiter */
-.dr-tabs{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 16px 6px;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
-.dr-tabs button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:8px 4px;border:0;border-radius:999px;background:none;color:var(--muted);font:600 13px/1.2 var(--f-body);transition:color .2s}
+.dr-tabs{position:relative;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin:0 16px 6px;padding:3px;border-radius:16px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.dr-tabs button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;padding:7px 2px 6px;border:0;border-radius:13px;background:none;color:var(--muted);font:600 12px/1.2 var(--f-body);transition:color .2s}
 .dr-tabs button:hover{color:var(--ink)}
 .dr-tabs button[aria-selected="true"]{color:var(--ink)}
 .dr-tabs svg{width:16px;height:16px;flex:0 0 16px}
 .dr-tabs span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dr-tab-ind{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px) / 4);border-radius:999px;background:var(--surface);
+.dr-tab-ind{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px) / 5);border-radius:13px;background:var(--surface);
   box-shadow:0 1px 2px rgba(0,0,0,.1),0 2px 8px -2px rgba(0,0,0,.12);transform:translateX(calc(var(--i,0) * 100%));transition:transform .38s var(--spring)}
-@media (max-width:460px){.dr-tabs svg{display:none}}
+@media (max-width:460px){.dr-tabs svg{display:none}.dr-tabs button{padding:9px 2px}}
+
+/* Kopf: vier Stile der Uhr als kleine Skizzen */
+.theme-pick.hs-pick{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.hs-prev{position:relative;display:block;aspect-ratio:16/11;border-radius:min(11px,calc(var(--r) * .5 + 2px));overflow:hidden;background:linear-gradient(180deg,#3F6CB0,#86AADB 68%,#D7C2B6)}
+.hs-prev b,.hs-prev i{position:absolute;display:block;border-radius:2px;background:rgba(255,255,255,.95)}
+.hs-prev i{height:6%;background:rgba(255,255,255,.66)}
+.hs-prev[data-hs="classic"] b{left:9%;top:30%;width:42%;height:34%}
+.hs-prev[data-hs="classic"] i:nth-of-type(1){right:9%;top:33%;width:25%;height:10%;background:rgba(255,255,255,.9)}
+.hs-prev[data-hs="classic"] i:nth-of-type(2){right:9%;top:50%;width:19%}
+.hs-prev[data-hs="classic"] i:nth-of-type(3){right:9%;top:61%;width:23%}
+.hs-prev[data-hs="giant"] b{left:8%;top:12%;width:70%;height:50%}
+.hs-prev[data-hs="giant"] i:nth-of-type(1){left:8%;top:69%;width:42%;height:8%;background:rgba(255,255,255,.85)}
+.hs-prev[data-hs="giant"] i:nth-of-type(2){left:8%;top:81%;width:30%}
+.hs-prev[data-hs="giant"] i:nth-of-type(3){left:41%;top:81%;width:22%}
+.hs-prev[data-hs="compact"] b{left:8%;top:36%;width:27%;height:22%}
+.hs-prev[data-hs="compact"] i:nth-of-type(1){left:40%;top:38%;width:17%;height:9%;background:rgba(255,255,255,.88)}
+.hs-prev[data-hs="compact"] i:nth-of-type(2){left:40%;top:52%;width:13%}
+.hs-prev[data-hs="compact"] i:nth-of-type(3){right:8%;top:44%;width:24%}
+.hs-prev[data-hs="center"] b{left:24%;top:32%;width:52%;height:34%}
+.hs-prev[data-hs="center"] i:nth-of-type(1){left:36%;top:15%;width:28%;height:9%;background:rgba(255,255,255,.88)}
+.hs-prev[data-hs="center"] i:nth-of-type(2){left:30%;top:73%;width:40%}
+.hs-prev[data-hs="center"] i:nth-of-type(3){left:39%;top:84%;width:22%}
+@media (max-width:400px){.theme-pick.hs-pick{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Listen zum Sortieren: Kacheln oben, Bausteine im Spiegel */
+.dr-group.sort-list{list-style:none;margin:0;padding:2px 10px 2px 6px}
+.sort-row{display:flex;align-items:center;gap:8px;min-height:52px;padding:7px 4px 7px 0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent);border-radius:12px}
+.sort-row:first-child{border-top-color:transparent}
+.sort-row .dr-lt{flex:1}
+.sort-row .chip{flex:0 0 auto}
+.sort-row .dr-in{width:auto;flex:0 1 auto;max-width:42%;font-size:13px;padding:6px 9px}
+.sort-h{flex:0 0 28px;width:28px;height:38px;padding:0;border:0;border-radius:8px;background:none;color:var(--muted);display:grid;place-items:center;cursor:grab;touch-action:none}
+.sort-h svg{width:18px;height:18px}
+.sort-h:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.sort-row.sort-drag{position:relative;z-index:2;background:var(--surface);border-top-color:transparent;box-shadow:0 10px 26px -12px rgba(0,0,0,.4),0 0 0 2px var(--accent)}
+.sort-row.sort-drag + .sort-row{border-top-color:transparent}
+.sort-row.sort-drag .sort-h{cursor:grabbing}
+.time-pair{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+.time-pair .dr-in{width:auto}
 
 .dr-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 16px calc(28px + env(safe-area-inset-bottom,0px));scrollbar-width:thin}
 .dr-pane{animation:pane-in .28s var(--ease)}
@@ -1240,15 +1354,41 @@ label.dr-line{cursor:pointer}
 .dlg-body{overflow-y:auto;overscroll-behavior:contain;padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px;min-height:0}
 .dlg-foot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 20px;border-top:1px solid var(--line)}
 .dlg .field input,.dlg .field select,.dlg .field .sel-btn{font-size:14px;padding:7px 9px}
-.gal{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.gal-item{display:grid;grid-template-columns:42px minmax(0,1fr);gap:2px 12px;padding:12px;border:1px solid var(--line);border-radius:12px;align-items:start}
-.gal-ico{grid-row:span 3;width:42px;height:42px;border-radius:12px;background:var(--chip-bg);color:var(--accent-ink);display:grid;place-items:center}
-.gal-ico svg{width:22px;height:22px}
-.gal-name{margin:0;font:700 16px/1.25 var(--f-display)}
-.gal-desc{margin:0;color:var(--muted);font-size:13px;line-height:1.4}
-.gal-act{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.gal-act .btn{padding:6px 13px;font-size:13px}
-.gal-act button:disabled{opacity:.5;cursor:default}
+.dlg-gal{width:min(680px,calc(100% - 24px));height:min(88vh,760px)}
+.dlg-gal .dlg-head{border-bottom:0;padding-bottom:10px}
+.dlg-gal .dlg-body{gap:0;padding:12px 12px 18px}
+.gal-tools{display:flex;flex-direction:column;gap:10px;padding:0 20px 12px;border-bottom:1px solid var(--line)}
+.gal-search{display:flex;align-items:center;gap:9px;padding:0 13px;border-radius:12px;background:var(--raise);border:1px solid transparent;transition:border-color .15s,box-shadow .15s}
+.gal-search:focus-within{border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.gal-search svg{width:17px;height:17px;flex:0 0 17px;color:var(--muted)}
+.gal-search input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:15px;color:var(--ink);padding:10px 0;outline:0}
+.gal-search input::-webkit-search-cancel-button{cursor:pointer}
+.gal-cats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -2px;padding:0 2px}
+.gal-cats::-webkit-scrollbar{display:none}
+.gal-cats button{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:600 13px/1.2 var(--f-body);transition:background-color .15s,color .15s}
+.gal-cats button:hover{color:var(--ink)}
+.gal-cats button span{font:600 11px/1 var(--f-data);opacity:.65;font-variant-numeric:tabular-nums}
+.gal-cats button[aria-pressed="true"]{background:var(--ink);border-color:transparent;color:var(--surface)}
+.gal-h{margin:16px 6px 4px;font:600 13px/1.3 var(--f-body);color:var(--muted)}
+.gal-h:first-child{margin-top:0}
+.gal{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.gal-item{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 8px;border-radius:12px;transition:background-color .15s}
+.gal-item:hover{background:var(--raise)}
+.gal-ico{width:38px;height:38px;border-radius:11px;background:var(--chip-bg);color:var(--accent-ink);display:grid;place-items:center}
+.gal-ico svg{width:20px;height:20px}
+.gal-tx{min-width:0}
+.gal-name{margin:0;display:flex;align-items:center;gap:6px;font:650 15px/1.25 var(--f-display)}
+.gal-desc{margin:1px 0 0;color:var(--muted);font-size:13px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gal-more{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.gal-more .btn-ghost{padding:4px 10px;font-size:12px}
+.gal-add,.gal-on{flex:0 0 34px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center}
+.gal-add{border:0;background:var(--accent-fill);color:var(--on-accent);transition:transform .15s var(--spring),filter .15s}
+.gal-add:hover{filter:brightness(1.06);transform:scale(1.06)}
+.gal-add svg,.gal-on svg{width:18px;height:18px}
+.gal-on{color:var(--good);background:color-mix(in srgb,var(--good) 13%,transparent)}
+.gal-item.placed .gal-ico{opacity:.5}
+.gal-item.placed .gal-name{color:var(--muted)}
+.gal-none{padding:18px 6px}
 .gal-sub{margin:10px 0 0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .soon{display:flex;flex-wrap:wrap;gap:6px}
 .soon span{display:inline-flex;align-items:center;gap:6px;padding:4px 11px 4px 8px;border:1px dashed var(--line);border-radius:999px;font-size:13px;color:var(--muted)}
@@ -1294,58 +1434,97 @@ label.dr-line{cursor:pointer}
 @media (prefers-reduced-motion: reduce){.dlg.cmd[open]{animation:none}}
 
 /* 45-spiegel.css */
-/* Spiegel-Modus: reines Schwarz, nur Schrift. Funktioniert hoch und quer. */
-.mirror{position:fixed;inset:0;z-index:200;background:#000;color:#F2F4F7;overflow:hidden;cursor:none;
+/* Spiegel-Modus: reines Schwarz, nur Schrift. Größen in cqmin, also relativ zum Spiegel selbst.
+   So sieht die verkleinerte Vorschau im Anpassen-Fenster genauso aus wie der echte Spiegel. Funktioniert hoch und quer. */
+.mirror{position:fixed;inset:0;z-index:200;background:#000;color:#F2F4F7;overflow:hidden;cursor:none;container-type:size;
   --m-dim:#8B93A0;font-family:var(--f-body)}
 .mirror.awake{cursor:auto}
 html.mirror-on body{overflow:hidden}
-.m-in{position:absolute;inset:0;padding:clamp(28px,5vmin,72px);display:grid;gap:clamp(24px,4vmin,56px);
-  grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
-  grid-template-areas:"clock wx" "cal cd";transition:transform 2s ease}
-.m-clock{grid-area:clock}
-.m-time{margin:0;font-family:var(--f-display);font-weight:250;font-variation-settings:'wdth' 75,'opsz' 96;font-size:clamp(96px,19vmin,260px);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.m-time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
-.m-date{margin:.7em 0 0;font:500 clamp(18px,2.6vmin,32px)/1.2 var(--f-body);color:var(--m-dim)}
-.m-wx{grid-area:wx;justify-self:end;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.m-wx p{margin:0;font-size:clamp(17px,2.3vmin,28px);line-height:1.3}
-.m-wx-now{display:flex;align-items:center;gap:.3em;font-size:clamp(56px,10vmin,140px)}
-.m-wx-now b{font-family:var(--f-display);font-weight:300;font-variation-settings:'wdth' 80;line-height:.9;letter-spacing:-.03em}
-.m-wx-ico svg{width:.75em;height:.75em;display:block;color:#F2F4F7;--surface:#000}
+.m-in{position:absolute;inset:0;padding:clamp(28px,5cqmin,72px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  column-gap:clamp(24px,4cqmin,56px);row-gap:clamp(20px,3.6cqmin,48px);overflow:hidden;transition:transform 2s ease,opacity 1.5s ease}
+/* Sieben Bereiche: oben Mitte, oben links und rechts, Mitte, unten links und rechts, unten Mitte */
+.mz{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(18px,3.4cqmin,46px);min-width:0;min-height:0}
+.mz[data-z="top"]{grid-area:top}
+.mz[data-z="tl"]{grid-area:tl}
+.mz[data-z="tr"]{grid-area:tr}
+.mz[data-z="mid"]{grid-area:mid;justify-content:center}
+.mz[data-z="bl"]{grid-area:bl;justify-content:flex-end}
+.mz[data-z="br"]{grid-area:br;justify-content:flex-end}
+.mz[data-z="bottom"]{grid-area:bottom}
+.mz[data-z="tr"],.mz[data-z="br"]{align-items:flex-end;text-align:right}
+.mz[data-z="top"],.mz[data-z="mid"],.mz[data-z="bottom"]{align-items:center;text-align:center}
+.mb{min-width:0;max-width:100%;margin:0}
 .m-dim{color:var(--m-dim)}
-.m-wx .m-dim{max-width:22em}
-.m-cal{grid-area:cal;min-height:0;overflow:hidden}
-.m-cal h3{margin:0 0 .4em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
-.m-cal h3:not(:first-child){margin-top:1em}
-.m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7vmin,34px);line-height:1.25}
-.m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c)}
-.m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
-.m-side{grid-area:cd;justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:clamp(22px,4vmin,48px);min-height:0;overflow:hidden}
-.m-cd{text-align:right}
-.m-notes{list-style:none;margin:.9em 0 0;padding:0;display:flex;flex-direction:column;gap:.35em;font-size:clamp(16px,2.2vmin,26px);line-height:1.3}
-.m-notes:empty{display:none}
+
+/* Uhr */
+.m-clock{display:flex;flex-direction:column;align-items:inherit}
+.m-time{margin:0;font-family:var(--f-display);font-weight:250;font-variation-settings:'wdth' 75,'opsz' 96;font-size:calc(clamp(96px,19cqmin,260px) * var(--m-k,1));line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
+.m-time .sec{display:inline-block;font-size:.2em;font-weight:400;font-variation-settings:'wdth' 85;letter-spacing:0;margin-left:.4em;opacity:.6;vertical-align:top;line-height:1;transform:translateY(.25em)}
+.m-date{margin:.7em 0 0;font:500 clamp(18px,2.6cqmin,32px)/1.2 var(--f-body);color:var(--m-dim)}
+
+/* Hinweise */
+.m-notes{list-style:none;padding:0;display:flex;flex-direction:column;align-items:inherit;gap:.35em;font-size:clamp(16px,2.2cqmin,26px);line-height:1.3}
 .m-notes li{display:flex;align-items:center;gap:.55em}
 .m-notes li::before{content:"";flex:0 0 auto;width:.5em;height:.5em;border-radius:50%;background:var(--c)}
-.m-dep{text-align:right;min-width:0;max-width:100%}
-.m-dep h3{margin:0 0 .5em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+
+/* Wetter */
+.m-wx{display:flex;flex-direction:column;align-items:inherit;gap:4px}
+.m-wx p{margin:0;font-size:clamp(17px,2.3cqmin,28px);line-height:1.3}
+.m-wx-now{display:flex;align-items:center;gap:.3em;font-size:calc(clamp(56px,10cqmin,140px) * var(--m-k,1))}
+.m-wx-now b{font-family:var(--f-display);font-weight:300;font-variation-settings:'wdth' 80;line-height:.9;letter-spacing:-.03em}
+.m-wx-ico svg{width:.75em;height:.75em;display:block;color:#F2F4F7;--surface:#000}
+.m-wx .m-dim{max-width:22em}
+
+/* Pendeln */
+.m-cm h3,.m-cal h3,.m-dep h3{margin:0 0 .45em;font:600 clamp(15px,2cqmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-cm p{margin:0;display:flex;align-items:baseline;gap:.5em;flex-wrap:wrap;justify-content:inherit;font-size:clamp(18px,2.6cqmin,32px)}
+.m-cm b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.6em;line-height:1}
+.m-cm .warn{color:#F2A24A}
+
+/* Termine */
+.m-cal h3:not(:first-child){margin-top:1em}
+.m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7cqmin,34px);line-height:1.25}
+.m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c);text-align:left}
+.mz[data-z="tr"] .m-cal li,.mz[data-z="br"] .m-cal li{grid-template-columns:minmax(0,1fr) 5.2em;padding:0 .6em 0 0;border-left:0;border-right:3px solid var(--c);text-align:right}
+.mz[data-z="tr"] .m-cal .m-t,.mz[data-z="br"] .m-cal .m-t{order:2}
+.mz[data-z="top"] .m-cal li,.mz[data-z="mid"] .m-cal li,.mz[data-z="bottom"] .m-cal li{display:flex;justify-content:center;gap:.6em;padding:0;border:0;text-align:center}
+.mz[data-z="top"] .m-cal li::before,.mz[data-z="mid"] .m-cal li::before,.mz[data-z="bottom"] .m-cal li::before{content:"";align-self:center;width:.45em;height:.45em;border-radius:50%;background:var(--c)}
+.m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Abfahrten */
+.m-dep{min-width:0;max-width:100%}
 .m-dep h3 span{color:#F2F4F7;margin-left:.4em}
-.m-dep ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4em;font-size:clamp(17px,2.5vmin,30px);line-height:1.25}
+.m-dep ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4em;font-size:clamp(17px,2.5cqmin,30px);line-height:1.25}
 .m-dep li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.6em;text-align:left}
 .m-dep .dp-line{font-size:.72em;min-width:2.5em}
 .m-to{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:14em}
 .m-dep b{font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;min-width:3.6em}
 .m-dep li.x{color:var(--m-dim)}
 .m-dep li.x .m-to{text-decoration:line-through}
-.m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9em}
-.m-cd li{display:flex;flex-direction:column;font-size:clamp(15px,2vmin,24px)}
+
+/* Kacheln und Countdowns */
+.m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;align-items:inherit;gap:.9em}
+.mz[data-z="top"] .m-cd ul,.mz[data-z="bottom"] .m-cd ul{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:.9em 2.4em}
+.m-cd li{display:flex;flex-direction:column;align-items:inherit;font-size:clamp(15px,2cqmin,24px)}
 .m-cd b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.5em;line-height:1.15}
+
+/* Platzhalter, nur in der Vorschau */
+.m-ph{display:flex;flex-direction:column;gap:.2em;padding:.7em 1em;border:2px dashed #3A3F47;border-radius:.6em;color:var(--m-dim);font-size:clamp(16px,2.2cqmin,26px);max-width:24em}
+.m-ph b{color:#C9CED6;font-weight:600}
+
 .m-exit{position:absolute;top:16px;right:16px;opacity:0;pointer-events:none;transition:opacity .3s;border:1px solid #333;background:#111;color:#ddd;padding:8px 14px;border-radius:999px;font:600 14px var(--f-body)}
 .mirror.awake .m-exit,.m-exit:focus-visible{opacity:1;pointer-events:auto}
-@media (orientation:portrait){
-  .m-in{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"clock clock" "wx cd" "cal cal"}
-  .m-wx{justify-self:start;text-align:left;align-items:flex-start}
-  .m-to{max-width:9em}
-}
+@container (orientation: portrait){.m-to{max-width:9em}}
 @media (prefers-reduced-motion: reduce){.m-in{transition:none}}
+
+/* Vorschau im Anpassen-Fenster: Spiegel in voller Größe, verkleinert */
+.mp-wrap{display:flex;flex-direction:column;gap:10px}
+.mp-frame{position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;border-radius:min(14px,calc(var(--r) * .7));background:#000;box-shadow:0 0 0 1px var(--glass-line),0 10px 30px -14px rgba(0,0,0,.5)}
+.mp-frame[data-o="port"]{width:min(230px,62%);aspect-ratio:9/16;margin:0 auto}
+.mirror.mp{position:absolute;inset:auto;left:0;top:0;z-index:auto;width:1600px;height:900px;transform-origin:0 0;transform:scale(var(--mp-s,.24));cursor:default;pointer-events:none}
+.mp-frame[data-o="port"] .mirror.mp{width:900px;height:1600px}
+.mp-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -1374,7 +1553,7 @@ html.mirror-on body{overflow:hidden}
         <p class="time" id="h-time" aria-live="off">00:00</p>
         <div class="sky-side">
           <p class="sky-day" id="h-day">&nbsp;</p>
-          <p class="sky-date"><span id="h-date">&nbsp;</span><span class="kw" title="Kalenderwoche">KW <b id="h-kw">00</b></span></p>
+          <p class="sky-date" id="sky-date"><span id="h-date">&nbsp;</span><span class="kw" id="sky-kw" title="Kalenderwoche">KW <b id="h-kw">00</b></span></p>
           <p class="sky-line" id="h-wx" hidden></p>
           <p class="sky-line" id="h-sun"></p>
           <p class="sky-line sky-next" id="h-next" hidden></p>
@@ -1412,10 +1591,13 @@ html.mirror-on body{overflow:hidden}
   </div>
 
   <section class="next" id="tiles" aria-label="Als Nächstes">
-    <div class="tile" id="t-fa"><p class="t-label">Feierabend</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
-    <div class="tile" id="t-we"><p class="t-label">Wochenende</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
-    <div class="tile" id="t-ft"><p class="t-label">Nächster Feiertag</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
-    <div class="tile" id="t-ur"><p class="t-label">Nächster Urlaub</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-fa" data-key="fa"><p class="t-label">Feierabend</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-we" data-key="we"><p class="t-label">Wochenende</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-ft" data-key="ft"><p class="t-label">Nächster Feiertag</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-ur" data-key="ur"><p class="t-label">Nächster Urlaub</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-cal" data-key="cal" hidden><p class="t-label">Nächster Termin</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <div class="tile" id="t-sun" data-key="sun" hidden><p class="t-label">Sonnenuntergang</p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p></div>
+    <button type="button" class="tiles-edit" id="tiles-edit" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Kacheln wählen</span></button>
   </section>
 
 <main class="board flow" id="board" aria-live="off">
@@ -1458,6 +1640,7 @@ html.mirror-on body{overflow:hidden}
         <div class="field" style="margin-top:8px"><label for="cm-key">TomTom API-Key</label><input id="cm-key" type="password" maxlength="80" autocomplete="off" spellcheck="false"></div>
         <div class="tt-test"><button type="button" class="btn-ghost" id="cm-key-test">Key testen</button><span class="tt-res" id="cm-key-res" role="status"></span></div>
       </details>
+      <label class="check-row"><input type="checkbox" class="switch" id="cm-compact"> Kompakt, Karte und Meldungen per Tipp</label>
       <p class="err" id="cm-err" hidden></p>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
@@ -1483,6 +1666,7 @@ html.mirror-on body{overflow:hidden}
       </div>
       <p class="cm-route" id="cm-route"></p>
       <p class="verdict" id="cm-verdict"></p>
+      <button type="button" class="more-tg" id="cm-more" aria-expanded="false" aria-controls="cm-live" hidden><span>Karte und Meldungen</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       <ul class="incidents" id="cm-inc"></ul>
       <div class="cm-wrap" id="cm-wrap">
         <div class="cm-map" id="cm-map"></div>
@@ -1538,6 +1722,7 @@ html.mirror-on body{overflow:hidden}
               <div class="wx-temp" id="wx-temp"></div>
               <div class="wx-desc" id="wx-desc"></div>
               <div class="wx-feel" id="wx-feel"></div>
+              <div class="wx-hilo" id="wx-hilo"></div>
             </div>
           </div>
           <dl class="wx-dl" id="wx-dl"></dl>
@@ -1549,7 +1734,7 @@ html.mirror-on body{overflow:hidden}
           <p class="rain-txt" id="wx-rain-txt"></p>
         </div>
       </div>
-      <div style="margin-top:16px" id="wx-hours-box">
+      <div class="wx-hours-box" id="wx-hours-box">
         <p class="sub-h" style="margin-bottom:6px">Nächste 12 Stunden</p>
         <div class="hours" id="wx-hours"></div>
       </div>
@@ -1572,6 +1757,7 @@ html.mirror-on body{overflow:hidden}
           </div>
         </div>
       </div>
+      <button type="button" class="more-tg" id="wx-more" aria-expanded="false" aria-controls="wx-live" hidden><span>Details und Regenradar</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
     </div>
 
     <div class="wx-off is-loading" id="wx-off" style="--sk-h:210px">
@@ -1916,8 +2102,9 @@ html.mirror-on body{overflow:hidden}
   <div class="dr-tabs" role="tablist" aria-label="Bereiche" id="dr-tabs">
     <span class="dr-tab-ind" aria-hidden="true"></span>
     <button type="button" role="tab" id="dr-t-look" data-tab="look" aria-controls="dr-p-look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.9-.8 1.9-1.8 0-1.3-1-1.6-1-2.8 0-1 .8-1.7 1.8-1.7h2.1a3.7 3.7 0 0 0 3.7-3.7C20.5 6.7 16.7 3.5 12 3.5z"/><circle cx="7.6" cy="11.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.4" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="7.8" r="1.1" fill="currentColor" stroke="none"/></svg><span>Aussehen</span></button>
+    <button type="button" role="tab" id="dr-t-head" data-tab="head" aria-controls="dr-p-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Kopf</span></button>
     <button type="button" role="tab" id="dr-t-pages" data-tab="pages" aria-controls="dr-p-pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="9" rx="2"/><rect x="13" y="3.5" width="7.5" height="5.5" rx="2"/><rect x="3.5" y="14.5" width="7.5" height="6" rx="2"/><rect x="13" y="11" width="7.5" height="9.5" rx="2"/></svg><span>Seiten</span></button>
-    <button type="button" role="tab" id="dr-t-devices" data-tab="devices" aria-controls="dr-p-devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="13" height="10" rx="2"/><path d="M6 19h6M9 15v4"/><rect x="16.5" y="9" width="5" height="10.5" rx="1.5"/></svg><span>Geräte</span></button>
+    <button type="button" role="tab" id="dr-t-mirror" data-tab="mirror" aria-controls="dr-p-mirror"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/></svg><span>Spiegel</span></button>
     <button type="button" role="tab" id="dr-t-data" data-tab="data" aria-controls="dr-p-data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6"/><path d="M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg><span>Daten</span></button>
   </div>
   <div class="dr-body" id="dr-body">
@@ -1955,13 +2142,56 @@ html.mirror-on body{overflow:hidden}
         </div>
       </div>
 
-      <h3 class="dr-gh">Kopf</h3>
+      <p class="dr-note">Design, Schwarz, Abstände und Kartenbreite gelten nur auf diesem Gerät. Akzentfarbe und Ecken nimmt der Sync auf alle Geräte mit.</p>
+    </section>
+
+    <!-- Kopf: Uhr, Tagesinfos, Kacheln, Countdowns -->
+    <section class="dr-pane" id="dr-p-head" role="tabpanel" aria-labelledby="dr-t-head" hidden>
+      <h3 class="dr-gh" id="dr-hstyle-l">Stil der Uhr</h3>
+      <div class="theme-pick hs-pick" role="group" aria-labelledby="dr-hstyle-l" id="dr-hstyle">
+        <button type="button" data-v="classic"><span class="hs-prev" data-hs="classic" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Klassisch</span></button>
+        <button type="button" data-v="giant"><span class="hs-prev" data-hs="giant" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Riesig</span></button>
+        <button type="button" data-v="compact"><span class="hs-prev" data-hs="compact" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Kompakt</span></button>
+        <button type="button" data-v="center"><span class="hs-prev" data-hs="center" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Zentriert</span></button>
+      </div>
       <div class="dr-group">
-        <div class="dr-line"><label class="dr-lt" for="dr-greet">Begrüßung</label><input class="dr-in" id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
-        <label class="dr-line"><span class="dr-lt">Sekunden an der Uhr</span><input type="checkbox" class="switch" id="dr-secs"></label>
+        <div class="dr-line"><label class="dr-lt" for="dr-hsize">Größe</label>
+          <div class="range-row"><input type="range" class="range" id="dr-hsize" min="70" max="140" step="5"><output id="dr-hsize-v" for="dr-hsize"></output></div>
+        </div>
+        <div class="dr-line"><label class="dr-lt" for="dr-hweight">Schriftstärke</label>
+          <div class="range-row"><input type="range" class="range" id="dr-hweight" min="200" max="700" step="10"><output id="dr-hweight-v" for="dr-hweight"></output></div>
+        </div>
+        <label class="dr-line"><span class="dr-lt">Sekunden</span><input type="checkbox" class="switch" id="dr-secs"></label>
+      </div>
+
+      <h3 class="dr-gh">Neben der Uhr</h3>
+      <div class="dr-group">
+        <label class="dr-line"><span class="dr-lt">Begrüßung</span><input type="checkbox" class="switch" id="dr-hgreet"></label>
+        <div class="dr-line" id="dr-greet-row"><label class="dr-lt" for="dr-greet">Text der Begrüßung</label><input class="dr-in" id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
+        <label class="dr-line"><span class="dr-lt">Wochentag und Datum</span><input type="checkbox" class="switch" id="dr-hdate"></label>
+        <label class="dr-line"><span class="dr-lt">Kalenderwoche</span><input type="checkbox" class="switch" id="dr-hkw"></label>
         <label class="dr-line"><span class="dr-lt">Himmel nach Sonnenstand<small>Oben färbt sich alles wie der echte Himmel an deinem Ort, bei Wolken grauer.</small></span><input type="checkbox" class="switch" id="dr-sky"></label>
       </div>
-      <p class="dr-note">Design, Schwarz, Abstände und Kartenbreite gelten nur auf diesem Gerät. Akzentfarbe und Ecken nimmt der Sync auf alle Geräte mit.</p>
+      <p class="dr-note">Stil, Größe und Schrift der Uhr gelten nur auf diesem Gerät, zum Beispiel riesig am Rechner und kompakt am Handy.</p>
+
+      <h3 class="dr-gh" id="dr-tiles-l">Kacheln oben</h3>
+      <ul class="dr-group sort-list" id="dr-tiles" aria-labelledby="dr-tiles-l"></ul>
+      <p class="dr-note">Am Griff ziehen oder ihn antippen und mit den Pfeiltasten schieben. Im Bearbeiten-Modus geht das auch direkt oben im Cockpit. Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
+
+      <h3 class="dr-gh">Eigene Countdowns</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <ul class="cd-list" id="dr-cd-list"></ul>
+        <form id="dr-cd-form" novalidate class="dr-stack">
+          <div class="grid3">
+            <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
+            <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
+            <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
+          </div>
+          <p class="err" id="cd-err" hidden></p>
+          <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
+        </form>
+      </div>
+
     </section>
 
     <!-- Seiten -->
@@ -1990,32 +2220,58 @@ html.mirror-on body{overflow:hidden}
         <button type="button" class="dr-act" id="dr-plan-back" hidden><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span><span class="dr-lt">Alte Seiten zurückholen</span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
 
-      <h3 class="dr-gh">Kacheln oben</h3>
-      <div class="dr-group" id="dr-tiles"></div>
-      <p class="dr-note">Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
-
-      <h3 class="dr-gh">Eigene Countdowns</h3>
-      <div class="dr-group dr-pad dr-stack">
-        <ul class="cd-list" id="dr-cd-list"></ul>
-        <form id="dr-cd-form" novalidate class="dr-stack">
-          <div class="grid3">
-            <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
-            <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
-            <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
-          </div>
-          <p class="err" id="cd-err" hidden></p>
-          <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
-        </form>
-      </div>
-
       <h3 class="dr-gh">Feiertage</h3>
       <div class="dr-group">
         <div class="dr-line"><label class="dr-lt" for="dr-region">Bundesland<small>Für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</small></label><select class="dr-in" id="dr-region"></select></div>
       </div>
     </section>
 
-    <!-- Geräte -->
-    <section class="dr-pane" id="dr-p-devices" role="tabpanel" aria-labelledby="dr-t-devices" hidden>
+    <!-- Spiegel -->
+    <section class="dr-pane" id="dr-p-mirror" role="tabpanel" aria-labelledby="dr-t-mirror" hidden>
+      <h3 class="dr-gh">Vorschau</h3>
+      <div class="mp-wrap">
+        <div class="mp-frame" id="mp-frame" data-o="land"><div class="mirror mp" aria-hidden="true"><div class="m-in" id="mp-in"></div></div></div>
+        <div class="mp-bar">
+          <div class="seg" role="group" aria-label="Vorschau" id="mp-o"><button type="button" data-v="land">Quer</button><button type="button" data-v="port">Hochkant</button></div>
+          <button type="button" class="btn" id="dr-mirror">Spiegel starten</button>
+        </div>
+      </div>
+
+      <h3 class="dr-gh" id="dr-mpreset-l">Aufteilung</h3>
+      <div class="dr-group">
+        <div class="dr-line"><span class="dr-lt">Vorlage<small>Danach kannst du jeden Baustein einzeln verschieben.</small></span>
+          <div class="seg" role="group" aria-labelledby="dr-mpreset-l" id="dr-mpreset"><button type="button" data-v="classic">Klassisch</button><button type="button" data-v="center">Zentriert</button><button type="button" data-v="calm">Ruhig</button></div>
+        </div>
+      </div>
+
+      <h3 class="dr-gh" id="dr-mblocks-l">Bausteine</h3>
+      <ul class="dr-group sort-list" id="dr-mblocks" aria-labelledby="dr-mblocks-l"></ul>
+      <p class="dr-note">Die Reihenfolge gilt innerhalb eines Bereichs. Was nicht mehr ganz passt, kürzt der Spiegel von allein.</p>
+
+      <h3 class="dr-gh">Uhr</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-msize">Größe</label>
+          <div class="range-row"><input type="range" class="range" id="dr-msize" min="70" max="140" step="5"><output id="dr-msize-v" for="dr-msize"></output></div>
+        </div>
+        <label class="dr-line"><span class="dr-lt">Sekunden</span><input type="checkbox" class="switch" id="dr-msecs"></label>
+      </div>
+
+      <h3 class="dr-gh">Nachts</h3>
+      <div class="dr-group">
+        <label class="dr-line"><span class="dr-lt">Nachts dimmen<small>Der Spiegel wird in dieser Zeit dunkler und blendet nicht.</small></span><input type="checkbox" class="switch" id="dr-mdim"></label>
+        <div class="dr-line" id="dr-mdim-times"><span class="dr-lt" id="dr-mdim-l">Von bis</span>
+          <div class="time-pair" role="group" aria-labelledby="dr-mdim-l"><input class="dr-in" id="dr-mdim-from" type="time" aria-label="Dimmen ab"><span aria-hidden="true">bis</span><input class="dr-in" id="dr-mdim-to" type="time" aria-label="Dimmen bis"></div>
+        </div>
+        <div class="dr-line" id="dr-mdim-row"><label class="dr-lt" for="dr-mdim-lvl">Helligkeit nachts</label>
+          <div class="range-row"><input type="range" class="range" id="dr-mdim-lvl" min="15" max="80" step="5"><output id="dr-mdim-lvl-v" for="dr-mdim-lvl"></output></div>
+        </div>
+        <label class="dr-line"><span class="dr-lt">Schutz vor Einbrennen<small>Der Inhalt wandert alle fünf Minuten ein paar Pixel.</small></span><input type="checkbox" class="switch" id="dr-mshift"></label>
+      </div>
+      <p class="dr-note">Den Spiegel startest du auch mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc. Die Einstellungen wandern per Sync auf alle Geräte, du kannst den Spiegel also bequem am Rechner einrichten.</p>
+    </section>
+
+    <!-- Daten: Sync, App, Sicherung -->
+    <section class="dr-pane" id="dr-p-data" role="tabpanel" aria-labelledby="dr-t-data" hidden>
       <h3 class="dr-gh">Sync zwischen Geräten</h3>
       <div class="dr-group dr-pad dr-stack" id="dr-sync">
         <div class="sy-box" id="sy-on" hidden>
@@ -2076,15 +2332,6 @@ html.mirror-on body{overflow:hidden}
         <p class="hint" id="dr-app-ios" hidden></p>
       </div>
 
-      <h3 class="dr-gh">Spiegel-Modus</h3>
-      <div class="dr-group dr-pad dr-stack">
-        <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Abfahrten, und Countdowns, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
-        <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
-      </div>
-    </section>
-
-    <!-- Daten -->
-    <section class="dr-pane" id="dr-p-data" role="tabpanel" aria-labelledby="dr-t-data" hidden>
       <h3 class="dr-gh">Sicherung als Datei</h3>
       <div class="dr-group dr-pad dr-stack" id="dr-data">
         <p class="hint">Mit der Datei bekommst du auf jedem Rechner genau dasselbe Cockpit, auch ohne Sync. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
@@ -2112,12 +2359,16 @@ html.mirror-on body{overflow:hidden}
   </div>
 </aside>
 
-<dialog class="dlg" id="dlg-gallery" aria-labelledby="gal-h">
+<dialog class="dlg dlg-gal" id="dlg-gallery" aria-labelledby="gal-h">
   <div class="dlg-head">
     <h2 id="gal-h">Widget hinzufügen</h2>
     <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
-  <div class="dlg-body" id="gal-body"></div>
+  <div class="gal-tools">
+    <label class="gal-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/></svg><input id="gal-q" type="search" placeholder="Widget suchen, zum Beispiel Regen oder Bus" autocomplete="off" spellcheck="false" aria-label="Widget suchen" enterkeyhint="go"></label>
+    <div class="gal-cats" id="gal-cats" role="group" aria-label="Bereiche"></div>
+  </div>
+  <div class="dlg-body" id="gal-body" aria-live="polite"></div>
 </dialog>
 
 <dialog class="dlg" id="dlg-widget" aria-labelledby="wd-h">
@@ -2422,23 +2673,7 @@ html.mirror-on body{overflow:hidden}
 </template>
 
 <div class="mirror" id="mirror" hidden aria-label="Spiegel-Modus">
-  <div class="m-in" id="m-in">
-    <section class="m-clock">
-      <p class="m-time" id="m-time">00:00</p>
-      <p class="m-date" id="m-date">&nbsp;</p>
-      <ul class="m-notes" id="m-notes"></ul>
-    </section>
-    <section class="m-wx" id="m-wx" hidden>
-      <div class="m-wx-now"><span class="m-wx-ico" id="m-wx-ico"></span><b id="m-wx-temp"></b></div>
-      <p id="m-wx-desc"></p>
-      <p class="m-dim" id="m-wx-sub"></p>
-    </section>
-    <section class="m-cal" id="m-cal" hidden></section>
-    <div class="m-side">
-      <section class="m-dep" id="m-dep" hidden></section>
-      <section class="m-cd" id="m-cd"></section>
-    </div>
-  </div>
+  <div class="m-in" id="m-in"></div>
   <button type="button" class="m-exit" id="m-exit">Spiegel verlassen</button>
 </div>
 
@@ -2729,32 +2964,48 @@ const numTxt = n => numDe(n, n % 1 ? 1 : 0);
  * state.waste    Müllabfuhr: { bins: [{ id, name, color, dates[], every, start }], file: { name, at } }
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
-const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
+/* Kacheln oben. Die Reihenfolge steht in ui.order, Countdowns stehen dort als „cd:ID“ mittendrin. */
+const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub', cal: 'Nächster Termin', sun: 'Sonne' };
+const TILE_ON = { fa: true, we: true, ft: true, ur: true, cal: false, sun: false };
+/* Kopf: Stil der Uhr samt Standard-Schriftstärke */
+const HEAD_STYLES = { classic: ['Klassisch', 220], giant: ['Riesig', 200], compact: ['Kompakt', 330], center: ['Zentriert', 240] };
+/* Spiegel: Bausteine und Bereiche */
+const MB = { clock: 'Uhr und Datum', notes: 'Hinweise', wx: 'Wetter', cm: 'Pendeln', cal: 'Termine', dep: 'Abfahrten', cd: 'Kacheln und Countdowns' };
+const MB_SUB = { notes: 'Warnungen, Geburtstage, Müllabfuhr', cm: 'Fahrzeit zur Arbeit oder nach Hause', cal: 'Heute und morgen', dep: 'Deine erste Haltestelle', cd: 'Wie oben, in derselben Reihenfolge' };
+const MZ = { top: 'Oben Mitte', tl: 'Oben links', tr: 'Oben rechts', mid: 'Mitte', bl: 'Unten links', br: 'Unten rechts', bottom: 'Unten Mitte' };
+const M_PRESETS = {
+  classic: { name: 'Klassisch', blocks: [['clock', 'tl', 1], ['notes', 'tl', 1], ['wx', 'tr', 1], ['cm', 'tr', 0], ['cal', 'bl', 1], ['dep', 'br', 1], ['cd', 'br', 1]] },
+  center: { name: 'Zentriert', blocks: [['clock', 'top', 1], ['wx', 'top', 1], ['notes', 'top', 1], ['cal', 'bl', 1], ['dep', 'br', 1], ['cm', 'br', 0], ['cd', 'bottom', 1]] },
+  calm: { name: 'Ruhig', blocks: [['clock', 'mid', 1], ['wx', 'mid', 1], ['notes', 'mid', 1], ['cal', 'bl', 0], ['dep', 'br', 0], ['cm', 'br', 0], ['cd', 'bottom', 0]] }
+};
+const mPresetBlocks = k => M_PRESETS[k].blocks.map(([b, z, on]) => ({ k: b, z, on: !!on }));
 const SIZES = { s: 320, m: 380, l: 470 };
 const DENSITY = { tight: 'Dicht', normal: 'Normal', airy: 'Luftig' };
 
 /* Widget-Typen. multi: kann es mehrfach geben, jede Kopie hat eigene Daten. w: Standardbreite in Spalten */
 const TYPES = {
-  now:      { name: 'Jetzt wichtig', multi: false, w: 2, since: '2.6', desc: 'Das Wichtigste aus allen Widgets auf einen Blick, je nach Tageszeit: Warnungen, Termine, Abfahrten, Müll und mehr. Dazu ein Feld zum schnellen Notieren.' },
-  tasks:    { name: 'Aufgaben', multi: true, w: 1, desc: 'Deine Todoist-Projekte zum Abhaken. Pro Widget legst du fest, welche Projekte es zeigt.' },
-  progress: { name: 'Fortschritt', multi: true, w: 1, desc: 'Balken für Arbeitstag, Arbeitswoche, Monat, Jahr oder eigene Zeiträume.' },
-  vacation: { name: 'Urlaub', multi: false, w: 1, desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
-  commute:  { name: 'Pendeln', multi: false, w: 1, desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
-  weather:  { name: 'Wetter', multi: false, w: 2, desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
-  links:    { name: 'Schnellzugriff', multi: true, w: 1, desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
-  notes:    { name: 'Notizen', multi: true, w: 1, desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' },
-  pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
-  habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
-  learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  football: { name: 'Fußball', multi: true, w: 1, since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
-  f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
-  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
-  cal:      { name: 'Kalender', multi: false, w: 1, since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
-  dep:      { name: 'Abfahrten', multi: true, w: 1, since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
-  bday:     { name: 'Geburtstage', multi: false, w: 1, since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
-  waste:    { name: 'Müllabfuhr', multi: false, w: 1, since: '2.4', desc: 'Welche Tonne wann rausmuss, mit Erinnerung am Vorabend. Termine aus der Datei deines Entsorgers oder als eigener Rhythmus.' }
+  now:      { name: 'Jetzt wichtig', multi: false, w: 2, cat: 'day', since: '2.6', desc: 'Das Wichtigste aus allen Widgets auf einen Blick, je nach Tageszeit: Warnungen, Termine, Abfahrten, Müll und mehr. Dazu ein Feld zum schnellen Notieren.' },
+  tasks:    { name: 'Aufgaben', multi: true, w: 1, cat: 'day', desc: 'Deine Todoist-Projekte zum Abhaken. Pro Widget legst du fest, welche Projekte es zeigt.' },
+  progress: { name: 'Fortschritt', multi: true, w: 1, cat: 'plan', desc: 'Balken für Arbeitstag, Arbeitswoche, Monat, Jahr oder eigene Zeiträume.' },
+  vacation: { name: 'Urlaub', multi: false, w: 1, cat: 'plan', desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
+  commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
+  weather:  { name: 'Wetter', multi: false, w: 2, cat: 'go', desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
+  links:    { name: 'Schnellzugriff', multi: true, w: 1, cat: 'day', desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
+  notes:    { name: 'Notizen', multi: true, w: 1, cat: 'day', desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' },
+  pomodoro: { name: 'Pomodoro', multi: false, w: 1, cat: 'plan', since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
+  habits:   { name: 'Gewohnheiten', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
+  learn:    { name: 'Lernfortschritt', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
+  football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
+  f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
+  fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
+  cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
+  dep:      { name: 'Abfahrten', multi: true, w: 1, cat: 'go', since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
+  bday:     { name: 'Geburtstage', multi: false, w: 1, cat: 'plan', since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
+  waste:    { name: 'Müllabfuhr', multi: false, w: 1, cat: 'day', since: '2.4', desc: 'Welche Tonne wann rausmuss, mit Erinnerung am Vorabend. Termine aus der Datei deines Entsorgers oder als eigener Rhythmus.' }
 };
 const SOON = [];
+/* Register in der Galerie */
+const CATS = { day: 'Alltag', plan: 'Planung', go: 'Unterwegs', fun: 'Freizeit' };
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
 /* Verkehrsmittel im Abfahrten-Widget */
 const DP_CATS = { s: 'S-Bahn', u: 'U-Bahn', bus: 'Bus', tram: 'Straßenbahn', ferry: 'Fähre', re: 'Regionalzug', fv: 'Fernzug' };
@@ -2791,7 +3042,9 @@ const DEF_BARS = () => [
 const DEF_UI = () => ({
   greet: 'Moin Jere', theme: 'auto', dark: 'graphite', accent: 'amber', accentHex: '#E8A126', size: 'm', density: 'normal', radius: 18,
   seconds: true, region: 'HH', sky: true,
-  tiles: { fa: true, we: true, ft: true, ur: true }, countdowns: [],
+  tiles: { ...TILE_ON }, countdowns: [], order: Object.keys(TILES),
+  head: { style: 'classic', size: 100, weight: 220, date: true, kw: true, greet: true },
+  mirror: { preset: 'classic', blocks: mPresetBlocks('classic'), size: 100, secs: false, shift: true, dim: { on: false, from: '22:00', to: '06:00', lvl: 40 } },
   start: { mode: 'last', page: '', work: '', free: '' }
 });
 /* Ausgangslage im alten Format (Version 1). Neue Nutzer laufen durch denselben Umzug wie alte Daten. */
@@ -2934,7 +3187,8 @@ function normCfg(type, c) {
     case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
-    case 'weather': return { hours: c.hours !== false, radar: c.radar !== false };
+    case 'weather': return { hours: c.hours !== false, radar: c.radar !== false, compact: c.compact !== false };
+    case 'commute': return { compact: c.compact !== false };
     case 'links': return { items: normLinks(c.items) };
     case 'notes': return { text: typeof c.text === 'string' ? c.text.slice(0, 8000) : '' };
     default: return {};
@@ -2983,6 +3237,8 @@ function normUi(u) {
   const t = u.tiles && typeof u.tiles === 'object' ? u.tiles : {};
   const st = u.start && typeof u.start === 'object' ? u.start : {};
   const pid = x => String(x || '').slice(0, 24);
+  const cds = (Array.isArray(u.countdowns) ? u.countdowns : []).filter(c => c && validYmd(c.date)).slice(0, 6)
+    .map(c => ({ id: String(c.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(), name: String(c.name || 'Countdown').slice(0, 30), date: c.date, time: validHm(c.time) ? c.time : '' }));
   return {
     greet: typeof u.greet === 'string' ? u.greet.slice(0, 40) : d.greet,
     theme: ['auto', 'light', 'dark'].includes(u.theme) ? u.theme : 'auto',
@@ -2995,10 +3251,50 @@ function normUi(u) {
     seconds: u.seconds !== false,
     sky: u.sky !== false,
     region: REGIONS[u.region] ? u.region : 'HH',
-    tiles: { fa: t.fa !== false, we: t.we !== false, ft: t.ft !== false, ur: t.ur !== false },
-    countdowns: (Array.isArray(u.countdowns) ? u.countdowns : []).filter(c => c && validYmd(c.date)).slice(0, 6)
-      .map(c => ({ id: String(c.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(), name: String(c.name || 'Countdown').slice(0, 30), date: c.date, time: validHm(c.time) ? c.time : '' })),
+    tiles: Object.fromEntries(Object.keys(TILES).map(k => [k, typeof t[k] === 'boolean' ? t[k] : TILE_ON[k]])),
+    countdowns: cds,
+    order: normOrder(u.order, cds),
+    head: normHead(u.head),
+    mirror: normMirror(u.mirror),
     start: { mode: ['last', 'fixed', 'auto'].includes(st.mode) ? st.mode : 'last', page: pid(st.page), work: pid(st.work), free: pid(st.free) }
+  };
+}
+/* Reihenfolge der Kacheln: bekannte Kacheln und vorhandene Countdowns, Fehlendes hinten dran */
+function normOrder(list, cds) {
+  const ok = new Set([...Object.keys(TILES), ...cds.map(c => 'cd:' + c.id)]), out = [];
+  for (const k of Array.isArray(list) ? list : []) if (typeof k === 'string' && ok.has(k) && !out.includes(k)) out.push(k);
+  for (const k of ok) if (!out.includes(k)) out.push(k);
+  return out;
+}
+function normHead(h) {
+  h = h && typeof h === 'object' ? h : {};
+  const style = HEAD_STYLES[h.style] ? h.style : 'classic';
+  return {
+    style,
+    size: Number.isFinite(+h.size) ? Math.round(okClamp(+h.size, 70, 140) / 5) * 5 : 100,
+    weight: Number.isFinite(+h.weight) ? Math.round(okClamp(+h.weight, 200, 700) / 10) * 10 : HEAD_STYLES[style][1],
+    date: h.date !== false, kw: h.kw !== false, greet: h.greet !== false
+  };
+}
+function normMirror(m) {
+  m = m && typeof m === 'object' ? m : {};
+  const blocks = [], seen = new Set();
+  for (const b of Array.isArray(m.blocks) ? m.blocks : []) {
+    if (!b || !MB[b.k] || seen.has(b.k)) continue;
+    seen.add(b.k);
+    blocks.push({ k: b.k, z: MZ[b.z] ? b.z : 'tl', on: b.on !== false });
+  }
+  // Ganz neu: Aufteilung „Klassisch“. Neue Bausteine aus späteren Versionen kommen ausgeschaltet dazu.
+  const fresh = !blocks.length;
+  for (const b of mPresetBlocks('classic')) if (!seen.has(b.k)) blocks.push({ ...b, on: fresh && b.on });
+  const d = m.dim && typeof m.dim === 'object' ? m.dim : {};
+  return {
+    preset: M_PRESETS[m.preset] ? m.preset : fresh ? 'classic' : '',
+    blocks,
+    size: Number.isFinite(+m.size) ? Math.round(okClamp(+m.size, 70, 140) / 5) * 5 : 100,
+    secs: !!m.secs,
+    shift: m.shift !== false,
+    dim: { on: !!d.on, from: validHm(d.from) ? d.from : '22:00', to: validHm(d.to) ? d.to : '06:00', lvl: Number.isFinite(+d.lvl) ? Math.round(okClamp(+d.lvl, 15, 80) / 5) * 5 : 40 }
   };
 }
 const isoOrNull = x => typeof x === 'string' && !Number.isNaN(Date.parse(x)) ? x : null;
@@ -3539,6 +3835,91 @@ if (SEL_ON) {
   addEventListener('resize', () => selClose(false));
   document.addEventListener('scroll', e => { if (sp.pop && !sp.pop.contains(e.target)) selPlace(); }, true);
   document.addEventListener('pointerdown', e => { if (sp.pop && !sp.pop.contains(e.target) && !sp.btn.contains(e.target)) selClose(false); }, true);
+}
+
+/* 06-sortieren.js */
+/* Sortieren per Ziehen (Maus, Finger, Stift) und per Pfeiltasten am Griff. Für die Kacheln oben und die Bausteine im Spiegel.
+ * box: die Liste, item: Selektor der Einträge (mit data-key), handle: Selektor des Griffs, when(): darf gerade sortiert werden,
+ * done(keys): neue Reihenfolge aller Einträge. Die Einträge rutschen live an ihren neuen Platz, die anderen gleiten hinterher. */
+function sortable(box, { item, handle, done, when }) {
+  const all = () => [...box.querySelectorAll(item)];
+  const keys = () => all().map(x => x.dataset.key);
+  const shown = () => all().filter(x => !x.hidden);
+  function flip(fn) {
+    const els = all(), before = new Map(els.map(el => [el, el.getBoundingClientRect()]));
+    fn();
+    if (reduceMotion) return;
+    for (const el of els) {
+      if (el.hidden || el.classList.contains('sort-drag')) continue;
+      const a = before.get(el), b = el.getBoundingClientRect(), dx = a.left - b.left, dy = a.top - b.top;
+      if (dx || dy) el.animate([{ transform: `translate(${dx}px,${dy}px)` }, { transform: 'none' }], { duration: 220, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    }
+  }
+  box.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || (when && !when())) return;
+    const h = e.target.closest(handle);
+    if (!h || !box.contains(h)) return;
+    const it = h.closest(item);
+    if (!it) return;
+    const ctl = e.target.closest('input,select,textarea,a,button,.sel-btn');
+    if (ctl && ctl !== h && !h.contains(ctl)) return;
+    const x0 = e.clientX, y0 = e.clientY;
+    let on = false;
+    const move = ev => {
+      if (!on) {
+        if (Math.hypot(ev.clientX - x0, ev.clientY - y0) < 5) return;
+        on = true;
+        it.classList.add('sort-drag');
+        box.classList.add('sorting');
+        try { h.setPointerCapture(ev.pointerId); } catch { /* Zeiger schon weg */ }
+      }
+      ev.preventDefault();
+      let best = null, bd = Infinity;
+      for (const s of shown()) {
+        if (s === it) continue;
+        const r = s.getBoundingClientRect(), d = Math.hypot(ev.clientX - (r.left + r.width / 2), ev.clientY - (r.top + r.height / 2));
+        if (d < bd) { bd = d; best = s; }
+      }
+      if (!best) return;
+      const r = best.getBoundingClientRect();
+      // Liegen Einträge nebeneinander, entscheidet die Waagerechte, sonst die Senkrechte
+      const row = Math.abs(r.top - it.getBoundingClientRect().top) < r.height / 2;
+      const before = row ? ev.clientX < r.left + r.width / 2 : ev.clientY < r.top + r.height / 2;
+      const ref = before ? best : best.nextElementSibling;
+      if (ref !== it && it.nextElementSibling !== ref) flip(() => box.insertBefore(it, ref));
+    };
+    const up = () => {
+      removeEventListener('pointermove', move);
+      removeEventListener('pointerup', up);
+      removeEventListener('pointercancel', up);
+      if (!on) return;
+      it.classList.remove('sort-drag');
+      box.classList.remove('sorting');
+      // Der Klick nach dem Loslassen soll nichts auslösen
+      const kill = ev => { ev.stopPropagation(); ev.preventDefault(); };
+      addEventListener('click', kill, { capture: true, once: true });
+      setTimeout(() => removeEventListener('click', kill, true), 80);
+      setTimeout(() => done(keys()), 0);
+    };
+    addEventListener('pointermove', move, { passive: false });
+    addEventListener('pointerup', up);
+    addEventListener('pointercancel', up);
+  });
+  box.addEventListener('keydown', e => {
+    if (when && !when()) return;
+    const h = e.target.closest(handle);
+    if (!h || !box.contains(h)) return;
+    const back = e.key === 'ArrowUp' || e.key === 'ArrowLeft', fwd = e.key === 'ArrowDown' || e.key === 'ArrowRight';
+    if (!back && !fwd) return;
+    const it = h.closest(item), vis = shown(), i = vis.indexOf(it);
+    if (i < 0) return;
+    e.preventDefault();
+    const j = i + (back ? -1 : 1);
+    if (j < 0 || j >= vis.length) return;
+    flip(() => box.insertBefore(it, back ? vis[j] : vis[j].nextElementSibling));
+    h.focus({ preventScroll: true });
+    done(keys());
+  });
 }
 
 /* 10-fortschritt.js */
@@ -4142,6 +4523,7 @@ function renderWeather() {
   if (Number.isFinite(c.relative_humidity_2m)) dl.push(['Feuchte', `${Math.round(c.relative_humidity_2m)} %`]);
   if (d.daily && d.daily.sunrise) dl.push(['Sonne', `${fmtT(d.daily.sunrise[0])} bis ${fmtT(d.daily.sunset[0])}`]);
   $('#wx-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  $('#wx-hilo').textContent = dl.length && dl[0][0] === 'Heute' ? `Heute ${dl[0][1]}` : '';
 
   // Regen in den nächsten 2 Stunden (15-Minuten-Schritte)
   const m = d.minutely_15, now = Date.now();
@@ -4325,7 +4707,7 @@ function stopPlay() {
 /* Radar auf- und zuklappen. Auf dem Handy startet es zu, damit die Seite kürzer bleibt. Merkt sich jedes Gerät selbst. */
 const RD_KEY = 'jere-cockpit-radar';
 function radarOpen() { const v = lsGet(RD_KEY); return v == null ? !isNarrow() : !!v; }
-const radarShown = () => radarOpen() && !$('#radar-box').hidden && !zu.has('weather');
+const radarShown = () => radarOpen() && !$('#radar-box').hidden && !zu.has('weather') && !$('#weather').classList.contains('is-compact');
 function renderRadarTg() {
   const on = radarOpen();
   $('#rd-body').hidden = !on;
@@ -4337,18 +4719,36 @@ $('#rd-tg').addEventListener('click', () => { lsSet(RD_KEY, radarOpen() ? 0 : 1)
 $('#rd-play').addEventListener('click', () => { if (rd.timer) { rd.userPaused = true; stopPlay(); } else { rd.userPaused = false; play(); } });
 $('#rd-slider').addEventListener('input', e => { rd.userPaused = true; stopPlay(); showFrame(+e.target.value); });
 
+/* Kompakt: jetzt, Regen in einem Satz und die Stundenleiste. Details und Radar klappen per Tipp auf (gilt bis zum Neuladen). */
+const wxx = { open: false };
+function wxCompactUi() {
+  const c = state.widgets.weather.cfg, on = c.compact && !wxx.open, b = $('#wx-more');
+  $('#weather').classList.toggle('is-compact', on);
+  b.hidden = !c.compact || (!c.radar && !c.hours);
+  b.setAttribute('aria-expanded', String(!on));
+  b.querySelector('span').textContent = on ? (c.radar ? 'Details und Regenradar' : 'Mehr Details') : 'Weniger zeigen';
+}
+$('#wx-more').addEventListener('click', () => {
+  wxx.open = !wxx.open;
+  wxCompactUi();
+  renderRadarTg();
+  if (wxx.open && rd.map) setTimeout(() => rd.map.invalidateSize(), 80);
+  schedLayout();
+});
 defineWidget('weather', {
   render() {
     const c = state.widgets.weather.cfg;
     $('#wx-hours-box').hidden = !c.hours;
     $('#radar-box').hidden = !c.radar;
+    wxCompactUi();
     renderRadarTg();
   },
   settings: {
     render(box, w) {
-      box.innerHTML = `<label class="check-row"><input type="checkbox" class="switch" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
+      box.innerHTML = `<label class="check-row"><input type="checkbox" class="switch" data-s="compact"${w.cfg.compact ? ' checked' : ''}> Kompakt, Details und Radar per Tipp</label><label class="check-row"><input type="checkbox" class="switch" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" class="switch" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
     },
     save(box, w) {
+      w.cfg.compact = box.querySelector('[data-s="compact"]').checked;
       w.cfg.hours = box.querySelector('[data-s="hours"]').checked;
       w.cfg.radar = box.querySelector('[data-s="radar"]').checked;
       if (w.cfg.radar && rd.map) setTimeout(() => rd.map.invalidateSize(), 80);
@@ -5095,8 +5495,11 @@ function renderCommute() {
   if (R.ab.failed) hints.push('Ein Teil der Autobahn-Meldungen fehlt gerade.');
   $('#cm-hint').textContent = hints.join(' ');
   $('#cm-hint').hidden = !hints.length;
+  // Die reine Erklärung ohne TomTom-Key braucht es in der kompakten Ansicht nicht, Störungen schon
+  $('#cm-hint').dataset.k = !tt && !(R.tt && R.tt.error) && !R.ab.failed ? 'info' : 'warn';
   $('#cm-src').textContent = `Stand ${hm(new Date(R.at))} Uhr · Route: OpenStreetMap · Meldungen: Autobahn GmbH${tt ? ` · Live-Fahrzeit: TomTom${tt.stale ? ` von ${hm(new Date(tt.stale))} Uhr` : ''}` : ''}`;
   cm.items = items;
+  cmCompactUi();
   cmMap(R, items, tt);
   tickTiles(new Date());
   if (views.has('fuel')) renderFuel();
@@ -5201,6 +5604,7 @@ function openCmForm() {
   try { key = localStorage.getItem(TT_KEY) || ''; } catch { key = ''; }
   $('#cm-key').value = key;
   $('#cm-key-res').textContent = '';
+  $('#cm-compact').checked = state.widgets.commute.cfg.compact;
   $('#cm-err').hidden = true;
   $('#cm-form').hidden = false;
   $('#cm-home').focus();
@@ -5253,7 +5657,23 @@ $('#cm-key-test').addEventListener('click', async () => {
   } finally { btn.disabled = false; }
 });
 
-defineWidget('commute', {});
+/* Kompakt: Fahrzeit, Lage und wann du los musst. Karte und Meldungen klappen per Tipp auf (gilt bis zum Neuladen). */
+const cmx = { open: false };
+function cmCompactUi() {
+  const c = state.widgets.commute.cfg, on = c.compact && !cmx.open, b = $('#cm-more'), n = cm.items ? cm.items.length : 0;
+  $('#commute').classList.toggle('is-compact', on);
+  b.hidden = !c.compact;
+  b.setAttribute('aria-expanded', String(!on));
+  b.querySelector('span').textContent = !on ? 'Weniger zeigen' : n ? `Karte und ${n === 1 ? 'eine Meldung' : n + ' Meldungen'}` : 'Karte zeigen';
+}
+$('#cm-more').addEventListener('click', () => {
+  cmx.open = !cmx.open;
+  cmCompactUi();
+  if (cmx.open) setTimeout(() => cmFit(false), 80);
+  schedLayout();
+});
+$('#cm-compact').addEventListener('change', e => { state.widgets.commute.cfg.compact = e.target.checked; cmx.open = false; commit(); });
+defineWidget('commute', { render: cmCompactUi });
 
 /* 20-kopf.js */
 /* Kopfzeile, Kacheln oben und Aussehen */
@@ -5301,6 +5721,31 @@ function tickTiles(now) {
     const n = dayDiff(t, f);
     setTile('#t-ur', inDays(n), `${upcoming.label || 'Urlaub'}${upcoming.example ? ' (Beispiel)' : ''}, ab ${WD[f.getDay()]} ${dm(f)}`, n <= 1 ? 'hot' : null);
   } else setTile('#t-ur', 'Nix geplant', 'Trag deinen nächsten Urlaub ein');
+  // Nächster Termin aus dem Kalender
+  const sec = caSec();
+  if (!sec.feeds.length) setTile('#t-cal', 'Kein Kalender', 'Richte das Kalender-Widget ein');
+  else if (!ca.data) setTile('#t-cal', 'Kommt gleich', 'Termine werden geladen');
+  else {
+    const t0 = +now, evs = ca.data.events.filter(e => !e.a && sec.feeds.some(f => f.id === e.f));
+    const run = evs.find(e => e.s <= t0 && e.e > t0), nx = evs.find(e => e.s > t0);
+    if (run) setTile('#t-cal', 'Läuft gerade', `${run.t}, bis ${hm(new Date(run.e))} Uhr`, 'good');
+    else if (nx) {
+      const s = new Date(nx.s), n = dayDiff(t, sod(s));
+      setTile('#t-cal', n === 0 ? `in ${dur(nx.s - t0, true)}` : inDays(n), `${nx.t}, ${n === 0 ? '' : n === 1 ? 'morgen ' : WD[s.getDay()] + ' ' + dm(s) + ' '}${hm(s)} Uhr`, nx.s - t0 < 36e5 ? 'hot' : null);
+    } else setTile('#t-cal', 'Nichts geplant', 'In den nächsten Tagen keine Termine');
+  }
+  // Sonne: der nächste Auf- oder Untergang
+  const D = sky.day, sl = $('#t-sun .t-label');
+  if (D && D.rise && D.set && now < D.set) {
+    const rise = now < D.rise;
+    sl.textContent = rise ? 'Sonnenaufgang' : 'Sonnenuntergang';
+    setTile('#t-sun', `in ${dur((rise ? D.rise : D.set) - now, true)}`, `um ${hm(rise ? D.rise : D.set)} Uhr${rise ? '' : `, ${hrsMin(D.set - D.rise)} Tageslicht`}`, !rise && D.set - now < 36e5 ? 'hot' : null);
+  } else {
+    const T = sunMorrow(now);
+    sl.textContent = 'Sonnenaufgang';
+    if (T && T.rise) setTile('#t-sun', `in ${dur(T.rise - now, true)}`, `morgen um ${hm(T.rise)} Uhr`);
+    else setTile('#t-sun', 'Heute nicht', 'Kein Auf- oder Untergang an deinem Ort');
+  }
   // Eigene Countdowns
   for (const el of document.querySelectorAll('[data-cd]')) {
     const c = state.ui.countdowns.find(x => x.id === el.dataset.cd);
@@ -5314,21 +5759,39 @@ function tickTiles(now) {
     else setTile(el, `vor ${-n} ${n === -1 ? 'Tag' : 'Tagen'}`, sub);
   }
 }
+/* Morgen früh: Sonnenaufgang für die Sonnen-Kachel, einmal pro Tag gerechnet */
+let sunMo = { key: '', day: null };
+function sunMorrow(now) {
+  const k = ymd(now);
+  if (sunMo.key !== k) sunMo = { key: k, day: sunDay(addDays(sod(now), 1), skyLoc()) };
+  return sunMo.day;
+}
+/* Kacheln in der eingestellten Reihenfolge. Im Bearbeiten-Modus lassen sie sich direkt hier oben verschieben. */
 function renderTiles() {
-  const box = $('#tiles');
-  for (const k of Object.keys(TILES)) $('#t-' + k).hidden = !state.ui.tiles[k];
+  const box = $('#tiles'), u = state.ui, els = {}, end = $('#tiles-edit');
+  for (const k of Object.keys(TILES)) { els[k] = $('#t-' + k); els[k].hidden = !u.tiles[k]; }
   box.querySelectorAll('[data-cd]').forEach(el => el.remove());
-  for (const c of state.ui.countdowns) {
+  for (const c of u.countdowns) {
     const el = document.createElement('div');
     el.className = 'tile';
     el.id = 'cd-' + c.id;
     el.dataset.cd = c.id;
+    el.dataset.key = 'cd:' + c.id;
     el.innerHTML = '<p class="t-label"></p><p class="t-val">&nbsp;</p><p class="t-sub">&nbsp;</p>';
     el.querySelector('.t-label').textContent = c.name;
-    box.appendChild(el);
+    els['cd:' + c.id] = el;
   }
+  for (const k of normOrder(u.order, u.countdowns)) if (els[k]) box.insertBefore(els[k], end);
+  for (const el of box.querySelectorAll('.tile')) {
+    if (edit.on) { el.tabIndex = 0; el.setAttribute('aria-label', `${el.querySelector('.t-label').textContent}, mit Pfeiltasten oder Ziehen verschieben`); }
+    else { el.removeAttribute('tabindex'); el.removeAttribute('aria-label'); }
+  }
+  end.hidden = !edit.on;
+  box.classList.toggle('sortable', edit.on);
   box.hidden = !curPage().tiles || !box.querySelector('.tile:not([hidden])');
 }
+sortable($('#tiles'), { item: '.tile', handle: '.tile', when: () => edit.on, done: keys => { state.ui.order = normOrder(keys, state.ui.countdowns); commit(); } });
+$('#tiles-edit').addEventListener('click', () => { openDrawer('head'); setTimeout(() => { const g = $('#dr-tiles'); if (g) g.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' }); }, 80); });
 
 let headKey = '';
 function tickHeader(now) {
@@ -5360,6 +5823,16 @@ function applyUi() {
   if (u.density === 'normal') root.removeAttribute('data-density'); else root.setAttribute('data-density', u.density);
   root.style.setProperty('--r', u.radius + 'px');
   applyAccent();
+  // Kopf: Stil, Größe und Stärke der Uhr, was neben der Uhr steht
+  const h = u.head;
+  root.dataset.head = h.style;
+  root.style.setProperty('--clock-k', String(h.size / 100));
+  root.style.setProperty('--clock-w', String(h.weight));
+  $('#h-greet').classList.toggle('vh', !h.greet);
+  $('#h-day').hidden = !h.date;
+  $('#h-date').hidden = !h.date;
+  $('#sky-kw').hidden = !h.kw;
+  $('#sky-date').hidden = !h.date && !h.kw;
   $('#h-greet').textContent = u.greet.trim() || 'Moin';
   $('#foot-region').textContent = `Feiertage: ${REGIONS[u.region]}`;
   headKey = '';
@@ -5605,6 +6078,7 @@ function setEdit(on) {
   $('#edit-btn').setAttribute('aria-pressed', String(on));
   $('#edit-btn-txt').textContent = on ? 'Fertig' : 'Bearbeiten';
   $('#editbar').hidden = !on;
+  renderTiles();
   syncBoard();
   renderEditBar();
   schedLayout();
@@ -5757,42 +6231,73 @@ function newCfg(type) {
   if (type === 'progress') return { bars: [{ id: uid(), kind: 'month', name: 'Monat' }, { id: uid(), kind: 'year', name: 'Jahr' }] };
   return {};
 }
-function openGallery() {
-  const page = curPage(), body = $('#gal-body');
-  body.textContent = '';
-  const ul = document.createElement('ul');
-  ul.className = 'gal';
-  for (const [type, T] of Object.entries(TYPES)) {
-    let act;
-    if (!T.multi) {
-      act = page.items.some(x => x.w === type)
-        ? '<button type="button" class="btn-ghost" disabled>Ist schon auf dieser Seite</button>'
-        : `<button type="button" class="btn" data-gadd="${type}">Hinzufügen</button>`;
-    } else {
-      act = `<button type="button" class="btn" data-gnew="${type}">Neu anlegen</button>`;
-      for (const [id] of widgetsOf(type)) {
-        if (page.items.some(x => x.w === id)) continue;
-        const where = pagesUsing(id).map(p => p.name);
-        act += `<button type="button" class="btn-ghost" data-gadd="${esc(id)}" title="${esc(where.length ? `Liegt auf: ${where.join(', ')}` : 'Liegt gerade auf keiner Seite')}">„${esc(widgetLabel(id))}“ einfügen</button>`;
-      }
+/* Galerie mit Registern (Alltag, Planung, Unterwegs, Freizeit) und Suche. Pro Widget eine schlanke Zeile mit Plus. */
+const gal = { cat: 'all', q: '' };
+const GAL_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13"/></svg>';
+const GAL_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function galRow(type, T, page) {
+  const m = T.desc.match(/^.*?\.(?=\s|$)/), first = m ? m[0] : T.desc;
+  let act = '', more = '';
+  const placed = !T.multi && page.items.some(x => x.w === type);
+  if (!T.multi) act = placed ? `<span class="gal-on" role="img" aria-label="Liegt schon auf dieser Seite" title="Liegt schon auf dieser Seite">${GAL_OK}</span>` : `<button type="button" class="gal-add" data-gadd="${type}" aria-label="${esc(T.name)} hinzufügen" title="Hinzufügen">${GAL_PLUS}</button>`;
+  else {
+    act = `<button type="button" class="gal-add" data-gnew="${type}" aria-label="${esc(T.name)} neu anlegen" title="Neu anlegen">${GAL_PLUS}</button>`;
+    for (const [id] of widgetsOf(type)) {
+      if (page.items.some(x => x.w === id)) continue;
+      const where = pagesUsing(id).map(p => p.name);
+      more += `<button type="button" class="btn-ghost" data-gadd="${esc(id)}" title="${esc(where.length ? `Liegt auf: ${where.join(', ')}` : 'Liegt gerade auf keiner Seite')}">„${esc(widgetLabel(id))}“ holen</button>`;
     }
-    const li = document.createElement('li');
-    li.className = 'gal-item';
-    li.innerHTML = `<span class="gal-ico">${TICON[type]}</span><p class="gal-name">${esc(T.name)}${T.since === VERSION ? ' <span class="chip">Neu</span>' : ''}</p><p class="gal-desc">${esc(T.desc)}</p><div class="gal-act">${act}</div>`;
-    ul.appendChild(li);
   }
-  body.appendChild(ul);
-  if (!SOON.length) { $('#dlg-gallery').showModal(); return; }
-  const sub = document.createElement('p');
-  sub.className = 'gal-sub';
-  sub.textContent = 'Kommt demnächst';
-  body.appendChild(sub);
-  const soon = document.createElement('div');
-  soon.className = 'soon';
-  soon.innerHTML = SOON.map(([k, n]) => `<span>${TICON[k]}${esc(n)}</span>`).join('');
-  body.appendChild(soon);
-  $('#dlg-gallery').showModal();
+  return `<li class="gal-item${placed ? ' placed' : ''}"><span class="gal-ico">${TICON[type]}</span><div class="gal-tx"><p class="gal-name">${esc(T.name)}${T.since === VERSION ? ' <span class="chip">Neu</span>' : ''}</p><p class="gal-desc">${esc(first)}</p>${more ? `<div class="gal-more">${more}</div>` : ''}</div>${act}</li>`;
 }
+function renderGallery() {
+  const page = curPage(), words = cmdNorm(gal.q).split(/\s+/).filter(Boolean), all = Object.entries(TYPES);
+  const hit = ([, T]) => { const h = cmdNorm(`${T.name} ${T.desc} ${CATS[T.cat] || ''}`); return words.every(w => h.includes(w)); };
+  $('#gal-cats').innerHTML = [['all', 'Alle'], ...Object.entries(CATS)].map(([k, n]) => {
+    const c = k === 'all' ? all.length : all.filter(([, T]) => T.cat === k).length;
+    return `<button type="button" data-cat="${k}" aria-pressed="${!words.length && gal.cat === k}">${esc(n)} <span>${c}</span></button>`;
+  }).join('');
+  let html = '';
+  if (words.length) {
+    const list = all.filter(hit);
+    html = list.length ? `<ul class="gal">${list.map(([t, T]) => galRow(t, T, page)).join('')}</ul>` : '<p class="empty gal-none">Kein Widget gefunden. Versuch es mit einem anderen Wort.</p>';
+  } else {
+    for (const [k, n] of Object.entries(CATS)) {
+      if (gal.cat !== 'all' && gal.cat !== k) continue;
+      const list = all.filter(([, T]) => T.cat === k);
+      if (!list.length) continue;
+      if (gal.cat === 'all') html += `<h3 class="gal-h">${esc(n)}</h3>`;
+      html += `<ul class="gal">${list.map(([t, T]) => galRow(t, T, page)).join('')}</ul>`;
+    }
+    if (SOON.length) html += `<p class="gal-sub">Kommt demnächst</p><div class="soon">${SOON.map(([k, n]) => `<span>${TICON[k]}${esc(n)}</span>`).join('')}</div>`;
+  }
+  $('#gal-body').innerHTML = html;
+}
+function openGallery() {
+  gal.q = '';
+  $('#gal-q').value = '';
+  renderGallery();
+  $('#dlg-gallery').showModal();
+  $('#gal-body').scrollTop = 0;
+  // Am Rechner gleich lostippen, am Handy nicht sofort die Tastatur hochholen
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) $('#gal-q').focus();
+}
+$('#gal-q').addEventListener('input', e => { gal.q = e.target.value; renderGallery(); });
+$('#gal-q').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const b = $('#gal-body .gal-add, #gal-body [data-gadd]');
+  if (b) b.click();
+});
+$('#gal-cats').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]');
+  if (!b) return;
+  gal.cat = b.dataset.cat;
+  gal.q = '';
+  $('#gal-q').value = '';
+  renderGallery();
+  $('#gal-body').scrollTop = 0;
+});
 function placeWidget(id) {
   const page = curPage(), w = state.widgets[id];
   if (!w || page.items.some(x => x.w === id)) return;
@@ -5874,11 +6379,22 @@ for (const d of $$('dialog.dlg')) {
 }
 
 /* 24-anpassen.js */
-/* Anpassen: schwebendes Fenster mit vier Bereichen (Aussehen, Seiten, Geräte, Daten).
+/* Anpassen: schwebendes Fenster mit fünf Bereichen (Aussehen, Kopf, Seiten, Spiegel, Daten).
  * Jede Änderung wirkt sofort, das Cockpit bleibt dahinter sichtbar. Auf dem Handy ein Blatt von unten zum Wegziehen. */
-const DR_TABS = ['look', 'pages', 'devices', 'data'];
+const DR_TABS = ['look', 'head', 'pages', 'mirror', 'data'];
 const dr = { open: false, tab: 'look', closeT: 0 };
-let editingCd = null, greetTimer = null, radiusTimer = null;
+let editingCd = null, greetTimer = null, radiusTimer = null, slideTimer = null;
+const GRIP = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6.5" r="1.6"/><circle cx="15" cy="6.5" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="17.5" r="1.6"/><circle cx="15" cy="17.5" r="1.6"/></svg>';
+/* Schieberegler mit gefülltem Stück bis zum Daumen und Wert daneben */
+function setRange(sel, v, lo, hi, txt) {
+  const r = $(sel);
+  r.value = v;
+  r.style.setProperty('--p', `${((v - lo) / (hi - lo)) * 100}%`);
+  $(sel + '-v').textContent = txt;
+}
+const HW_TXT = w => w < 260 ? 'Hauchdünn' : w < 360 ? 'Leicht' : w < 480 ? 'Normal' : w < 600 ? 'Kräftig' : 'Fett';
+/* Regler: sofort zeigen, kurz nach dem Loslassen speichern */
+function slideSave() { clearTimeout(slideTimer); slideTimer = setTimeout(() => { slideTimer = null; commit(); }, 400); }
 function afterStateSwap(old) {
   if (JSON.stringify(old.loc) !== JSON.stringify(state.loc) && (wx.live || state.loc.mode === 'fixed')) startWeather();
   if (JSON.stringify(old.commute) !== JSON.stringify(state.commute)) { cm.res = null; loadCommute(); }
@@ -5962,9 +6478,56 @@ function renderStartSec() {
     : wb ? `Deine Arbeitszeit kommt aus dem Balken „${wb.name}“: ${DAYS_TXT(wb.days || [])}, ${wb.start} bis ${wb.end} Uhr. Eine Stunde vor Beginn zählt schon als Arbeit, Feiertage und Urlaub als frei. Das Cockpit wechselt auch, während es offen ist, außer du hast in der letzten halben Stunde selbst eine Seite gewählt.`
     : 'Dafür braucht das Cockpit deine Arbeitszeit. Leg im Fortschritt-Widget einen Arbeitstag-Balken an.';
 }
+/* Kopf: Stil, Größe und Stärke der Uhr, was daneben steht */
+function renderHeadSec() {
+  const u = state.ui, h = u.head;
+  segSet($('#dr-hstyle'), h.style);
+  setRange('#dr-hsize', h.size, 70, 140, `${h.size} %`);
+  setRange('#dr-hweight', h.weight, 200, 700, HW_TXT(h.weight));
+  $('#dr-secs').checked = u.seconds;
+  $('#dr-hgreet').checked = h.greet;
+  $('#dr-greet-row').hidden = !h.greet;
+  $('#dr-hdate').checked = h.date;
+  $('#dr-hkw').checked = h.kw;
+  $('#dr-sky').checked = u.sky;
+}
+/* Kacheln oben: eine Liste zum Sortieren, Countdowns mittendrin. Daneben steht, was die Kachel gerade zeigt. */
+const TILE_SUB = { cal: 'Aus deinem Kalender', sun: 'Nächster Auf- oder Untergang' };
 function renderTilesSec() {
-  const tl = $('#dr-tiles');
-  tl.innerHTML = Object.entries(TILES).map(([k, n]) => `<label class="dr-line"><span class="dr-lt">${esc(n)}</span><input type="checkbox" class="switch" data-tile="${k}"${state.ui.tiles[k] ? ' checked' : ''}></label>`).join('');
+  const u = state.ui;
+  $('#dr-tiles').innerHTML = normOrder(u.order, u.countdowns).map(k => {
+    const cd = k.startsWith('cd:') ? u.countdowns.find(c => 'cd:' + c.id === k) : null;
+    const name = cd ? cd.name : TILES[k];
+    if (!name) return '';
+    const el = cd ? $('#cd-' + cd.id) : $('#t-' + k);
+    const val = el ? el.querySelector('.t-val').textContent.trim() : '';
+    const sub = k === 'sun' && val ? `${el.querySelector('.t-label').textContent} ${val}` : val || TILE_SUB[k] || '';
+    return `<li class="sort-row" data-key="${esc(k)}"><button type="button" class="sort-h" aria-label="${esc(name)} verschieben" title="Ziehen oder mit den Pfeiltasten schieben">${GRIP}</button>`
+      + `<span class="dr-lt">${esc(name)}${sub ? `<small>${esc(sub)}</small>` : ''}</span>`
+      + (cd ? '<span class="chip">Countdown</span>' : `<input type="checkbox" class="switch" data-tile="${k}"${u.tiles[k] ? ' checked' : ''} aria-label="${esc(name)} zeigen">`) + '</li>';
+  }).join('');
+}
+/* Spiegel: Vorlage, Bausteine mit Bereich, Uhr, Nachtmodus. Die Vorschau zeichnet sich bei jeder Änderung neu. */
+const mp = { o: 'land' };
+function renderMirrorSec() {
+  const m = state.ui.mirror;
+  segSet($('#dr-mpreset'), m.preset);
+  segSet($('#mp-o'), mp.o);
+  $('#mp-frame').dataset.o = mp.o;
+  $('#dr-mblocks').innerHTML = m.blocks.map(b => `<li class="sort-row" data-key="${b.k}"><button type="button" class="sort-h" aria-label="${esc(MB[b.k])} verschieben" title="Ziehen oder mit den Pfeiltasten schieben">${GRIP}</button>`
+    + `<span class="dr-lt">${esc(MB[b.k])}${MB_SUB[b.k] ? `<small>${esc(MB_SUB[b.k])}</small>` : ''}</span>`
+    + `<select class="dr-in mz-sel" data-mz="${b.k}" aria-label="Bereich für ${esc(MB[b.k])}"${b.on ? '' : ' disabled'}>${Object.entries(MZ).map(([z, n]) => `<option value="${z}"${z === b.z ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>`
+    + `<input type="checkbox" class="switch" data-mon="${b.k}"${b.on ? ' checked' : ''} aria-label="${esc(MB[b.k])} zeigen"></li>`).join('');
+  setRange('#dr-msize', m.size, 70, 140, `${m.size} %`);
+  $('#dr-msecs').checked = m.secs;
+  $('#dr-mdim').checked = m.dim.on;
+  $('#dr-mdim-from').value = m.dim.from;
+  $('#dr-mdim-to').value = m.dim.to;
+  $('#dr-mdim-times').hidden = !m.dim.on;
+  $('#dr-mdim-row').hidden = !m.dim.on;
+  setRange('#dr-mdim-lvl', m.dim.lvl, 15, 80, `${m.dim.lvl} %`);
+  $('#dr-mshift').checked = m.shift;
+  renderMirror();
 }
 function renderDrawer() {
   const u = state.ui;
@@ -5974,9 +6537,9 @@ function renderDrawer() {
   segSet($('#dr-density'), u.density);
   renderRadius();
   renderSwatches();
-  $('#dr-secs').checked = u.seconds;
-  $('#dr-sky').checked = u.sky;
+  renderHeadSec();
   renderTilesSec();
+  renderMirrorSec();
   renderCdList();
   renderStartSec();
   const sel = $('#dr-region');
@@ -5990,6 +6553,7 @@ function renderDrawer() {
 }
 /* Bereich wechseln: Pille gleitet, Inhalt blendet weich ein */
 function setDrTab(tab, focus) {
+  if (tab === 'devices') tab = 'data';
   if (!DR_TABS.includes(tab)) tab = 'look';
   const changed = dr.tab !== tab;
   dr.tab = tab;
@@ -6002,6 +6566,8 @@ function setDrTab(tab, focus) {
   $('#dr-tabs').style.setProperty('--i', DR_TABS.indexOf(tab));
   for (const t of DR_TABS) $('#dr-p-' + t).hidden = t !== tab;
   if (changed) $('#dr-body').scrollTop = 0;
+  if (tab === 'mirror') { mr.last = ''; renderMirror(); }
+  if (tab === 'head') renderTilesSec();
 }
 function openDrawer(tab) {
   clearTimeout(dr.closeT);
@@ -6021,6 +6587,7 @@ function closeDrawer() {
   if (!dr.open) return;
   if (greetTimer) { clearTimeout(greetTimer); greetTimer = null; commit(); }
   if (radiusTimer) { clearTimeout(radiusTimer); radiusTimer = null; commit(); }
+  if (slideTimer) { clearTimeout(slideTimer); slideTimer = null; commit(); }
   const d = $('#drawer'), sc = $('#scrim');
   $('#cust-btn').setAttribute('aria-expanded', 'false');
   dr.open = false;
@@ -6156,23 +6723,93 @@ $('#dr-accent').addEventListener('click', e => {
 });
 $('#dr-secs').addEventListener('change', e => { state.ui.seconds = e.target.checked; commit(); });
 $('#dr-sky').addEventListener('change', e => { state.ui.sky = e.target.checked; commit(); });
-$('#dr-mirror').addEventListener('click', () => { closeDrawer(); mirrorOpen(true); });
+/* Kopf */
+$('#dr-hstyle').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b) return;
+  const h = state.ui.head;
+  h.style = b.dataset.v;
+  h.weight = HEAD_STYLES[h.style][1];
+  h.size = 100;
+  commit();
+  renderHeadSec();
+});
+$('#dr-hsize').addEventListener('input', e => { state.ui.head.size = +e.target.value; applyUi(); renderHeadSec(); slideSave(); });
+$('#dr-hweight').addEventListener('input', e => { state.ui.head.weight = +e.target.value; applyUi(); renderHeadSec(); slideSave(); });
+for (const [sel, key] of [['#dr-hgreet', 'greet'], ['#dr-hdate', 'date'], ['#dr-hkw', 'kw']]) {
+  $(sel).addEventListener('change', e => { state.ui.head[key] = e.target.checked; commit(); renderHeadSec(); });
+}
+/* Kacheln oben */
 $('#dr-tiles').addEventListener('change', e => {
   const k = e.target.dataset.tile;
   if (!k) return;
   state.ui.tiles[k] = e.target.checked;
   commit();
 });
+sortable($('#dr-tiles'), { item: '.sort-row', handle: '.sort-h', done: keys => { state.ui.order = normOrder(keys, state.ui.countdowns); commit(); } });
+/* Spiegel */
+$('#dr-mirror').addEventListener('click', () => { closeDrawer(); mirrorOpen(true); });
+$('#mp-o').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b) return;
+  mp.o = b.dataset.v;
+  segSet($('#mp-o'), mp.o);
+  $('#mp-frame').dataset.o = mp.o;
+  renderMirror();
+});
+$('#dr-mpreset').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b || !M_PRESETS[b.dataset.v]) return;
+  const m = state.ui.mirror;
+  m.blocks = mPresetBlocks(b.dataset.v);
+  m.preset = b.dataset.v;
+  commit();
+  renderMirrorSec();
+});
+$('#dr-mblocks').addEventListener('change', e => {
+  const m = state.ui.mirror, t = e.target, k = t.dataset.mz || t.dataset.mon, b = m.blocks.find(x => x.k === k);
+  if (!b) return;
+  if (t.dataset.mz && MZ[t.value]) b.z = t.value;
+  if (t.dataset.mon) { b.on = t.checked; const s = t.closest('li').querySelector('.mz-sel'); if (s) s.disabled = !b.on; }
+  m.preset = '';
+  segSet($('#dr-mpreset'), '');
+  commit();
+  renderMirror();
+});
+sortable($('#dr-mblocks'), { item: '.sort-row', handle: '.sort-h', done: keys => {
+  const m = state.ui.mirror;
+  m.blocks = keys.map(k => m.blocks.find(b => b.k === k)).filter(Boolean);
+  m.preset = '';
+  segSet($('#dr-mpreset'), '');
+  commit();
+  renderMirror();
+} });
+$('#dr-msize').addEventListener('input', e => { state.ui.mirror.size = +e.target.value; setRange('#dr-msize', state.ui.mirror.size, 70, 140, `${state.ui.mirror.size} %`); renderMirror(); slideSave(); });
+$('#dr-mdim-lvl').addEventListener('input', e => { state.ui.mirror.dim.lvl = +e.target.value; setRange('#dr-mdim-lvl', state.ui.mirror.dim.lvl, 15, 80, `${state.ui.mirror.dim.lvl} %`); slideSave(); });
+$('#dr-msecs').addEventListener('change', e => { state.ui.mirror.secs = e.target.checked; commit(); renderMirror(); });
+$('#dr-mshift').addEventListener('change', e => { state.ui.mirror.shift = e.target.checked; commit(); });
+$('#dr-mdim').addEventListener('change', e => { state.ui.mirror.dim.on = e.target.checked; commit(); renderMirrorSec(); });
+for (const [sel, key] of [['#dr-mdim-from', 'from'], ['#dr-mdim-to', 'to']]) {
+  $(sel).addEventListener('change', e => { if (validHm(e.target.value)) { state.ui.mirror.dim[key] = e.target.value; commit(); } });
+}
 $('#dr-cd-list').addEventListener('click', e => {
   const del = e.target.closest('[data-cddel]');
   if (del) {
     const i = state.ui.countdowns.findIndex(c => c.id === del.dataset.cddel);
     if (i < 0) return;
     const [removed] = state.ui.countdowns.splice(i, 1);
+    const pos = state.ui.order.indexOf('cd:' + removed.id);
+    state.ui.order = normOrder(state.ui.order, state.ui.countdowns);
     if (editingCd === removed.id) resetCdForm();
     commit();
     renderCdList();
-    toast(`„${removed.name}“ gelöscht`, () => { state.ui.countdowns.splice(Math.min(i, state.ui.countdowns.length), 0, removed); commit(); renderCdList(); });
+    renderTilesSec();
+    toast(`„${removed.name}“ gelöscht`, () => {
+      state.ui.countdowns.splice(Math.min(i, state.ui.countdowns.length), 0, removed);
+      if (pos >= 0) state.ui.order.splice(Math.min(pos, state.ui.order.length), 0, 'cd:' + removed.id);
+      state.ui.order = normOrder(state.ui.order, state.ui.countdowns);
+      commit(); renderCdList(); renderTilesSec();
+    });
     return;
   }
   const ed = e.target.closest('[data-cdedit]');
@@ -6198,9 +6835,11 @@ $('#dr-cd-form').addEventListener('submit', e => {
   const i = state.ui.countdowns.findIndex(x => x.id === c.id);
   if (i >= 0) state.ui.countdowns[i] = c;
   else if (state.ui.countdowns.length < 6) state.ui.countdowns.push(c);
+  state.ui.order = normOrder(state.ui.order, state.ui.countdowns);
   resetCdForm();
   commit();
   renderCdList();
+  renderTilesSec();
 });
 $('#dr-start').addEventListener('change', e => {
   const st = state.ui.start, tg = startTargets();
@@ -8148,9 +8787,10 @@ function skyTick(now) {
 /* 41-spiegel.js */
 /* Spiegel-Modus: schwarzer Vollbild-Überblick für einen Smart Mirror oder einen Bildschirm an der Wand.
  * Schwarz bleibt hinter Spiegelglas unsichtbar, deshalb nur helle Schrift ohne Flächen.
+ * Was wo steht, legst du unter Anpassen, Spiegel fest: Bausteine (Uhr, Wetter, Termine …) in sieben Bereichen.
  * Start über den Knopf oben, die Taste S oder die Adresse …/#spiegel. Beenden mit Esc oder S.
- * Hält den Bildschirm wach (Wake Lock, wenn der Browser es kann) und verschiebt den Inhalt alle paar Minuten
- * um ein paar Pixel, damit sich nichts einbrennt. */
+ * Hält den Bildschirm wach (Wake Lock, wenn der Browser es kann), kann nachts dimmen und verschiebt den Inhalt
+ * alle paar Minuten um ein paar Pixel, damit sich nichts einbrennt. */
 const mr = { on: false, fs: false, lock: null, idle: null, shift: -1, last: '' };
 function mirrorFromHash() { try { return decodeURIComponent(location.hash.slice(1)).toLowerCase() === 'spiegel'; } catch { return false; } }
 async function mirrorLock() {
@@ -8168,7 +8808,8 @@ function mirrorOpen(gesture) {
   mirrorLock();
   mirrorWake();
   mr.last = '';
-  renderMirror();
+  mr.shift = -1;
+  mirrorTick(new Date());
 }
 function mirrorClose() {
   if (!mr.on) return;
@@ -8187,28 +8828,37 @@ function mirrorWake() {
   clearTimeout(mr.idle);
   mr.idle = setTimeout(() => $('#mirror').classList.remove('awake'), 3000);
 }
-function renderMirror() {
-  if (!mr.on) return;
-  const now = new Date();
-  $('#m-time').innerHTML = `${pad(now.getHours())}<span class="colon">:</span>${pad(now.getMinutes())}`;
-  $('#m-date').textContent = `${WDL[now.getDay()]}, ${now.getDate()}. ${ML[now.getMonth()]}, KW ${isoWeek(now)}`;
-  // Wetter
-  const d = wx.data, c = d && d.current;
-  $('#m-wx').hidden = !c;
-  if (c) {
+/* Platzhalter für die Vorschau, wenn ein Baustein gerade nichts zu zeigen hat */
+const mPh = (k, txt) => `<section class="mb m-ph" data-b="${k}"><b>${esc(MB[k])}</b><span>${esc(txt)}</span></section>`;
+/* Die Bausteine. Jeder liefert sein HTML oder nichts, wenn es gerade nichts zu zeigen gibt. */
+const MBR = {
+  clock(now) {
+    const s = state.ui.mirror.secs ? `<span class="sec">${pad(now.getSeconds())}</span>` : '';
+    return `<section class="mb m-clock" data-b="clock"><p class="m-time">${pad(now.getHours())}<span class="colon">:</span>${pad(now.getMinutes())}${s}</p><p class="m-date">${WDL[now.getDay()]}, ${now.getDate()}. ${ML[now.getMonth()]}, KW ${isoWeek(now)}</p></section>`;
+  },
+  notes(now, pv) {
+    const list = [...wnMirror(now), ...bdMirror(now).map(t => ({ t, c: '#F0B040' })), ...wsMirror(now)];
+    if (!list.length) return pv ? mPh('notes', 'Gerade nichts, hier stehen Warnungen, Geburtstage und Müll') : '';
+    return `<ul class="mb m-notes" data-b="notes">${list.map(n => `<li style="--c:${n.c}">${esc(n.t)}</li>`).join('')}</ul>`;
+  },
+  wx(now, pv) {
+    const d = wx.data, c = d && d.current;
+    if (!c) return pv ? mPh('wx', 'Kommt, sobald das Wetter geladen ist') : '';
     const w = WMO[c.weather_code] || ['', 'cloud'];
-    $('#m-wx-ico').innerHTML = icon(w[1], c.is_day !== 0);
-    $('#m-wx-temp').textContent = Number.isFinite(c.temperature_2m) ? `${Math.round(c.temperature_2m)}°` : '';
-    $('#m-wx-desc').textContent = w[0];
     const hi = d.daily ? Math.round(d.daily.temperature_2m_max[0]) : null, lo = d.daily ? Math.round(d.daily.temperature_2m_min[0]) : null;
     const D = sky.day, sun = D && D.rise && D.set ? `Sonne ${hm(D.rise)} bis ${hm(D.set)}` : '';
-    $('#m-wx-sub').textContent = [hi != null ? `${lo}° bis ${hi}°` : '', mirrorRain(d, now), sun].filter(Boolean).join('. ');
-  }
-  // Termine heute und morgen
-  const box = $('#m-cal');
-  const evs = ca.data && caSec().feeds.length ? ca.data.events : null;
-  box.hidden = !evs;
-  if (evs) {
+    const sub = [hi != null ? `${lo}° bis ${hi}°` : '', mirrorRain(d, now), sun].filter(Boolean).join('. ');
+    return `<section class="mb m-wx" data-b="wx"><div class="m-wx-now"><span class="m-wx-ico">${icon(w[1], c.is_day !== 0)}</span><b>${Number.isFinite(c.temperature_2m) ? Math.round(c.temperature_2m) + '°' : ''}</b></div><p>${esc(w[0])}</p><p class="m-dim">${esc(sub)}</p></section>`;
+  },
+  cm(now, pv) {
+    const s = cm.sum;
+    if (!s) return pv ? mPh('cm', state.commute.home ? 'Kommt, sobald die Strecke berechnet ist' : 'Trag erst deine Strecke im Pendeln-Widget ein') : '';
+    const how = s.closures ? (s.closures === 1 ? 'Sperrung auf der Strecke' : `${s.closures} Sperrungen`) : s.delay >= 1 ? `+${Math.round(s.delay)} Min Stau` : 'freie Fahrt';
+    return `<section class="mb m-cm" data-b="cm"><h3>${s.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'}</h3><p><b>${s.mins} Min</b><span${s.closures || s.delay >= 3 ? ' class="warn"' : ''}>${esc(how)}</span></p></section>`;
+  },
+  cal(now, pv) {
+    const evs = ca.data && caSec().feeds.length ? ca.data.events : null;
+    if (!evs) return pv ? mPh('cal', 'Verbinde zuerst deinen Kalender') : '';
     let html = '', n = 0;
     for (let i = 0; i < 2 && n < 7; i++) {
       const day = addDays(sod(now), i);
@@ -8222,42 +8872,75 @@ function renderMirror() {
       }
       html += '</ul>';
     }
-    box.innerHTML = html || '<h3>Heute</h3><p class="m-dim">Keine Termine mehr heute und morgen.</p>';
-  }
-  // Hinweise unter dem Datum: Wetterwarnungen, Geburtstage und Müllabfuhr von heute und morgen
-  const notes = [...wnMirror(now), ...bdMirror(now).map(t => ({ t, c: '#F0B040' })), ...wsMirror(now)];
-  $('#m-notes').innerHTML = notes.map(n => `<li style="--c:${n.c}">${esc(n.t)}</li>`).join('');
-  // Abfahrten der ersten Haltestelle
-  const dep = dpMirror(now), dbox = $('#m-dep');
-  dbox.hidden = !dep;
-  if (dep) {
+    return `<section class="mb m-cal" data-b="cal">${html || '<h3>Heute</h3><p class="m-dim">Keine Termine mehr heute und morgen.</p>'}</section>`;
+  },
+  dep(now, pv) {
+    const dep = dpMirror(now);
+    if (!dep) return pv ? mPh('dep', 'Wähl zuerst eine Haltestelle im Abfahrten-Widget') : '';
     const go = dep.walk ? dep.rows.find(r => !r.x) : null, left = go ? Math.floor((go.t - dep.walk * 6e4 - +now) / 6e4) : 0;
-    dbox.innerHTML = `<h3>${esc(dep.name)}${go ? ` <span>${left < 1 ? 'jetzt los' : `los in ${left} Min`}</span>` : ''}</h3>`
-      + (dep.rows.length ? `<ul>${dep.rows.map(r => `<li${r.x ? ' class="x"' : ''}>${dpBadge(r)}<span class="m-to">${esc(r.to)}</span><b>${r.x ? 'fällt aus' : mirrorMin(r.t - +now, r.t)}</b></li>`).join('')}</ul>` : '<p class="m-dim">Gerade keine Abfahrten.</p>');
+    return `<section class="mb m-dep" data-b="dep"><h3>${esc(dep.name)}${go ? ` <span>${left < 1 ? 'jetzt los' : `los in ${left} Min`}</span>` : ''}</h3>`
+      + (dep.rows.length ? `<ul>${dep.rows.map(r => `<li${r.x ? ' class="x"' : ''}>${dpBadge(r)}<span class="m-to">${esc(r.to)}</span><b>${r.x ? 'fällt aus' : mirrorMin(r.t - +now, r.t)}</b></li>`).join('')}</ul>` : '<p class="m-dim">Gerade keine Abfahrten.</p>') + '</section>';
+  },
+  cd(now, pv) {
+    // Kacheln und Countdowns wie oben im Cockpit, in derselben Reihenfolge
+    const u = state.ui, out = [];
+    for (const k of normOrder(u.order, u.countdowns)) {
+      const el = k.startsWith('cd:') ? $('#cd-' + k.slice(3)) : u.tiles[k] ? $('#t-' + k) : null;
+      if (!el) continue;
+      const val = el.querySelector('.t-val').textContent.trim();
+      if (val) out.push(`<li><span class="m-dim">${esc(el.querySelector('.t-label').textContent)}</span><b>${esc(val)}</b></li>`);
+    }
+    if (!out.length) return pv ? mPh('cd', 'Schalte unter Kopf ein paar Kacheln ein') : '';
+    return `<section class="mb m-cd" data-b="cd"><ul>${out.join('')}</ul></section>`;
   }
-  // Countdowns aus den Kacheln
-  const cd = [];
-  for (const id of ['t-fa', 't-we', 't-ur']) {
-    const t = $('#' + id);
-    if (!t || !state.ui.tiles[id.slice(2)]) continue;
-    cd.push(`<li><span class="m-dim">${esc(t.querySelector('.t-label').textContent)}</span><b>${esc(t.querySelector('.t-val').textContent)}</b></li>`);
+};
+/* Spiegel in ein Raster zeichnen: Bereiche ohne Inhalt fallen weg, die Mitte hält den Platz frei */
+function mirrorRender(root, now, pv) {
+  const m = state.ui.mirror, zones = Object.fromEntries(Object.keys(MZ).map(z => [z, []]));
+  for (const b of m.blocks) {
+    if (!b.on || !MBR[b.k]) continue;
+    let h = '';
+    try { h = MBR[b.k](now, pv); } catch { h = ''; }
+    if (h) zones[b.z].push(h);
   }
-  for (const c2 of state.ui.countdowns.slice(0, 2)) {
-    const t = $('#cd-' + c2.id);
-    if (t) cd.push(`<li><span class="m-dim">${esc(c2.name)}</span><b>${esc(t.querySelector('.t-val').textContent)}</b></li>`);
-  }
-  $('#m-cd').innerHTML = cd.length ? `<ul>${cd.join('')}</ul>` : '';
-  mirrorFit();
+  const rows = [];
+  if (zones.top.length) rows.push(['top top', 'auto']);
+  if (zones.tl.length || zones.tr.length) rows.push(['tl tr', 'auto']);
+  rows.push(['mid mid', 'minmax(0,1fr)']);
+  if (zones.bl.length || zones.br.length) rows.push(['bl br', 'auto']);
+  if (zones.bottom.length) rows.push(['bottom bottom', 'auto']);
+  root.style.gridTemplateAreas = rows.map(r => `"${r[0]}"`).join(' ');
+  root.style.gridTemplateRows = rows.map(r => r[1]).join(' ');
+  root.style.setProperty('--m-k', String(m.size / 100));
+  root.innerHTML = Object.entries(zones).filter(([, l]) => l.length).map(([z, l]) => `<div class="mz" data-z="${z}">${l.join('')}</div>`).join('');
+  mirrorFit(root);
 }
-/* Rechte Spalte: Was nicht mehr ganz passt, fliegt raus, zuerst Countdowns, dann späte Abfahrten (mindestens 2 bleiben) */
-function mirrorFit() {
-  const side = $('.m-side');
-  for (let i = 0; i < 12 && side.scrollHeight > side.clientHeight + 1; i++) {
-    const cd = $$('#m-cd li'), dep = $$('#m-dep li');
-    if (cd.length) cd[cd.length - 1].remove();
-    else if (dep.length > 2) dep[dep.length - 1].remove();
-    else break;
+/* Was nicht mehr ganz passt, fliegt raus: zuerst Countdowns, dann späte Abfahrten, späte Termine, dann Hinweise */
+function mirrorFit(root) {
+  for (let i = 0; i < 40 && root.scrollHeight > root.clientHeight + 1; i++) {
+    const cd = root.querySelectorAll('.m-cd li'), dep = root.querySelectorAll('.m-dep li'), cal = root.querySelectorAll('.m-cal li'), nt = root.querySelectorAll('.m-notes li');
+    let x = null;
+    if (cd.length > 1) x = cd[cd.length - 1];
+    else if (dep.length > 2) x = dep[dep.length - 1];
+    else if (cal.length > 2) x = cal[cal.length - 1];
+    else if (nt.length > 1) x = nt[nt.length - 1];
+    if (!x) break;
+    const ul = x.parentElement;
+    x.remove();
+    if (!ul.children.length && ul.previousElementSibling && ul.previousElementSibling.tagName === 'H3') { ul.previousElementSibling.remove(); ul.remove(); }
   }
+}
+const mirrorPreviewOn = () => dr.open && dr.tab === 'mirror';
+function renderMirror() {
+  const now = new Date();
+  if (mr.on) mirrorRender($('#m-in'), now, false);
+  if (mirrorPreviewOn()) { mirrorScale(); mirrorRender($('#mp-in'), now, true); }
+}
+/* Vorschau: der Spiegel wird in voller Größe (1600 × 900 oder hochkant) gezeichnet und passend verkleinert */
+function mirrorScale() {
+  const f = $('#mp-frame'), p = f.querySelector('.mp');
+  if (!f.offsetWidth || !p.offsetWidth) return;
+  p.style.setProperty('--mp-s', String(f.offsetWidth / p.offsetWidth));
 }
 const mirrorMin = (ms, t) => { const m = Math.floor(ms / 6e4); return m < 1 ? 'jetzt' : m < 60 ? `${m} Min` : hm(new Date(t)); };
 /* Regen in den nächsten 2 Stunden in einem Satz */
@@ -8271,15 +8954,26 @@ function mirrorRain(d, now) {
   const wet = next.find(([, p]) => p > 0.05);
   return wet ? `Regen ab etwa ${hm(new Date(wet[0] * 1000))}` : 'Trocken in den nächsten 2 Stunden';
 }
+/* Liegt die Uhrzeit im Fenster zum Dimmen? Das Fenster darf über Mitternacht gehen. */
+function mirrorDimNow(now) {
+  const d = state.ui.mirror.dim;
+  if (!d.on || d.from === d.to) return false;
+  const t = hm(now);
+  return d.from < d.to ? t >= d.from && t < d.to : t >= d.from || t < d.to;
+}
 function mirrorTick(now) {
-  if (!mr.on) return;
+  if (!mr.on && !mirrorPreviewOn()) return;
   const k = `${hm(now)}|${ymd(now)}`;
   if (k !== mr.last) { mr.last = k; renderMirror(); }
+  if (state.ui.mirror.secs) for (const s of document.querySelectorAll('.m-time .sec')) s.textContent = pad(now.getSeconds());
+  if (!mr.on) return;
+  const m = state.ui.mirror, inner = $('#m-in');
+  inner.style.opacity = mirrorDimNow(now) ? String(m.dim.lvl / 100) : '';
   const s = Math.floor(now.getTime() / 3e5);
   if (s !== mr.shift) {
     mr.shift = s;
     const a = (s * 2.39996) % (2 * Math.PI);
-    $('#m-in').style.transform = reduceMotion ? '' : `translate(${(Math.cos(a) * 6).toFixed(1)}px,${(Math.sin(a) * 6).toFixed(1)}px)`;
+    inner.style.transform = reduceMotion || !m.shift ? '' : `translate(${(Math.cos(a) * 6).toFixed(1)}px,${(Math.sin(a) * 6).toFixed(1)}px)`;
   }
 }
 $('#mirror-btn').addEventListener('click', () => mirrorOpen(true));
@@ -8300,6 +8994,7 @@ document.addEventListener('keydown', e => {
 document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && mr.on && mr.fs) mirrorClose(); });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') mirrorLock(); });
 addEventListener('hashchange', () => { if (mirrorFromHash()) mirrorOpen(false); else if (mr.on) mirrorClose(); });
+if (typeof ResizeObserver === 'function') new ResizeObserver(mirrorScale).observe($('#mp-frame'));
 
 /* 42-abfahrten.js */
 /* Abfahrten über Transitous: eine freie, nicht kommerzielle Fahrplanauskunft (MOTIS) mit offenen Daten,
@@ -9741,8 +10436,8 @@ function syCfg() {
 }
 const sySave = c => lsSet(SY_KEY, c);
 
-/* Was pro Gerät bleibt: Hell oder Dunkel, Graphit oder Schwarz, Kartenbreite und Abstände. Akzent und Ecken wandern mit. */
-const SY_LOCAL_UI = ['theme', 'dark', 'size', 'density'];
+/* Was pro Gerät bleibt: Hell oder Dunkel, Graphit oder Schwarz, Kartenbreite, Abstände und der Stil der Uhr. Akzent, Ecken, Kacheln und Spiegel wandern mit. */
+const SY_LOCAL_UI = ['theme', 'dark', 'size', 'density', 'head'];
 /* Was zwischen Geräten wandert: alles außer der offenen Seite, den Merkzetteln dieses Browsers und den Einstellungen pro Gerät */
 function syView(s) {
   const v = { ...s, ui: { ...s.ui } };
@@ -10197,13 +10892,16 @@ function cmdBuild() {
   for (const [k, n] of [['s', 'Schmal'], ['m', 'Normal'], ['l', 'Breit']]) add('Aussehen', `Kartenbreite: ${n}`, () => cmdSetUi({ size: k }), { ico: CMD_ICO.grid, on: u.size === k, words: 'karten groesse spalten' });
   add('Aussehen', u.seconds ? 'Sekunden ausblenden' : 'Sekunden zeigen', () => cmdSetUi({ seconds: !u.seconds }), { ico: CMD_ICO.clock, words: 'uhr zeit' });
   add('Aussehen', u.sky ? 'Himmel ausschalten' : 'Himmel nach Sonnenstand färben', () => cmdSetUi({ sky: !u.sky }), { ico: CMD_ICO.sky, words: 'kopf sonne farbe' });
+  for (const [k, [n]] of Object.entries(HEAD_STYLES)) add('Aussehen', `Uhr: ${n}`, () => cmdSetUi({ head: { ...u.head, style: k, weight: HEAD_STYLES[k][1], size: 100 } }), { ico: CMD_ICO.clock, on: u.head.style === k, words: 'kopf stil uhrzeit' });
   add('Aussehen', 'Ecken einstellen', () => { openDrawer('look'); setTimeout(() => $('#dr-radius').focus(), 60); }, { ico: CMD_ICO.tune, words: 'rund radius form' });
 
   add('Einstellungen', 'Startseite festlegen', () => openDrawer('pages'), { ico: CMD_ICO.page, words: 'beim oeffnen arbeitszeit automatisch' });
-  add('Einstellungen', 'Countdown anlegen', () => { openDrawer('pages'); setTimeout(() => { const n = $('#cd-name'); n.scrollIntoView({ block: 'center' }); n.focus({ preventScroll: true }); }, 60); }, { ico: CMD_ICO.flag, words: 'kachel pruefung termin zaehlen' });
-  add('Einstellungen', 'Kacheln oben ein- und ausschalten', () => openDrawer('pages'), { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub' });
-  add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('devices'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });
-  add('Einstellungen', 'Als App installieren', () => openDrawer('devices'), { ico: CMD_ICO.plus, words: 'pwa homescreen dock' });
+  add('Einstellungen', 'Uhr und Kopf anpassen', () => openDrawer('head'), { ico: CMD_ICO.clock, words: 'groesse schrift datum kalenderwoche begruessung sekunden' });
+  add('Einstellungen', 'Spiegel einrichten', () => openDrawer('mirror'), { ico: CMD_ICO.mirror, words: 'smart mirror bausteine dimmen nachts vorschau' });
+  add('Einstellungen', 'Countdown anlegen', () => { openDrawer('head'); setTimeout(() => { const n = $('#cd-name'); n.scrollIntoView({ block: 'center' }); n.focus({ preventScroll: true }); }, 60); }, { ico: CMD_ICO.flag, words: 'kachel pruefung termin zaehlen' });
+  add('Einstellungen', 'Kacheln oben wählen und sortieren', () => { openDrawer('head'); setTimeout(() => $('#dr-tiles').scrollIntoView({ block: 'start' }), 60); }, { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub reihenfolge termin sonne' });
+  add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('data'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });
+  add('Einstellungen', 'Als App installieren', () => openDrawer('data'), { ico: CMD_ICO.plus, words: 'pwa homescreen dock' });
   add('Einstellungen', 'Zwischenstand zurückholen', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'rueckgaengig wiederherstellen backup gestern' });
   add('Einstellungen', 'Sicherung laden', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'import datei backup' });
   return out;
@@ -10296,7 +10994,7 @@ document.addEventListener('keydown', e => {
 
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.9';
+const VERSION = '3.0';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -10326,6 +11024,7 @@ function renderAll() {
   renderEditBar();
   checkBackup();
   tick();
+  renderMirror();
   schedLayout();
 }
 
@@ -10350,9 +11049,10 @@ const NEWS = {
   '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
   '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null],
   '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau'],
-  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => openDrawer('devices'), 'Zeigen'],
+  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => openDrawer('data'), 'Zeigen'],
   '2.8': ['Neuer Look: Dunkel in Graphit oder Schwarz, mehr Akzentfarben mit Verläufen, ein neues Anpassen-Fenster und die Schnellsuche mit Strg+K.', () => openDrawer('look'), 'Ansehen'],
-  '2.9': ['Feinschliff: Notizen lassen dich jetzt durchschreiben, Auswahllisten passen zum Look, alle laufenden Balken leuchten in deiner Farbe und Pendeln sagt genauer, was mit TomTom los ist. Der Vers des Tages ist raus.', null]
+  '2.9': ['Feinschliff: Notizen lassen dich jetzt durchschreiben, Auswahllisten passen zum Look, alle laufenden Balken leuchten in deiner Farbe und Pendeln sagt genauer, was mit TomTom los ist. Der Vers des Tages ist raus.', null],
+  '3.0': ['Neu: Stile für die Uhr, Kacheln zum Sortieren, ein Spiegel zum Einrichten mit Vorschau, kompaktes Wetter und Pendeln und eine Galerie mit Registern. Soll ich dir den neuen Kopf zeigen?', () => openDrawer('head'), 'Zeigen']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {

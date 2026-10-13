@@ -1,52 +1,91 @@
-/* Spiegel-Modus: reines Schwarz, nur Schrift. Funktioniert hoch und quer. */
-.mirror{position:fixed;inset:0;z-index:200;background:#000;color:#F2F4F7;overflow:hidden;cursor:none;
+/* Spiegel-Modus: reines Schwarz, nur Schrift. Größen in cqmin, also relativ zum Spiegel selbst.
+   So sieht die verkleinerte Vorschau im Anpassen-Fenster genauso aus wie der echte Spiegel. Funktioniert hoch und quer. */
+.mirror{position:fixed;inset:0;z-index:200;background:#000;color:#F2F4F7;overflow:hidden;cursor:none;container-type:size;
   --m-dim:#8B93A0;font-family:var(--f-body)}
 .mirror.awake{cursor:auto}
 html.mirror-on body{overflow:hidden}
-.m-in{position:absolute;inset:0;padding:clamp(28px,5vmin,72px);display:grid;gap:clamp(24px,4vmin,56px);
-  grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);
-  grid-template-areas:"clock wx" "cal cd";transition:transform 2s ease}
-.m-clock{grid-area:clock}
-.m-time{margin:0;font-family:var(--f-display);font-weight:250;font-variation-settings:'wdth' 75,'opsz' 96;font-size:clamp(96px,19vmin,260px);line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.m-time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
-.m-date{margin:.7em 0 0;font:500 clamp(18px,2.6vmin,32px)/1.2 var(--f-body);color:var(--m-dim)}
-.m-wx{grid-area:wx;justify-self:end;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.m-wx p{margin:0;font-size:clamp(17px,2.3vmin,28px);line-height:1.3}
-.m-wx-now{display:flex;align-items:center;gap:.3em;font-size:clamp(56px,10vmin,140px)}
-.m-wx-now b{font-family:var(--f-display);font-weight:300;font-variation-settings:'wdth' 80;line-height:.9;letter-spacing:-.03em}
-.m-wx-ico svg{width:.75em;height:.75em;display:block;color:#F2F4F7;--surface:#000}
+.m-in{position:absolute;inset:0;padding:clamp(28px,5cqmin,72px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  column-gap:clamp(24px,4cqmin,56px);row-gap:clamp(20px,3.6cqmin,48px);overflow:hidden;transition:transform 2s ease,opacity 1.5s ease}
+/* Sieben Bereiche: oben Mitte, oben links und rechts, Mitte, unten links und rechts, unten Mitte */
+.mz{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(18px,3.4cqmin,46px);min-width:0;min-height:0}
+.mz[data-z="top"]{grid-area:top}
+.mz[data-z="tl"]{grid-area:tl}
+.mz[data-z="tr"]{grid-area:tr}
+.mz[data-z="mid"]{grid-area:mid;justify-content:center}
+.mz[data-z="bl"]{grid-area:bl;justify-content:flex-end}
+.mz[data-z="br"]{grid-area:br;justify-content:flex-end}
+.mz[data-z="bottom"]{grid-area:bottom}
+.mz[data-z="tr"],.mz[data-z="br"]{align-items:flex-end;text-align:right}
+.mz[data-z="top"],.mz[data-z="mid"],.mz[data-z="bottom"]{align-items:center;text-align:center}
+.mb{min-width:0;max-width:100%;margin:0}
 .m-dim{color:var(--m-dim)}
-.m-wx .m-dim{max-width:22em}
-.m-cal{grid-area:cal;min-height:0;overflow:hidden}
-.m-cal h3{margin:0 0 .4em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
-.m-cal h3:not(:first-child){margin-top:1em}
-.m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7vmin,34px);line-height:1.25}
-.m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c)}
-.m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
-.m-side{grid-area:cd;justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:clamp(22px,4vmin,48px);min-height:0;overflow:hidden}
-.m-cd{text-align:right}
-.m-notes{list-style:none;margin:.9em 0 0;padding:0;display:flex;flex-direction:column;gap:.35em;font-size:clamp(16px,2.2vmin,26px);line-height:1.3}
-.m-notes:empty{display:none}
+
+/* Uhr */
+.m-clock{display:flex;flex-direction:column;align-items:inherit}
+.m-time{margin:0;font-family:var(--f-display);font-weight:250;font-variation-settings:'wdth' 75,'opsz' 96;font-size:calc(clamp(96px,19cqmin,260px) * var(--m-k,1));line-height:.8;letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.m-time .colon{display:inline-block;opacity:.55;margin:0 .045em 0 .035em;transform:translateY(-.07em)}
+.m-time .sec{display:inline-block;font-size:.2em;font-weight:400;font-variation-settings:'wdth' 85;letter-spacing:0;margin-left:.4em;opacity:.6;vertical-align:top;line-height:1;transform:translateY(.25em)}
+.m-date{margin:.7em 0 0;font:500 clamp(18px,2.6cqmin,32px)/1.2 var(--f-body);color:var(--m-dim)}
+
+/* Hinweise */
+.m-notes{list-style:none;padding:0;display:flex;flex-direction:column;align-items:inherit;gap:.35em;font-size:clamp(16px,2.2cqmin,26px);line-height:1.3}
 .m-notes li{display:flex;align-items:center;gap:.55em}
 .m-notes li::before{content:"";flex:0 0 auto;width:.5em;height:.5em;border-radius:50%;background:var(--c)}
-.m-dep{text-align:right;min-width:0;max-width:100%}
-.m-dep h3{margin:0 0 .5em;font:600 clamp(15px,2vmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+
+/* Wetter */
+.m-wx{display:flex;flex-direction:column;align-items:inherit;gap:4px}
+.m-wx p{margin:0;font-size:clamp(17px,2.3cqmin,28px);line-height:1.3}
+.m-wx-now{display:flex;align-items:center;gap:.3em;font-size:calc(clamp(56px,10cqmin,140px) * var(--m-k,1))}
+.m-wx-now b{font-family:var(--f-display);font-weight:300;font-variation-settings:'wdth' 80;line-height:.9;letter-spacing:-.03em}
+.m-wx-ico svg{width:.75em;height:.75em;display:block;color:#F2F4F7;--surface:#000}
+.m-wx .m-dim{max-width:22em}
+
+/* Pendeln */
+.m-cm h3,.m-cal h3,.m-dep h3{margin:0 0 .45em;font:600 clamp(15px,2cqmin,24px)/1.2 var(--f-body);color:var(--m-dim)}
+.m-cm p{margin:0;display:flex;align-items:baseline;gap:.5em;flex-wrap:wrap;justify-content:inherit;font-size:clamp(18px,2.6cqmin,32px)}
+.m-cm b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.6em;line-height:1}
+.m-cm .warn{color:#F2A24A}
+
+/* Termine */
+.m-cal h3:not(:first-child){margin-top:1em}
+.m-cal ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.45em;font-size:clamp(18px,2.7cqmin,34px);line-height:1.25}
+.m-cal li{display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:.6em;padding-left:.6em;border-left:3px solid var(--c);text-align:left}
+.mz[data-z="tr"] .m-cal li,.mz[data-z="br"] .m-cal li{grid-template-columns:minmax(0,1fr) 5.2em;padding:0 .6em 0 0;border-left:0;border-right:3px solid var(--c);text-align:right}
+.mz[data-z="tr"] .m-cal .m-t,.mz[data-z="br"] .m-cal .m-t{order:2}
+.mz[data-z="top"] .m-cal li,.mz[data-z="mid"] .m-cal li,.mz[data-z="bottom"] .m-cal li{display:flex;justify-content:center;gap:.6em;padding:0;border:0;text-align:center}
+.mz[data-z="top"] .m-cal li::before,.mz[data-z="mid"] .m-cal li::before,.mz[data-z="bottom"] .m-cal li::before{content:"";align-self:center;width:.45em;height:.45em;border-radius:50%;background:var(--c)}
+.m-t{color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Abfahrten */
+.m-dep{min-width:0;max-width:100%}
 .m-dep h3 span{color:#F2F4F7;margin-left:.4em}
-.m-dep ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4em;font-size:clamp(17px,2.5vmin,30px);line-height:1.25}
+.m-dep ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.4em;font-size:clamp(17px,2.5cqmin,30px);line-height:1.25}
 .m-dep li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.6em;text-align:left}
 .m-dep .dp-line{font-size:.72em;min-width:2.5em}
 .m-to{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:14em}
 .m-dep b{font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;min-width:3.6em}
 .m-dep li.x{color:var(--m-dim)}
 .m-dep li.x .m-to{text-decoration:line-through}
-.m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.9em}
-.m-cd li{display:flex;flex-direction:column;font-size:clamp(15px,2vmin,24px)}
+
+/* Kacheln und Countdowns */
+.m-cd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;align-items:inherit;gap:.9em}
+.mz[data-z="top"] .m-cd ul,.mz[data-z="bottom"] .m-cd ul{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:.9em 2.4em}
+.m-cd li{display:flex;flex-direction:column;align-items:inherit;font-size:clamp(15px,2cqmin,24px)}
 .m-cd b{font-family:var(--f-display);font-weight:400;font-variation-settings:'wdth' 82;font-size:1.5em;line-height:1.15}
+
+/* Platzhalter, nur in der Vorschau */
+.m-ph{display:flex;flex-direction:column;gap:.2em;padding:.7em 1em;border:2px dashed #3A3F47;border-radius:.6em;color:var(--m-dim);font-size:clamp(16px,2.2cqmin,26px);max-width:24em}
+.m-ph b{color:#C9CED6;font-weight:600}
+
 .m-exit{position:absolute;top:16px;right:16px;opacity:0;pointer-events:none;transition:opacity .3s;border:1px solid #333;background:#111;color:#ddd;padding:8px 14px;border-radius:999px;font:600 14px var(--f-body)}
 .mirror.awake .m-exit,.m-exit:focus-visible{opacity:1;pointer-events:auto}
-@media (orientation:portrait){
-  .m-in{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto minmax(0,1fr);grid-template-areas:"clock clock" "wx cd" "cal cal"}
-  .m-wx{justify-self:start;text-align:left;align-items:flex-start}
-  .m-to{max-width:9em}
-}
+@container (orientation: portrait){.m-to{max-width:9em}}
 @media (prefers-reduced-motion: reduce){.m-in{transition:none}}
+
+/* Vorschau im Anpassen-Fenster: Spiegel in voller Größe, verkleinert */
+.mp-wrap{display:flex;flex-direction:column;gap:10px}
+.mp-frame{position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;border-radius:min(14px,calc(var(--r) * .7));background:#000;box-shadow:0 0 0 1px var(--glass-line),0 10px 30px -14px rgba(0,0,0,.5)}
+.mp-frame[data-o="port"]{width:min(230px,62%);aspect-ratio:9/16;margin:0 auto}
+.mirror.mp{position:absolute;inset:auto;left:0;top:0;z-index:auto;width:1600px;height:900px;transform-origin:0 0;transform:scale(var(--mp-s,.24));cursor:default;pointer-events:none}
+.mp-frame[data-o="port"] .mirror.mp{width:900px;height:1600px}
+.mp-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}

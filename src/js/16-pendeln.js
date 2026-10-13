@@ -311,8 +311,11 @@ function renderCommute() {
   if (R.ab.failed) hints.push('Ein Teil der Autobahn-Meldungen fehlt gerade.');
   $('#cm-hint').textContent = hints.join(' ');
   $('#cm-hint').hidden = !hints.length;
+  // Die reine Erklärung ohne TomTom-Key braucht es in der kompakten Ansicht nicht, Störungen schon
+  $('#cm-hint').dataset.k = !tt && !(R.tt && R.tt.error) && !R.ab.failed ? 'info' : 'warn';
   $('#cm-src').textContent = `Stand ${hm(new Date(R.at))} Uhr · Route: OpenStreetMap · Meldungen: Autobahn GmbH${tt ? ` · Live-Fahrzeit: TomTom${tt.stale ? ` von ${hm(new Date(tt.stale))} Uhr` : ''}` : ''}`;
   cm.items = items;
+  cmCompactUi();
   cmMap(R, items, tt);
   tickTiles(new Date());
   if (views.has('fuel')) renderFuel();
@@ -417,6 +420,7 @@ function openCmForm() {
   try { key = localStorage.getItem(TT_KEY) || ''; } catch { key = ''; }
   $('#cm-key').value = key;
   $('#cm-key-res').textContent = '';
+  $('#cm-compact').checked = state.widgets.commute.cfg.compact;
   $('#cm-err').hidden = true;
   $('#cm-form').hidden = false;
   $('#cm-home').focus();
@@ -469,4 +473,20 @@ $('#cm-key-test').addEventListener('click', async () => {
   } finally { btn.disabled = false; }
 });
 
-defineWidget('commute', {});
+/* Kompakt: Fahrzeit, Lage und wann du los musst. Karte und Meldungen klappen per Tipp auf (gilt bis zum Neuladen). */
+const cmx = { open: false };
+function cmCompactUi() {
+  const c = state.widgets.commute.cfg, on = c.compact && !cmx.open, b = $('#cm-more'), n = cm.items ? cm.items.length : 0;
+  $('#commute').classList.toggle('is-compact', on);
+  b.hidden = !c.compact;
+  b.setAttribute('aria-expanded', String(!on));
+  b.querySelector('span').textContent = !on ? 'Weniger zeigen' : n ? `Karte und ${n === 1 ? 'eine Meldung' : n + ' Meldungen'}` : 'Karte zeigen';
+}
+$('#cm-more').addEventListener('click', () => {
+  cmx.open = !cmx.open;
+  cmCompactUi();
+  if (cmx.open) setTimeout(() => cmFit(false), 80);
+  schedLayout();
+});
+$('#cm-compact').addEventListener('change', e => { state.widgets.commute.cfg.compact = e.target.checked; cmx.open = false; commit(); });
+defineWidget('commute', { render: cmCompactUi });
