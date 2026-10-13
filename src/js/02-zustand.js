@@ -377,19 +377,26 @@ let state = loadState();
 
 const SYNC_TXT = {
   local: 'Gespeichert in diesem Browser.',
-  none: 'Dieser Browser speichert hier nichts, zum Beispiel im privaten Fenster. Änderungen sind nach dem Neuladen weg.'
+  none: 'Dieser Browser speichert hier nichts, zum Beispiel im privaten Fenster. Änderungen sind nach dem Neuladen weg.',
+  cloud: 'Gespeichert in diesem Browser und in deiner Cloud.',
+  cloudwait: 'Gespeichert in diesem Browser, der Abgleich mit der Cloud folgt gleich.',
+  cloudbusy: 'Gleicht mit der Cloud ab …',
+  clouderr: 'Der Abgleich mit der Cloud klappt gerade nicht. Deine Änderungen bleiben in diesem Browser.'
 };
 function setSync(m) { const el = $('#sync'); el.dataset.mode = m; el.textContent = SYNC_TXT[m]; }
+/* Haken für den Abgleich zwischen Geräten (49-sync.js hängt sich hier ein): wird bei jedem Speichern gerufen und sagt, wie die Fußzeile heißen soll */
+let syncHook = null, syncMode = () => 'local';
 /* Jede Änderung: speichern, merken wann, alles neu zeichnen */
 function commit() {
   state.edited = true;
   state.meta.changedAt = new Date().toISOString();
   lsSet(LS_KEY, state);
+  if (syncHook) syncHook();
   renderAll();
-  setSync(lsOk ? 'local' : 'none');
+  setSync(lsOk ? syncMode() : 'none');
 }
 /* Nur speichern, ohne als Änderung zu zählen (z. B. welche Seite offen ist) */
-function persist() { lsSet(LS_KEY, state); }
+function persist() { lsSet(LS_KEY, state); if (syncHook) syncHook(); }
 
 /* Toast mit Rückgängig */
 let toastTimer = null, undoFn = null;

@@ -1,0 +1,17 @@
+/* Sync zwischen Geräten */
+.sy-box{display:flex;flex-direction:column;gap:12px}
+.sy-steps-box summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--sea)}
+.sy-steps-box[open] summary{margin-bottom:10px}
+.sy-steps{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
+.sy-steps li::marker{font-weight:700;color:var(--muted)}
+.sy-steps b{font-weight:700}
+.sy-steps code{font:500 12.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;padding:1px 5px;border-radius:5px;background:var(--raise);overflow-wrap:anywhere}
+.sy-steps-box .hint{margin-top:10px}
+.sy-state[data-s="err"]{color:var(--bad);font-weight:600}
+.sy-addr{margin:0;font:500 13px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace;overflow-wrap:anywhere}
+.sy-choice{display:flex;flex-direction:column;gap:10px;padding:12px 14px;border-radius:12px;background:var(--raise);border:1px solid var(--line)}
+.sy-choice p{margin:0}
+.sy-choice #sy-choice-txt{font-size:14px;line-height:1.45;font-weight:600}
+.sync[data-mode="cloud"]::before{background:var(--good)}
+.sync[data-mode="cloudwait"]::before,.sync[data-mode="cloudbusy"]::before{background:var(--warn)}
+.sync[data-mode="clouderr"]::before{background:var(--bad)}

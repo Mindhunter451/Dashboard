@@ -5,6 +5,7 @@
 //   <!--@include pfad-->  fügt eine Datei aus src/ ein (z. B. html/drawer.html)
 //   <!--@css-->           alle Dateien aus src/css/ in Namensreihenfolge
 //   <!--@js-->            alle Dateien aus src/js/ in Namensreihenfolge, in einem gemeinsamen Block
+//                         (der Code aus tools/sync-worker.js wird dabei in 49-sync.js eingesetzt)
 //
 // Dazu kommen für die Installation als App manifest.webmanifest und sw.js aus src/pwa/.
 // In sw.js wird __VERSION__ durch die Version aus src/js/99-start.js ersetzt, damit jede Version
@@ -24,7 +25,12 @@ function include(html, depth = 0) {
 }
 
 const css = list('css', '.css').map(f => `/* ${f} */\n${read('css/' + f).trim()}`).join('\n\n');
-const js = list('js', '.js').map(f => `/* ${f} */\n${read('js/' + f).trim()}`).join('\n\n');
+// Der Code des Sync-Workers steht nur einmal in tools/sync-worker.js und wird hier in 49-sync.js eingesetzt (zum Kopieren im Cockpit)
+const syncWorker = readFileSync(join(root, 'tools', 'sync-worker.js'), 'utf8').trim().replace(/<\//g, '<\\/');
+const PLATZHALTER = "/*@sync-worker*/''";
+let js = list('js', '.js').map(f => `/* ${f} */\n${read('js/' + f).trim()}`).join('\n\n');
+if (!js.includes(PLATZHALTER)) throw new Error('Platzhalter für den Sync-Worker fehlt in src/js/49-sync.js');
+js = js.replace(PLATZHALTER, () => JSON.stringify(syncWorker));
 
 let out = include(read('index.html'));
 out = out.replace('<!--@css-->', () => `<style>\n${css}\n</style>`);

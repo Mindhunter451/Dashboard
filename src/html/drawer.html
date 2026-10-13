@@ -79,9 +79,62 @@
       <p class="hint">Gilt für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</p>
     </section>
 
+    <section class="dr-sec" id="dr-sync">
+      <h3>Sync zwischen Geräten</h3>
+      <div class="sy-box" id="sy-on" hidden>
+        <p class="hint sy-state" id="sy-state" data-s="ok"></p>
+        <div class="form-row">
+          <button type="button" class="btn-ghost" id="sy-now">Jetzt abgleichen</button>
+          <button type="button" class="btn-danger" id="sy-off" style="margin-left:0">Trennen</button>
+        </div>
+        <p class="hint">Auf einem weiteren Gerät öffnest du das Cockpit, gehst auf Anpassen und trägst dort dieselbe Adresse und dasselbe Passwort ein.</p>
+        <p class="sy-addr" id="sy-addr"></p>
+        <div class="form-row">
+          <button type="button" class="btn-ghost" id="sy-addr-copy">Adresse kopieren</button>
+          <button type="button" class="btn-ghost" id="sy-pass-copy2">Passwort kopieren</button>
+        </div>
+        <p class="sy-addr" id="sy-pass-view" hidden></p>
+      </div>
+      <div class="sy-box" id="sy-setup">
+        <p class="hint">Dein Cockpit legt seinen Stand in einer eigenen kleinen Ablage bei Cloudflare ab, und deine anderen Geräte holen ihn sich von dort. Das ist kostenlos, liegt in deinem eigenen Konto und ist nur mit deinem Passwort erreichbar. Todoist-Token, Keys, Kalender-Links und der laufende Pomodoro-Timer bleiben auf jedem Gerät für sich.</p>
+        <details class="sy-steps-box">
+          <summary>So richtest du es ein</summary>
+          <ol class="sy-steps">
+            <li><b>Ablage anlegen.</b> Auf dash.cloudflare.com links unter „Storage &amp; databases“ den Bereich „KV“ öffnen und einen Namespace anlegen, zum Beispiel mit dem Namen cockpit.</li>
+            <li><b>Worker anlegen.</b> Unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“ anlegen, den Code durch den Code unten ersetzen und auf „Deploy“ klicken.
+              <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="sy-code"></pre><button type="button" class="btn-ghost" id="sy-copy">Code kopieren</button></details>
+            </li>
+            <li><b>Ablage und Passwort verbinden.</b> Beim Worker unter „Settings“, „Bindings“ eine Verbindung zu deinem KV-Namespace hinzufügen, mit dem Namen <code>SYNC_KV</code>. Unter „Variables and secrets“ ein Secret mit dem Namen <code>SYNC_SECRET</code> anlegen und als Wert das Passwort eintragen, das du unten mit „Erzeugen“ bekommst. Danach noch einmal „Deploy“.</li>
+            <li><b>Hier eintragen.</b> Adresse des Workers und Passwort unten eintragen und auf „Verbinden“ klicken.</li>
+          </ol>
+          <p class="hint">Cloudflare benennt Menüpunkte manchmal um, die Namen können leicht abweichen.</p>
+        </details>
+        <form class="sy-box" id="sy-form" novalidate>
+          <div class="field"><label for="sy-url">Adresse des Workers</label><input id="sy-url" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://cockpit-sync.dein-name.workers.dev"></div>
+          <div class="field"><label for="sy-pass">Passwort</label><input id="sy-pass" type="password" maxlength="100" autocomplete="off" spellcheck="false"></div>
+          <div class="form-row">
+            <button type="button" class="btn-ghost" id="sy-gen">Erzeugen</button>
+            <button type="button" class="btn-ghost" id="sy-show">Anzeigen</button>
+            <button type="button" class="btn-ghost" id="sy-pass-copy">Kopieren</button>
+          </div>
+          <p class="err" id="sy-err" hidden></p>
+          <div class="form-row"><button type="submit" class="btn" id="sy-go">Verbinden</button></div>
+        </form>
+        <div class="sy-choice" id="sy-choice" hidden>
+          <p id="sy-choice-txt"></p>
+          <p class="hint">Auf einem neuen Gerät nimmst du meist den Stand aus der Cloud, dann bleibt eine Kopie deines bisherigen Standes in diesem Browser liegen. Auf deinem Hauptgerät lädst du den eigenen Stand hoch, dann wird der in der Cloud ersetzt.</p>
+          <div class="form-row">
+            <button type="button" class="btn" id="sy-take-cloud">Stand aus der Cloud holen</button>
+            <button type="button" class="btn-ghost" id="sy-take-mine">Meinen Stand hochladen</button>
+            <button type="button" class="btn-ghost" id="sy-choice-cancel">Abbrechen</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="dr-sec" id="dr-data">
       <h3>Daten</h3>
-      <p class="hint">Deine Einstellungen liegen nur in diesem Browser. Sicher sie ab und zu als Datei. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key, Tankerkönig-Key und deine Kalender-Links sind nicht mit drin.</p>
+      <p class="hint">Deine Einstellungen liegen in diesem Browser, mit dem Sync oben auch in deiner Cloud. Sicher sie trotzdem ab und zu als Datei, denn der Sync gibt auch Fehler an alle Geräte weiter. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
       <p class="hint" id="dr-backup-at"></p>
       <div class="form-row">
         <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>

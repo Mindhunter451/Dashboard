@@ -31,9 +31,10 @@ function checkBackup() {
   const base = last || Date.parse(m.since) || now;
   const due = changed > last && now - base > BACKUP_DAYS * DAY && !(m.snooze && Date.parse(m.snooze) > now);
   $('#notice').hidden = !due;
+  const cloud = syncMode().startsWith('cloud');
   if (due) $('#notice-text').innerHTML = last
-    ? `<b>Deine letzte Sicherung ist ${agoTxt(last)} her.</b> Seitdem hast du einiges geändert, und alles liegt nur in diesem Browser.`
-    : '<b>Du hast deine Einstellungen noch nie gesichert.</b> Alles liegt nur in diesem Browser. Ein Klick, und du hast eine Kopie als Datei.';
+    ? `<b>Deine letzte Sicherung ist ${agoTxt(last)} her.</b> Seitdem hast du einiges geändert${cloud ? ', und der Sync ersetzt keine Sicherung.' : ', und alles liegt nur in diesem Browser.'}`
+    : `<b>Du hast deine Einstellungen noch nie gesichert.</b> ${cloud ? 'Der Sync ersetzt keine Sicherung, denn er gibt auch Fehler an alle Geräte weiter.' : 'Alles liegt nur in diesem Browser.'} Ein Klick, und du hast eine Kopie als Datei.`;
 }
 function renderBackupInfo() {
   const t = state.meta.backupAt;
