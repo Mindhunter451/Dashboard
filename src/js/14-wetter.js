@@ -111,6 +111,7 @@ function renderWeather() {
   if (Number.isFinite(c.relative_humidity_2m)) dl.push(['Feuchte', `${Math.round(c.relative_humidity_2m)} %`]);
   if (d.daily && d.daily.sunrise) dl.push(['Sonne', `${fmtT(d.daily.sunrise[0])} bis ${fmtT(d.daily.sunset[0])}`]);
   $('#wx-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  $('#wx-hilo').textContent = dl.length && dl[0][0] === 'Heute' ? `Heute ${dl[0][1]}` : '';
 
   // Regen in den nächsten 2 Stunden (15-Minuten-Schritte)
   const m = d.minutely_15, now = Date.now();
@@ -294,7 +295,7 @@ function stopPlay() {
 /* Radar auf- und zuklappen. Auf dem Handy startet es zu, damit die Seite kürzer bleibt. Merkt sich jedes Gerät selbst. */
 const RD_KEY = 'jere-cockpit-radar';
 function radarOpen() { const v = lsGet(RD_KEY); return v == null ? !isNarrow() : !!v; }
-const radarShown = () => radarOpen() && !$('#radar-box').hidden && !zu.has('weather');
+const radarShown = () => radarOpen() && !$('#radar-box').hidden && !zu.has('weather') && !$('#weather').classList.contains('is-compact');
 function renderRadarTg() {
   const on = radarOpen();
   $('#rd-body').hidden = !on;
@@ -306,18 +307,36 @@ $('#rd-tg').addEventListener('click', () => { lsSet(RD_KEY, radarOpen() ? 0 : 1)
 $('#rd-play').addEventListener('click', () => { if (rd.timer) { rd.userPaused = true; stopPlay(); } else { rd.userPaused = false; play(); } });
 $('#rd-slider').addEventListener('input', e => { rd.userPaused = true; stopPlay(); showFrame(+e.target.value); });
 
+/* Kompakt: jetzt, Regen in einem Satz und die Stundenleiste. Details und Radar klappen per Tipp auf (gilt bis zum Neuladen). */
+const wxx = { open: false };
+function wxCompactUi() {
+  const c = state.widgets.weather.cfg, on = c.compact && !wxx.open, b = $('#wx-more');
+  $('#weather').classList.toggle('is-compact', on);
+  b.hidden = !c.compact || (!c.radar && !c.hours);
+  b.setAttribute('aria-expanded', String(!on));
+  b.querySelector('span').textContent = on ? (c.radar ? 'Details und Regenradar' : 'Mehr Details') : 'Weniger zeigen';
+}
+$('#wx-more').addEventListener('click', () => {
+  wxx.open = !wxx.open;
+  wxCompactUi();
+  renderRadarTg();
+  if (wxx.open && rd.map) setTimeout(() => rd.map.invalidateSize(), 80);
+  schedLayout();
+});
 defineWidget('weather', {
   render() {
     const c = state.widgets.weather.cfg;
     $('#wx-hours-box').hidden = !c.hours;
     $('#radar-box').hidden = !c.radar;
+    wxCompactUi();
     renderRadarTg();
   },
   settings: {
     render(box, w) {
-      box.innerHTML = `<label class="check-row"><input type="checkbox" class="switch" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
+      box.innerHTML = `<label class="check-row"><input type="checkbox" class="switch" data-s="compact"${w.cfg.compact ? ' checked' : ''}> Kompakt, Details und Radar per Tipp</label><label class="check-row"><input type="checkbox" class="switch" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" class="switch" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
     },
     save(box, w) {
+      w.cfg.compact = box.querySelector('[data-s="compact"]').checked;
       w.cfg.hours = box.querySelector('[data-s="hours"]').checked;
       w.cfg.radar = box.querySelector('[data-s="radar"]').checked;
       if (w.cfg.radar && rd.map) setTimeout(() => rd.map.invalidateSize(), 80);

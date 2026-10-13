@@ -12,32 +12,48 @@
  * state.waste    Müllabfuhr: { bins: [{ id, name, color, dates[], every, start }], file: { name, at } }
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
-const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
+/* Kacheln oben. Die Reihenfolge steht in ui.order, Countdowns stehen dort als „cd:ID“ mittendrin. */
+const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub', cal: 'Nächster Termin', sun: 'Sonne' };
+const TILE_ON = { fa: true, we: true, ft: true, ur: true, cal: false, sun: false };
+/* Kopf: Stil der Uhr samt Standard-Schriftstärke */
+const HEAD_STYLES = { classic: ['Klassisch', 220], giant: ['Riesig', 200], compact: ['Kompakt', 330], center: ['Zentriert', 240] };
+/* Spiegel: Bausteine und Bereiche */
+const MB = { clock: 'Uhr und Datum', notes: 'Hinweise', wx: 'Wetter', cm: 'Pendeln', cal: 'Termine', dep: 'Abfahrten', cd: 'Kacheln und Countdowns' };
+const MB_SUB = { notes: 'Warnungen, Geburtstage, Müllabfuhr', cm: 'Fahrzeit zur Arbeit oder nach Hause', cal: 'Heute und morgen', dep: 'Deine erste Haltestelle', cd: 'Wie oben, in derselben Reihenfolge' };
+const MZ = { top: 'Oben Mitte', tl: 'Oben links', tr: 'Oben rechts', mid: 'Mitte', bl: 'Unten links', br: 'Unten rechts', bottom: 'Unten Mitte' };
+const M_PRESETS = {
+  classic: { name: 'Klassisch', blocks: [['clock', 'tl', 1], ['notes', 'tl', 1], ['wx', 'tr', 1], ['cm', 'tr', 0], ['cal', 'bl', 1], ['dep', 'br', 1], ['cd', 'br', 1]] },
+  center: { name: 'Zentriert', blocks: [['clock', 'top', 1], ['wx', 'top', 1], ['notes', 'top', 1], ['cal', 'bl', 1], ['dep', 'br', 1], ['cm', 'br', 0], ['cd', 'bottom', 1]] },
+  calm: { name: 'Ruhig', blocks: [['clock', 'mid', 1], ['wx', 'mid', 1], ['notes', 'mid', 1], ['cal', 'bl', 0], ['dep', 'br', 0], ['cm', 'br', 0], ['cd', 'bottom', 0]] }
+};
+const mPresetBlocks = k => M_PRESETS[k].blocks.map(([b, z, on]) => ({ k: b, z, on: !!on }));
 const SIZES = { s: 320, m: 380, l: 470 };
 const DENSITY = { tight: 'Dicht', normal: 'Normal', airy: 'Luftig' };
 
 /* Widget-Typen. multi: kann es mehrfach geben, jede Kopie hat eigene Daten. w: Standardbreite in Spalten */
 const TYPES = {
-  now:      { name: 'Jetzt wichtig', multi: false, w: 2, since: '2.6', desc: 'Das Wichtigste aus allen Widgets auf einen Blick, je nach Tageszeit: Warnungen, Termine, Abfahrten, Müll und mehr. Dazu ein Feld zum schnellen Notieren.' },
-  tasks:    { name: 'Aufgaben', multi: true, w: 1, desc: 'Deine Todoist-Projekte zum Abhaken. Pro Widget legst du fest, welche Projekte es zeigt.' },
-  progress: { name: 'Fortschritt', multi: true, w: 1, desc: 'Balken für Arbeitstag, Arbeitswoche, Monat, Jahr oder eigene Zeiträume.' },
-  vacation: { name: 'Urlaub', multi: false, w: 1, desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
-  commute:  { name: 'Pendeln', multi: false, w: 1, desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
-  weather:  { name: 'Wetter', multi: false, w: 2, desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
-  links:    { name: 'Schnellzugriff', multi: true, w: 1, desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
-  notes:    { name: 'Notizen', multi: true, w: 1, desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' },
-  pomodoro: { name: 'Pomodoro', multi: false, w: 1, since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
-  habits:   { name: 'Gewohnheiten', multi: true, w: 1, since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
-  learn:    { name: 'Lernfortschritt', multi: true, w: 1, since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  football: { name: 'Fußball', multi: true, w: 1, since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
-  f1:       { name: 'Formel 1', multi: false, w: 1, since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
-  fuel:     { name: 'Spritpreise', multi: false, w: 1, since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
-  cal:      { name: 'Kalender', multi: false, w: 1, since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
-  dep:      { name: 'Abfahrten', multi: true, w: 1, since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
-  bday:     { name: 'Geburtstage', multi: false, w: 1, since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
-  waste:    { name: 'Müllabfuhr', multi: false, w: 1, since: '2.4', desc: 'Welche Tonne wann rausmuss, mit Erinnerung am Vorabend. Termine aus der Datei deines Entsorgers oder als eigener Rhythmus.' }
+  now:      { name: 'Jetzt wichtig', multi: false, w: 2, cat: 'day', since: '2.6', desc: 'Das Wichtigste aus allen Widgets auf einen Blick, je nach Tageszeit: Warnungen, Termine, Abfahrten, Müll und mehr. Dazu ein Feld zum schnellen Notieren.' },
+  tasks:    { name: 'Aufgaben', multi: true, w: 1, cat: 'day', desc: 'Deine Todoist-Projekte zum Abhaken. Pro Widget legst du fest, welche Projekte es zeigt.' },
+  progress: { name: 'Fortschritt', multi: true, w: 1, cat: 'plan', desc: 'Balken für Arbeitstag, Arbeitswoche, Monat, Jahr oder eigene Zeiträume.' },
+  vacation: { name: 'Urlaub', multi: false, w: 1, cat: 'plan', desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
+  commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
+  weather:  { name: 'Wetter', multi: false, w: 2, cat: 'go', desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
+  links:    { name: 'Schnellzugriff', multi: true, w: 1, cat: 'day', desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
+  notes:    { name: 'Notizen', multi: true, w: 1, cat: 'day', desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' },
+  pomodoro: { name: 'Pomodoro', multi: false, w: 1, cat: 'plan', since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
+  habits:   { name: 'Gewohnheiten', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
+  learn:    { name: 'Lernfortschritt', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
+  football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
+  f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
+  fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
+  cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
+  dep:      { name: 'Abfahrten', multi: true, w: 1, cat: 'go', since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
+  bday:     { name: 'Geburtstage', multi: false, w: 1, cat: 'plan', since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
+  waste:    { name: 'Müllabfuhr', multi: false, w: 1, cat: 'day', since: '2.4', desc: 'Welche Tonne wann rausmuss, mit Erinnerung am Vorabend. Termine aus der Datei deines Entsorgers oder als eigener Rhythmus.' }
 };
 const SOON = [];
+/* Register in der Galerie */
+const CATS = { day: 'Alltag', plan: 'Planung', go: 'Unterwegs', fun: 'Freizeit' };
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
 /* Verkehrsmittel im Abfahrten-Widget */
 const DP_CATS = { s: 'S-Bahn', u: 'U-Bahn', bus: 'Bus', tram: 'Straßenbahn', ferry: 'Fähre', re: 'Regionalzug', fv: 'Fernzug' };
@@ -74,7 +90,9 @@ const DEF_BARS = () => [
 const DEF_UI = () => ({
   greet: 'Moin Jere', theme: 'auto', dark: 'graphite', accent: 'amber', accentHex: '#E8A126', size: 'm', density: 'normal', radius: 18,
   seconds: true, region: 'HH', sky: true,
-  tiles: { fa: true, we: true, ft: true, ur: true }, countdowns: [],
+  tiles: { ...TILE_ON }, countdowns: [], order: Object.keys(TILES),
+  head: { style: 'classic', size: 100, weight: 220, date: true, kw: true, greet: true },
+  mirror: { preset: 'classic', blocks: mPresetBlocks('classic'), size: 100, secs: false, shift: true, dim: { on: false, from: '22:00', to: '06:00', lvl: 40 } },
   start: { mode: 'last', page: '', work: '', free: '' }
 });
 /* Ausgangslage im alten Format (Version 1). Neue Nutzer laufen durch denselben Umzug wie alte Daten. */
@@ -217,7 +235,8 @@ function normCfg(type, c) {
     case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
-    case 'weather': return { hours: c.hours !== false, radar: c.radar !== false };
+    case 'weather': return { hours: c.hours !== false, radar: c.radar !== false, compact: c.compact !== false };
+    case 'commute': return { compact: c.compact !== false };
     case 'links': return { items: normLinks(c.items) };
     case 'notes': return { text: typeof c.text === 'string' ? c.text.slice(0, 8000) : '' };
     default: return {};
@@ -266,6 +285,8 @@ function normUi(u) {
   const t = u.tiles && typeof u.tiles === 'object' ? u.tiles : {};
   const st = u.start && typeof u.start === 'object' ? u.start : {};
   const pid = x => String(x || '').slice(0, 24);
+  const cds = (Array.isArray(u.countdowns) ? u.countdowns : []).filter(c => c && validYmd(c.date)).slice(0, 6)
+    .map(c => ({ id: String(c.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(), name: String(c.name || 'Countdown').slice(0, 30), date: c.date, time: validHm(c.time) ? c.time : '' }));
   return {
     greet: typeof u.greet === 'string' ? u.greet.slice(0, 40) : d.greet,
     theme: ['auto', 'light', 'dark'].includes(u.theme) ? u.theme : 'auto',
@@ -278,10 +299,50 @@ function normUi(u) {
     seconds: u.seconds !== false,
     sky: u.sky !== false,
     region: REGIONS[u.region] ? u.region : 'HH',
-    tiles: { fa: t.fa !== false, we: t.we !== false, ft: t.ft !== false, ur: t.ur !== false },
-    countdowns: (Array.isArray(u.countdowns) ? u.countdowns : []).filter(c => c && validYmd(c.date)).slice(0, 6)
-      .map(c => ({ id: String(c.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 16) || uid(), name: String(c.name || 'Countdown').slice(0, 30), date: c.date, time: validHm(c.time) ? c.time : '' })),
+    tiles: Object.fromEntries(Object.keys(TILES).map(k => [k, typeof t[k] === 'boolean' ? t[k] : TILE_ON[k]])),
+    countdowns: cds,
+    order: normOrder(u.order, cds),
+    head: normHead(u.head),
+    mirror: normMirror(u.mirror),
     start: { mode: ['last', 'fixed', 'auto'].includes(st.mode) ? st.mode : 'last', page: pid(st.page), work: pid(st.work), free: pid(st.free) }
+  };
+}
+/* Reihenfolge der Kacheln: bekannte Kacheln und vorhandene Countdowns, Fehlendes hinten dran */
+function normOrder(list, cds) {
+  const ok = new Set([...Object.keys(TILES), ...cds.map(c => 'cd:' + c.id)]), out = [];
+  for (const k of Array.isArray(list) ? list : []) if (typeof k === 'string' && ok.has(k) && !out.includes(k)) out.push(k);
+  for (const k of ok) if (!out.includes(k)) out.push(k);
+  return out;
+}
+function normHead(h) {
+  h = h && typeof h === 'object' ? h : {};
+  const style = HEAD_STYLES[h.style] ? h.style : 'classic';
+  return {
+    style,
+    size: Number.isFinite(+h.size) ? Math.round(okClamp(+h.size, 70, 140) / 5) * 5 : 100,
+    weight: Number.isFinite(+h.weight) ? Math.round(okClamp(+h.weight, 200, 700) / 10) * 10 : HEAD_STYLES[style][1],
+    date: h.date !== false, kw: h.kw !== false, greet: h.greet !== false
+  };
+}
+function normMirror(m) {
+  m = m && typeof m === 'object' ? m : {};
+  const blocks = [], seen = new Set();
+  for (const b of Array.isArray(m.blocks) ? m.blocks : []) {
+    if (!b || !MB[b.k] || seen.has(b.k)) continue;
+    seen.add(b.k);
+    blocks.push({ k: b.k, z: MZ[b.z] ? b.z : 'tl', on: b.on !== false });
+  }
+  // Ganz neu: Aufteilung „Klassisch“. Neue Bausteine aus späteren Versionen kommen ausgeschaltet dazu.
+  const fresh = !blocks.length;
+  for (const b of mPresetBlocks('classic')) if (!seen.has(b.k)) blocks.push({ ...b, on: fresh && b.on });
+  const d = m.dim && typeof m.dim === 'object' ? m.dim : {};
+  return {
+    preset: M_PRESETS[m.preset] ? m.preset : fresh ? 'classic' : '',
+    blocks,
+    size: Number.isFinite(+m.size) ? Math.round(okClamp(+m.size, 70, 140) / 5) * 5 : 100,
+    secs: !!m.secs,
+    shift: m.shift !== false,
+    dim: { on: !!d.on, from: validHm(d.from) ? d.from : '22:00', to: validHm(d.to) ? d.to : '06:00', lvl: Number.isFinite(+d.lvl) ? Math.round(okClamp(+d.lvl, 15, 80) / 5) * 5 : 40 }
   };
 }
 const isoOrNull = x => typeof x === 'string' && !Number.isNaN(Date.parse(x)) ? x : null;

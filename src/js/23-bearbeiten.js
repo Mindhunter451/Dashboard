@@ -7,6 +7,7 @@ function setEdit(on) {
   $('#edit-btn').setAttribute('aria-pressed', String(on));
   $('#edit-btn-txt').textContent = on ? 'Fertig' : 'Bearbeiten';
   $('#editbar').hidden = !on;
+  renderTiles();
   syncBoard();
   renderEditBar();
   schedLayout();
@@ -159,42 +160,73 @@ function newCfg(type) {
   if (type === 'progress') return { bars: [{ id: uid(), kind: 'month', name: 'Monat' }, { id: uid(), kind: 'year', name: 'Jahr' }] };
   return {};
 }
-function openGallery() {
-  const page = curPage(), body = $('#gal-body');
-  body.textContent = '';
-  const ul = document.createElement('ul');
-  ul.className = 'gal';
-  for (const [type, T] of Object.entries(TYPES)) {
-    let act;
-    if (!T.multi) {
-      act = page.items.some(x => x.w === type)
-        ? '<button type="button" class="btn-ghost" disabled>Ist schon auf dieser Seite</button>'
-        : `<button type="button" class="btn" data-gadd="${type}">Hinzufügen</button>`;
-    } else {
-      act = `<button type="button" class="btn" data-gnew="${type}">Neu anlegen</button>`;
-      for (const [id] of widgetsOf(type)) {
-        if (page.items.some(x => x.w === id)) continue;
-        const where = pagesUsing(id).map(p => p.name);
-        act += `<button type="button" class="btn-ghost" data-gadd="${esc(id)}" title="${esc(where.length ? `Liegt auf: ${where.join(', ')}` : 'Liegt gerade auf keiner Seite')}">„${esc(widgetLabel(id))}“ einfügen</button>`;
-      }
+/* Galerie mit Registern (Alltag, Planung, Unterwegs, Freizeit) und Suche. Pro Widget eine schlanke Zeile mit Plus. */
+const gal = { cat: 'all', q: '' };
+const GAL_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13"/></svg>';
+const GAL_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function galRow(type, T, page) {
+  const m = T.desc.match(/^.*?\.(?=\s|$)/), first = m ? m[0] : T.desc;
+  let act = '', more = '';
+  const placed = !T.multi && page.items.some(x => x.w === type);
+  if (!T.multi) act = placed ? `<span class="gal-on" role="img" aria-label="Liegt schon auf dieser Seite" title="Liegt schon auf dieser Seite">${GAL_OK}</span>` : `<button type="button" class="gal-add" data-gadd="${type}" aria-label="${esc(T.name)} hinzufügen" title="Hinzufügen">${GAL_PLUS}</button>`;
+  else {
+    act = `<button type="button" class="gal-add" data-gnew="${type}" aria-label="${esc(T.name)} neu anlegen" title="Neu anlegen">${GAL_PLUS}</button>`;
+    for (const [id] of widgetsOf(type)) {
+      if (page.items.some(x => x.w === id)) continue;
+      const where = pagesUsing(id).map(p => p.name);
+      more += `<button type="button" class="btn-ghost" data-gadd="${esc(id)}" title="${esc(where.length ? `Liegt auf: ${where.join(', ')}` : 'Liegt gerade auf keiner Seite')}">„${esc(widgetLabel(id))}“ holen</button>`;
     }
-    const li = document.createElement('li');
-    li.className = 'gal-item';
-    li.innerHTML = `<span class="gal-ico">${TICON[type]}</span><p class="gal-name">${esc(T.name)}${T.since === VERSION ? ' <span class="chip">Neu</span>' : ''}</p><p class="gal-desc">${esc(T.desc)}</p><div class="gal-act">${act}</div>`;
-    ul.appendChild(li);
   }
-  body.appendChild(ul);
-  if (!SOON.length) { $('#dlg-gallery').showModal(); return; }
-  const sub = document.createElement('p');
-  sub.className = 'gal-sub';
-  sub.textContent = 'Kommt demnächst';
-  body.appendChild(sub);
-  const soon = document.createElement('div');
-  soon.className = 'soon';
-  soon.innerHTML = SOON.map(([k, n]) => `<span>${TICON[k]}${esc(n)}</span>`).join('');
-  body.appendChild(soon);
-  $('#dlg-gallery').showModal();
+  return `<li class="gal-item${placed ? ' placed' : ''}"><span class="gal-ico">${TICON[type]}</span><div class="gal-tx"><p class="gal-name">${esc(T.name)}${T.since === VERSION ? ' <span class="chip">Neu</span>' : ''}</p><p class="gal-desc">${esc(first)}</p>${more ? `<div class="gal-more">${more}</div>` : ''}</div>${act}</li>`;
 }
+function renderGallery() {
+  const page = curPage(), words = cmdNorm(gal.q).split(/\s+/).filter(Boolean), all = Object.entries(TYPES);
+  const hit = ([, T]) => { const h = cmdNorm(`${T.name} ${T.desc} ${CATS[T.cat] || ''}`); return words.every(w => h.includes(w)); };
+  $('#gal-cats').innerHTML = [['all', 'Alle'], ...Object.entries(CATS)].map(([k, n]) => {
+    const c = k === 'all' ? all.length : all.filter(([, T]) => T.cat === k).length;
+    return `<button type="button" data-cat="${k}" aria-pressed="${!words.length && gal.cat === k}">${esc(n)} <span>${c}</span></button>`;
+  }).join('');
+  let html = '';
+  if (words.length) {
+    const list = all.filter(hit);
+    html = list.length ? `<ul class="gal">${list.map(([t, T]) => galRow(t, T, page)).join('')}</ul>` : '<p class="empty gal-none">Kein Widget gefunden. Versuch es mit einem anderen Wort.</p>';
+  } else {
+    for (const [k, n] of Object.entries(CATS)) {
+      if (gal.cat !== 'all' && gal.cat !== k) continue;
+      const list = all.filter(([, T]) => T.cat === k);
+      if (!list.length) continue;
+      if (gal.cat === 'all') html += `<h3 class="gal-h">${esc(n)}</h3>`;
+      html += `<ul class="gal">${list.map(([t, T]) => galRow(t, T, page)).join('')}</ul>`;
+    }
+    if (SOON.length) html += `<p class="gal-sub">Kommt demnächst</p><div class="soon">${SOON.map(([k, n]) => `<span>${TICON[k]}${esc(n)}</span>`).join('')}</div>`;
+  }
+  $('#gal-body').innerHTML = html;
+}
+function openGallery() {
+  gal.q = '';
+  $('#gal-q').value = '';
+  renderGallery();
+  $('#dlg-gallery').showModal();
+  $('#gal-body').scrollTop = 0;
+  // Am Rechner gleich lostippen, am Handy nicht sofort die Tastatur hochholen
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) $('#gal-q').focus();
+}
+$('#gal-q').addEventListener('input', e => { gal.q = e.target.value; renderGallery(); });
+$('#gal-q').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const b = $('#gal-body .gal-add, #gal-body [data-gadd]');
+  if (b) b.click();
+});
+$('#gal-cats').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]');
+  if (!b) return;
+  gal.cat = b.dataset.cat;
+  gal.q = '';
+  $('#gal-q').value = '';
+  renderGallery();
+  $('#gal-body').scrollTop = 0;
+});
 function placeWidget(id) {
   const page = curPage(), w = state.widgets[id];
   if (!w || page.items.some(x => x.w === id)) return;

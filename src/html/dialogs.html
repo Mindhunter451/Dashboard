@@ -1,9 +1,13 @@
-<dialog class="dlg" id="dlg-gallery" aria-labelledby="gal-h">
+<dialog class="dlg dlg-gal" id="dlg-gallery" aria-labelledby="gal-h">
   <div class="dlg-head">
     <h2 id="gal-h">Widget hinzufügen</h2>
     <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
-  <div class="dlg-body" id="gal-body"></div>
+  <div class="gal-tools">
+    <label class="gal-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/></svg><input id="gal-q" type="search" placeholder="Widget suchen, zum Beispiel Regen oder Bus" autocomplete="off" spellcheck="false" aria-label="Widget suchen" enterkeyhint="go"></label>
+    <div class="gal-cats" id="gal-cats" role="group" aria-label="Bereiche"></div>
+  </div>
+  <div class="dlg-body" id="gal-body" aria-live="polite"></div>
 </dialog>
 
 <dialog class="dlg" id="dlg-widget" aria-labelledby="wd-h">

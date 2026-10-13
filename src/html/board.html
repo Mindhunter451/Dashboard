@@ -38,6 +38,7 @@
         <div class="field" style="margin-top:8px"><label for="cm-key">TomTom API-Key</label><input id="cm-key" type="password" maxlength="80" autocomplete="off" spellcheck="false"></div>
         <div class="tt-test"><button type="button" class="btn-ghost" id="cm-key-test">Key testen</button><span class="tt-res" id="cm-key-res" role="status"></span></div>
       </details>
+      <label class="check-row"><input type="checkbox" class="switch" id="cm-compact"> Kompakt, Karte und Meldungen per Tipp</label>
       <p class="err" id="cm-err" hidden></p>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
@@ -63,6 +64,7 @@
       </div>
       <p class="cm-route" id="cm-route"></p>
       <p class="verdict" id="cm-verdict"></p>
+      <button type="button" class="more-tg" id="cm-more" aria-expanded="false" aria-controls="cm-live" hidden><span>Karte und Meldungen</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       <ul class="incidents" id="cm-inc"></ul>
       <div class="cm-wrap" id="cm-wrap">
         <div class="cm-map" id="cm-map"></div>
@@ -118,6 +120,7 @@
               <div class="wx-temp" id="wx-temp"></div>
               <div class="wx-desc" id="wx-desc"></div>
               <div class="wx-feel" id="wx-feel"></div>
+              <div class="wx-hilo" id="wx-hilo"></div>
             </div>
           </div>
           <dl class="wx-dl" id="wx-dl"></dl>
@@ -129,7 +132,7 @@
           <p class="rain-txt" id="wx-rain-txt"></p>
         </div>
       </div>
-      <div style="margin-top:16px" id="wx-hours-box">
+      <div class="wx-hours-box" id="wx-hours-box">
         <p class="sub-h" style="margin-bottom:6px">Nächste 12 Stunden</p>
         <div class="hours" id="wx-hours"></div>
       </div>
@@ -152,6 +155,7 @@
           </div>
         </div>
       </div>
+      <button type="button" class="more-tg" id="wx-more" aria-expanded="false" aria-controls="wx-live" hidden><span>Details und Regenradar</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
     </div>
 
     <div class="wx-off is-loading" id="wx-off" style="--sk-h:210px">

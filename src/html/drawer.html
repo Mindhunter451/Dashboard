@@ -9,8 +9,9 @@
   <div class="dr-tabs" role="tablist" aria-label="Bereiche" id="dr-tabs">
     <span class="dr-tab-ind" aria-hidden="true"></span>
     <button type="button" role="tab" id="dr-t-look" data-tab="look" aria-controls="dr-p-look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.9-.8 1.9-1.8 0-1.3-1-1.6-1-2.8 0-1 .8-1.7 1.8-1.7h2.1a3.7 3.7 0 0 0 3.7-3.7C20.5 6.7 16.7 3.5 12 3.5z"/><circle cx="7.6" cy="11.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.4" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="7.8" r="1.1" fill="currentColor" stroke="none"/></svg><span>Aussehen</span></button>
+    <button type="button" role="tab" id="dr-t-head" data-tab="head" aria-controls="dr-p-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Kopf</span></button>
     <button type="button" role="tab" id="dr-t-pages" data-tab="pages" aria-controls="dr-p-pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="9" rx="2"/><rect x="13" y="3.5" width="7.5" height="5.5" rx="2"/><rect x="3.5" y="14.5" width="7.5" height="6" rx="2"/><rect x="13" y="11" width="7.5" height="9.5" rx="2"/></svg><span>Seiten</span></button>
-    <button type="button" role="tab" id="dr-t-devices" data-tab="devices" aria-controls="dr-p-devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="13" height="10" rx="2"/><path d="M6 19h6M9 15v4"/><rect x="16.5" y="9" width="5" height="10.5" rx="1.5"/></svg><span>Geräte</span></button>
+    <button type="button" role="tab" id="dr-t-mirror" data-tab="mirror" aria-controls="dr-p-mirror"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/></svg><span>Spiegel</span></button>
     <button type="button" role="tab" id="dr-t-data" data-tab="data" aria-controls="dr-p-data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6"/><path d="M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg><span>Daten</span></button>
   </div>
   <div class="dr-body" id="dr-body">
@@ -48,13 +49,56 @@
         </div>
       </div>
 
-      <h3 class="dr-gh">Kopf</h3>
+      <p class="dr-note">Design, Schwarz, Abstände und Kartenbreite gelten nur auf diesem Gerät. Akzentfarbe und Ecken nimmt der Sync auf alle Geräte mit.</p>
+    </section>
+
+    <!-- Kopf: Uhr, Tagesinfos, Kacheln, Countdowns -->
+    <section class="dr-pane" id="dr-p-head" role="tabpanel" aria-labelledby="dr-t-head" hidden>
+      <h3 class="dr-gh" id="dr-hstyle-l">Stil der Uhr</h3>
+      <div class="theme-pick hs-pick" role="group" aria-labelledby="dr-hstyle-l" id="dr-hstyle">
+        <button type="button" data-v="classic"><span class="hs-prev" data-hs="classic" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Klassisch</span></button>
+        <button type="button" data-v="giant"><span class="hs-prev" data-hs="giant" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Riesig</span></button>
+        <button type="button" data-v="compact"><span class="hs-prev" data-hs="compact" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Kompakt</span></button>
+        <button type="button" data-v="center"><span class="hs-prev" data-hs="center" aria-hidden="true"><b></b><i></i><i></i><i></i></span><span class="tp-name">Zentriert</span></button>
+      </div>
       <div class="dr-group">
-        <div class="dr-line"><label class="dr-lt" for="dr-greet">Begrüßung</label><input class="dr-in" id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
-        <label class="dr-line"><span class="dr-lt">Sekunden an der Uhr</span><input type="checkbox" class="switch" id="dr-secs"></label>
+        <div class="dr-line"><label class="dr-lt" for="dr-hsize">Größe</label>
+          <div class="range-row"><input type="range" class="range" id="dr-hsize" min="70" max="140" step="5"><output id="dr-hsize-v" for="dr-hsize"></output></div>
+        </div>
+        <div class="dr-line"><label class="dr-lt" for="dr-hweight">Schriftstärke</label>
+          <div class="range-row"><input type="range" class="range" id="dr-hweight" min="200" max="700" step="10"><output id="dr-hweight-v" for="dr-hweight"></output></div>
+        </div>
+        <label class="dr-line"><span class="dr-lt">Sekunden</span><input type="checkbox" class="switch" id="dr-secs"></label>
+      </div>
+
+      <h3 class="dr-gh">Neben der Uhr</h3>
+      <div class="dr-group">
+        <label class="dr-line"><span class="dr-lt">Begrüßung</span><input type="checkbox" class="switch" id="dr-hgreet"></label>
+        <div class="dr-line" id="dr-greet-row"><label class="dr-lt" for="dr-greet">Text der Begrüßung</label><input class="dr-in" id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
+        <label class="dr-line"><span class="dr-lt">Wochentag und Datum</span><input type="checkbox" class="switch" id="dr-hdate"></label>
+        <label class="dr-line"><span class="dr-lt">Kalenderwoche</span><input type="checkbox" class="switch" id="dr-hkw"></label>
         <label class="dr-line"><span class="dr-lt">Himmel nach Sonnenstand<small>Oben färbt sich alles wie der echte Himmel an deinem Ort, bei Wolken grauer.</small></span><input type="checkbox" class="switch" id="dr-sky"></label>
       </div>
-      <p class="dr-note">Design, Schwarz, Abstände und Kartenbreite gelten nur auf diesem Gerät. Akzentfarbe und Ecken nimmt der Sync auf alle Geräte mit.</p>
+      <p class="dr-note">Stil, Größe und Schrift der Uhr gelten nur auf diesem Gerät, zum Beispiel riesig am Rechner und kompakt am Handy.</p>
+
+      <h3 class="dr-gh" id="dr-tiles-l">Kacheln oben</h3>
+      <ul class="dr-group sort-list" id="dr-tiles" aria-labelledby="dr-tiles-l"></ul>
+      <p class="dr-note">Am Griff ziehen oder ihn antippen und mit den Pfeiltasten schieben. Im Bearbeiten-Modus geht das auch direkt oben im Cockpit. Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
+
+      <h3 class="dr-gh">Eigene Countdowns</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <ul class="cd-list" id="dr-cd-list"></ul>
+        <form id="dr-cd-form" novalidate class="dr-stack">
+          <div class="grid3">
+            <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
+            <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
+            <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
+          </div>
+          <p class="err" id="cd-err" hidden></p>
+          <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
+        </form>
+      </div>
+
     </section>
 
     <!-- Seiten -->
@@ -83,32 +127,58 @@
         <button type="button" class="dr-act" id="dr-plan-back" hidden><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span><span class="dr-lt">Alte Seiten zurückholen</span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
 
-      <h3 class="dr-gh">Kacheln oben</h3>
-      <div class="dr-group" id="dr-tiles"></div>
-      <p class="dr-note">Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
-
-      <h3 class="dr-gh">Eigene Countdowns</h3>
-      <div class="dr-group dr-pad dr-stack">
-        <ul class="cd-list" id="dr-cd-list"></ul>
-        <form id="dr-cd-form" novalidate class="dr-stack">
-          <div class="grid3">
-            <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
-            <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
-            <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
-          </div>
-          <p class="err" id="cd-err" hidden></p>
-          <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
-        </form>
-      </div>
-
       <h3 class="dr-gh">Feiertage</h3>
       <div class="dr-group">
         <div class="dr-line"><label class="dr-lt" for="dr-region">Bundesland<small>Für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</small></label><select class="dr-in" id="dr-region"></select></div>
       </div>
     </section>
 
-    <!-- Geräte -->
-    <section class="dr-pane" id="dr-p-devices" role="tabpanel" aria-labelledby="dr-t-devices" hidden>
+    <!-- Spiegel -->
+    <section class="dr-pane" id="dr-p-mirror" role="tabpanel" aria-labelledby="dr-t-mirror" hidden>
+      <h3 class="dr-gh">Vorschau</h3>
+      <div class="mp-wrap">
+        <div class="mp-frame" id="mp-frame" data-o="land"><div class="mirror mp" aria-hidden="true"><div class="m-in" id="mp-in"></div></div></div>
+        <div class="mp-bar">
+          <div class="seg" role="group" aria-label="Vorschau" id="mp-o"><button type="button" data-v="land">Quer</button><button type="button" data-v="port">Hochkant</button></div>
+          <button type="button" class="btn" id="dr-mirror">Spiegel starten</button>
+        </div>
+      </div>
+
+      <h3 class="dr-gh" id="dr-mpreset-l">Aufteilung</h3>
+      <div class="dr-group">
+        <div class="dr-line"><span class="dr-lt">Vorlage<small>Danach kannst du jeden Baustein einzeln verschieben.</small></span>
+          <div class="seg" role="group" aria-labelledby="dr-mpreset-l" id="dr-mpreset"><button type="button" data-v="classic">Klassisch</button><button type="button" data-v="center">Zentriert</button><button type="button" data-v="calm">Ruhig</button></div>
+        </div>
+      </div>
+
+      <h3 class="dr-gh" id="dr-mblocks-l">Bausteine</h3>
+      <ul class="dr-group sort-list" id="dr-mblocks" aria-labelledby="dr-mblocks-l"></ul>
+      <p class="dr-note">Die Reihenfolge gilt innerhalb eines Bereichs. Was nicht mehr ganz passt, kürzt der Spiegel von allein.</p>
+
+      <h3 class="dr-gh">Uhr</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-msize">Größe</label>
+          <div class="range-row"><input type="range" class="range" id="dr-msize" min="70" max="140" step="5"><output id="dr-msize-v" for="dr-msize"></output></div>
+        </div>
+        <label class="dr-line"><span class="dr-lt">Sekunden</span><input type="checkbox" class="switch" id="dr-msecs"></label>
+      </div>
+
+      <h3 class="dr-gh">Nachts</h3>
+      <div class="dr-group">
+        <label class="dr-line"><span class="dr-lt">Nachts dimmen<small>Der Spiegel wird in dieser Zeit dunkler und blendet nicht.</small></span><input type="checkbox" class="switch" id="dr-mdim"></label>
+        <div class="dr-line" id="dr-mdim-times"><span class="dr-lt" id="dr-mdim-l">Von bis</span>
+          <div class="time-pair" role="group" aria-labelledby="dr-mdim-l"><input class="dr-in" id="dr-mdim-from" type="time" aria-label="Dimmen ab"><span aria-hidden="true">bis</span><input class="dr-in" id="dr-mdim-to" type="time" aria-label="Dimmen bis"></div>
+        </div>
+        <div class="dr-line" id="dr-mdim-row"><label class="dr-lt" for="dr-mdim-lvl">Helligkeit nachts</label>
+          <div class="range-row"><input type="range" class="range" id="dr-mdim-lvl" min="15" max="80" step="5"><output id="dr-mdim-lvl-v" for="dr-mdim-lvl"></output></div>
+        </div>
+        <label class="dr-line"><span class="dr-lt">Schutz vor Einbrennen<small>Der Inhalt wandert alle fünf Minuten ein paar Pixel.</small></span><input type="checkbox" class="switch" id="dr-mshift"></label>
+      </div>
+      <p class="dr-note">Den Spiegel startest du auch mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc. Die Einstellungen wandern per Sync auf alle Geräte, du kannst den Spiegel also bequem am Rechner einrichten.</p>
+    </section>
+
+    <!-- Daten: Sync, App, Sicherung -->
+    <section class="dr-pane" id="dr-p-data" role="tabpanel" aria-labelledby="dr-t-data" hidden>
       <h3 class="dr-gh">Sync zwischen Geräten</h3>
       <div class="dr-group dr-pad dr-stack" id="dr-sync">
         <div class="sy-box" id="sy-on" hidden>
@@ -169,15 +239,6 @@
         <p class="hint" id="dr-app-ios" hidden></p>
       </div>
 
-      <h3 class="dr-gh">Spiegel-Modus</h3>
-      <div class="dr-group dr-pad dr-stack">
-        <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Abfahrten, und Countdowns, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
-        <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
-      </div>
-    </section>
-
-    <!-- Daten -->
-    <section class="dr-pane" id="dr-p-data" role="tabpanel" aria-labelledby="dr-t-data" hidden>
       <h3 class="dr-gh">Sicherung als Datei</h3>
       <div class="dr-group dr-pad dr-stack" id="dr-data">
         <p class="hint">Mit der Datei bekommst du auf jedem Rechner genau dasselbe Cockpit, auch ohne Sync. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
