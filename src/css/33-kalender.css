@@ -32,12 +32,3 @@
 .ca-feeds .tx span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ca-dot{flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:0;background:var(--c);padding:0}
 .ca-locrow{align-self:end;padding-bottom:9px}
-
-/* Vers des Tages */
-.vs{margin:0;display:flex;flex-direction:column;gap:12px}
-.vs-text{margin:0;font:italic 400 clamp(18px,1.25vw + 8px,22px)/1.5 var(--f-serif);font-variation-settings:'opsz' 24;text-wrap:pretty;max-width:52ch}
-.vs-text.muted{font-style:normal;font-family:var(--f-body);font-size:14px;color:var(--muted)}
-.vs-text .sk-lines{max-width:46ch}
-.vs-cap{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:13px;color:var(--muted)}
-.vs-cap a{font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 30%,transparent)}
-.vs-cap a:hover{border-bottom-color:var(--ink)}

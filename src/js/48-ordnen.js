@@ -20,7 +20,7 @@ function planBuild(W, used, from, span) {
   const main = T.find(id => !tW.includes(id) && !tP.includes(id)) || tW[0] || tP[0];
   const N = of('notes'), nW = N.filter(isWork), Lk = of('links'), lW = Lk.filter(isWork);
   const plan = [
-    { key: 'heute', name: 'Heute', smart: true, tiles: true, ids: ['now', ...one('weather'), ...of('dep'), ...one('cal'), ...(main ? [main] : []), ...one('waste'), ...one('bday'), ...one('verse')] },
+    { key: 'heute', name: 'Heute', smart: true, tiles: true, ids: ['now', ...one('weather'), ...of('dep'), ...one('cal'), ...(main ? [main] : []), ...one('waste'), ...one('bday')] },
     { key: 'arbeit', name: 'Arbeit', tiles: true, ids: [...tW, ...one('commute'), ...one('fuel'), ...of('progress'), ...one('vacation'), ...nW, ...lW] },
     { key: 'privat', name: 'Privat', tiles: false, ids: [...tP, ...one('cal'), ...one('bday'), ...N.filter(id => !nW.includes(id)), ...Lk.filter(id => !lW.includes(id))] },
     { key: 'fokus', name: 'Fokus', tiles: false, ids: [...one('pomodoro'), ...of('learn'), ...of('habits')] },
@@ -63,7 +63,7 @@ function pagePlan(s) {
 function planFresh(s) {
   const W = s.widgets;
   if (!Object.values(W).some(w => w.type === 'dep')) W.wdep = { type: 'dep', title: '', cfg: normCfg('dep', {}) };
-  const used = ['tasks', 'tasks-arbeit', 'tasks-privat', 'weather', ...Object.keys(W).filter(id => W[id].type === 'dep'), 'cal', 'waste', 'bday', 'verse', 'commute', 'progress', 'vacation', 'notes', 'notes-arbeit', 'links'].filter(id => W[id]);
+  const used = ['tasks', 'tasks-arbeit', 'tasks-privat', 'weather', ...Object.keys(W).filter(id => W[id].type === 'dep'), 'cal', 'waste', 'bday', 'commute', 'progress', 'vacation', 'notes', 'notes-arbeit', 'links'].filter(id => W[id]);
   const from = { 'tasks-arbeit': 'arbeit', 'notes-arbeit': 'arbeit', 'tasks-privat': 'privat' };
   s.pages = planBuild(W, used, from, {}).map(p => ({ id: p.key, name: p.name, tiles: p.tiles, smart: p.smart, items: p.items }));
   s.page = s.pages[0].id;

@@ -4,7 +4,7 @@
 .board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
 @media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
 .card{scroll-margin-top:72px;position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:var(--pad-t) var(--pad-x) var(--pad-b);display:flex;flex-direction:column;gap:var(--card-gap);min-width:0;container-type:inline-size}
-/* Wichtige Karten (Wetter, Abfahrten, Kalender, Pendeln) schweben höher, ruhige (Schnellzugriff, Notizen, Vers) liegen flach */
+/* Wichtige Karten (Wetter, Abfahrten, Kalender, Pendeln) schweben höher, ruhige (Schnellzugriff, Notizen) liegen flach */
 .card[data-tier="hero"]{background:var(--surface-hi);box-shadow:var(--shadow-2)}
 .card[data-tier="quiet"]{background:var(--quiet);box-shadow:none;--raise:var(--surface)}
 h2{margin:0;font:660 17px/1.25 var(--f-display);font-variation-settings:'wdth' 90;letter-spacing:-.008em}

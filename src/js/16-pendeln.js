@@ -123,13 +123,58 @@ async function autobahnItems(roads, g, skipWarnings) {
   }
   return { list: out, failed };
 }
+/* TomTom-Abruf, der bei Fehlern sagt, woran es lag: key (abgelehnt), limit (Kontingent), slow (Zeitüberschreitung), net (nicht erreichbar), svc (sonstiger Fehler) */
+const ttUrl = (from, to, key) => `https://api.tomtom.com/routing/1/calculateRoute/${from.lat},${from.lon}:${to.lat},${to.lon}/json?key=${encodeURIComponent(key)}&traffic=true&travelMode=car&routeType=fastest&sectionType=traffic&computeTravelTimeFor=all&language=de-DE`;
+const ttErr = (why, status, text) => Object.assign(new Error('tomtom'), { why, status: status || 0, text: text || '' });
+async function ttFetch(url) {
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 12000);
+  try {
+    let r;
+    try { r = await fetch(url, { signal: ctl.signal }); } catch (e) { throw ttErr(e && e.name === 'AbortError' ? 'slow' : 'net'); }
+    const raw = await r.text().catch(() => '');
+    let j = null;
+    try { j = JSON.parse(raw); } catch { j = null; }
+    if (r.ok && j) return j;
+    const d = j && (j.detailedError || j.error) ? (j.detailedError || j.error) : null;
+    const text = String((d && (d.message || d.description)) || (j && j.errorText) || raw.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim().slice(0, 140);
+    if (r.status === 429 || ((r.status === 403 || r.status === 401) && /limit|quota|exceed|over/i.test(text))) throw ttErr('limit', r.status, text);
+    if (r.status === 401 || r.status === 403) throw ttErr('key', r.status, text);
+    throw ttErr('svc', r.status, text);
+  } finally { clearTimeout(timer); }
+}
+const TT_WHY = {
+  key: 'TomTom lehnt den Key gerade ab, deshalb ohne Live-Stadtverkehr. Prüf ihn über die Regler oben mit „Key testen“.',
+  limit: 'Das Kontingent deines TomTom-Keys ist gerade aufgebraucht, deshalb ohne Live-Stadtverkehr. Später geht es von allein weiter.',
+  slow: 'TomTom hat zu lange gebraucht, deshalb diesmal ohne Live-Stadtverkehr. Beim nächsten Abruf in fünf Minuten klappt es meistens wieder.',
+  net: 'TomTom ist gerade nicht erreichbar, deshalb ohne Live-Stadtverkehr. In fünf Minuten probiert es das Cockpit wieder.',
+  svc: 'TomTom liefert gerade keine Route, deshalb ohne Live-Stadtverkehr. In fünf Minuten probiert es das Cockpit wieder.'
+};
+/* Live-Fahrzeit holen: bei Wacklern einmal nachfassen, sonst bis zu 15 Minuten den letzten guten Wert behalten */
+async function ttLive(from, to) {
+  const sig = `${cm.dir}|${from.lat},${from.lon}|${to.lat},${to.lon}`;
+  let err = null;
+  for (let i = 0; i < 2; i++) {
+    try {
+      const t = await tomtom(from, to);
+      if (t) cm.ttOk = { sig, at: Date.now(), t };
+      return t;
+    } catch (e) {
+      err = e;
+      if (e.why === 'key' || e.why === 'limit' || i) break;
+      await new Promise(res => setTimeout(res, 2500));
+    }
+  }
+  const old = cm.ttOk;
+  if (old && old.sig === sig && Date.now() - old.at < 15 * 6e4) return { ...old.t, stale: old.at };
+  return { error: true, why: (err && err.why) || 'svc' };
+}
 async function tomtom(from, to) {
   let key = null;
   try { key = localStorage.getItem(TT_KEY); } catch { key = null; }
   if (!key) return null;
-  const j = await getJson(`https://api.tomtom.com/routing/1/calculateRoute/${from.lat},${from.lon}:${to.lat},${to.lon}/json?key=${encodeURIComponent(key)}&traffic=true&travelMode=car&routeType=fastest&sectionType=traffic&computeTravelTimeFor=all&language=de-DE`, 12000);
+  const j = await ttFetch(ttUrl(from, to, key));
   const r = j && Array.isArray(j.routes) ? j.routes[0] : null;
-  if (!r || !r.summary || !Number.isFinite(+r.summary.travelTimeInSeconds)) throw new Error('tomtom');
+  if (!r || !r.summary || !Number.isFinite(+r.summary.travelTimeInSeconds)) throw ttErr('svc');
   const points = (r.legs || []).flatMap(l => (l.points || []).map(p => [+p.longitude, +p.latitude]));
   const g = points.length > 1 ? prepRoute(points) : null;
   const CAT = { JAM: ['jam', 'Stau'], ROAD_WORK: ['works', 'Baustelle'], ROAD_CLOSURE: ['closure', 'Sperrung'] };
@@ -178,7 +223,8 @@ async function loadCommute() {
       if (m) refs.add('A' + m[1]);
     }
     const g = prepRoute(route.geometry.coordinates);
-    const tt = await tomtom(from, to).catch(() => ({ error: true }));
+    const tt = await ttLive(from, to);
+    if (seq !== cm.seq) return;
     const ab = await autobahnItems([...refs], g, !!(tt && !tt.error));
     if (seq !== cm.seq) return;
     cm.res = { dir: cm.dir, from, to, route, refs: [...refs], ab, tt, at: Date.now() };
@@ -261,11 +307,11 @@ function renderCommute() {
     ul.appendChild(li);
   }
   const hints = [];
-  if (!tt) hints.push(R.tt && R.tt.error ? 'Der TomTom-Key funktioniert gerade nicht, deshalb ohne Live-Stadtverkehr.' : 'Fahrzeit = normale Fahrzeit plus gemeldete Autobahn-Staus. Stau in der Stadt zeigt Google Maps, oder du hinterlegst unter „Adressen“ einen TomTom-Key.');
+  if (!tt) hints.push(R.tt && R.tt.error ? TT_WHY[R.tt.why] || TT_WHY.svc : 'Fahrzeit = normale Fahrzeit plus gemeldete Autobahn-Staus. Stau in der Stadt zeigt Google Maps, oder du hinterlegst über die Regler oben einen TomTom-Key.');
   if (R.ab.failed) hints.push('Ein Teil der Autobahn-Meldungen fehlt gerade.');
   $('#cm-hint').textContent = hints.join(' ');
   $('#cm-hint').hidden = !hints.length;
-  $('#cm-src').textContent = `Stand ${hm(new Date(R.at))} Uhr · Route: OpenStreetMap · Meldungen: Autobahn GmbH${tt ? ' · Live-Fahrzeit: TomTom' : ''}`;
+  $('#cm-src').textContent = `Stand ${hm(new Date(R.at))} Uhr · Route: OpenStreetMap · Meldungen: Autobahn GmbH${tt ? ` · Live-Fahrzeit: TomTom${tt.stale ? ` von ${hm(new Date(tt.stale))} Uhr` : ''}` : ''}`;
   cm.items = items;
   cmMap(R, items, tt);
   tickTiles(new Date());
@@ -370,6 +416,7 @@ function openCmForm() {
   let key = '';
   try { key = localStorage.getItem(TT_KEY) || ''; } catch { key = ''; }
   $('#cm-key').value = key;
+  $('#cm-key-res').textContent = '';
   $('#cm-err').hidden = true;
   $('#cm-form').hidden = false;
   $('#cm-home').focus();
@@ -389,8 +436,37 @@ $('#cm-form').addEventListener('submit', e => {
   cm.res = null;
   cm.sum = null;
   cm.homeMins = null;
+  cm.ttOk = null;
   commit();
   loadCommute();
+});
+/* Key ausprobieren, ohne zu speichern: mit deiner Strecke oder, solange die fehlt, einmal quer durch Hamburg */
+$('#cm-key-test').addEventListener('click', async () => {
+  const k = $('#cm-key').value.trim(), out = $('#cm-key-res'), btn = $('#cm-key-test');
+  out.dataset.lv = '';
+  if (!k) { out.textContent = 'Trag zuerst einen Key ein.'; return; }
+  const ok = p => !!p && p.lat !== null && p.lon !== null, mine = ok(state.commute.home) && ok(state.commute.work);
+  const [a, b] = mine ? [state.commute.home, state.commute.work] : [{ lat: 53.5503, lon: 9.9927 }, { lat: 53.5530, lon: 10.0067 }];
+  btn.disabled = true;
+  out.textContent = 'Frage TomTom …';
+  const t0 = performance.now();
+  try {
+    const j = await ttFetch(ttUrl(a, b, k));
+    const r = j && Array.isArray(j.routes) ? j.routes[0] : null;
+    if (!r || !r.summary) throw ttErr('svc');
+    out.dataset.lv = 'ok';
+    out.textContent = `Klappt, TomTom hat in ${numDe((performance.now() - t0) / 1000, 1)} s geantwortet${mine ? `. Gerade ${Math.max(1, Math.round(r.summary.travelTimeInSeconds / 60))} Min für deine Strecke` : ''}.`;
+  } catch (e) {
+    out.dataset.lv = 'bad';
+    const why = {
+      key: 'TomTom lehnt diesen Key ab.',
+      limit: 'Der Key stimmt, aber sein Kontingent ist gerade aufgebraucht.',
+      slow: 'TomTom hat zu lange gebraucht. Probier es gleich nochmal.',
+      net: 'TomTom ist von hier aus nicht erreichbar. Bleibt das so, prüf auf developer.tomtom.com, ob der Key aktiv ist und die Routing API darf, denn ein abgelehnter Key sieht im Browser manchmal genauso aus.',
+      svc: 'TomTom hat geantwortet, aber keine Route geliefert.'
+    }[e.why] || 'Das hat nicht geklappt.';
+    out.textContent = why + (e.text ? ` TomTom sagt: „${e.text}“${e.status ? ` (Fehler ${e.status})` : ''}.` : e.status ? ` (Fehler ${e.status})` : '');
+  } finally { btn.disabled = false; }
 });
 
 defineWidget('commute', {});

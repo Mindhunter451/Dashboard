@@ -43,17 +43,27 @@ const widgetsOf = type => Object.entries(state.widgets).filter(([, w]) => w.type
 
 /* Raster an die aktuelle Seite anpassen: richtige Karten zeigen, Reihenfolge und Breite setzen */
 function syncBoard() {
-  const page = curPage(), board = $('#board');
+  const page = curPage(), board = $('#board'), add = $('#add-tile');
   for (const id of [...views.keys()]) if (!state.widgets[id]) dropView(id);
-  const on = new Set();
+  const on = new Set(), list = [];
   // Seiten mit „nach Tageszeit ordnen“ zeigen ihre Karten je nach Uhrzeit anders sortiert, beim Bearbeiten in der eigenen Reihenfolge
   for (const it of page.smart && !edit.on ? smartOrder(page.items, new Date()) : page.items) {
     const v = ensureView(it.w);
     if (!v) continue;
     on.add(v.el);
-    board.insertBefore(v.el, $('#add-tile'));
+    list.push(v.el);
     v.el.hidden = false;
     v.el.dataset.span = String(it.s);
+  }
+  // Karten nur umhängen, wenn die Reihenfolge wirklich nicht stimmt: Jedes Umhängen nimmt dem Feld, in dem du gerade tippst, den Fokus
+  if (!inOrder(list, add)) {
+    const a = document.activeElement, keep = a && a !== document.body && board.contains(a) ? a : null;
+    const sel = keep ? [keep.selectionStart, keep.selectionEnd, keep.selectionDirection] : null;
+    for (const el of list) board.insertBefore(el, add);
+    if (keep && keep.isConnected && document.activeElement !== keep) {
+      keep.focus({ preventScroll: true });
+      try { if (sel[0] !== null && sel[0] !== undefined) keep.setSelectionRange(...sel); } catch { /* nicht jedes Feld kennt eine Auswahl */ }
+    }
   }
   for (const el of board.children) if (el.classList.contains('card') && el.id !== 'add-tile' && !on.has(el)) el.hidden = true;
   $('#add-tile').hidden = !edit.on;
@@ -62,6 +72,8 @@ function syncBoard() {
   board.setAttribute('aria-label', page.name);
   renderOverlays();
 }
+/* Stehen die Karten schon in dieser Reihenfolge vor dem Plus-Feld? */
+const inOrder = (list, end) => list.every((el, i) => el.parentNode === end.parentNode && !!(el.compareDocumentPosition(list[i + 1] || end) & Node.DOCUMENT_POSITION_FOLLOWING));
 /* Titel und Inhalt aller Widgets zeichnen */
 function renderViews() {
   for (const v of views.values()) {

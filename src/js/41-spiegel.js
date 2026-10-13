@@ -20,7 +20,6 @@ function mirrorOpen(gesture) {
   mirrorLock();
   mirrorWake();
   mr.last = '';
-  if (!vs.cur || !vs.cur.key.startsWith(ymd(new Date()))) vsLoad();
   renderMirror();
 }
 function mirrorClose() {
@@ -100,10 +99,6 @@ function renderMirror() {
     if (t) cd.push(`<li><span class="m-dim">${esc(c2.name)}</span><b>${esc(t.querySelector('.t-val').textContent)}</b></li>`);
   }
   $('#m-cd').innerHTML = cd.length ? `<ul>${cd.join('')}</ul>` : '';
-  // Vers
-  const v = vs.cur && vs.cur.key && vs.cur.key.startsWith(ymd(now)) ? vs.cur : null;
-  $('#m-verse').hidden = !v;
-  if (v) { $('#m-verse-text').textContent = v.text; $('#m-verse-ref').textContent = v.ref; }
   mirrorFit();
 }
 /* Rechte Spalte: Was nicht mehr ganz passt, fliegt raus, zuerst Countdowns, dann späte Abfahrten (mindestens 2 bleiben) */

@@ -6,7 +6,7 @@ const zu = new Set((Array.isArray(lsGet(ZU_KEY)) ? lsGet(ZU_KEY) : []).map(Strin
 const narrowMq = matchMedia('(max-width: 720px)');
 const isNarrow = () => narrowMq.matches;
 /* Wichtige Karten schweben etwas höher, ruhige liegen flach */
-const TIER = { now: 'hero', weather: 'hero', dep: 'hero', cal: 'hero', commute: 'hero', links: 'quiet', notes: 'quiet', verse: 'quiet' };
+const TIER = { now: 'hero', weather: 'hero', dep: 'hero', cal: 'hero', commute: 'hero', links: 'quiet', notes: 'quiet' };
 const CHEV = '<svg class="card-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 
 /* Aus dem Titel wird ein Knopf zum Einklappen, davor das Symbol des Widgets, dahinter Platz für die Kurzinfo */
@@ -107,7 +107,6 @@ const PEEK = {
     return r ? `${esc(r.b.name)} <small>${esc(r.pct.textContent)}</small>` : '';
   },
   commute: () => ($('#cm-live').hidden ? '' : `${esc($('#cm-time').textContent)} <small>${esc($('#cm-time-lbl').textContent)}</small>`),
-  verse: () => ($('#vs-ref').hidden ? '' : `<small>${esc($('#vs-ref').textContent)}</small>`),
   notes(v) {
     const line = (state.widgets[v.id].cfg.text || '').split('\n').map(s => s.trim()).find(Boolean);
     return line ? `<small>${esc(line.slice(0, 60))}</small>` : '';
@@ -134,7 +133,6 @@ function peekAll() { for (const v of views.values()) if (!v.el.hidden && zu.has(
 /* Platzhalter-Zeilen für Listen, solange Daten unterwegs sind */
 const skelRows = (n, label) => `<li class="vh">${esc(label || 'Wird geladen')}</li>` + Array.from({ length: n }, (_, i) =>
   `<li class="sk-row" aria-hidden="true"><i class="sk-a"></i><span><i style="width:${[72, 56, 64, 48][i % 4]}%"></i><i class="s" style="width:${[36, 44, 30, 40][i % 4]}%"></i></span><i class="sk-b"></i></li>`).join('');
-const skelLines = (n, label) => `<span class="sk-lines" role="img" aria-label="${esc(label || 'Wird geladen')}">${Array.from({ length: n }, (_, i) => `<i style="width:${i === n - 1 ? 58 : 100}%"></i>`).join('')}</span>`;
 
 /* Seitenwechsel: Karten kommen von oben links nach unten rechts kurz nacheinander rein */
 let cardsInTimer = 0;

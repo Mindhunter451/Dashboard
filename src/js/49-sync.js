@@ -80,7 +80,7 @@ function syCheckRemote(r) {
  * Bei 'conflict' und 'connect' wird der verdrängte eigene Stand als Kopie aufgehoben und lässt sich über den Toast zurückholen. */
 function syApply(r, how) {
   const a = document.activeElement;
-  if (edit.on || (a && a.matches && a.matches('input:not([type=button]), textarea, select, [contenteditable="true"]'))) return false;
+  if (edit.on || (a && a.matches && a.matches('input:not([type=button]), textarea, select, .sel-btn, .sel-pop, [contenteditable="true"]'))) return false;
   const old = state, hb = syHash();
   if (how !== 'pull') lsSet(SY_BACKUP, state);
   const keep = Object.fromEntries(SY_LOCAL_UI.map(k => [k, old.ui[k]]));

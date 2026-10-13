@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '2.8';
+const VERSION = '2.9';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -8,7 +8,6 @@ function tick() {
   autoTick(now);
   tickPomo(now);
   skyTick(now);
-  vsTick(now);
   caTick(now);
   dpTick(now);
   bdTick(now);
@@ -50,12 +49,13 @@ document.addEventListener('visibilitychange', () => {
 const NEWS = {
   '2.1': ['Neu: Pomodoro, Gewohnheiten und Lernfortschritt. Soll ich dir eine Fokus-Seite damit einrichten?', () => setupFocusPage()],
   '2.2': ['Neu: Fußball, Formel 1 und Spritpreise. Soll ich dir eine Sport-Seite mit dem HSV einrichten?', () => setupSportPage()],
-  '2.3': ['Neu: Kalender, Vers des Tages, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich Kalender und Vers auf deine erste Seite legen?', () => setupNews23()],
+  '2.3': ['Neu: Kalender, der Himmel oben und der Spiegel-Modus (Taste S). Die Gleitzeit ist raus. Soll ich den Kalender auf deine erste Seite legen?', () => setupNews23()],
   '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
   '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null],
   '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau'],
   '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => openDrawer('devices'), 'Zeigen'],
-  '2.8': ['Neuer Look: Dunkel in Graphit oder Schwarz, mehr Akzentfarben mit Verläufen, ein neues Anpassen-Fenster und die Schnellsuche mit Strg+K.', () => openDrawer('look'), 'Ansehen']
+  '2.8': ['Neuer Look: Dunkel in Graphit oder Schwarz, mehr Akzentfarben mit Verläufen, ein neues Anpassen-Fenster und die Schnellsuche mit Strg+K.', () => openDrawer('look'), 'Ansehen'],
+  '2.9': ['Feinschliff: Notizen lassen dich jetzt durchschreiben, Auswahllisten passen zum Look, alle laufenden Balken leuchten in deiner Farbe und Pendeln sagt genauer, was mit TomTom los ist. Der Vers des Tages ist raus.', null]
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {
@@ -83,10 +83,10 @@ function setupSportPage() {
   layoutNow();
   toast(addFuel ? `Seite „${name}“ ist fertig, und die Spritpreise liegen auf „${work.name}“ neben dem Pendeln.` : `Seite „${name}“ ist fertig.`);
 }
-/* 2.3: Vers und Kalender auf die erste Seite, das Gleitzeit-Widget gibt es nicht mehr */
+/* 2.3: Kalender auf die erste Seite, das Gleitzeit-Widget gibt es nicht mehr */
 function setupNews23() {
-  const p = state.pages[0], add = ['cal', 'verse'].filter(w => !p.items.some(x => x.w === w));
-  if (!add.length) { toast(`Kalender und Vers liegen schon auf „${p.name}“.`); return; }
+  const p = state.pages[0], add = ['cal'].filter(w => !p.items.some(x => x.w === w));
+  if (!add.length) { toast(`Der Kalender liegt schon auf „${p.name}“.`); return; }
   p.items.splice(Math.min(1, p.items.length), 0, ...add.map(w => ({ w, s: 1 })));
   if (state.page !== p.id) state.page = p.id;
   commit();
@@ -137,6 +137,8 @@ addEventListener('storage', e => {
 });
 
 $('#foot-ver').textContent = `Version ${VERSION}`;
+// Den Vers des Tages gibt es seit 2.9 nicht mehr, sein Zwischenspeicher kann weg
+try { localStorage.removeItem('jere-cockpit-vers'); } catch { /* Browser speichert nicht */ }
 if (!lsOk) setSync('none');
 for (const t of ['commute', 'weather', 'vacation']) ensureView(t);
 // Ganz neu hier (nichts gespeichert): mit Heute, Arbeit und Privat starten
