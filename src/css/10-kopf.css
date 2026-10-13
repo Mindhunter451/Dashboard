@@ -13,20 +13,27 @@
 /* Zeile oben: Begrüßung, Seiten, Knöpfe */
 .sky-top{display:flex;align-items:center;gap:10px 18px;min-width:0}
 .greet{margin:0;flex:0 0 auto;font:680 clamp(19px,1.7vw,23px)/1.1 var(--f-display);font-variation-settings:'wdth' 88;letter-spacing:-.012em}
-.tabs{display:flex;gap:2px;padding:3px;border-radius:999px;overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%;
+.tabs{position:relative;display:flex;gap:2px;padding:3px;border-radius:999px;overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%;
   background:color-mix(in srgb,var(--sky-ink) 9%,transparent);border:1px solid color-mix(in srgb,var(--sky-ink) 16%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;border:0;background:transparent;padding:6px 15px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:color-mix(in srgb,var(--sky-ink) 76%,transparent);white-space:nowrap}
+.tab{position:relative;z-index:1;flex:0 0 auto;border:0;background:transparent;padding:6px 15px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:color-mix(in srgb,var(--sky-ink) 76%,transparent);white-space:nowrap;transition:color .25s}
 .tab:hover{color:var(--sky-ink);background:color-mix(in srgb,var(--sky-ink) 12%,transparent)}
-.tab[aria-selected="true"],.tab[aria-current="page"]{background:var(--sky-ink);color:var(--sky-top)}
-.sky.plain .tab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
+.tab[aria-selected="true"],.tab[aria-current="page"]{color:var(--sky-top)}
+.tab[aria-selected="true"]:hover,.tab[aria-current="page"]:hover{background:transparent;color:var(--sky-top)}
+/* Die weiße Pille unter dem aktiven Tab gleitet beim Wechsel (gesetzt in 22-seiten.js) */
+.tab-ind{position:absolute;z-index:0;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:var(--sky-ink);pointer-events:none;opacity:0;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .42s var(--spring),width .42s var(--spring),opacity .2s}
+@media (prefers-reduced-motion: reduce){.tab-ind{transition:none}}
 .sky-tools{display:flex;gap:8px;margin-left:auto;flex:0 0 auto}
 .sky-btn{position:relative;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;font:600 13px/1.2 var(--f-body);color:var(--sky-ink);
   border:1px solid color-mix(in srgb,var(--sky-ink) 22%,transparent);background:color-mix(in srgb,var(--sky-ink) 7%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .sky-btn:hover{background:color-mix(in srgb,var(--sky-ink) 15%,transparent)}
 .sky-btn svg{width:16px;height:16px;flex:0 0 16px}
+.sky-btn kbd{font:600 11px/1 var(--f-body);padding:3px 5px;margin:-2px -4px -2px 2px;border-radius:6px;background:color-mix(in srgb,var(--sky-ink) 14%,transparent);opacity:.85}
+@media (max-width:1100px){.sky-btn kbd{display:none}}
+@media (hover:none){.sky-btn kbd{display:none}}
 .sky :focus-visible{outline-color:var(--sky-ink)}
-.edit-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.edit-btn[aria-pressed="true"]{background:var(--accent-fill);border-color:transparent;color:var(--on-accent)}
 @media (max-width:860px){
   .sky-top{flex-wrap:wrap}
   .sky-top .tabs{order:3;flex:1 1 100%}
@@ -75,7 +82,7 @@
 .arc-rest{stroke-opacity:.38;stroke-width:1.25;stroke-dasharray:1.5 5}
 .arc-done{stroke-opacity:.85;stroke-width:2}
 .arc-sun{position:absolute;left:var(--sun-x,50%);bottom:calc(var(--sun-f,0) * var(--arc-h) * .94);width:14px;height:14px;margin:0 0 -7px -7px;border-radius:50%;background:#FFF4DA;box-shadow:0 0 0 4px rgba(255,238,200,.22),0 0 26px 8px rgba(255,210,140,.5)}
-.sky.plain .arc-sun{background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.sky.plain .arc-sun{background:var(--accent-fill);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
 .arc-lbl{position:absolute;bottom:9px;font:600 12px/1 var(--f-body);font-variant-numeric:tabular-nums;opacity:.8;white-space:nowrap}
 #arc-rise{transform:translateX(calc(-100% - 8px))}
 #arc-set{transform:translateX(8px)}

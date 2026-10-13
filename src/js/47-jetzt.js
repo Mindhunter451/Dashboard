@@ -387,7 +387,7 @@ defineWidget('now', {
   settings: {
     render(box, w) {
       box.innerHTML = `<label class="field"><span class="lbl">Höchstens so viele Hinweise</span><select data-s="n">${[3, 4, 6, 8].map(n => `<option value="${n}"${n === w.cfg.n ? ' selected' : ''}>${n}</option>`).join('')}</select></label>`
-        + `<label class="check-row"><input type="checkbox" data-s="cap"${w.cfg.cap ? ' checked' : ''}> Feld zum schnellen Notieren zeigen</label>`
+        + `<label class="check-row"><input type="checkbox" class="switch" data-s="cap"${w.cfg.cap ? ' checked' : ''}> Feld zum schnellen Notieren zeigen</label>`
         + '<p class="hint">Die Karte sammelt aus deinen anderen Widgets, was gerade zählt: Wetterwarnungen, Termine, Abfahrten, Pendeln, Regen, Frost, Müll, Geburtstage, Aufgaben, Prüfung und Gewohnheiten. Morgens zählt der Weg, abends das, was morgen ansteht. Auf dem Handy zeigt sie höchstens 4, der Rest steckt hinter „weitere zeigen“.</p>';
     },
     save(box, w) {

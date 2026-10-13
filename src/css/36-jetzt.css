@@ -7,7 +7,7 @@ button.nw-row{cursor:pointer;transition:background-color .15s}
 button.nw-row:active{background:color-mix(in srgb,var(--ink) 10%,var(--raise))}
 .nw-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surface);color:var(--muted)}
 .nw-ico svg{width:18px;height:18px}
-.nw-row[data-lv="now"] .nw-ico{background:var(--accent);color:var(--on-accent)}
+.nw-row[data-lv="now"] .nw-ico{background:var(--accent-fill);color:var(--on-accent)}
 .nw-row[data-lv="warn"] .nw-ico{background:color-mix(in srgb,var(--warn) 20%,var(--surface));color:var(--warn)}
 .nw-row[data-lv="bad"] .nw-ico{background:var(--bad);color:#fff}
 .nw-row .nw-ico[style]{background:var(--wc);color:#1A1203}

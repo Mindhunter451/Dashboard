@@ -62,7 +62,7 @@
 .bd-row.today{background:color-mix(in srgb,var(--accent) 15%,var(--surface));padding-left:8px;margin-inline:-8px 0}
 .bd-row.today .bd-cal{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .bd-row.today .bd-cal small{color:inherit}
-.bd-row.today .bd-in{padding:2px 10px;border-radius:999px;background:var(--accent);color:var(--on-accent)}
+.bd-row.today .bd-in{padding:2px 10px;border-radius:999px;background:var(--accent-fill);color:var(--on-accent)}
 .bd-msg{padding:8px 11px;border-radius:9px;background:var(--surface);border:1px solid var(--line);color:var(--ink);margin-top:8px}
 .bd-all{max-height:300px;overflow:auto}
 .bd-all .tx span{font-variant-numeric:tabular-nums}

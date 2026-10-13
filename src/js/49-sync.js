@@ -2,7 +2,7 @@
  * Adresse und Passwort bleiben nur in diesem Browser (jere-cockpit-sync) und kommen nicht in die Sicherung.
  * Eigene Änderungen gehen nach ein paar Sekunden hoch, sonst fragt das Cockpit regelmäßig nach.
  * Ändern zwei Geräte gleichzeitig etwas, gilt der spätere Stand. Der verdrängte bleibt als Kopie liegen (jere-cockpit-vor-sync).
- * Pro Gerät bleiben Seite, Design und Kartengröße, außerdem alles, was in einem eigenen Schlüssel liegt (Tokens, Keys, Kalender-Links, Timer). */
+ * Pro Gerät bleiben Seite, Design (Hell, Dunkel, Graphit, Schwarz), Kartenbreite und Abstände, außerdem alles, was in einem eigenen Schlüssel liegt (Tokens, Keys, Kalender-Links, Timer). */
 const SY_KEY = 'jere-cockpit-sync', SY_BACKUP = 'jere-cockpit-vor-sync';
 const SY_WORKER = /*@sync-worker*/'';
 const sy = { on: false, busy: false, again: false, waiting: false, said: false, seen: '', touch: 0, noteT: null, pushT: null, last: 0, err: '', errKind: '', told: '', choice: null };
@@ -14,13 +14,14 @@ function syCfg() {
 }
 const sySave = c => lsSet(SY_KEY, c);
 
-/* Was zwischen Geräten wandert: alles außer der offenen Seite, den Merkzetteln dieses Browsers und Design und Größe */
+/* Was pro Gerät bleibt: Hell oder Dunkel, Graphit oder Schwarz, Kartenbreite und Abstände. Akzent und Ecken wandern mit. */
+const SY_LOCAL_UI = ['theme', 'dark', 'size', 'density'];
+/* Was zwischen Geräten wandert: alles außer der offenen Seite, den Merkzetteln dieses Browsers und den Einstellungen pro Gerät */
 function syView(s) {
   const v = { ...s, ui: { ...s.ui } };
   delete v.page;
   delete v.meta;
-  delete v.ui.theme;
-  delete v.ui.size;
+  for (const k of SY_LOCAL_UI) delete v.ui[k];
   return v;
 }
 const syCanon = v => Array.isArray(v) ? `[${v.map(syCanon).join(',')}]`
@@ -82,7 +83,8 @@ function syApply(r, how) {
   if (edit.on || (a && a.matches && a.matches('input:not([type=button]), textarea, select, [contenteditable="true"]'))) return false;
   const old = state, hb = syHash();
   if (how !== 'pull') lsSet(SY_BACKUP, state);
-  state = normalize({ ...r.state, ui: { ...(r.state.ui || {}), theme: old.ui.theme, size: old.ui.size }, page: old.page, meta: old.meta });
+  const keep = Object.fromEntries(SY_LOCAL_UI.map(k => [k, old.ui[k]]));
+  state = normalize({ ...r.state, ui: { ...(r.state.ui || {}), ...keep }, page: old.page, meta: old.meta });
   persist();
   sy.seen = syHash();
   renderAll();
@@ -221,6 +223,8 @@ function syMode() {
 function syShow() {
   setSync(lsOk ? syMode() : 'none');
   renderSyncState();
+  // Mit Sync gibt es keine Erinnerung ans Sichern, ohne wieder
+  checkBackup();
 }
 function renderSyncState() {
   const c = syCfg(), el = $('#sy-state');

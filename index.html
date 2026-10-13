@@ -29,10 +29,13 @@
   --ink:#0F1B2B;
   --muted:#5B6B7D;
   --line:#DCE3EA;
+  /* Akzent: setzt 20-kopf.js aus der gewählten Farbe, das hier ist nur der Start */
   --accent:#E8A126;
+  --accent-2:var(--accent);
+  --accent-fill:var(--accent);
   --accent-ink:#8A5604;
   --on-accent:#1D1404;
-  --chip-bg:#FCEFD3;
+  --chip-bg:color-mix(in oklab,var(--accent) 15%,var(--surface));
   --sea:#2B66A0;
   --rain:#3A86CF;
   --good:#2F8458;
@@ -42,8 +45,15 @@
   --f-body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-data:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-serif:"Literata", Georgia, "Times New Roman", serif;
+  /* Ecken: --r kommt aus Anpassen (4 bis 28 px), innere Flächen runden etwas weniger */
   --r:18px;
+  --r2:clamp(4px,calc(var(--r) * .66),16px);
+  /* Abstände: Dicht, Normal oder Luftig (data-density am Wurzelelement) */
   --gap:clamp(14px,1.8vw,22px);
+  --pad-t:16px;
+  --pad-x:clamp(16px,1.7vw,22px);
+  --pad-b:20px;
+  --card-gap:14px;
   --arc-h:96px;
   /* Ebenen: ruhige Karten liegen flach, normale leicht erhaben, wichtige Karten schweben etwas höher */
   --card-line:rgba(15,27,43,.075);
@@ -53,33 +63,61 @@
   --quiet:color-mix(in srgb,var(--surface) 48%,var(--bg));
   /* Füllung für Balken, die nicht „jetzt“ sind. Die Akzentfarbe bleibt für jetzt, heute und Aktionen. */
   --fill-n:color-mix(in srgb,var(--ink) 52%,var(--surface));
+  /* Glas für schwebende Fenster (Anpassen, Suche) und der Schleier dahinter */
+  --glass:color-mix(in srgb,var(--surface) 86%,transparent);
+  --glass-line:rgba(15,27,43,.09);
+  --scrim:rgba(14,18,24,.34);
+  --pop:0 1px 1px rgba(15,27,43,.04),0 24px 60px -18px rgba(15,27,43,.38);
   --ease:cubic-bezier(.2,.7,.2,1);
+  --spring:cubic-bezier(.3,1.25,.5,1);
 }
+:root[data-density="tight"]{--gap:clamp(10px,1.2vw,14px);--pad-t:12px;--pad-x:14px;--pad-b:14px;--card-gap:10px}
+:root[data-density="airy"]{--gap:clamp(18px,2.4vw,32px);--pad-t:20px;--pad-x:clamp(20px,2.2vw,28px);--pad-b:26px;--card-gap:18px}
+/* Dunkel: Graphit, fast schwarz mit einem Hauch Wärme, statt Nachtblau. Karten heben sich durch eine feine Linie ab, nicht durch Schatten.
+   Mit data-dark="oled" echtes Schwarz, praktisch für OLED-Bildschirme und den Spiegel. */
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
-    --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
-    --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+    --bg:#11100F; --surface:#1A1918; --raise:#242321; --ink:#ECE9E5; --muted:#A7A49F; --line:#2C2B29;
+    --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
     --card-line:rgba(255,255,255,.065);
-    --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
-    --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
-    --surface-hi:#142039;
+    --shadow-1:none;
+    --shadow-2:inset 0 1px 0 rgba(255,255,255,.045);
+    --surface-hi:#1F1E1D;
     --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
-    --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
+    --fill-n:color-mix(in srgb,var(--ink) 46%,var(--surface));
+    --chip-bg:color-mix(in oklab,var(--accent) 17%,var(--surface));
+    --glass:color-mix(in srgb,var(--surface) 86%,transparent);
+    --glass-line:rgba(255,255,255,.09);
+    --scrim:rgba(0,0,0,.42);
+    --pop:inset 0 1px 0 rgba(255,255,255,.05),0 30px 70px -20px rgba(0,0,0,.75);
     color-scheme:dark;
+  }
+  :root:not([data-theme="light"])[data-dark="oled"]{
+    --bg:#000000; --surface:#0D0D0D; --raise:#171717; --ink:#E8E6E2; --muted:#9B9893; --line:#222222;
+    --card-line:rgba(255,255,255,.075); --surface-hi:#131313; --quiet:#080808;
+    --glass:color-mix(in srgb,#0D0D0D 88%,transparent);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#090F1C; --surface:#111B2D; --raise:#18243A; --ink:#E6EDF5; --muted:#97A6BB; --line:#233149;
-  --accent:#F0B040; --accent-ink:#F3C266; --on-accent:#1D1404; --chip-bg:#3A2B0E;
-  --sea:#7DB2E2; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+  --bg:#11100F; --surface:#1A1918; --raise:#242321; --ink:#ECE9E5; --muted:#A7A49F; --line:#2C2B29;
+  --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
   --card-line:rgba(255,255,255,.065);
-  --shadow-1:inset 0 1px 0 rgba(255,255,255,.035),0 2px 10px rgba(0,0,0,.28);
-  --shadow-2:inset 0 1px 0 rgba(255,255,255,.06),0 16px 36px -12px rgba(0,0,0,.65);
-  --surface-hi:#142039;
+  --shadow-1:none;
+  --shadow-2:inset 0 1px 0 rgba(255,255,255,.045);
+  --surface-hi:#1F1E1D;
   --quiet:color-mix(in srgb,var(--surface) 55%,var(--bg));
-  --fill-n:color-mix(in srgb,var(--ink) 48%,var(--surface));
+  --fill-n:color-mix(in srgb,var(--ink) 46%,var(--surface));
+  --chip-bg:color-mix(in oklab,var(--accent) 17%,var(--surface));
+  --glass:color-mix(in srgb,var(--surface) 86%,transparent);
+  --glass-line:rgba(255,255,255,.09);
+  --scrim:rgba(0,0,0,.42);
+  --pop:inset 0 1px 0 rgba(255,255,255,.05),0 30px 70px -20px rgba(0,0,0,.75);
   color-scheme:dark;
+}
+:root[data-theme="dark"][data-dark="oled"]{
+  --bg:#000000; --surface:#0D0D0D; --raise:#171717; --ink:#E8E6E2; --muted:#9B9893; --line:#222222;
+  --card-line:rgba(255,255,255,.075); --surface-hi:#131313; --quiet:#080808;
+  --glass:color-mix(in srgb,#0D0D0D 88%,transparent);
 }
 @media (max-width:720px){:root{--arc-h:70px}}
 *,*::before,*::after{box-sizing:border-box}
@@ -90,7 +128,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--f-bo
 /* Unter dem Horizont schimmert die Farbe des Himmels noch ein Stück nach */
 .wrap{position:relative;isolation:isolate;max-width:3200px;margin:0 auto;padding-inline:clamp(16px,2.6vw,44px);padding-block:clamp(16px,2.4vw,26px) 40px;display:flex;flex-direction:column;gap:var(--gap)}
 .wrap::before{content:"";position:absolute;z-index:-1;top:0;left:calc(50% - 50vw);width:100vw;height:clamp(200px,24vw,340px);pointer-events:none;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--horizon,var(--bg)) 20%,transparent),transparent)}
+  background:linear-gradient(180deg,color-mix(in srgb,var(--horizon,var(--bg)) var(--glow,20%),transparent),transparent)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wrap{--glow:9%}}
+:root[data-theme="dark"] .wrap{--glow:9%}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -130,7 +170,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @media (prefers-reduced-motion: reduce){.sk-row i,.sk-lines i,.is-loading::before{animation:none}.icon-btn.spin svg{animation-duration:3s}}
 
 /* Einrichten-Hinweis in einer Karte: kompakt, eine Zeile Text und ein Knopf */
-.setup{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;padding:12px 12px 12px 14px;border-radius:12px;background:var(--raise);border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent)}
+.setup{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;padding:12px 12px 12px 14px;border-radius:var(--r2);background:var(--raise);border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent)}
 .setup h3{margin:0;font:650 15px/1.3 var(--f-display);font-variation-settings:'wdth' 92;grid-column:1}
 .setup p{margin:0;grid-column:1;font-size:13px;line-height:1.45;color:var(--muted);max-width:none}
 .setup .form-row{grid-column:2;grid-row:1/span 2;flex-wrap:nowrap}
@@ -138,7 +178,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 @container (max-width:330px){.setup{grid-template-columns:minmax(0,1fr)}.setup .form-row{grid-column:1;grid-row:auto;margin-top:8px}}
 
 /* Formulare */
-.panel{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.panel{background:var(--raise);border:1px solid var(--line);border-radius:var(--r2);padding:14px;display:flex;flex-direction:column;gap:12px}
 .panel h3{margin:0;font:700 16px/1.2 var(--f-display)}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @container (max-width:400px){.grid2{grid-template-columns:minmax(0,1fr)}}
@@ -152,7 +192,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .days label{position:relative}
 .days input{position:absolute;opacity:0;width:1px;height:1px}
 .days span{display:inline-block;padding:4px 11px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:600;background:var(--surface);cursor:pointer;user-select:none}
-.days input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.days input:checked + span{background:var(--accent-fill);border-color:transparent;color:var(--on-accent)}
 .days input:focus-visible + span{outline:2px solid var(--sea);outline-offset:2px}
 .form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .err{margin:0;color:var(--bad);font-size:13px;font-weight:600}
@@ -175,20 +215,27 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* Zeile oben: Begrüßung, Seiten, Knöpfe */
 .sky-top{display:flex;align-items:center;gap:10px 18px;min-width:0}
 .greet{margin:0;flex:0 0 auto;font:680 clamp(19px,1.7vw,23px)/1.1 var(--f-display);font-variation-settings:'wdth' 88;letter-spacing:-.012em}
-.tabs{display:flex;gap:2px;padding:3px;border-radius:999px;overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%;
+.tabs{position:relative;display:flex;gap:2px;padding:3px;border-radius:999px;overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%;
   background:color-mix(in srgb,var(--sky-ink) 9%,transparent);border:1px solid color-mix(in srgb,var(--sky-ink) 16%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;border:0;background:transparent;padding:6px 15px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:color-mix(in srgb,var(--sky-ink) 76%,transparent);white-space:nowrap}
+.tab{position:relative;z-index:1;flex:0 0 auto;border:0;background:transparent;padding:6px 15px;border-radius:999px;font:600 14px/1.2 var(--f-body);color:color-mix(in srgb,var(--sky-ink) 76%,transparent);white-space:nowrap;transition:color .25s}
 .tab:hover{color:var(--sky-ink);background:color-mix(in srgb,var(--sky-ink) 12%,transparent)}
-.tab[aria-selected="true"],.tab[aria-current="page"]{background:var(--sky-ink);color:var(--sky-top)}
-.sky.plain .tab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
+.tab[aria-selected="true"],.tab[aria-current="page"]{color:var(--sky-top)}
+.tab[aria-selected="true"]:hover,.tab[aria-current="page"]:hover{background:transparent;color:var(--sky-top)}
+/* Die weiße Pille unter dem aktiven Tab gleitet beim Wechsel (gesetzt in 22-seiten.js) */
+.tab-ind{position:absolute;z-index:0;top:3px;bottom:3px;left:0;width:0;border-radius:999px;background:var(--sky-ink);pointer-events:none;opacity:0;
+  box-shadow:0 1px 3px rgba(0,0,0,.12);transition:transform .42s var(--spring),width .42s var(--spring),opacity .2s}
+@media (prefers-reduced-motion: reduce){.tab-ind{transition:none}}
 .sky-tools{display:flex;gap:8px;margin-left:auto;flex:0 0 auto}
 .sky-btn{position:relative;display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;font:600 13px/1.2 var(--f-body);color:var(--sky-ink);
   border:1px solid color-mix(in srgb,var(--sky-ink) 22%,transparent);background:color-mix(in srgb,var(--sky-ink) 7%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .sky-btn:hover{background:color-mix(in srgb,var(--sky-ink) 15%,transparent)}
 .sky-btn svg{width:16px;height:16px;flex:0 0 16px}
+.sky-btn kbd{font:600 11px/1 var(--f-body);padding:3px 5px;margin:-2px -4px -2px 2px;border-radius:6px;background:color-mix(in srgb,var(--sky-ink) 14%,transparent);opacity:.85}
+@media (max-width:1100px){.sky-btn kbd{display:none}}
+@media (hover:none){.sky-btn kbd{display:none}}
 .sky :focus-visible{outline-color:var(--sky-ink)}
-.edit-btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.edit-btn[aria-pressed="true"]{background:var(--accent-fill);border-color:transparent;color:var(--on-accent)}
 @media (max-width:860px){
   .sky-top{flex-wrap:wrap}
   .sky-top .tabs{order:3;flex:1 1 100%}
@@ -237,7 +284,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .arc-rest{stroke-opacity:.38;stroke-width:1.25;stroke-dasharray:1.5 5}
 .arc-done{stroke-opacity:.85;stroke-width:2}
 .arc-sun{position:absolute;left:var(--sun-x,50%);bottom:calc(var(--sun-f,0) * var(--arc-h) * .94);width:14px;height:14px;margin:0 0 -7px -7px;border-radius:50%;background:#FFF4DA;box-shadow:0 0 0 4px rgba(255,238,200,.22),0 0 26px 8px rgba(255,210,140,.5)}
-.sky.plain .arc-sun{background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+.sky.plain .arc-sun{background:var(--accent-fill);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
 .arc-lbl{position:absolute;bottom:9px;font:600 12px/1 var(--f-body);font-variant-numeric:tabular-nums;opacity:.8;white-space:nowrap}
 #arc-rise{transform:translateX(calc(-100% - 8px))}
 #arc-set{transform:translateX(8px)}
@@ -270,7 +317,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .board:not(.flow)>.card{position:absolute;top:0;left:0}
 .board.anim>.card{transition:transform .38s cubic-bezier(.2,.7,.2,1)}
 @media (prefers-reduced-motion: reduce){.board.anim>.card{transition:none}}
-.card{scroll-margin-top:72px;position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:16px clamp(16px,1.7vw,22px) 20px;display:flex;flex-direction:column;gap:14px;min-width:0;container-type:inline-size}
+.card{scroll-margin-top:72px;position:relative;background:var(--surface);border:1px solid var(--card-line);box-shadow:var(--shadow-1);border-radius:var(--r);padding:var(--pad-t) var(--pad-x) var(--pad-b);display:flex;flex-direction:column;gap:var(--card-gap);min-width:0;container-type:inline-size}
 /* Wichtige Karten (Wetter, Abfahrten, Kalender, Pendeln) schweben höher, ruhige (Schnellzugriff, Notizen, Vers) liegen flach */
 .card[data-tier="hero"]{background:var(--surface-hi);box-shadow:var(--shadow-2)}
 .card[data-tier="quiet"]{background:var(--quiet);box-shadow:none;--raise:var(--surface)}
@@ -289,7 +336,7 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .card-tg{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:calc(100% + 11px);margin:-3px -8px -3px -3px;padding:3px 8px 3px 3px;border:0;border-radius:11px;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:left}
 .card-tg:hover{background:color-mix(in srgb,var(--ink) 4.5%,transparent)}
 .card-tt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card-ico{flex:0 0 28px;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--raise);color:var(--muted)}
+.card-ico{flex:0 0 28px;width:28px;height:28px;border-radius:min(9px,var(--r2));display:grid;place-items:center;background:var(--raise);color:var(--muted)}
 .card[data-tier="hero"] .card-ico{color:var(--ink)}
 .card[data-tier="quiet"] .card-ico{background:color-mix(in srgb,var(--ink) 5%,transparent)}
 .card-ico svg{width:16px;height:16px}
@@ -301,7 +348,7 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .card-peek .dp-line{font-size:12px;height:1.7em;min-width:2.5em;margin-left:5px;vertical-align:-1px}
 
 /* Eingeklappt: nur der Kopf mit einer Kurzinfo rechts */
-.board:not(.editing)>.card.is-collapsed{gap:0;padding-bottom:16px}
+.board:not(.editing)>.card.is-collapsed{gap:0;padding-bottom:var(--pad-t)}
 .board:not(.editing)>.card.is-collapsed>:not(.card-head){display:none!important}
 .board:not(.editing)>.card.is-collapsed>.card-head{flex-wrap:nowrap}
 .board:not(.editing)>.card.is-collapsed>.card-head>:not(h2):not(.card-peek){display:none!important}
@@ -349,7 +396,7 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .track{position:relative;height:10px;border-radius:5px;background:var(--raise);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;margin-top:7px}
 .fill{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:5px;background:var(--fill-n);transition:width .9s var(--ease)}
 /* Nur der laufende Arbeitstag ist „jetzt“ und bekommt die Akzentfarbe */
-.bar[data-kind="day"][data-state="run"] .fill{background:var(--accent)}
+.bar[data-kind="day"][data-state="run"] .fill{background:var(--accent-fill)}
 .tick{position:absolute;top:2px;bottom:2px;width:1px;background:color-mix(in srgb,var(--ink) 18%,transparent)}
 .bar[data-state="done"] .fill{background:var(--good)}
 .bar[data-state="off"] .fill{background:var(--muted);opacity:.35}
@@ -396,7 +443,7 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .wx-dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;margin:0;font-size:13px}
 .wx-dl dt{color:var(--muted)}
 .wx-dl dd{margin:0;font-family:var(--f-data);font-variant-numeric:tabular-nums}
-.wx-rain{background:var(--raise);border-radius:12px;padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.wx-rain{background:var(--raise);border-radius:var(--r2);padding:12px 12px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .sub-h{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .rainbars{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;height:72px;align-items:end;border-bottom:1px solid var(--line)}
 .rb{height:var(--h);min-height:2px;background:var(--line);border-radius:3px 3px 0 0}
@@ -469,6 +516,7 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;background:var(--raise)}
 .seg button{border:0;background:transparent;padding:5px 11px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.seg.sm button{padding:4px 9px;font-size:12px}
 .cm-route{margin:0;font-size:13px;color:var(--muted);overflow-wrap:anywhere}
 .verdict{margin:0;font-weight:700;font-size:15px;line-height:1.35}
 .verdict[data-lv="bad"]{color:var(--bad)}
@@ -566,7 +614,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .hb-check{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);background:transparent;display:grid;place-items:center;color:transparent;padding:0;margin-top:2px}
 .hb-check svg{width:17px;height:17px}
 .hb-check:hover{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent-ink)}
-.hb-check[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.hb-check[aria-pressed="true"]{background:var(--accent-fill);color:var(--on-accent)}
 .hb-main{min-width:0}
 .hb-top{display:flex;align-items:center;gap:8px;min-width:0}
 .hb-name{font-weight:700;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -847,7 +895,7 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .bd-row.today{background:color-mix(in srgb,var(--accent) 15%,var(--surface));padding-left:8px;margin-inline:-8px 0}
 .bd-row.today .bd-cal{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .bd-row.today .bd-cal small{color:inherit}
-.bd-row.today .bd-in{padding:2px 10px;border-radius:999px;background:var(--accent);color:var(--on-accent)}
+.bd-row.today .bd-in{padding:2px 10px;border-radius:999px;background:var(--accent-fill);color:var(--on-accent)}
 .bd-msg{padding:8px 11px;border-radius:9px;background:var(--surface);border:1px solid var(--line);color:var(--ink);margin-top:8px}
 .bd-all{max-height:300px;overflow:auto}
 .bd-all .tx span{font-variant-numeric:tabular-nums}
@@ -910,7 +958,7 @@ button.nw-row{cursor:pointer;transition:background-color .15s}
 button.nw-row:active{background:color-mix(in srgb,var(--ink) 10%,var(--raise))}
 .nw-ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surface);color:var(--muted)}
 .nw-ico svg{width:18px;height:18px}
-.nw-row[data-lv="now"] .nw-ico{background:var(--accent);color:var(--on-accent)}
+.nw-row[data-lv="now"] .nw-ico{background:var(--accent-fill);color:var(--on-accent)}
 .nw-row[data-lv="warn"] .nw-ico{background:color-mix(in srgb,var(--warn) 20%,var(--surface));color:var(--warn)}
 .nw-row[data-lv="bad"] .nw-ico{background:var(--bad);color:#fff}
 .nw-row .nw-ico[style]{background:var(--wc);color:#1A1203}
@@ -970,32 +1018,183 @@ button.nw-row:active{background:color-mix(in srgb,var(--ink) 10%,var(--raise))}
 .dlg .field #cap-in{font-size:16px;padding:10px 12px}
 
 /* 40-anpassen.css */
-/* Anpassen */
-.scrim{position:fixed;inset:0;background:rgba(6,12,18,.42);z-index:2900}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);border-left:1px solid var(--line);box-shadow:-14px 0 44px rgba(0,0,0,.22);z-index:3000;display:flex;flex-direction:column}
-.dr-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
-.dr-head h2{font-size:22px}
-.dr-body{overflow-y:auto;overscroll-behavior:contain;padding:4px 20px 32px}
-.dr-sec{padding:18px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
-.dr-sec:last-child{border-bottom:0}
-.dr-sec>h3{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
-.dr-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.dr-row>.lbl{font-size:14px;color:var(--ink);font-weight:600}
-.swatches{display:flex;flex-wrap:wrap;gap:10px}
-.swatch{position:relative;display:block}
+/* Anpassen: schwebendes Glas-Fenster rechts, das Cockpit bleibt dahinter sichtbar und zeigt jede Änderung sofort.
+   Auf dem Handy ein Blatt von unten, das sich nach unten wegziehen lässt. */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:2900;animation:fade-in .25s ease}
+.scrim.closing{animation:fade-out .2s ease forwards}
+@media (min-width:900px){.scrim{background:color-mix(in srgb,var(--scrim) 30%,transparent)}}
+@keyframes fade-in{from{opacity:0}}
+@keyframes fade-out{to{opacity:0}}
+.drawer{position:fixed;z-index:3000;top:12px;right:12px;bottom:12px;width:min(424px,calc(100% - 24px));display:flex;flex-direction:column;
+  background:var(--glass);-webkit-backdrop-filter:blur(30px) saturate(1.6);backdrop-filter:blur(30px) saturate(1.6);
+  border:1px solid var(--glass-line);border-radius:min(28px,calc(var(--r) + 10px));box-shadow:var(--pop);overflow:hidden;
+  animation:dr-in .34s var(--ease)}
+.drawer.closing{animation:dr-out .2s ease forwards}
+@keyframes dr-in{from{opacity:0;transform:translateX(28px) scale(.985)}}
+@keyframes dr-out{to{opacity:0;transform:translateX(28px) scale(.985)}}
+.dr-grab{display:none}
+.dr-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 16px 14px 22px}
+.dr-head h2{font:680 25px/1.1 var(--f-display);font-variation-settings:'wdth' 86;letter-spacing:-.018em}
+.dr-x{flex:0 0 34px;width:34px;height:34px;border:0;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--ink)}
+.dr-x:hover{background:color-mix(in srgb,var(--ink) 14%,transparent)}
+.dr-x svg{width:18px;height:18px}
+
+/* Bereiche: Pille gleitet unter den aktiven Reiter */
+.dr-tabs{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 16px 6px;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.dr-tabs button{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:8px 4px;border:0;border-radius:999px;background:none;color:var(--muted);font:600 13px/1.2 var(--f-body);transition:color .2s}
+.dr-tabs button:hover{color:var(--ink)}
+.dr-tabs button[aria-selected="true"]{color:var(--ink)}
+.dr-tabs svg{width:16px;height:16px;flex:0 0 16px}
+.dr-tabs span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dr-tab-ind{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px) / 4);border-radius:999px;background:var(--surface);
+  box-shadow:0 1px 2px rgba(0,0,0,.1),0 2px 8px -2px rgba(0,0,0,.12);transform:translateX(calc(var(--i,0) * 100%));transition:transform .38s var(--spring)}
+@media (max-width:460px){.dr-tabs svg{display:none}}
+
+.dr-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 16px calc(28px + env(safe-area-inset-bottom,0px));scrollbar-width:thin}
+.dr-pane{animation:pane-in .28s var(--ease)}
+@keyframes pane-in{from{opacity:0;transform:translateY(6px)}}
+.dr-gh{margin:22px 6px 8px;font:600 13px/1.3 var(--f-body);color:var(--muted)}
+.dr-pane>.dr-gh:first-child{margin-top:12px}
+/* Gruppen: Zeilen mit Text links und Schalter rechts, durch feine Linien getrennt */
+.dr-group{border-radius:min(18px,calc(var(--r) * .8 + 2px));background:color-mix(in srgb,var(--surface) 62%,transparent);border:1px solid var(--glass-line);padding:2px 14px}
+.dr-group.dr-pad{padding:14px}
+.dr-stack{display:flex;flex-direction:column;gap:12px}
+.dr-line{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:52px;padding:9px 0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent)}
+label.dr-line{cursor:pointer}
+.dr-group>.dr-line:first-child,.dr-group>.dr-act:first-child{border-top:0}
+.dr-lt{display:flex;flex-direction:column;gap:2px;min-width:0;font:600 14px/1.3 var(--f-body);color:var(--ink)}
+.dr-lt small{font:400 12.5px/1.4 var(--f-body);color:var(--muted)}
+.dr-in{font:inherit;font-size:14px;color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent);border:1px solid transparent;border-radius:10px;padding:8px 11px;width:min(200px,52%);min-width:0}
+.dr-in:focus{border-color:color-mix(in srgb,var(--accent) 60%,transparent);outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.dr-note{margin:8px 6px 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.dr-meta{margin:0;font-size:13px;font-weight:600}
+.drawer .hint{font-size:13px;line-height:1.5}
+.drawer .field input,.drawer .field select{font-size:14px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.drawer .seg{background:color-mix(in srgb,var(--ink) 7%,transparent);border-color:transparent;flex:0 0 auto}
+.drawer .seg button{padding:6px 11px;font-size:13px}
+.drawer .seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.12),0 2px 6px -2px rgba(0,0,0,.14)}
+.drawer .btn,.drawer .btn-ghost{padding:8px 14px;font-size:13px}
+.drawer .btn-ghost{background:color-mix(in srgb,var(--surface) 60%,transparent)}
+
+/* Aktionen als Zeile mit Symbol und Pfeil */
+.dr-act{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 0;border:0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent);background:none;text-align:left;color:var(--ink)}
+.dr-act[hidden]{display:none}
+.dr-act-ico{flex:0 0 32px;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--chip-bg);color:var(--accent-ink)}
+.dr-act-ico svg{width:17px;height:17px}
+.dr-act .dr-lt{flex:1}
+.dr-chev{flex:0 0 16px;width:16px;height:16px;color:var(--muted);transition:transform .2s var(--ease)}
+.dr-act:hover .dr-chev{transform:translateX(3px);color:var(--ink)}
+
+/* Design-Auswahl mit kleiner Vorschau */
+.theme-pick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.theme-pick button{display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:6px 6px 8px;border:1px solid var(--glass-line);border-radius:min(16px,calc(var(--r) * .7 + 4px));background:color-mix(in srgb,var(--surface) 62%,transparent);color:var(--muted);font:600 13px/1.2 var(--f-body);text-align:center;transition:border-color .2s,color .2s}
+.theme-pick button:hover{color:var(--ink)}
+.theme-pick button[aria-pressed="true"]{border-color:transparent;color:var(--ink);box-shadow:0 0 0 2px var(--accent)}
+.tp-prev{position:relative;display:block;aspect-ratio:16/10;border-radius:min(11px,calc(var(--r) * .5 + 2px));overflow:hidden;
+  --pv-bg:#E8EDF2;--pv-card:#FFFFFF;--pv-sky:linear-gradient(180deg,#4F8FDF,#A6CFF4);--pv-line:rgba(15,27,43,.08);
+  background:var(--pv-bg);box-shadow:inset 0 0 0 1px var(--pv-line)}
+.tp-prev[data-pv="dark"]{--pv-bg:#11100F;--pv-card:#1F1E1D;--pv-sky:linear-gradient(180deg,#0E0E10,#1D1C22);--pv-line:rgba(255,255,255,.1)}
+.tp-prev[data-pv="dark"][data-oled]{--pv-bg:#000;--pv-card:#141414;--pv-sky:#000}
+.tp-prev::before{content:"";position:absolute;left:0;right:0;top:0;height:36%;background:var(--pv-sky)}
+.tp-prev i{position:absolute;top:47%;bottom:12%;border-radius:4px;background:var(--pv-card);box-shadow:0 0 0 1px var(--pv-line)}
+.tp-prev i:first-of-type{left:9%;width:50%}
+.tp-prev i:last-of-type{right:9%;width:26%;background:var(--accent-fill)}
+/* Wie das System: links hell, rechts dunkel */
+.tp-prev[data-pv="auto"]::after{content:"";position:absolute;inset:0;clip-path:polygon(58% 0,100% 0,100% 100%,42% 100%);
+  background:linear-gradient(180deg,#0E0E10,#1D1C22) 0 0/100% 36% no-repeat,#11100F}
+.tp-prev[data-pv="auto"][data-oled]::after{background:#000}
+.tp-prev[data-pv="auto"] i{z-index:1}
+
+/* Akzentfarben */
+.acc{display:flex;flex-direction:column;gap:10px}
+.acc-sub{margin:4px 0 -2px;font:600 12px/1.3 var(--f-body);color:var(--muted)}
+.acc-sub:first-child{margin-top:0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:10px 8px;justify-items:center}
+.swatch{position:relative;display:block;cursor:pointer}
 .swatch input{position:absolute;opacity:0;width:1px;height:1px}
-.swatch span{display:block;width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14);cursor:pointer}
+.swatch span{position:relative;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:transform .2s var(--spring)}
+.swatch:hover span{transform:scale(1.08)}
 .swatch input:checked+span{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
 .swatch input:focus-visible+span{outline:2px solid var(--sea);outline-offset:5px}
-.seg.sm button{padding:4px 9px;font-size:12px}
+.swatch span svg{width:16px;height:16px;opacity:0;color:var(--on,#fff);transition:opacity .15s}
+.swatch input:checked+span svg{opacity:1}
+/* Eigene Farbe: Regenbogenring mit der gewählten Farbe in der Mitte, öffnet den Farbwähler */
+.sw-custom input[type="color"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:0;padding:0}
+.sw-custom span{background:radial-gradient(circle,var(--c) 0 46%,transparent 49%),conic-gradient(from 90deg,#F06A5A,#F3B33D,#B8D64B,#3FC2A8,#4A8FEA,#9B6BE8,#E35BA6,#F06A5A)}
+.sw-custom.on span{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
+.sw-custom input[type="color"]:focus-visible+span{outline:2px solid var(--sea);outline-offset:5px}
+/* Mit dem Tag: breite Pille mit dem Tagesverlauf */
+.sw-sun{grid-column:1/-1;justify-self:stretch}
+.swatch.sw-sun span{width:100%;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:0 6px 0 14px;font:650 13px/1 var(--f-body);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.25);
+  background:linear-gradient(90deg,#6E4FC2,#C7468A 22%,#E5654B 38%,#E8A126 55%,#1A9AA0 78%,#3D7BE0)}
+.sw-sun span b{font-weight:650;letter-spacing:.01em}
+.sw-sun span em{width:28px;height:28px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px rgba(255,255,255,.85);flex:0 0 28px}
+.sw-sun span svg{display:none}
+.sw-sun:hover span{transform:none;filter:brightness(1.05)}
+.acc-now{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.acc-now b{color:var(--ink);font-weight:600}
+
+/* Schalter statt Häkchen */
+.switch{-webkit-appearance:none;appearance:none;position:relative;flex:0 0 44px;width:44px;height:26px;margin:0;border-radius:999px;cursor:pointer;
+  background:color-mix(in srgb,var(--ink) 20%,transparent);transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .28s var(--spring)}
+.switch:checked{background:var(--accent-fill)}
+.switch:checked::after{transform:translateX(18px)}
+.switch:focus-visible{outline:2px solid var(--sea);outline-offset:3px}
+/* In Formularzeilen etwas kleiner, Text rechts daneben */
+.check-row .switch{flex-basis:38px;width:38px;height:22px}
+.check-row .switch::after{width:16px;height:16px}
+.check-row .switch:checked::after{transform:translateX(16px)}
+
+/* Regler für die Ecken */
+.range-row{display:flex;align-items:center;gap:10px;flex:0 1 220px;min-width:0}
+.range-row output{flex:0 0 3.2em;font:600 13px/1 var(--f-data);color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.range{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:26px;margin:0;background:transparent;cursor:pointer;--p:50%}
+.range::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent) var(--p),color-mix(in srgb,var(--ink) 16%,transparent) var(--p))}
+.range::-moz-range-track{height:6px;border-radius:3px;background:color-mix(in srgb,var(--ink) 16%,transparent)}
+.range::-moz-range-progress{height:6px;border-radius:3px;background:var(--accent)}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-8px;border-radius:50%;background:#FFFFFF;border:0;box-shadow:0 1px 4px rgba(0,0,0,.32),0 0 0 1px rgba(0,0,0,.06);transition:transform .2s var(--spring)}
+.range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#FFFFFF;border:0;box-shadow:0 1px 4px rgba(0,0,0,.32)}
+.range:active::-webkit-slider-thumb{transform:scale(1.12)}
+.range:focus-visible{outline:2px solid var(--sea);outline-offset:3px;border-radius:6px}
+
+/* Zwischenstände */
+.snap-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.snap-list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent)}
+.snap-list li:first-child{border-top:0;padding-top:0}
+.snap-list .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;font-size:14px}
+.snap-list .tx b{font-weight:600}
+.snap-list .tx span{font-size:12.5px;color:var(--muted)}
+
+/* Handy: Blatt von unten mit Griff zum Wegziehen */
+@media (max-width:640px){
+  .drawer{top:auto;left:0;right:0;bottom:0;width:100%;height:min(88dvh,calc(100% - 28px));border-radius:24px 24px 0 0;border-bottom:0;animation-name:sheet-in;animation-duration:.4s;touch-action:auto}
+  .drawer.closing{animation-name:sheet-out;animation-duration:.24s}
+  .drawer.dragging{animation:none;transition:none}
+  .drawer.settle{transition:transform .3s var(--ease)}
+  .dr-grab{display:flex;justify-content:center;padding:8px 0 0;cursor:grab;touch-action:none}
+  .dr-grab span{width:38px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--ink) 22%,transparent)}
+  .dr-head{padding:8px 14px 12px 20px;touch-action:none}
+  .dr-head h2{font-size:22px}
+  .dr-in{width:min(180px,50%)}
+  .range-row{flex-basis:170px}
+}
+@keyframes sheet-in{from{transform:translateY(100%)}}
+@keyframes sheet-out{to{transform:translateY(100%)}}
+@media (prefers-reduced-motion: reduce){
+  .drawer,.drawer.closing,.scrim,.scrim.closing,.dr-pane{animation:none}
+  .dr-tab-ind,.switch::after,.swatch span{transition:none}
+}
+
 .cd-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-.cd-list li{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid var(--line)}
+.cd-list:empty{display:none}
+.cd-list li{display:flex;align-items:center;gap:6px;padding:6px 0;border-top:1px solid color-mix(in srgb,var(--ink) 8%,transparent)}
+.cd-list li:first-child{border-top:0;padding-top:0}
 .cd-list .tx{flex:1;min-width:0;font-size:14px}
 .cd-list .tx b{font-weight:600}
 .cd-list .tx span{color:var(--muted);font:400 12px var(--f-data);margin-left:6px;font-variant-numeric:tabular-nums}
 .grid3{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,.8fr);gap:8px}
 @media (max-width:420px){.grid3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.grid3>:first-child{grid-column:1/-1}}
-.drawer .field input,.drawer .field select{font-size:14px;padding:7px 9px}
 
 /* Fuß und Toast */
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:12px;padding-top:4px}
@@ -1006,9 +1205,9 @@ button.nw-row:active{background:color-mix(in srgb,var(--ink) 10%,var(--raise))}
 @media (prefers-reduced-motion: reduce){.fill{transition:none}}
 
 /* Dialoge: Widget-Galerie und Widget-Einstellungen */
-.dlg{border:1px solid var(--line);border-radius:18px;padding:0;background:var(--surface);color:var(--ink);width:min(620px,calc(100% - 24px));max-height:min(88vh,860px);box-shadow:0 24px 70px rgba(0,0,0,.32)}
+.dlg{border:1px solid var(--line);border-radius:min(24px,calc(var(--r) + 4px));padding:0;background:var(--surface);color:var(--ink);width:min(620px,calc(100% - 24px));max-height:min(88vh,860px);box-shadow:0 24px 70px rgba(0,0,0,.32)}
 .dlg[open]{display:flex;flex-direction:column}
-.dlg::backdrop{background:rgba(6,12,18,.48)}
+.dlg::backdrop{background:var(--scrim)}
 .dlg>form{display:flex;flex-direction:column;min-height:0;flex:1}
 .dlg-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 14px 20px;border-bottom:1px solid var(--line)}
 .dlg-head h2{font-size:21px}
@@ -1032,6 +1231,42 @@ button.nw-row:active{background:color-mix(in srgb,var(--ink) 10%,var(--raise))}
 .pick{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;padding:2px}
 .pick .check-row{padding:7px 10px;border:1px solid var(--line);border-radius:10px}
 .pick .check-row small{color:var(--muted);margin-left:auto;font-size:12px}
+
+/* 41-suche.css */
+/* Schnellsuche: schwebt oben in der Mitte, Glas wie das Anpassen-Fenster */
+.dlg.cmd{margin:max(10vh,24px) auto auto;width:min(640px,calc(100% - 24px));max-height:min(72vh,640px);padding:0;overflow:hidden;
+  background:var(--glass);-webkit-backdrop-filter:blur(30px) saturate(1.6);backdrop-filter:blur(30px) saturate(1.6);
+  border:1px solid var(--glass-line);border-radius:min(24px,calc(var(--r) + 6px));box-shadow:var(--pop)}
+.dlg.cmd[open]{animation:cmd-in .22s var(--ease)}
+.dlg.cmd::backdrop{background:color-mix(in srgb,var(--scrim) 70%,transparent)}
+@keyframes cmd-in{from{opacity:0;transform:translateY(-8px) scale(.985)}}
+.cmd-in{display:flex;align-items:center;gap:12px;padding:14px 14px 14px 20px;border-bottom:1px solid color-mix(in srgb,var(--ink) 9%,transparent)}
+.cmd-in>svg{flex:0 0 20px;width:20px;height:20px;color:var(--muted)}
+.cmd-in input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--ink);font:500 18px/1.3 var(--f-body);padding:4px 0}
+.cmd-in input::placeholder{color:var(--muted);opacity:.8}
+.cmd-esc{flex:0 0 auto;border:0;border-radius:8px;padding:5px 8px;background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--muted);font:600 12px/1 var(--f-body)}
+.cmd-list{list-style:none;margin:0;padding:6px 8px 8px;overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;scrollbar-width:thin}
+.cmd-gh{padding:10px 12px 4px;font:600 12px/1.3 var(--f-body);color:var(--muted)}
+.cmd-it{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:12px;cursor:pointer;scroll-margin:8px}
+.cmd-it[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.cmd-ico{flex:0 0 30px;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--muted)}
+.cmd-it[aria-selected="true"] .cmd-ico{background:var(--chip-bg);color:var(--accent-ink)}
+.cmd-ico svg{width:17px;height:17px}
+.cmd-sw{background:transparent!important}
+.cmd-sw::after{content:"";width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.cmd-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.cmd-tx b{font:600 14.5px/1.3 var(--f-body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmd-tx small{font-size:12.5px;line-height:1.3;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmd-it kbd,.cmd-foot kbd{font:600 11.5px/1 var(--f-body);min-width:22px;text-align:center;padding:4px 6px;border-radius:6px;background:color-mix(in srgb,var(--ink) 8%,transparent);color:var(--muted)}
+.cmd-grp{flex:0 0 auto;font-size:12px;color:var(--muted)}
+.cmd-on{flex:0 0 18px;width:18px;height:18px;color:var(--accent-ink)}
+.cmd-on svg{width:18px;height:18px}
+.cmd-empty{margin:0;padding:22px 22px 26px;color:var(--muted);font-size:14px;line-height:1.5}
+.cmd-foot{display:flex;gap:16px;padding:10px 18px;border-top:1px solid color-mix(in srgb,var(--ink) 9%,transparent);font-size:12px;color:var(--muted)}
+.cmd-foot kbd{margin-right:3px}
+@media (hover:none),(max-width:640px){.cmd-foot{display:none}}
+@media (max-width:640px){.dlg.cmd{margin-top:max(env(safe-area-inset-top,0px) + 12px,12px);max-height:calc(100dvh - 24px)}}
+@media (prefers-reduced-motion: reduce){.dlg.cmd[open]{animation:none}}
 
 /* 45-spiegel.css */
 /* Spiegel-Modus: reines Schwarz, nur Schrift. Funktioniert hoch und quer. */
@@ -1107,6 +1342,7 @@ html.mirror-on body{overflow:hidden}
         <h1 class="greet" id="h-greet">Moin Jere</h1>
         <nav class="tabs" id="tabs" role="tablist" aria-label="Seiten"></nav>
         <div class="sky-tools">
+          <button type="button" class="sky-btn" id="search-btn" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/></svg><span>Suchen</span><kbd id="search-kbd">Strg K</kbd></button>
           <button type="button" class="sky-btn" id="mirror-btn" title="Spiegel-Modus (Taste S)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/></svg><span>Spiegel</span></button>
           <button type="button" class="sky-btn edit-btn" id="edit-btn" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><span id="edit-btn-txt">Bearbeiten</span></button>
           <button type="button" class="sky-btn cust-btn" id="cust-btn" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Anpassen</span></button>
@@ -1137,8 +1373,8 @@ html.mirror-on body{overflow:hidden}
     <div class="eb-tools">
       <button type="button" class="icon-btn" id="eb-left" aria-label="Seite nach links schieben" title="Nach links"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
       <button type="button" class="icon-btn" id="eb-right" aria-label="Seite nach rechts schieben" title="Nach rechts"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
-      <label class="check-row"><input type="checkbox" id="eb-tiles"> Kacheln oben zeigen</label>
-      <label class="check-row"><input type="checkbox" id="eb-smart"> Nach Tageszeit ordnen</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="eb-tiles"> Kacheln oben zeigen</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="eb-smart"> Nach Tageszeit ordnen</label>
       <button type="button" class="btn-ghost" id="eb-add">+ Neue Seite</button>
       <button type="button" class="btn-danger" id="eb-del">Seite löschen</button>
     </div>
@@ -1349,7 +1585,7 @@ html.mirror-on body{overflow:hidden}
         <div class="field"><label for="vs-allow">Tage pro Jahr</label><input id="vs-allow" type="number" min="0" max="60" step="0.5" inputmode="decimal"></div>
         <div class="field"><label for="vs-carry">Resturlaub aus dem Vorjahr</label><input id="vs-carry" type="number" min="0" max="60" step="0.5" inputmode="decimal"></div>
       </div>
-      <label class="check-row"><input type="checkbox" id="vs-xmas"> 24.12. und 31.12. zählen als halbe Urlaubstage</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="vs-xmas"> 24.12. und 31.12. zählen als halbe Urlaubstage</label>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
         <button type="button" class="btn-ghost" id="vs-cancel">Abbrechen</button>
@@ -1362,7 +1598,7 @@ html.mirror-on body{overflow:hidden}
         <div class="field"><label for="vf-from">Erster Urlaubstag</label><input id="vf-from" type="date"></div>
         <div class="field"><label for="vf-to">Letzter Urlaubstag</label><input id="vf-to" type="date"></div>
       </div>
-      <label class="check-row" id="vf-half-row" hidden><input type="checkbox" id="vf-half"> Nur ein halber Tag</label>
+      <label class="check-row" id="vf-half-row" hidden><input type="checkbox" class="switch" id="vf-half"> Nur ein halber Tag</label>
       <div class="field"><label for="vf-label">Bezeichnung (optional)</label><input id="vf-label" type="text" maxlength="40" placeholder="z. B. Mallorca" autocomplete="off"></div>
       <p class="preview" id="vf-preview"></p>
       <p class="err" id="vf-err" hidden></p>
@@ -1391,8 +1627,8 @@ html.mirror-on body{overflow:hidden}
         <div class="field"><label for="po-long">Lange Pause</label><input id="po-long" type="number" min="1" max="90" inputmode="numeric"></div>
         <div class="field"><label for="po-every">Lange Pause nach Runden</label><input id="po-every" type="number" min="2" max="8" inputmode="numeric"></div>
       </div>
-      <label class="check-row"><input type="checkbox" id="po-sound"> Ton am Ende einer Phase</label>
-      <label class="check-row"><input type="checkbox" id="po-auto"> Nächste Phase automatisch starten</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="po-sound"> Ton am Ende einer Phase</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="po-auto"> Nächste Phase automatisch starten</label>
       <p class="err" id="po-err" hidden></p>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
@@ -1520,7 +1756,7 @@ html.mirror-on body{overflow:hidden}
       <div class="form-row"><button type="button" class="btn-ghost" id="ca-add">+ Kalender</button></div>
       <div class="grid2">
         <div class="field"><label for="ca-days">Zeitraum</label><select id="ca-days"><option value="7">Nächste 7 Tage</option><option value="14">Nächste 14 Tage</option><option value="30">Nächste 30 Tage</option></select></div>
-        <label class="check-row ca-locrow"><input type="checkbox" id="ca-loc"> Ort unter dem Termin zeigen</label>
+        <label class="check-row ca-locrow"><input type="checkbox" class="switch" id="ca-loc"> Ort unter dem Termin zeigen</label>
       </div>
       <p class="hint">Links und Weiterleitung bleiben nur in diesem Browser und kommen nicht mit in die Sicherung.</p>
       <p class="err" id="ca-ferr" hidden></p>
@@ -1583,7 +1819,7 @@ html.mirror-on body{overflow:hidden}
       <ul class="ca-feeds bd-all" id="bd-all" hidden></ul>
       <div class="grid2">
         <div class="field"><label for="bd-n">In der Karte zeigen</label><select id="bd-n"><option value="4">4 Geburtstage</option><option value="6">6 Geburtstage</option><option value="8">8 Geburtstage</option><option value="12">12 Geburtstage</option></select></div>
-        <label class="check-row ca-locrow"><input type="checkbox" id="bd-cal"> Geburtstage aus dem Kalender mitzeigen</label>
+        <label class="check-row ca-locrow"><input type="checkbox" class="switch" id="bd-cal"> Geburtstage aus dem Kalender mitzeigen</label>
       </div>
       <p class="hint">Die Geburtstage kommen mit in deine Sicherung.</p>
       <div class="form-row">
@@ -1627,7 +1863,7 @@ html.mirror-on body{overflow:hidden}
       </div>
       <div class="form-row"><button type="button" class="btn-ghost" id="ws-add">+ Tonne</button></div>
       <div class="ws-remind">
-        <label class="check-row"><input type="checkbox" id="ws-remind"> Am Vorabend erinnern ab</label>
+        <label class="check-row"><input type="checkbox" class="switch" id="ws-remind"> Am Vorabend erinnern ab</label>
         <input id="ws-at" type="time" aria-label="Uhrzeit der Erinnerung">
         <button type="button" class="btn-ghost" id="ws-notify" hidden>Auch als Mitteilung</button>
         <span class="hint" id="ws-notify-on" hidden>Mitteilungen sind erlaubt.</span>
@@ -1662,150 +1898,208 @@ html.mirror-on body{overflow:hidden}
 </div>
 
 <div class="scrim" id="scrim" hidden></div>
+<!-- Anpassen: schwebendes Fenster rechts, auf dem Handy ein Blatt von unten. Das Cockpit bleibt dahinter sichtbar, jede Änderung wirkt sofort. -->
 <aside class="drawer" id="drawer" hidden aria-labelledby="dr-h" role="dialog" aria-modal="true">
-  <div class="dr-head">
+  <div class="dr-grab" id="dr-grab" aria-hidden="true"><span></span></div>
+  <div class="dr-head" id="dr-head">
     <h2 id="dr-h">Anpassen</h2>
-    <button type="button" class="btn" id="dr-close">Fertig</button>
+    <button type="button" class="dr-x" id="dr-close" aria-label="Schließen" title="Schließen (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
   </div>
-  <div class="dr-body">
-    <section class="dr-sec">
-      <h3>Ansicht</h3>
-      <div class="field"><label for="dr-greet">Begrüßung</label><input id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
-      <div class="dr-row"><span class="lbl">Design</span>
-        <div class="seg sm" role="group" aria-label="Design" id="dr-theme">
-          <button type="button" data-v="auto">Automatisch</button><button type="button" data-v="light">Hell</button><button type="button" data-v="dark">Dunkel</button>
+  <div class="dr-tabs" role="tablist" aria-label="Bereiche" id="dr-tabs">
+    <span class="dr-tab-ind" aria-hidden="true"></span>
+    <button type="button" role="tab" id="dr-t-look" data-tab="look" aria-controls="dr-p-look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.9-.8 1.9-1.8 0-1.3-1-1.6-1-2.8 0-1 .8-1.7 1.8-1.7h2.1a3.7 3.7 0 0 0 3.7-3.7C20.5 6.7 16.7 3.5 12 3.5z"/><circle cx="7.6" cy="11.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.4" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="7.8" r="1.1" fill="currentColor" stroke="none"/></svg><span>Aussehen</span></button>
+    <button type="button" role="tab" id="dr-t-pages" data-tab="pages" aria-controls="dr-p-pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="9" rx="2"/><rect x="13" y="3.5" width="7.5" height="5.5" rx="2"/><rect x="3.5" y="14.5" width="7.5" height="6" rx="2"/><rect x="13" y="11" width="7.5" height="9.5" rx="2"/></svg><span>Seiten</span></button>
+    <button type="button" role="tab" id="dr-t-devices" data-tab="devices" aria-controls="dr-p-devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="13" height="10" rx="2"/><path d="M6 19h6M9 15v4"/><rect x="16.5" y="9" width="5" height="10.5" rx="1.5"/></svg><span>Geräte</span></button>
+    <button type="button" role="tab" id="dr-t-data" data-tab="data" aria-controls="dr-p-data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6"/><path d="M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg><span>Daten</span></button>
+  </div>
+  <div class="dr-body" id="dr-body">
+
+    <!-- Aussehen -->
+    <section class="dr-pane" id="dr-p-look" role="tabpanel" aria-labelledby="dr-t-look">
+      <h3 class="dr-gh" id="dr-theme-l">Design</h3>
+      <div class="theme-pick" role="group" aria-labelledby="dr-theme-l" id="dr-theme">
+        <button type="button" data-v="light"><span class="tp-prev" data-pv="light" aria-hidden="true"><i></i><i></i></span><span class="tp-name">Hell</span></button>
+        <button type="button" data-v="dark"><span class="tp-prev" data-pv="dark" aria-hidden="true"><i></i><i></i></span><span class="tp-name">Dunkel</span></button>
+        <button type="button" data-v="auto"><span class="tp-prev" data-pv="auto" aria-hidden="true"><i></i><i></i></span><span class="tp-name">Wie das System</span></button>
+      </div>
+      <div class="dr-group">
+        <div class="dr-line"><span class="dr-lt" id="dr-dark-l">Dunkel in<small>Schwarz spart Strom auf OLED-Bildschirmen und verschwindet hinter Spiegelglas.</small></span>
+          <div class="seg" role="group" aria-labelledby="dr-dark-l" id="dr-dark"><button type="button" data-v="graphite">Graphit</button><button type="button" data-v="oled">Schwarz</button></div>
         </div>
       </div>
-      <div class="dr-row"><span class="lbl">Kartengröße</span>
-        <div class="seg sm" role="group" aria-label="Kartengröße" id="dr-size">
-          <button type="button" data-v="s">Kompakt</button><button type="button" data-v="m">Normal</button><button type="button" data-v="l">Groß</button>
+
+      <h3 class="dr-gh" id="dr-acc-l">Akzentfarbe</h3>
+      <div class="dr-group dr-pad">
+        <div class="acc" id="dr-accent" role="group" aria-labelledby="dr-acc-l"></div>
+        <p class="acc-now" id="dr-acc-now" aria-live="polite"></p>
+      </div>
+
+      <h3 class="dr-gh">Form</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-radius">Ecken</label>
+          <div class="range-row"><input type="range" class="range" id="dr-radius" min="4" max="28" step="2"><output id="dr-radius-v" for="dr-radius"></output></div>
+        </div>
+        <div class="dr-line"><span class="dr-lt" id="dr-density-l">Abstände</span>
+          <div class="seg" role="group" aria-labelledby="dr-density-l" id="dr-density"><button type="button" data-v="tight">Dicht</button><button type="button" data-v="normal">Normal</button><button type="button" data-v="airy">Luftig</button></div>
+        </div>
+        <div class="dr-line"><span class="dr-lt" id="dr-size-l">Kartenbreite</span>
+          <div class="seg" role="group" aria-labelledby="dr-size-l" id="dr-size"><button type="button" data-v="s">Schmal</button><button type="button" data-v="m">Normal</button><button type="button" data-v="l">Breit</button></div>
         </div>
       </div>
-      <div class="field"><span class="lbl" id="dr-acc-l">Akzentfarbe</span><div class="swatches" id="dr-accent" role="radiogroup" aria-labelledby="dr-acc-l"></div></div>
-      <label class="check-row"><input type="checkbox" id="dr-secs"> Sekunden an der Uhr zeigen</label>
-      <label class="check-row"><input type="checkbox" id="dr-sky"> Himmel oben nach dem echten Sonnenstand färben</label>
-    </section>
 
-    <section class="dr-sec">
-      <h3>Spiegel-Modus</h3>
-      <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Abfahrten, Countdowns und Vers, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
-    </section>
-
-    <section class="dr-sec" id="dr-app">
-      <h3>Als App</h3>
-      <p class="hint" id="dr-app-txt">Das Cockpit lässt sich wie eine App installieren. Es startet dann ohne Browserleiste in einem eigenen Fenster und öffnet auch ohne Netz.</p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-install" hidden>Als App installieren</button></div>
-      <p class="hint" id="dr-app-ios" hidden></p>
-    </section>
-
-    <section class="dr-sec">
-      <h3>Seiten</h3>
-      <div class="field"><label for="dr-start">Beim Öffnen zeigen</label>
-        <select id="dr-start">
-          <option value="last">Die zuletzt geöffnete Seite</option>
-          <option value="fixed">Immer dieselbe Seite</option>
-          <option value="auto">Automatisch nach Arbeitszeit</option>
-        </select>
+      <h3 class="dr-gh">Kopf</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-greet">Begrüßung</label><input class="dr-in" id="dr-greet" type="text" maxlength="40" autocomplete="off"></div>
+        <label class="dr-line"><span class="dr-lt">Sekunden an der Uhr</span><input type="checkbox" class="switch" id="dr-secs"></label>
+        <label class="dr-line"><span class="dr-lt">Himmel nach Sonnenstand<small>Oben färbt sich alles wie der echte Himmel an deinem Ort, bei Wolken grauer.</small></span><input type="checkbox" class="switch" id="dr-sky"></label>
       </div>
-      <div class="field" id="dr-start-fixed"><label for="dr-start-page">Seite</label><select id="dr-start-page"></select></div>
-      <div class="grid2" id="dr-start-auto">
-        <div class="field"><label for="dr-start-work">Während der Arbeitszeit</label><select id="dr-start-work"></select></div>
-        <div class="field"><label for="dr-start-free">Sonst</label><select id="dr-start-free"></select></div>
+      <p class="dr-note">Design, Schwarz, Abstände und Kartenbreite gelten nur auf diesem Gerät. Akzentfarbe und Ecken nimmt der Sync auf alle Geräte mit.</p>
+    </section>
+
+    <!-- Seiten -->
+    <section class="dr-pane" id="dr-p-pages" role="tabpanel" aria-labelledby="dr-t-pages" hidden>
+      <h3 class="dr-gh">Beim Öffnen</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <div class="field"><label for="dr-start">Diese Seite zeigen</label>
+          <select id="dr-start">
+            <option value="last">Die zuletzt geöffnete Seite</option>
+            <option value="fixed">Immer dieselbe Seite</option>
+            <option value="auto">Automatisch nach Arbeitszeit</option>
+          </select>
+        </div>
+        <div class="field" id="dr-start-fixed"><label for="dr-start-page">Seite</label><select id="dr-start-page"></select></div>
+        <div class="grid2" id="dr-start-auto">
+          <div class="field"><label for="dr-start-work">Während der Arbeitszeit</label><select id="dr-start-work"></select></div>
+          <div class="field"><label for="dr-start-free">Sonst</label><select id="dr-start-free"></select></div>
+        </div>
+        <p class="hint" id="dr-start-hint"></p>
       </div>
-      <p class="hint" id="dr-start-hint"></p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-edit">Seiten und Widgets bearbeiten</button></div>
-      <p class="hint">Aufräumen auf Knopfdruck: Aus deinen Seiten werden Heute, Arbeit, Privat, Fokus und Sport. Vorher siehst du, was wohin kommt, und eigene Seiten bleiben, wie sie sind.</p>
-      <div class="form-row"><button type="button" class="btn-ghost" id="dr-plan">Seiten neu ordnen</button><button type="button" class="btn-ghost" id="dr-plan-back" hidden>Alte Seiten zurückholen</button></div>
-    </section>
 
-    <section class="dr-sec">
-      <h3>Kacheln oben</h3>
-      <div id="dr-tiles" style="display:flex;flex-direction:column;gap:8px"></div>
-      <p class="lbl" style="margin:6px 0 0">Eigene Countdowns</p>
-      <ul class="cd-list" id="dr-cd-list"></ul>
-      <form id="dr-cd-form" novalidate style="display:flex;flex-direction:column;gap:8px">
-        <div class="grid3">
-          <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
-          <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
-          <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
-        </div>
-        <p class="err" id="cd-err" hidden></p>
-        <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
-      </form>
-      <p class="hint">Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
-    </section>
-
-    <section class="dr-sec">
-      <h3>Feiertage</h3>
-      <div class="field"><label for="dr-region">Bundesland</label><select id="dr-region"></select></div>
-      <p class="hint">Gilt für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</p>
-    </section>
-
-    <section class="dr-sec" id="dr-sync">
-      <h3>Sync zwischen Geräten</h3>
-      <div class="sy-box" id="sy-on" hidden>
-        <p class="hint sy-state" id="sy-state" data-s="ok"></p>
-        <div class="form-row">
-          <button type="button" class="btn-ghost" id="sy-now">Jetzt abgleichen</button>
-          <button type="button" class="btn-danger" id="sy-off" style="margin-left:0">Trennen</button>
-        </div>
-        <p class="hint">Auf einem weiteren Gerät öffnest du das Cockpit, gehst auf Anpassen und trägst dort dieselbe Adresse und dasselbe Passwort ein.</p>
-        <p class="sy-addr" id="sy-addr"></p>
-        <div class="form-row">
-          <button type="button" class="btn-ghost" id="sy-addr-copy">Adresse kopieren</button>
-          <button type="button" class="btn-ghost" id="sy-pass-copy2">Passwort kopieren</button>
-        </div>
-        <p class="sy-addr" id="sy-pass-view" hidden></p>
+      <h3 class="dr-gh">Seiten und Widgets</h3>
+      <div class="dr-group">
+        <button type="button" class="dr-act" id="dr-edit"><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></span><span class="dr-lt">Seiten und Widgets bearbeiten<small>Karten verschieben, breiter machen, hinzufügen oder entfernen.</small></span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="dr-act" id="dr-plan"><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h11M4 12h7M4 17h11"/><path d="M17 10l3 2-3 2"/></svg></span><span class="dr-lt">Seiten neu ordnen<small>Heute, Arbeit, Privat, Fokus und Sport. Vorher siehst du, was wohin kommt, eigene Seiten bleiben.</small></span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+        <button type="button" class="dr-act" id="dr-plan-back" hidden><span class="dr-act-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span><span class="dr-lt">Alte Seiten zurückholen</span><svg class="dr-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
       </div>
-      <div class="sy-box" id="sy-setup">
-        <p class="hint">Dein Cockpit legt seinen Stand in einer eigenen kleinen Ablage bei Cloudflare ab, und deine anderen Geräte holen ihn sich von dort. Das ist kostenlos, liegt in deinem eigenen Konto und ist nur mit deinem Passwort erreichbar. Todoist-Token, Keys, Kalender-Links und der laufende Pomodoro-Timer bleiben auf jedem Gerät für sich.</p>
-        <details class="sy-steps-box">
-          <summary>So richtest du es ein</summary>
-          <ol class="sy-steps">
-            <li><b>Ablage anlegen.</b> Auf dash.cloudflare.com links unter „Storage &amp; databases“ den Bereich „KV“ öffnen und einen Namespace anlegen, zum Beispiel mit dem Namen cockpit.</li>
-            <li><b>Worker anlegen.</b> Unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“ anlegen, den Code durch den Code unten ersetzen und auf „Deploy“ klicken.
-              <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="sy-code"></pre><button type="button" class="btn-ghost" id="sy-copy">Code kopieren</button></details>
-            </li>
-            <li><b>Ablage und Passwort verbinden.</b> Beim Worker unter „Settings“, „Bindings“ eine Verbindung zu deinem KV-Namespace hinzufügen, mit dem Namen <code>SYNC_KV</code>. Unter „Variables and secrets“ ein Secret mit dem Namen <code>SYNC_SECRET</code> anlegen und als Wert das Passwort eintragen, das du unten mit „Erzeugen“ bekommst. Danach noch einmal „Deploy“.</li>
-            <li><b>Hier eintragen.</b> Adresse des Workers und Passwort unten eintragen und auf „Verbinden“ klicken.</li>
-          </ol>
-          <p class="hint">Cloudflare benennt Menüpunkte manchmal um, die Namen können leicht abweichen.</p>
-        </details>
-        <form class="sy-box" id="sy-form" novalidate>
-          <div class="field"><label for="sy-url">Adresse des Workers</label><input id="sy-url" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://cockpit-sync.dein-name.workers.dev"></div>
-          <div class="field"><label for="sy-pass">Passwort</label><input id="sy-pass" type="password" maxlength="100" autocomplete="off" spellcheck="false"></div>
-          <div class="form-row">
-            <button type="button" class="btn-ghost" id="sy-gen">Erzeugen</button>
-            <button type="button" class="btn-ghost" id="sy-show">Anzeigen</button>
-            <button type="button" class="btn-ghost" id="sy-pass-copy">Kopieren</button>
+
+      <h3 class="dr-gh">Kacheln oben</h3>
+      <div class="dr-group" id="dr-tiles"></div>
+      <p class="dr-note">Ob die Kacheln auf einer Seite erscheinen, stellst du beim Bearbeiten der Seite ein.</p>
+
+      <h3 class="dr-gh">Eigene Countdowns</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <ul class="cd-list" id="dr-cd-list"></ul>
+        <form id="dr-cd-form" novalidate class="dr-stack">
+          <div class="grid3">
+            <div class="field"><label for="cd-name">Name</label><input id="cd-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Abschlussprüfung"></div>
+            <div class="field"><label for="cd-date">Datum</label><input id="cd-date" type="date"></div>
+            <div class="field"><label for="cd-time">Uhrzeit</label><input id="cd-time" type="time"></div>
           </div>
-          <p class="err" id="sy-err" hidden></p>
-          <div class="form-row"><button type="submit" class="btn" id="sy-go">Verbinden</button></div>
+          <p class="err" id="cd-err" hidden></p>
+          <div class="form-row"><button type="submit" class="btn-ghost" id="cd-save">+ Countdown</button><button type="button" class="btn-ghost" id="cd-cancel" hidden>Abbrechen</button></div>
         </form>
-        <div class="sy-choice" id="sy-choice" hidden>
-          <p id="sy-choice-txt"></p>
-          <p class="hint">Auf einem neuen Gerät nimmst du meist den Stand aus der Cloud, dann bleibt eine Kopie deines bisherigen Standes in diesem Browser liegen. Auf deinem Hauptgerät lädst du den eigenen Stand hoch, dann wird der in der Cloud ersetzt.</p>
-          <div class="form-row">
-            <button type="button" class="btn" id="sy-take-cloud">Stand aus der Cloud holen</button>
-            <button type="button" class="btn-ghost" id="sy-take-mine">Meinen Stand hochladen</button>
-            <button type="button" class="btn-ghost" id="sy-choice-cancel">Abbrechen</button>
-          </div>
-        </div>
+      </div>
+
+      <h3 class="dr-gh">Feiertage</h3>
+      <div class="dr-group">
+        <div class="dr-line"><label class="dr-lt" for="dr-region">Bundesland<small>Für Urlaubstage, Arbeitswoche und die Feiertags-Kachel.</small></label><select class="dr-in" id="dr-region"></select></div>
       </div>
     </section>
 
-    <section class="dr-sec" id="dr-data">
-      <h3>Daten</h3>
-      <p class="hint">Deine Einstellungen liegen in diesem Browser, mit dem Sync oben auch in deiner Cloud. Sicher sie trotzdem ab und zu als Datei, denn der Sync gibt auch Fehler an alle Geräte weiter. Mit der Datei bekommst du auf einem anderen Rechner genau dasselbe Cockpit. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
-      <p class="hint" id="dr-backup-at"></p>
-      <div class="form-row">
-        <button type="button" class="btn-ghost" id="dr-export">Einstellungen sichern</button>
-        <button type="button" class="btn-ghost" id="dr-import">Sicherung laden</button>
-        <input type="file" id="dr-file" accept="application/json,.json" hidden>
+    <!-- Geräte -->
+    <section class="dr-pane" id="dr-p-devices" role="tabpanel" aria-labelledby="dr-t-devices" hidden>
+      <h3 class="dr-gh">Sync zwischen Geräten</h3>
+      <div class="dr-group dr-pad dr-stack" id="dr-sync">
+        <div class="sy-box" id="sy-on" hidden>
+          <p class="hint sy-state" id="sy-state" data-s="ok"></p>
+          <div class="form-row">
+            <button type="button" class="btn" id="sy-now">Jetzt abgleichen</button>
+            <button type="button" class="btn-danger" id="sy-off" style="margin-left:0">Trennen</button>
+          </div>
+          <p class="hint">Auf einem weiteren Gerät öffnest du das Cockpit, gehst auf Anpassen, Geräte und trägst dort dieselbe Adresse und dasselbe Passwort ein.</p>
+          <p class="sy-addr" id="sy-addr"></p>
+          <div class="form-row">
+            <button type="button" class="btn-ghost" id="sy-addr-copy">Adresse kopieren</button>
+            <button type="button" class="btn-ghost" id="sy-pass-copy2">Passwort kopieren</button>
+          </div>
+          <p class="sy-addr" id="sy-pass-view" hidden></p>
+        </div>
+        <div class="sy-box" id="sy-setup">
+          <p class="hint">Dein Cockpit legt seinen Stand in einer eigenen kleinen Ablage bei Cloudflare ab, und deine anderen Geräte holen ihn sich von dort. Das ist kostenlos, liegt in deinem eigenen Konto und ist nur mit deinem Passwort erreichbar. Todoist-Token, Keys, Kalender-Links und der laufende Pomodoro-Timer bleiben auf jedem Gerät für sich.</p>
+          <details class="sy-steps-box">
+            <summary>So richtest du es ein</summary>
+            <ol class="sy-steps">
+              <li><b>Ablage anlegen.</b> Auf dash.cloudflare.com links unter „Storage &amp; databases“ den Bereich „KV“ öffnen und einen Namespace anlegen, zum Beispiel mit dem Namen cockpit.</li>
+              <li><b>Worker anlegen.</b> Unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“ anlegen, den Code durch den Code unten ersetzen und auf „Deploy“ klicken.
+                <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="sy-code"></pre><button type="button" class="btn-ghost" id="sy-copy">Code kopieren</button></details>
+              </li>
+              <li><b>Ablage und Passwort verbinden.</b> Beim Worker unter „Settings“, „Bindings“ eine Verbindung zu deinem KV-Namespace hinzufügen, mit dem Namen <code>SYNC_KV</code>. Unter „Variables and secrets“ ein Secret mit dem Namen <code>SYNC_SECRET</code> anlegen und als Wert das Passwort eintragen, das du unten mit „Erzeugen“ bekommst. Danach noch einmal „Deploy“.</li>
+              <li><b>Hier eintragen.</b> Adresse des Workers und Passwort unten eintragen und auf „Verbinden“ klicken.</li>
+            </ol>
+            <p class="hint">Cloudflare benennt Menüpunkte manchmal um, die Namen können leicht abweichen.</p>
+          </details>
+          <form class="sy-box" id="sy-form" novalidate>
+            <div class="field"><label for="sy-url">Adresse des Workers</label><input id="sy-url" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://cockpit-sync.dein-name.workers.dev"></div>
+            <div class="field"><label for="sy-pass">Passwort</label><input id="sy-pass" type="password" maxlength="100" autocomplete="off" spellcheck="false"></div>
+            <div class="form-row">
+              <button type="button" class="btn-ghost" id="sy-gen">Erzeugen</button>
+              <button type="button" class="btn-ghost" id="sy-show">Anzeigen</button>
+              <button type="button" class="btn-ghost" id="sy-pass-copy">Kopieren</button>
+            </div>
+            <p class="err" id="sy-err" hidden></p>
+            <div class="form-row"><button type="submit" class="btn" id="sy-go">Verbinden</button></div>
+          </form>
+          <div class="sy-choice" id="sy-choice" hidden>
+            <p id="sy-choice-txt"></p>
+            <p class="hint">Auf einem neuen Gerät nimmst du meist den Stand aus der Cloud, dann bleibt eine Kopie deines bisherigen Standes in diesem Browser liegen. Auf deinem Hauptgerät lädst du den eigenen Stand hoch, dann wird der in der Cloud ersetzt.</p>
+            <div class="form-row">
+              <button type="button" class="btn" id="sy-take-cloud">Stand aus der Cloud holen</button>
+              <button type="button" class="btn-ghost" id="sy-take-mine">Meinen Stand hochladen</button>
+              <button type="button" class="btn-ghost" id="sy-choice-cancel">Abbrechen</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <p class="err" id="dr-data-err" hidden></p>
-      <div class="form-row"><button type="button" class="btn-danger" id="dr-reset" style="margin-left:0">Alles zurücksetzen</button></div>
+
+      <h3 class="dr-gh">Als App</h3>
+      <div class="dr-group dr-pad dr-stack" id="dr-app">
+        <p class="hint" id="dr-app-txt">Das Cockpit lässt sich wie eine App installieren. Es startet dann ohne Browserleiste in einem eigenen Fenster und öffnet auch ohne Netz.</p>
+        <div class="form-row"><button type="button" class="btn" id="dr-install" hidden>Als App installieren</button></div>
+        <p class="hint" id="dr-app-ios" hidden></p>
+      </div>
+
+      <h3 class="dr-gh">Spiegel-Modus</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <p class="hint">Schwarzer Vollbild-Überblick mit Uhr, Wetter, Terminen, Abfahrten, Countdowns und Vers, gedacht für einen Smart Mirror oder einen Bildschirm an der Wand. Du startest ihn mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc.</p>
+        <div class="form-row"><button type="button" class="btn-ghost" id="dr-mirror">Spiegel-Modus starten</button></div>
+      </div>
+    </section>
+
+    <!-- Daten -->
+    <section class="dr-pane" id="dr-p-data" role="tabpanel" aria-labelledby="dr-t-data" hidden>
+      <h3 class="dr-gh">Sicherung als Datei</h3>
+      <div class="dr-group dr-pad dr-stack" id="dr-data">
+        <p class="hint">Mit der Datei bekommst du auf jedem Rechner genau dasselbe Cockpit, auch ohne Sync. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>
+        <p class="dr-meta" id="dr-backup-at"></p>
+        <div class="form-row">
+          <button type="button" class="btn" id="dr-export">Sicherung speichern</button>
+          <button type="button" class="btn-ghost" id="dr-import">Sicherung laden</button>
+          <input type="file" id="dr-file" accept="application/json,.json" hidden>
+        </div>
+        <p class="err" id="dr-data-err" hidden></p>
+      </div>
+
+      <h3 class="dr-gh">Zwischenstände</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <p class="hint" id="dr-snap-txt"></p>
+        <ul class="snap-list" id="dr-snaps"></ul>
+      </div>
+
+      <h3 class="dr-gh">Zurücksetzen</h3>
+      <div class="dr-group dr-pad dr-stack">
+        <p class="hint">Setzt alle Seiten, Widgets und Einstellungen auf den Anfang. Direkt danach kannst du es noch rückgängig machen.</p>
+        <div class="form-row"><button type="button" class="btn-danger" id="dr-reset" style="margin-left:0">Alles zurücksetzen</button></div>
+      </div>
     </section>
   </div>
 </aside>
@@ -1873,6 +2167,18 @@ html.mirror-on body{overflow:hidden}
     <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <div class="dlg-body" id="info-body"></div>
+</dialog>
+
+<!-- Schnellsuche: Strg+K oder Cmd+K -->
+<dialog class="dlg cmd" id="dlg-cmd" aria-label="Schnellsuche">
+  <div class="cmd-in">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5l5 5"/></svg>
+    <input id="cmd-q" type="text" role="combobox" aria-expanded="true" aria-controls="cmd-list" aria-autocomplete="list" aria-label="Seite, Widget oder Aktion suchen" placeholder="Seite, Widget oder Aktion suchen" autocomplete="off" spellcheck="false" enterkeyhint="go">
+    <button type="button" class="cmd-esc" data-close aria-label="Schließen">Esc</button>
+  </div>
+  <ul class="cmd-list" id="cmd-list" role="listbox" aria-label="Treffer"></ul>
+  <p class="cmd-empty" id="cmd-empty" hidden></p>
+  <div class="cmd-foot" aria-hidden="true"><span><kbd>↑</kbd><kbd>↓</kbd> wählen</span><span><kbd>Enter</kbd> ausführen</span><span><kbd>Esc</kbd> schließen</span></div>
 </dialog>
 
 <!-- Vorlagen für Widgets, die es mehrfach geben kann. Jede Kopie bekommt ihre eigenen Daten,
@@ -2208,6 +2514,154 @@ async function getJson(url, ms = 9000) {
 
 const slug = s => String(s || '').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
+/* 01-farben.js */
+/* Farben: Akzent aus einer Grundfarbe ableiten, in Hell und Dunkel mit genug Kontrast.
+ * Gerechnet wird in OKLCH (Helligkeit, Buntheit, Farbton), damit alle Töne gleich kräftig wirken.
+ * Aus einer Farbe entstehen: --accent (Flächen, Balken), --accent-ink (Text auf Karten), --on-accent (Text auf der Fläche).
+ * Bei Verläufen kommt --accent-2 dazu, --accent-fill ist dann der Verlauf. Der Chip-Hintergrund mischt CSS selbst. */
+const RAD_OK = Math.PI / 180;
+const acc = { sunHex: '' };
+const okLin = c => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+const okGam = c => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+const okHexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+const okRgbHex = c => '#' + c.map(x => Math.round(Math.max(0, Math.min(1, x)) * 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+const okValidHex = h => typeof h === 'string' && /^#[0-9a-f]{6}$/i.test(h);
+function okLab(hex) {
+  const [r, g, b] = okHexRgb(hex).map(okLin);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s];
+}
+function okLabRgb(L, a, b) {
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+  return [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s];
+}
+function okLch(hex) {
+  const [L, a, b] = okLab(hex);
+  return [L, Math.hypot(a, b), (Math.atan2(b, a) / RAD_OK + 360) % 360];
+}
+/* OKLCH nach Hex. Liegt die Farbe außerhalb von sRGB, wird nur die Buntheit verringert, Helligkeit und Farbton bleiben. */
+function okHex(L, C, H) {
+  const rgb = c => okLabRgb(L, c * Math.cos(H * RAD_OK), c * Math.sin(H * RAD_OK));
+  const inGamut = c => rgb(c).every(x => x >= -1e-4 && x <= 1 + 1e-4);
+  let c = C;
+  if (!inGamut(c)) {
+    let lo = 0, hi = C;
+    for (let i = 0; i < 18; i++) { const mid = (lo + hi) / 2; if (inGamut(mid)) lo = mid; else hi = mid; }
+    c = lo;
+  }
+  return okRgbHex(rgb(c).map(okGam));
+}
+function okLum(hex) { const [r, g, b] = okHexRgb(hex).map(okLin); return 0.2126 * r + 0.7152 * g + 0.0722 * b; }
+function okContrast(a, b) { const x = okLum(a), y = okLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+const okClamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
+
+/* Flächen, auf denen Akzent-Text steht. Die Werte stehen auch in 00-base.css. */
+const SURF = { light: '#FFFFFF', graphite: '#1A1918', oled: '#0E0E0E' };
+/* Aus einer Grundfarbe die Akzentwerte für ein Design ('light', 'graphite', 'oled') */
+function accentFor(hex, mode) {
+  const [L, C, H] = okLch(hex), mono = C < 0.035, dark = mode !== 'light', surf = SURF[mode] || SURF.light;
+  let a, ink;
+  if (!dark) {
+    a = mono ? okHex(0.33, 0.004, H) : okHex(okClamp(L, 0.55, 0.84), C, H);
+    let li = mono ? 0.33 : Math.min(L - 0.1, 0.56);
+    ink = okHex(li, Math.min(C, 0.17), H);
+    while (okContrast(ink, surf) < 4.8 && li > 0.2) { li -= 0.02; ink = okHex(li, Math.min(C, 0.17), H); }
+  } else {
+    a = mono ? okHex(0.9, 0.004, H) : okHex(okClamp(L + 0.08, 0.72, 0.88), C * 0.96, H);
+    let li = mono ? 0.9 : Math.max(L + 0.12, 0.8);
+    ink = okHex(li, Math.min(C * 0.75, 0.14), H);
+    while (okContrast(ink, surf) < 7 && li < 0.96) { li += 0.02; ink = okHex(li, Math.min(C * 0.75, 0.14), H); }
+  }
+  return { a, ink, H, C: mono ? 0 : C };
+}
+/* Schrift auf der Akzentfläche: hell oder dunkel, je nachdem, was auf allen Farben des Verlaufs besser lesbar ist */
+function onAccent(list, H, C) {
+  const darkInk = okHex(0.2, Math.min(C, 0.045), H);
+  const worst = ink => Math.min(...list.map(x => okContrast(x, ink)));
+  return worst('#FFFFFF') >= worst(darkInk) ? '#FFFFFF' : darkInk;
+}
+
+/* Einfarbige Akzente, im Kreis der Farbtöne sortiert. Die Grundfarbe ist der Ton im hellen Design. */
+const ACCENTS = {
+  amber:    { name: 'Bernstein', hex: '#E8A126' },
+  coral:    { name: 'Koralle', hex: '#E5654B' },
+  pink:     { name: 'Pink', hex: '#D9488A' },
+  violet:   { name: 'Violett', hex: '#8A5CD8' },
+  indigo:   { name: 'Indigo', hex: '#5B63E0' },
+  blue:     { name: 'Blau', hex: '#3D7BE0' },
+  teal:     { name: 'Petrol', hex: '#1A9AA0' },
+  green:    { name: 'Grün', hex: '#2FA36B' },
+  lime:     { name: 'Limette', hex: '#86B42A' },
+  graphite: { name: 'Graphit', hex: '#45464A' }
+};
+/* Verläufe aus zwei Tönen */
+const GRADS = {
+  'g-glut':     { name: 'Glut', a: '#E8A126', b: '#E5654B' },
+  'g-abend':    { name: 'Abendrot', a: '#EE7A4E', b: '#D9488A' },
+  'g-lavendel': { name: 'Lavendel', a: '#D9488A', b: '#8A5CD8' },
+  'g-lagune':   { name: 'Lagune', a: '#1A9AA0', b: '#3D7BE0' },
+  'g-nordlicht': { name: 'Nordlicht', a: '#2FA36B', b: '#5B63E0' },
+  'g-zitrus':   { name: 'Zitrus', a: '#86B42A', b: '#E8A126' }
+};
+const ACCENT_KEYS = () => [...Object.keys(ACCENTS), ...Object.keys(GRADS), 'custom', 'sun'];
+
+/* Akzent „Mit dem Tag“: nachts Violett, in der Dämmerung Pink und Koralle, morgens Bernstein, mittags Petrol und Blau.
+ * Unter dem Horizont zählt die Sonnenhöhe in Grad, darüber der Anteil an der höchsten Höhe des Tages.
+ * Zwischen zwei Tönen läuft der Farbton auf dem kürzeren Weg um den Kreis, Helligkeit und Buntheit gleiten mit. */
+const SUN_KEYS = {
+  am: [[-90, '#8A5CD8'], [-12, '#8A5CD8'], [-5, '#D9488A'], [0, '#E5654B'], [0.3, '#E8A126'], [0.5, '#1A9AA0'], [1, '#3D7BE0']],
+  pm: [[-90, '#8A5CD8'], [-11, '#8A5CD8'], [-4, '#D9488A'], [0.02, '#E5654B'], [0.35, '#E8A126'], [0.55, '#1A9AA0'], [1, '#3D7BE0']]
+};
+function sunAccentHex(alt, pm, max) {
+  const x = alt < 0 ? alt : alt / Math.max(4, max || 1);
+  const K = SUN_KEYS[pm ? 'pm' : 'am'];
+  let i = 1;
+  while (i < K.length - 1 && x > K[i][0]) i++;
+  const [x0, c0] = K[i - 1], [x1, c1] = K[i], t = okClamp((x - x0) / (x1 - x0 || 1), 0, 1);
+  const A = okLch(c0), B = okLch(c1);
+  let dh = B[2] - A[2];
+  if (dh > 180) dh -= 360;
+  if (dh < -180) dh += 360;
+  return okHex(A[0] + (B[0] - A[0]) * t, Math.max(0.1, A[1] + (B[1] - A[1]) * t), (A[2] + dh * t + 360) % 360);
+}
+/* Die Grundfarben des gewählten Akzents: eine oder zwei */
+function accentBase(u) {
+  if (GRADS[u.accent]) return [GRADS[u.accent].a, GRADS[u.accent].b];
+  if (u.accent === 'custom' && okValidHex(u.accentHex)) return [u.accentHex];
+  if (u.accent === 'sun') return [acc.sunHex || ACCENTS.amber.hex];
+  return [(ACCENTS[u.accent] || ACCENTS.amber).hex];
+}
+/* CSS-Variablen für ein Design */
+function accentVars(base, mode) {
+  const sets = base.map(h => accentFor(h, mode)), s0 = sets[0];
+  const on = onAccent(sets.map(s => s.a), s0.H, s0.C);
+  let v = `--accent:${s0.a};--accent-ink:${s0.ink};--on-accent:${on};`;
+  if (sets[1]) {
+    v += `--accent-2:${sets[1].a};--accent-fill:linear-gradient(120deg,${s0.a},${sets[1].a});`;
+  } else v += `--accent-2:${s0.a};--accent-fill:${s0.a};`;
+  return v;
+}
+/* Stylesheet mit den Akzentwerten für Hell, Graphit und Schwarz */
+function accentCss(u) {
+  const base = accentBase(u), dk = state.ui.dark === 'oled' ? 'oled' : 'graphite';
+  const d = accentVars(base, dk);
+  let css = `:root{${accentVars(base, 'light')}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${d}}}:root[data-theme="dark"]{${d}}`;
+  // Verläufe in OKLCH gemischt, wo der Browser das kann: kräftiger in der Mitte, kein Grau
+  if (base[1]) css += '@supports (background:linear-gradient(in oklch,red,blue)){:root{--accent-fill:linear-gradient(in oklch 120deg,var(--accent),var(--accent-2))}}';
+  return css;
+}
+/* Kleiner Kreis für die Auswahl: Farbe im aktuellen Design */
+function accentSwatch(key, dark) {
+  const mode = dark ? (state.ui.dark === 'oled' ? 'oled' : 'graphite') : 'light';
+  if (GRADS[key]) return `linear-gradient(135deg,${accentFor(GRADS[key].a, mode).a},${accentFor(GRADS[key].b, mode).a})`;
+  if (key === 'custom') return okValidHex(state.ui.accentHex) ? accentFor(state.ui.accentHex, mode).a : '#888888';
+  return accentFor((ACCENTS[key] || ACCENTS.amber).hex, mode).a;
+}
+
 /* 01-feiertage.js */
 /* Gesetzliche Feiertage je Bundesland (landesweite, ohne rein kommunale) */
 const REGIONS = { BW: 'Baden-Württemberg', BY: 'Bayern', BE: 'Berlin', BB: 'Brandenburg', HB: 'Bremen', HH: 'Hamburg', HE: 'Hessen', MV: 'Mecklenburg-Vorpommern', NI: 'Niedersachsen', NW: 'Nordrhein-Westfalen', RP: 'Rheinland-Pfalz', SL: 'Saarland', SN: 'Sachsen', ST: 'Sachsen-Anhalt', SH: 'Schleswig-Holstein', TH: 'Thüringen' };
@@ -2272,16 +2726,8 @@ const numTxt = n => numDe(n, n % 1 ? 1 : 0);
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
-const ACCENTS = {
-  amber:  { name: 'Bernstein', l: ['#E8A126', '#8A5604', '#FCEFD3', '#1D1404'], d: ['#F0B040', '#F3C266', '#3A2B0E', '#1D1404'] },
-  coral:  { name: 'Koralle',   l: ['#E5654B', '#A3361F', '#FBE1DA', '#2A0B05'], d: ['#F08068', '#F6A08C', '#3D1D16', '#2A0B05'] },
-  pink:   { name: 'Pink',      l: ['#D9488A', '#9C2059', '#FADDEA', '#2B0716'], d: ['#EE6FA6', '#F49CC2', '#401629', '#2B0716'] },
-  violet: { name: 'Violett',   l: ['#8A5CD8', '#5B3399', '#EAE0FA', '#FFFFFF'], d: ['#A987EE', '#C4ABF4', '#2B1E46', '#170C2B'] },
-  blue:   { name: 'Blau',      l: ['#3D7BE0', '#1E4F9E', '#DDE8FB', '#06142C'], d: ['#6A9CF0', '#9BBDF5', '#172A4A', '#06142C'] },
-  teal:   { name: 'Petrol',    l: ['#1A9AA0', '#0E6267', '#D4EFF0', '#03191A'], d: ['#3CC0C6', '#7AD6DA', '#0E2F31', '#03191A'] },
-  green:  { name: 'Grün',      l: ['#2FA36B', '#1C6B45', '#D9F1E4', '#04180D'], d: ['#4CC48A', '#7FD8AA', '#12301F', '#04180D'] }
-};
 const SIZES = { s: 320, m: 380, l: 470 };
+const DENSITY = { tight: 'Dicht', normal: 'Normal', airy: 'Luftig' };
 
 /* Widget-Typen. multi: kann es mehrfach geben, jede Kopie hat eigene Daten. w: Standardbreite in Spalten */
 const TYPES = {
@@ -2350,7 +2796,8 @@ const DEF_BARS = () => [
   { id: 'b5', kind: 'range', name: 'Ausbildung', from: '2024-08-01', to: '2027-07-31', example: true }
 ];
 const DEF_UI = () => ({
-  greet: 'Moin Jere', theme: 'auto', accent: 'amber', size: 'm', seconds: true, region: 'HH', sky: true,
+  greet: 'Moin Jere', theme: 'auto', dark: 'graphite', accent: 'amber', accentHex: '#E8A126', size: 'm', density: 'normal', radius: 18,
+  seconds: true, region: 'HH', sky: true,
   tiles: { fa: true, we: true, ft: true, ur: true }, countdowns: [],
   start: { mode: 'last', page: '', work: '', free: '' }
 });
@@ -2547,8 +2994,12 @@ function normUi(u) {
   return {
     greet: typeof u.greet === 'string' ? u.greet.slice(0, 40) : d.greet,
     theme: ['auto', 'light', 'dark'].includes(u.theme) ? u.theme : 'auto',
-    accent: ACCENTS[u.accent] ? u.accent : 'amber',
+    dark: u.dark === 'oled' ? 'oled' : 'graphite',
+    accent: ACCENT_KEYS().includes(u.accent) ? u.accent : 'amber',
+    accentHex: okValidHex(u.accentHex) ? u.accentHex.toUpperCase() : d.accentHex,
     size: SIZES[u.size] ? u.size : 'm',
+    density: DENSITY[u.density] ? u.density : 'normal',
+    radius: Number.isFinite(+u.radius) ? Math.round(okClamp(+u.radius, 4, 28) / 2) * 2 : d.radius,
     seconds: u.seconds !== false,
     sky: u.sky !== false,
     region: REGIONS[u.region] ? u.region : 'HH',
@@ -3723,7 +4174,7 @@ defineWidget('weather', {
   },
   settings: {
     render(box, w) {
-      box.innerHTML = `<label class="check-row"><input type="checkbox" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
+      box.innerHTML = `<label class="check-row"><input type="checkbox" class="switch" data-s="hours"${w.cfg.hours ? ' checked' : ''}> Stundenleiste zeigen</label><label class="check-row"><input type="checkbox" data-s="radar"${w.cfg.radar ? ' checked' : ''}> Regenradar zeigen</label>`;
     },
     save(box, w) {
       w.cfg.hours = box.querySelector('[data-s="hours"]').checked;
@@ -4649,17 +5100,23 @@ function tickHeader(now) {
 const themeStyle = document.createElement('style');
 document.head.appendChild(themeStyle);
 let lastLook = '';
+/* Akzent neu setzen, nur wenn sich etwas geändert hat (bei „Mit dem Tag“ jede Minute geprüft) */
+function applyAccent() {
+  const css = accentCss(state.ui);
+  if (css !== themeStyle.textContent) themeStyle.textContent = css;
+}
 function applyUi() {
   const u = state.ui, root = document.documentElement;
   if (u.theme === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', u.theme);
-  const p = ACCENTS[u.accent] || ACCENTS.amber;
-  const vars = a => `--accent:${a[0]};--accent-ink:${a[1]};--chip-bg:${a[2]};--on-accent:${a[3]};`;
-  themeStyle.textContent = `:root{${vars(p.l)}}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${vars(p.d)}}}:root[data-theme="dark"]{${vars(p.d)}}`;
+  if (u.dark === 'oled') root.setAttribute('data-dark', 'oled'); else root.removeAttribute('data-dark');
+  if (u.density === 'normal') root.removeAttribute('data-density'); else root.setAttribute('data-density', u.density);
+  root.style.setProperty('--r', u.radius + 'px');
+  applyAccent();
   $('#h-greet').textContent = u.greet.trim() || 'Moin';
   $('#foot-region').textContent = `Feiertage: ${REGIONS[u.region]}`;
   headKey = '';
   sky.minute = -1;
-  const look = `${isDark()}|${u.accent}`;
+  const look = `${isDark()}|${u.accent}|${u.accentHex}|${u.dark}`;
   if (look !== lastLook) { lastLook = look; refreshMapLook(); }
 }
 
@@ -4760,13 +5217,43 @@ function renderTabs() {
   const act = nav.querySelector('[aria-selected="true"]');
   if (act && had) act.focus();
   if (act && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = Math.max(0, act.offsetLeft - 24);
+  placePill(nav);
   // Dieselben Seiten in der Mini-Leiste oben
   const mb = $('#mb-tabs');
   mb.innerHTML = state.pages.map(p => `<button type="button" class="tab" data-page="${esc(p.id)}"${p.id === cur.id ? ' aria-current="page"' : ''}>${esc(p.name)}</button>`).join('');
   const ma = mb.querySelector('[aria-current]');
   // Abstand zum Rand der Leiste messen, nicht zum Seitenrand (sonst rutscht der erste Tab halb raus)
   if (ma && mb.scrollWidth > mb.clientWidth) mb.scrollLeft = Math.max(0, mb.scrollLeft + ma.getBoundingClientRect().left - mb.getBoundingClientRect().left - 24);
+  placePill(mb);
 }
+/* Gleitende Pille unter dem aktiven Tab. Die Tabs werden bei jedem Rendern neu gebaut, die Pille startet dann
+ * an der alten Stelle und gleitet zur neuen. Ist die Leiste unsichtbar, wird sie beim Auftauchen nachgezogen. */
+const pillAt = new WeakMap();
+function placePill(nav, still) {
+  let ind = nav.querySelector('.tab-ind');
+  if (!ind) {
+    ind = document.createElement('span');
+    ind.className = 'tab-ind';
+    ind.setAttribute('aria-hidden', 'true');
+    nav.prepend(ind);
+  }
+  const act = nav.querySelector('[aria-selected="true"],[aria-current="page"]');
+  if (!act || !act.offsetWidth) { ind.style.opacity = '0'; pillAt.delete(nav); return; }
+  const x = act.offsetLeft, w = act.offsetWidth, prev = pillAt.get(nav);
+  const from = prev && !still && !reduceMotion ? prev : { x, w };
+  ind.style.transition = 'none';
+  ind.style.transform = `translateX(${from.x}px)`;
+  ind.style.width = `${from.w}px`;
+  ind.style.opacity = '1';
+  void ind.offsetWidth;
+  ind.style.transition = '';
+  ind.style.transform = `translateX(${x}px)`;
+  ind.style.width = `${w}px`;
+  pillAt.set(nav, { x, w });
+}
+const placePills = () => { placePill($('#tabs'), true); placePill($('#mb-tabs'), true); };
+addEventListener('resize', () => requestAnimationFrame(placePills));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(placePills);
 /* Mini-Leiste: taucht auf, sobald die Seiten-Tabs oben aus dem Bild sind */
 function setMinibar(on) {
   const m = $('#minibar');
@@ -4774,6 +5261,7 @@ function setMinibar(on) {
   m.classList.toggle('on', on);
   m.inert = !on;
   m.setAttribute('aria-hidden', String(!on));
+  if (on) placePill($('#mb-tabs'), true);
 }
 if (typeof IntersectionObserver === 'function') new IntersectionObserver(es => { for (const e of es) setMinibar(!e.isIntersecting && e.boundingClientRect.top < 0); }).observe($('#tabs'));
 $('#mb-tabs').addEventListener('click', e => {
@@ -5138,9 +5626,11 @@ for (const d of $$('dialog.dlg')) {
 }
 
 /* 24-anpassen.js */
-/* Anpassen: Seitenleiste mit allgemeinen Einstellungen */
-const dr = { open: false };
-let editingCd = null, greetTimer = null;
+/* Anpassen: schwebendes Fenster mit vier Bereichen (Aussehen, Seiten, Geräte, Daten).
+ * Jede Änderung wirkt sofort, das Cockpit bleibt dahinter sichtbar. Auf dem Handy ein Blatt von unten zum Wegziehen. */
+const DR_TABS = ['look', 'pages', 'devices', 'data'];
+const dr = { open: false, tab: 'look', closeT: 0 };
+let editingCd = null, greetTimer = null, radiusTimer = null;
 function afterStateSwap(old) {
   if (JSON.stringify(old.loc) !== JSON.stringify(state.loc) && (wx.live || state.loc.mode === 'fixed')) startWeather();
   if (JSON.stringify(old.commute) !== JSON.stringify(state.commute)) { cm.res = null; loadCommute(); }
@@ -5148,17 +5638,38 @@ function afterStateSwap(old) {
   if (proj(old) !== proj(state)) tasksReconfigure();
 }
 function segSet(box, v) { box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === v))); }
+/* Name des gewählten Akzents für die Zeile unter den Farben */
+function accentName(u) {
+  if (u.accent === 'custom') return `Eigene Farbe ${u.accentHex}`;
+  if (u.accent === 'sun') return 'Mit dem Tag: nachts Violett, morgens Koralle und Bernstein, mittags Petrol und Blau, abends wieder warm';
+  return (ACCENTS[u.accent] || GRADS[u.accent] || ACCENTS.amber).name;
+}
 function renderSwatches() {
-  const box = $('#dr-accent'), dark = isDark();
-  box.textContent = '';
-  for (const [k, p] of Object.entries(ACCENTS)) {
-    const lab = document.createElement('label');
-    lab.className = 'swatch';
-    lab.title = p.name;
-    lab.innerHTML = `<input type="radio" name="dr-acc" value="${k}"${k === state.ui.accent ? ' checked' : ''}><span style="--c:${dark ? p.d[0] : p.l[0]}"></span>`;
-    lab.querySelector('input').setAttribute('aria-label', p.name);
-    box.appendChild(lab);
-  }
+  const box = $('#dr-accent'), dark = isDark(), u = state.ui;
+  const one = (k, name, cls) => {
+    const on = accentFor(GRADS[k] ? GRADS[k].a : (ACCENTS[k] || ACCENTS.amber).hex, dark ? (u.dark === 'oled' ? 'oled' : 'graphite') : 'light');
+    const ink = onAccent([on.a], on.H, on.C);
+    return `<label class="swatch${cls ? ' ' + cls : ''}" title="${esc(name)}"><input type="radio" name="dr-acc" value="${k}"${k === u.accent ? ' checked' : ''} aria-label="${esc(name)}"><span style="--c:${accentSwatch(k, dark)};--on:${ink}">${CHECK}</span></label>`;
+  };
+  const sunC = acc.sunHex ? accentFor(acc.sunHex, dark ? 'graphite' : 'light').a : ACCENTS.amber.hex;
+  box.innerHTML = '<p class="acc-sub">Einfarbig</p><div class="swatches">'
+    + Object.entries(ACCENTS).map(([k, p]) => one(k, p.name)).join('')
+    + `<label class="swatch sw-custom${u.accent === 'custom' ? ' on' : ''}" title="Eigene Farbe wählen"><input type="color" id="dr-acc-pick" value="${esc(u.accentHex.toLowerCase())}" aria-label="Eigene Farbe wählen"><span style="--c:${accentSwatch('custom', dark)}"></span></label></div>`
+    + '<p class="acc-sub">Verlauf</p><div class="swatches">' + Object.entries(GRADS).map(([k, g]) => one(k, g.name)).join('') + '</div>'
+    + `<p class="acc-sub">Mit der Sonne</p><div class="swatches"><label class="swatch sw-sun" title="Folgt dem Sonnenstand"><input type="radio" name="dr-acc" value="sun"${u.accent === 'sun' ? ' checked' : ''} aria-label="Mit dem Tag, folgt dem Sonnenstand"><span style="--c:${sunC}"><b>Mit dem Tag</b><em></em>${CHECK}</span></label></div>`;
+  $('#dr-acc-now').innerHTML = `<b>${esc(accentName(u).split(':')[0])}</b>${u.accent === 'sun' ? ': ' + esc(accentName(u).split(': ')[1]) : ''}`;
+}
+/* Vorschau-Kacheln im Design-Bereich zeigen Graphit oder Schwarz, je nach Wahl */
+function renderThemePick() {
+  segSet($('#dr-theme'), state.ui.theme);
+  for (const el of document.querySelectorAll('#dr-theme .tp-prev')) el.toggleAttribute('data-oled', state.ui.dark === 'oled');
+  segSet($('#dr-dark'), state.ui.dark);
+}
+function renderRadius() {
+  const r = $('#dr-radius'), v = state.ui.radius;
+  r.value = v;
+  r.style.setProperty('--p', `${((v - 4) / 24) * 100}%`);
+  $('#dr-radius-v').textContent = `${v} px`;
 }
 function renderCdList() {
   const ul = $('#dr-cd-list');
@@ -5203,63 +5714,129 @@ function renderStartSec() {
     : wb ? `Deine Arbeitszeit kommt aus dem Balken „${wb.name}“: ${DAYS_TXT(wb.days || [])}, ${wb.start} bis ${wb.end} Uhr. Eine Stunde vor Beginn zählt schon als Arbeit, Feiertage und Urlaub als frei. Das Cockpit wechselt auch, während es offen ist, außer du hast in der letzten halben Stunde selbst eine Seite gewählt.`
     : 'Dafür braucht das Cockpit deine Arbeitszeit. Leg im Fortschritt-Widget einen Arbeitstag-Balken an.';
 }
+function renderTilesSec() {
+  const tl = $('#dr-tiles');
+  tl.innerHTML = Object.entries(TILES).map(([k, n]) => `<label class="dr-line"><span class="dr-lt">${esc(n)}</span><input type="checkbox" class="switch" data-tile="${k}"${state.ui.tiles[k] ? ' checked' : ''}></label>`).join('');
+}
 function renderDrawer() {
   const u = state.ui;
-  $('#dr-greet').value = u.greet;
-  segSet($('#dr-theme'), u.theme);
+  if (document.activeElement !== $('#dr-greet')) $('#dr-greet').value = u.greet;
+  renderThemePick();
   segSet($('#dr-size'), u.size);
+  segSet($('#dr-density'), u.density);
+  renderRadius();
   renderSwatches();
   $('#dr-secs').checked = u.seconds;
   $('#dr-sky').checked = u.sky;
-  const tl = $('#dr-tiles');
-  tl.textContent = '';
-  for (const [k, n] of Object.entries(TILES)) {
-    const lab = document.createElement('label');
-    lab.className = 'check-row';
-    lab.innerHTML = `<input type="checkbox" data-tile="${k}"${u.tiles[k] ? ' checked' : ''}> ${esc(n)}`;
-    tl.appendChild(lab);
-  }
+  renderTilesSec();
   renderCdList();
   renderStartSec();
   const sel = $('#dr-region');
   if (!sel.options.length) for (const [k, n] of Object.entries(REGIONS)) sel.add(new Option(n, k));
   sel.value = u.region;
   renderBackupInfo();
+  renderSnaps();
   renderPlanBtns();
   renderSync();
   $('#dr-data-err').hidden = true;
 }
-function openDrawer() {
+/* Bereich wechseln: Pille gleitet, Inhalt blendet weich ein */
+function setDrTab(tab, focus) {
+  if (!DR_TABS.includes(tab)) tab = 'look';
+  const changed = dr.tab !== tab;
+  dr.tab = tab;
+  for (const b of document.querySelectorAll('#dr-tabs [role="tab"]')) {
+    const on = b.dataset.tab === tab;
+    b.setAttribute('aria-selected', String(on));
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+  }
+  $('#dr-tabs').style.setProperty('--i', DR_TABS.indexOf(tab));
+  for (const t of DR_TABS) $('#dr-p-' + t).hidden = t !== tab;
+  if (changed) $('#dr-body').scrollTop = 0;
+}
+function openDrawer(tab) {
+  clearTimeout(dr.closeT);
+  const d = $('#drawer'), sc = $('#scrim');
+  d.classList.remove('closing', 'settle');
+  sc.classList.remove('closing');
+  d.style.transform = '';
   renderDrawer();
-  $('#drawer').hidden = false;
-  $('#scrim').hidden = false;
+  setDrTab(tab || dr.tab);
+  d.hidden = false;
+  sc.hidden = false;
   $('#cust-btn').setAttribute('aria-expanded', 'true');
   dr.open = true;
-  $('#dr-close').focus();
+  $(`#dr-tabs [aria-selected="true"]`).focus({ preventScroll: true });
 }
 function closeDrawer() {
   if (!dr.open) return;
   if (greetTimer) { clearTimeout(greetTimer); greetTimer = null; commit(); }
-  $('#drawer').hidden = true;
-  $('#scrim').hidden = true;
+  if (radiusTimer) { clearTimeout(radiusTimer); radiusTimer = null; commit(); }
+  const d = $('#drawer'), sc = $('#scrim');
   $('#cust-btn').setAttribute('aria-expanded', 'false');
   dr.open = false;
   resetCdForm();
-  $('#cust-btn').focus();
+  const done = () => { d.hidden = true; sc.hidden = true; d.classList.remove('closing', 'settle'); sc.classList.remove('closing'); d.style.transform = ''; };
+  if (reduceMotion) done();
+  else {
+    // Beim Wegziehen auf dem Handy läuft das Blatt von dort weiter, wo der Finger es losgelassen hat
+    if (d.style.transform) { d.classList.add('settle'); d.style.transform = 'translateY(100%)'; }
+    else d.classList.add('closing');
+    sc.classList.add('closing');
+    dr.closeT = setTimeout(done, 240);
+  }
+  $('#cust-btn').focus({ preventScroll: true });
 }
 $('#cust-btn').addEventListener('click', () => (dr.open ? closeDrawer() : openDrawer()));
 $('#dr-close').addEventListener('click', closeDrawer);
 $('#scrim').addEventListener('click', closeDrawer);
+$('#dr-tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) setDrTab(b.dataset.tab); });
+$('#dr-tabs').addEventListener('keydown', e => {
+  const i = DR_TABS.indexOf(dr.tab), n = DR_TABS.length;
+  const j = e.key === 'ArrowRight' ? (i + 1) % n : e.key === 'ArrowLeft' ? (i - 1 + n) % n : e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : -1;
+  if (j < 0) return;
+  e.preventDefault();
+  setDrTab(DR_TABS[j], true);
+});
 document.addEventListener('keydown', e => {
   if (!dr.open) return;
   if (e.key === 'Escape') { e.preventDefault(); closeDrawer(); return; }
   if (e.key !== 'Tab') return;
-  const f = [...$('#drawer').querySelectorAll('button:not([disabled]),input:not([type=hidden]):not([hidden]),select,textarea,a[href]')].filter(el => el.offsetParent !== null);
+  const f = [...$('#drawer').querySelectorAll('button:not([disabled]),input:not([type=hidden]):not([hidden]),select,textarea,a[href],summary,[tabindex="0"]')].filter(el => el.offsetParent !== null && el.tabIndex >= 0);
   if (!f.length) return;
   const first = f[0], last = f[f.length - 1];
   if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
   else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 });
+/* Handy: Blatt am Griff oder an der Überschrift nach unten ziehen, ab einem Stück schließt es */
+(() => {
+  const d = $('#drawer');
+  let y0 = null, dy = 0, t0 = 0;
+  const start = e => {
+    if (!matchMedia('(max-width:640px)').matches || e.target.closest('button')) return;
+    y0 = e.clientY; dy = 0; t0 = Date.now();
+    d.classList.add('dragging');
+    d.setPointerCapture(e.pointerId);
+  };
+  const move = e => {
+    if (y0 === null) return;
+    dy = Math.max(0, e.clientY - y0);
+    d.style.transform = dy ? `translateY(${dy}px)` : '';
+  };
+  const end = () => {
+    if (y0 === null) return;
+    y0 = null;
+    d.classList.remove('dragging');
+    const fast = dy > 40 && Date.now() - t0 < 250;
+    if (dy > Math.min(140, d.offsetHeight * 0.25) || fast) closeDrawer();
+    else { d.classList.add('settle'); d.style.transform = ''; setTimeout(() => d.classList.remove('settle'), 320); }
+  };
+  for (const el of [$('#dr-grab'), $('#dr-head')]) el.addEventListener('pointerdown', start);
+  d.addEventListener('pointermove', move);
+  d.addEventListener('pointerup', end);
+  d.addEventListener('pointercancel', end);
+})();
 $('#dr-greet').addEventListener('input', e => {
   state.ui.greet = e.target.value.slice(0, 40);
   $('#h-greet').textContent = state.ui.greet.trim() || 'Moin';
@@ -5271,7 +5848,17 @@ $('#dr-theme').addEventListener('click', e => {
   if (!b) return;
   state.ui.theme = b.dataset.v;
   commit();
-  segSet($('#dr-theme'), state.ui.theme);
+  renderThemePick();
+  renderSwatches();
+});
+$('#dr-dark').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b) return;
+  state.ui.dark = b.dataset.v;
+  // Wer Schwarz wählt, will es meist auch sehen
+  if (!isDark()) state.ui.theme = 'dark';
+  commit();
+  renderThemePick();
   renderSwatches();
 });
 $('#dr-size').addEventListener('click', e => {
@@ -5281,7 +5868,44 @@ $('#dr-size').addEventListener('click', e => {
   commit();
   segSet($('#dr-size'), state.ui.size);
 });
-$('#dr-accent').addEventListener('change', e => { if (e.target.name === 'dr-acc') { state.ui.accent = e.target.value; commit(); } });
+$('#dr-density').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b) return;
+  state.ui.density = b.dataset.v;
+  commit();
+  segSet($('#dr-density'), state.ui.density);
+});
+$('#dr-radius').addEventListener('input', e => {
+  state.ui.radius = Math.round(okClamp(+e.target.value, 4, 28) / 2) * 2;
+  document.documentElement.style.setProperty('--r', state.ui.radius + 'px');
+  renderRadius();
+  clearTimeout(radiusTimer);
+  radiusTimer = setTimeout(() => { radiusTimer = null; commit(); }, 400);
+});
+$('#dr-accent').addEventListener('change', e => {
+  if (e.target.name === 'dr-acc') { state.ui.accent = e.target.value; commit(); renderSwatches(); }
+  if (e.target.id === 'dr-acc-pick') { commit(); renderSwatches(); }
+});
+/* Eigene Farbe: beim Ziehen im Farbwähler gleich zeigen, gespeichert wird beim Loslassen */
+$('#dr-accent').addEventListener('input', e => {
+  if (e.target.id !== 'dr-acc-pick' || !okValidHex(e.target.value)) return;
+  state.ui.accentHex = e.target.value.toUpperCase();
+  state.ui.accent = 'custom';
+  applyAccent();
+  const sp = e.target.nextElementSibling;
+  if (sp) sp.style.setProperty('--c', accentSwatch('custom', isDark()));
+  e.target.closest('.sw-custom').classList.add('on');
+  for (const r of document.querySelectorAll('#dr-accent input[name="dr-acc"]')) r.checked = false;
+});
+/* Ein Klick auf die eigene Farbe wählt sie auch dann, wenn man im Farbwähler nichts ändert */
+$('#dr-accent').addEventListener('click', e => {
+  if (e.target.id !== 'dr-acc-pick' || state.ui.accent === 'custom') return;
+  state.ui.accent = 'custom';
+  commit();
+  e.target.closest('.sw-custom').classList.add('on');
+  for (const r of document.querySelectorAll('#dr-accent input[name="dr-acc"]')) r.checked = false;
+  $('#dr-acc-now').innerHTML = `<b>${esc(accentName(state.ui))}</b>`;
+});
 $('#dr-secs').addEventListener('change', e => { state.ui.seconds = e.target.checked; commit(); });
 $('#dr-sky').addEventListener('change', e => { state.ui.sky = e.target.checked; commit(); });
 $('#dr-mirror').addEventListener('click', () => { closeDrawer(); mirrorOpen(true); });
@@ -5353,11 +5977,13 @@ function replaceState(next, msg) {
   if (dr.open) renderDrawer();
   toast(msg, () => { const cur = state; state = prev; commit(); afterStateSwap(cur); layoutNow(); if (dr.open) renderDrawer(); });
 }
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { applyUi(); if (dr.open) renderSwatches(); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { applyUi(); sky.minute = -1; skyTick(new Date()); if (dr.open) renderSwatches(); });
 
 /* 25-sicherung.js */
-/* Sichern, Laden, Zurücksetzen und die Erinnerung ans Sichern */
-const BACKUP_DAYS = 14;
+/* Sichern, Laden, Zurücksetzen, Zwischenstände und die Erinnerung ans Sichern.
+ * Läuft der Sync, erinnert das Cockpit nicht mehr ans Sichern als Datei. Dafür hebt jedes Gerät einmal am Tag
+ * einen Zwischenstand auf, so lassen sich Fehler zurückholen, die der Sync schon auf alle Geräte verteilt hat. */
+const BACKUP_DAYS = 14, SNAP_KEY = 'jere-cockpit-staende', SNAP_MAX = 7;
 function exportState() {
   state.meta.backupAt = new Date().toISOString();
   state.meta.snooze = null;
@@ -5381,19 +6007,66 @@ const agoTxt = (t, dat) => {
   if (d >= 14) return `${Math.floor(d / 7)} Wochen`;
   return d === 1 ? (dat ? 'einem Tag' : 'einen Tag') : `${d} ${dat ? 'Tagen' : 'Tage'}`;
 };
-/* Hinweis zeigen, wenn seit der letzten Sicherung (oder seit Beginn) zwei Wochen um sind und sich etwas geändert hat */
+/* Hinweis zeigen, wenn seit der letzten Sicherung (oder seit Beginn) zwei Wochen um sind und sich etwas geändert hat. Mit Sync nicht. */
 function checkBackup() {
   const m = state.meta, now = Date.now();
   const last = m.backupAt ? Date.parse(m.backupAt) : 0;
   const changed = m.changedAt ? Date.parse(m.changedAt) : 0;
   const base = last || Date.parse(m.since) || now;
-  const due = changed > last && now - base > BACKUP_DAYS * DAY && !(m.snooze && Date.parse(m.snooze) > now);
+  const cloud = !!syCfg();
+  const due = !cloud && changed > last && now - base > BACKUP_DAYS * DAY && !(m.snooze && Date.parse(m.snooze) > now);
   $('#notice').hidden = !due;
-  const cloud = syncMode().startsWith('cloud');
   if (due) $('#notice-text').innerHTML = last
-    ? `<b>Deine letzte Sicherung ist ${agoTxt(last)} her.</b> Seitdem hast du einiges geändert${cloud ? ', und der Sync ersetzt keine Sicherung.' : ', und alles liegt nur in diesem Browser.'}`
-    : `<b>Du hast deine Einstellungen noch nie gesichert.</b> ${cloud ? 'Der Sync ersetzt keine Sicherung, denn er gibt auch Fehler an alle Geräte weiter.' : 'Alles liegt nur in diesem Browser.'} Ein Klick, und du hast eine Kopie als Datei.`;
+    ? `<b>Deine letzte Sicherung ist ${agoTxt(last)} her.</b> Seitdem hast du einiges geändert, und alles liegt nur in diesem Browser.`
+    : '<b>Du hast deine Einstellungen noch nie gesichert.</b> Alles liegt nur in diesem Browser. Ein Klick, und du hast eine Kopie als Datei.';
 }
+/* Zwischenstände: der Stand, wie er am Tag beim ersten Öffnen war. Liste neueste zuerst: [{ at, state }] */
+const snapView = s => JSON.stringify({ ...s, page: undefined, meta: undefined });
+function snapList() {
+  const l = lsGet(SNAP_KEY);
+  return Array.isArray(l) ? l.filter(x => x && typeof x.at === 'string' && x.state && typeof x.state === 'object' && Array.isArray(x.state.pages)) : [];
+}
+function snapTake() {
+  if (!lsOk) return;
+  const list = snapList(), now = new Date();
+  if (list[0] && ymd(new Date(list[0].at)) === ymd(now)) return;
+  const cur = snapView(state);
+  if (cur.length > 4e5) return;
+  // Hat sich seit dem letzten Zwischenstand nichts geändert, reicht der alte
+  if (list[0] && snapView(list[0].state) === cur) return;
+  let next = [{ at: now.toISOString(), state: JSON.parse(JSON.stringify(state)) }, ...list].slice(0, SNAP_MAX);
+  // Ist der Speicher knapp, fallen die ältesten weg
+  while (next.length) {
+    try { localStorage.setItem(SNAP_KEY, JSON.stringify(next)); break; } catch { next = next.slice(0, -1); }
+  }
+  if (dr.open) renderSnaps();
+}
+function snapLabel(t) {
+  const d = new Date(t), n = dayDiff(d, new Date());
+  return `${n === 0 ? 'Heute' : n === 1 ? 'Gestern' : `${WD[d.getDay()]} ${dm(d)}`}, ${hm(d)} Uhr`;
+}
+function renderSnaps() {
+  const list = snapList(), cloud = !!syCfg(), cur = snapView(state);
+  $('#dr-snap-txt').textContent = (cloud ? 'Weil der Sync läuft, erinnert dich das Cockpit nicht mehr ans Sichern als Datei. ' : '')
+    + 'Einmal am Tag hebt dieses Gerät auf, wie dein Cockpit beim ersten Öffnen aussah. Hast du dich vertan, holst du hier einen der letzten sieben Stände zurück'
+    + (cloud ? ', und der Sync bringt ihn auf deine anderen Geräte.' : '.');
+  const ul = $('#dr-snaps');
+  ul.hidden = !list.length;
+  ul.innerHTML = list.map((x, i) => {
+    const s = x.state, same = snapView(s) === cur;
+    const nw = Object.keys(s.widgets || {}).length;
+    const info = `${s.pages.length} ${s.pages.length === 1 ? 'Seite' : 'Seiten'}, ${nw} Widgets${same ? ', wie jetzt' : ''}`;
+    return `<li><div class="tx"><b>${esc(snapLabel(x.at))}</b><span>${esc(info)}</span></div><button type="button" class="btn-ghost" data-snap="${i}"${same ? ' disabled' : ''}>Zurückholen</button></li>`;
+  }).join('');
+}
+$('#dr-snaps').addEventListener('click', e => {
+  const b = e.target.closest('[data-snap]');
+  if (!b) return;
+  const x = snapList()[+b.dataset.snap];
+  if (!x) return;
+  replaceState(normalize({ ...x.state, page: state.page, meta: state.meta }), `Stand von ${snapLabel(x.at).replace(/^Heute/, 'heute').replace(/^Gestern/, 'gestern')} ist zurück`);
+  renderSnaps();
+});
 function renderBackupInfo() {
   const t = state.meta.backupAt;
   $('#dr-backup-at').textContent = !t ? 'Du hast noch keine Sicherung gemacht.'
@@ -7220,6 +7893,11 @@ function skyColors(alt, pm, grey) {
   });
 }
 const ALT_MAX = 64;
+/* Eine Himmelsfarbe Richtung Grau mit derselben Helligkeit schieben, mit deep zusätzlich abdunkeln */
+function skyNeutral(c, n, deep) {
+  const y = Math.sqrt(lumOf(c)) * 255 * (deep ? 1 - n * 0.6 : 1);
+  return mixRgb(c, [y * 1.02, y, y * 0.97], n);
+}
 /* Sterne einmal zufällig, aber immer gleich verteilt */
 (() => {
   let seed = 7;
@@ -7235,7 +7913,10 @@ function renderSky(now) {
   if (dk !== sky.key) { sky.key = dk; sky.day = sunDay(now, loc); sky.w = 0; }
   const D = sky.day, alt = sunAlt(now, +loc.lat, +loc.lon), pm = now > D.noon;
   const grey = skyGrey(), on = state.ui.sky;
-  const [top, mid, low] = skyColors(alt, pm, grey);
+  let [top, mid, low] = skyColors(alt, pm, grey);
+  // Im dunklen Design wird die Nacht neutraler, damit der Himmel zu den Graphit-Karten passt. In Schwarz (OLED) fast schwarz mit Sternen.
+  const dkTh = isDark(), oled = dkTh && state.ui.dark === 'oled', night = dkTh ? clamp01((-alt - 1) / 9) * (oled ? 0.92 : 0.6) : 0;
+  if (night) [top, mid, low] = [top, mid, low].map(c => skyNeutral(c, night, oled));
   const inkHi = lumOf(mixRgb(top, mid, 0.5)) > 0.36 ? '#0F1B2B' : '#FFFFFF';
   const inkLo = lumOf(low) > 0.4 ? '#0F1B2B' : '#FFFFFF';
   const xNow = (now - sod(now)) / DAY;
@@ -7259,7 +7940,10 @@ function renderSky(now) {
   el.style.setProperty('--sun-f', yNow.toFixed(3));
   el.dataset.night = alt < -6 ? '1' : '0';
   const tc = document.querySelector('meta[name="theme-color"]');
-  if (tc && on) tc.content = rgb2hex(top);
+  if (tc) tc.content = on ? rgb2hex(top) : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#11100F';
+  // Akzent „Mit dem Tag“ folgt der Sonne. Gerechnet wird immer, damit die Auswahl im Anpassen-Fenster den Ton von jetzt zeigt.
+  const sh = sunAccentHex(alt, pm, D.max);
+  if (sh !== acc.sunHex) { acc.sunHex = sh; if (state.ui.accent === 'sun') applyAccent(); }
   // Bogen
   const H = 100, toY = a => (H - Math.max(0, a) / ALT_MAX * (H - 6)).toFixed(1);
   const nowM = xNow * 1440;
@@ -8752,7 +9436,7 @@ defineWidget('now', {
   settings: {
     render(box, w) {
       box.innerHTML = `<label class="field"><span class="lbl">Höchstens so viele Hinweise</span><select data-s="n">${[3, 4, 6, 8].map(n => `<option value="${n}"${n === w.cfg.n ? ' selected' : ''}>${n}</option>`).join('')}</select></label>`
-        + `<label class="check-row"><input type="checkbox" data-s="cap"${w.cfg.cap ? ' checked' : ''}> Feld zum schnellen Notieren zeigen</label>`
+        + `<label class="check-row"><input type="checkbox" class="switch" data-s="cap"${w.cfg.cap ? ' checked' : ''}> Feld zum schnellen Notieren zeigen</label>`
         + '<p class="hint">Die Karte sammelt aus deinen anderen Widgets, was gerade zählt: Wetterwarnungen, Termine, Abfahrten, Pendeln, Regen, Frost, Müll, Geburtstage, Aufgaben, Prüfung und Gewohnheiten. Morgens zählt der Weg, abends das, was morgen ansteht. Auf dem Handy zeigt sie höchstens 4, der Rest steckt hinter „weitere zeigen“.</p>';
     },
     save(box, w) {
@@ -8903,7 +9587,7 @@ $('#pl-ok').addEventListener('click', applyPlan);
  * Adresse und Passwort bleiben nur in diesem Browser (jere-cockpit-sync) und kommen nicht in die Sicherung.
  * Eigene Änderungen gehen nach ein paar Sekunden hoch, sonst fragt das Cockpit regelmäßig nach.
  * Ändern zwei Geräte gleichzeitig etwas, gilt der spätere Stand. Der verdrängte bleibt als Kopie liegen (jere-cockpit-vor-sync).
- * Pro Gerät bleiben Seite, Design und Kartengröße, außerdem alles, was in einem eigenen Schlüssel liegt (Tokens, Keys, Kalender-Links, Timer). */
+ * Pro Gerät bleiben Seite, Design (Hell, Dunkel, Graphit, Schwarz), Kartenbreite und Abstände, außerdem alles, was in einem eigenen Schlüssel liegt (Tokens, Keys, Kalender-Links, Timer). */
 const SY_KEY = 'jere-cockpit-sync', SY_BACKUP = 'jere-cockpit-vor-sync';
 const SY_WORKER = "// Ablage für Jeres Tagescockpit: hält den Stand des Cockpits in Cloudflare KV,\n// damit sich deine Geräte abgleichen können. Erreichbar nur mit deinem Passwort.\n// Einrichtung: einen KV-Namespace unter dem Namen SYNC_KV an den Worker binden\n// und ein Secret SYNC_SECRET mit deinem Passwort anlegen.\nconst MAX_ZEICHEN = 1900000;\n\nasync function hash(text) {\n  return new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)));\n}\n// Vergleich ohne Abkürzung, damit die Antwortzeit nichts über das Passwort verrät\nasync function gleich(a, b) {\n  const x = await hash(a), y = await hash(b);\n  let d = 0;\n  for (let i = 0; i < x.length; i++) d |= x[i] ^ y[i];\n  return d === 0;\n}\n\nexport default {\n  async fetch(request, env) {\n    const cors = {\n      'Access-Control-Allow-Origin': '*',\n      'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',\n      'Access-Control-Allow-Headers': 'Authorization, Content-Type',\n      'Access-Control-Max-Age': '86400',\n      'Cache-Control': 'no-store'\n    };\n    const antwort = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json; charset=utf-8' } });\n    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });\n    if (!env.SYNC_KV || !env.SYNC_SECRET) {\n      return antwort({ error: 'setup', missing: [!env.SYNC_KV && 'SYNC_KV', !env.SYNC_SECRET && 'SYNC_SECRET'].filter(Boolean) }, 500);\n    }\n    const gegeben = (request.headers.get('Authorization') || '').replace(/^Bearer\\s+/i, '');\n    if (!(await gleich(gegeben, env.SYNC_SECRET))) {\n      await new Promise(r => setTimeout(r, 500));\n      return antwort({ error: 'auth' }, 401);\n    }\n    if (request.method === 'GET') {\n      return antwort((await env.SYNC_KV.get('stand', 'json')) || { rev: 0 });\n    }\n    if (request.method === 'PUT') {\n      const text = await request.text();\n      if (text.length > MAX_ZEICHEN) return antwort({ error: 'size' }, 413);\n      let b;\n      try { b = JSON.parse(text); } catch { return antwort({ error: 'format' }, 400); }\n      if (!b || typeof b !== 'object' || !b.state || typeof b.state !== 'object' || Array.isArray(b.state) || Number.isNaN(Date.parse(b.at))) {\n        return antwort({ error: 'format' }, 400);\n      }\n      const jetzt = (await env.SYNC_KV.get('stand', 'json')) || { rev: 0 };\n      // Ein anderes Gerät war schneller: den aktuellen Stand zurückgeben, das Cockpit entscheidet dann\n      if (!b.force && b.base !== jetzt.rev) return antwort({ error: 'conflict', ...jetzt }, 409);\n      const neu = { rev: jetzt.rev + 1, at: b.at, ver: String(b.ver || ''), state: b.state };\n      try {\n        await env.SYNC_KV.put('stand', JSON.stringify(neu));\n      } catch (e) {\n        return antwort({ error: 'kv', message: String((e && e.message) || e).slice(0, 200) }, 503);\n      }\n      return antwort({ rev: neu.rev, at: neu.at });\n    }\n    return antwort({ error: 'method' }, 405);\n  }\n};";
 const sy = { on: false, busy: false, again: false, waiting: false, said: false, seen: '', touch: 0, noteT: null, pushT: null, last: 0, err: '', errKind: '', told: '', choice: null };
@@ -8915,13 +9599,14 @@ function syCfg() {
 }
 const sySave = c => lsSet(SY_KEY, c);
 
-/* Was zwischen Geräten wandert: alles außer der offenen Seite, den Merkzetteln dieses Browsers und Design und Größe */
+/* Was pro Gerät bleibt: Hell oder Dunkel, Graphit oder Schwarz, Kartenbreite und Abstände. Akzent und Ecken wandern mit. */
+const SY_LOCAL_UI = ['theme', 'dark', 'size', 'density'];
+/* Was zwischen Geräten wandert: alles außer der offenen Seite, den Merkzetteln dieses Browsers und den Einstellungen pro Gerät */
 function syView(s) {
   const v = { ...s, ui: { ...s.ui } };
   delete v.page;
   delete v.meta;
-  delete v.ui.theme;
-  delete v.ui.size;
+  for (const k of SY_LOCAL_UI) delete v.ui[k];
   return v;
 }
 const syCanon = v => Array.isArray(v) ? `[${v.map(syCanon).join(',')}]`
@@ -8983,7 +9668,8 @@ function syApply(r, how) {
   if (edit.on || (a && a.matches && a.matches('input:not([type=button]), textarea, select, [contenteditable="true"]'))) return false;
   const old = state, hb = syHash();
   if (how !== 'pull') lsSet(SY_BACKUP, state);
-  state = normalize({ ...r.state, ui: { ...(r.state.ui || {}), theme: old.ui.theme, size: old.ui.size }, page: old.page, meta: old.meta });
+  const keep = Object.fromEntries(SY_LOCAL_UI.map(k => [k, old.ui[k]]));
+  state = normalize({ ...r.state, ui: { ...(r.state.ui || {}), ...keep }, page: old.page, meta: old.meta });
   persist();
   sy.seen = syHash();
   renderAll();
@@ -9122,6 +9808,8 @@ function syMode() {
 function syShow() {
   setSync(lsOk ? syMode() : 'none');
   renderSyncState();
+  // Mit Sync gibt es keine Erinnerung ans Sichern, ohne wieder
+  checkBackup();
 }
 function renderSyncState() {
   const c = syCfg(), el = $('#sy-state');
@@ -9299,9 +9987,174 @@ addEventListener('storage', e => { if (e.key === SY_KEY) { sy.on = !!syCfg(); if
 syncHook = syNote;
 syncMode = syMode;
 
+/* 50-suche.js */
+/* Schnellsuche mit Strg+K (am Mac Cmd+K) oder über „Suchen“ oben: Seiten, Widgets, Aktionen und Einstellungen finden
+ * und mit Enter direkt ausführen. Ohne Suchwort zeigt sie Seiten und die wichtigsten Aktionen. */
+const cmd = { all: [], hits: [], sel: 0 };
+const cmdMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+const cmdNorm = s => String(s || '').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+  .normalize('NFD').replace(/[̀-ͯ]/g, '');
+const CMD_ICO = {
+  page: svgIco('<rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M3.5 9h17"/>'),
+  note: svgIco('<path d="M5 19.5h4L19.5 9a2.5 2.5 0 0 0-3.5-3.5L5.5 16z"/>'),
+  edit: svgIco('<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>'),
+  plus: svgIco('<path d="M12 5v14M5 12h14"/>'),
+  mirror: svgIco('<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/>'),
+  tune: svgIco('<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'),
+  sync: svgIco('<path d="M20 8a8 8 0 0 0-14.5-2.5M4 4v4h4"/><path d="M4 16a8 8 0 0 0 14.5 2.5M20 20v-4h-4"/>'),
+  save: svgIco('<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19.5h14"/>'),
+  sun: svgIco('<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>'),
+  moon: svgIco('<path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z"/>'),
+  auto: svgIco('<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/>'),
+  clock: svgIco('<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>'),
+  sky: svgIco('<path d="M3 16.5c3-4.5 6-6.5 9-6.5s6 2 9 6.5"/><circle cx="12" cy="6" r="2"/>'),
+  grid: svgIco('<rect x="3.5" y="3.5" width="7.5" height="9" rx="2"/><rect x="13" y="3.5" width="7.5" height="5.5" rx="2"/><rect x="3.5" y="14.5" width="7.5" height="6" rx="2"/><rect x="13" y="11" width="7.5" height="9.5" rx="2"/>'),
+  data: svgIco('<ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6"/>'),
+  flag: svgIco('<path d="M5 21V4M5 4.6c4-2 6 2 10 0s4 0 4 0v8.6s-1-2-4 0-6-2-10 0"/>')
+};
+function cmdSetUi(o, msg) {
+  Object.assign(state.ui, o);
+  commit();
+  if (dr.open) renderDrawer();
+  if (msg) toast(msg, null, { ms: 2500 });
+}
+/* Alle Einträge. words: zusätzliche Suchwörter, sw: Farbe für einen Punkt statt Symbol, on: ist schon so eingestellt */
+function cmdBuild() {
+  const out = [], u = state.ui;
+  const add = (group, title, run, o = {}) => out.push({ group, title, run, sub: o.sub || '', key: o.key || '', ico: o.ico || '', sw: o.sw || '', on: !!o.on, top: !!o.top,
+    words: cmdNorm(`${title} ${o.sub || ''} ${o.words || ''}`) });
+  const cur = curPage();
+  state.pages.forEach((p, i) => add('Seiten', p.name, () => showPage(p.id, 'user'), {
+    key: i < 9 ? String(i + 1) : '', ico: CMD_ICO.page, top: true, on: p.id === cur.id,
+    sub: p.id === cur.id ? 'Gerade offen' : `${p.items.length} ${p.items.length === 1 ? 'Widget' : 'Widgets'}`, words: 'seite'
+  }));
+  for (const [id, w] of Object.entries(state.widgets)) {
+    const ps = pagesUsing(id);
+    if (!ps.length || !TYPES[w.type]) continue;
+    add('Widgets', widgetLabel(id) || TYPES[w.type].name, () => nwJump(id), { ico: TICON[w.type] || '', sub: `Auf ${ps.map(p => p.name).join(', ')}`, words: `${TYPES[w.type].name} widget karte` });
+  }
+  add('Aktionen', 'Schnell notieren', openCapture, { key: 'N', ico: CMD_ICO.note, top: true, words: 'notiz aufgabe todo idee merken' });
+  add('Aktionen', edit.on ? 'Bearbeiten beenden' : 'Seiten und Widgets bearbeiten', () => setEdit(!edit.on), { ico: CMD_ICO.edit, top: true, words: 'bearbeiten verschieben anordnen breite entfernen' });
+  add('Aktionen', 'Widget hinzufügen', () => { setEdit(true); openGallery(); }, { ico: CMD_ICO.plus, top: true, words: 'neu galerie karte' });
+  add('Aktionen', 'Spiegel-Modus starten', () => mirrorOpen(true), { key: 'S', ico: CMD_ICO.mirror, top: true, words: 'vollbild smart mirror wand kiosk' });
+  add('Aktionen', 'Anpassen öffnen', () => openDrawer('look'), { ico: CMD_ICO.tune, top: true, words: 'einstellungen optionen' });
+  if (syncMode().startsWith('cloud')) add('Aktionen', 'Jetzt abgleichen', () => $('#sy-now').click(), { ico: CMD_ICO.sync, words: 'sync cloud geraete' });
+  add('Aktionen', 'Sicherung als Datei speichern', exportState, { ico: CMD_ICO.save, words: 'export backup download' });
+  add('Aktionen', 'Seiten neu ordnen', openPlan, { ico: CMD_ICO.grid, words: 'aufraeumen heute arbeit privat fokus sport' });
+
+  const th = [['light', 'Hell', CMD_ICO.sun], ['dark', 'Dunkel', CMD_ICO.moon], ['auto', 'Wie das System', CMD_ICO.auto]];
+  for (const [v, n, ico] of th) add('Aussehen', `Design: ${n}`, () => cmdSetUi({ theme: v }), { ico, on: u.theme === v, words: 'modus dark light nacht tag' });
+  add('Aussehen', 'Dunkel in Graphit', () => cmdSetUi({ dark: 'graphite', theme: isDark() ? u.theme : 'dark' }), { ico: CMD_ICO.moon, on: u.dark === 'graphite', words: 'grau dunkel design' });
+  add('Aussehen', 'Dunkel in Schwarz', () => cmdSetUi({ dark: 'oled', theme: isDark() ? u.theme : 'dark' }), { ico: CMD_ICO.moon, on: u.dark === 'oled', words: 'oled amoled schwarz dunkel design spiegel' });
+  const dark = isDark();
+  for (const [k, a] of Object.entries(ACCENTS)) add('Aussehen', `Akzent: ${a.name}`, () => cmdSetUi({ accent: k }), { sw: accentSwatch(k, dark), on: u.accent === k, words: 'akzentfarbe farbe' });
+  for (const [k, g] of Object.entries(GRADS)) add('Aussehen', `Akzent: ${g.name}`, () => cmdSetUi({ accent: k }), { sw: accentSwatch(k, dark), on: u.accent === k, words: 'akzentfarbe farbe verlauf' });
+  add('Aussehen', 'Akzent: Mit dem Tag', () => cmdSetUi({ accent: 'sun' }), { ico: CMD_ICO.sun, on: u.accent === 'sun', words: 'akzentfarbe farbe sonne tageszeit' });
+  add('Aussehen', 'Akzent: Eigene Farbe', () => { openDrawer('look'); setTimeout(() => { const c = $('#dr-acc-pick'); if (c) c.focus(); }, 60); }, { sw: accentSwatch('custom', dark), on: u.accent === 'custom', words: 'akzentfarbe farbe farbwaehler' });
+  for (const [k, n] of Object.entries(DENSITY)) add('Aussehen', `Abstände: ${n}`, () => cmdSetUi({ density: k }), { ico: CMD_ICO.grid, on: u.density === k, words: 'dichte kompakt luft platz' });
+  for (const [k, n] of [['s', 'Schmal'], ['m', 'Normal'], ['l', 'Breit']]) add('Aussehen', `Kartenbreite: ${n}`, () => cmdSetUi({ size: k }), { ico: CMD_ICO.grid, on: u.size === k, words: 'karten groesse spalten' });
+  add('Aussehen', u.seconds ? 'Sekunden ausblenden' : 'Sekunden zeigen', () => cmdSetUi({ seconds: !u.seconds }), { ico: CMD_ICO.clock, words: 'uhr zeit' });
+  add('Aussehen', u.sky ? 'Himmel ausschalten' : 'Himmel nach Sonnenstand färben', () => cmdSetUi({ sky: !u.sky }), { ico: CMD_ICO.sky, words: 'kopf sonne farbe' });
+  add('Aussehen', 'Ecken einstellen', () => { openDrawer('look'); setTimeout(() => $('#dr-radius').focus(), 60); }, { ico: CMD_ICO.tune, words: 'rund radius form' });
+
+  add('Einstellungen', 'Startseite festlegen', () => openDrawer('pages'), { ico: CMD_ICO.page, words: 'beim oeffnen arbeitszeit automatisch' });
+  add('Einstellungen', 'Countdown anlegen', () => { openDrawer('pages'); setTimeout(() => { const n = $('#cd-name'); n.scrollIntoView({ block: 'center' }); n.focus({ preventScroll: true }); }, 60); }, { ico: CMD_ICO.flag, words: 'kachel pruefung termin zaehlen' });
+  add('Einstellungen', 'Kacheln oben ein- und ausschalten', () => openDrawer('pages'), { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub' });
+  add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('devices'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });
+  add('Einstellungen', 'Als App installieren', () => openDrawer('devices'), { ico: CMD_ICO.plus, words: 'pwa homescreen dock' });
+  add('Einstellungen', 'Zwischenstand zurückholen', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'rueckgaengig wiederherstellen backup gestern' });
+  add('Einstellungen', 'Sicherung laden', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'import datei backup' });
+  return out;
+}
+const CMD_GROUPS = ['Seiten', 'Aktionen', 'Widgets', 'Aussehen', 'Einstellungen'];
+/* Treffer: jedes Wort der Suche muss vorkommen. Wer mit dem Titel anfängt oder ein Wort im Titel trifft, steht weiter oben. */
+function cmdFilter(q) {
+  const t = cmdNorm(q).split(/\s+/).filter(Boolean);
+  if (!t.length) return cmd.all.filter(x => x.top);
+  const score = x => {
+    const title = cmdNorm(x.title);
+    let s = 0;
+    if (title.startsWith(t[0])) s += 4;
+    if (title.split(/[\s:,-]+/).some(w => w.startsWith(t[0]))) s += 2;
+    if (x.group === 'Seiten' || x.group === 'Aktionen') s += 1;
+    return s;
+  };
+  const hits = cmd.all.filter(x => t.every(w => x.words.includes(w))).map(x => [x, score(x)]);
+  hits.sort((a, b) => b[1] - a[1] || CMD_GROUPS.indexOf(a[0].group) - CMD_GROUPS.indexOf(b[0].group));
+  return hits.slice(0, 40).map(h => h[0]);
+}
+function cmdRender() {
+  const q = $('#cmd-q').value, list = $('#cmd-list');
+  cmd.hits = cmdFilter(q);
+  cmd.sel = Math.min(cmd.sel, Math.max(0, cmd.hits.length - 1));
+  // Ohne Suchwort in Gruppen, mit Suchwort nach Treffergüte, die Gruppe steht dann klein rechts
+  const grouped = !q.trim();
+  let html = '', last = '';
+  cmd.hits.forEach((x, i) => {
+    if (grouped && x.group !== last) { html += `<li class="cmd-gh" role="presentation">${esc(x.group)}</li>`; last = x.group; }
+    const ico = x.sw ? `<span class="cmd-ico cmd-sw" style="--c:${x.sw}"></span>` : `<span class="cmd-ico">${x.ico}</span>`;
+    const right = x.on ? `<span class="cmd-on">${CHECK}</span>` : x.key ? `<kbd>${esc(x.key)}</kbd>` : (!grouped ? `<span class="cmd-grp">${esc(x.group)}</span>` : '');
+    html += `<li class="cmd-it" role="option" id="cmd-o${i}" data-i="${i}" aria-selected="${i === cmd.sel}">${ico}<span class="cmd-tx"><b>${esc(x.title)}</b>${x.sub ? `<small>${esc(x.sub)}</small>` : ''}</span>${right}</li>`;
+  });
+  list.innerHTML = html;
+  $('#cmd-empty').hidden = !!cmd.hits.length;
+  if (!cmd.hits.length) $('#cmd-empty').textContent = `Nichts gefunden für „${q.trim()}“. Probier es mit einem Seitennamen, einem Widget oder Wörtern wie Farbe, Dunkel oder Sync.`;
+  cmdMark();
+}
+function cmdMark() {
+  const q = $('#cmd-q');
+  for (const li of document.querySelectorAll('#cmd-list .cmd-it')) li.setAttribute('aria-selected', String(+li.dataset.i === cmd.sel));
+  const el = $(`#cmd-o${cmd.sel}`);
+  if (el) { q.setAttribute('aria-activedescendant', el.id); el.scrollIntoView({ block: 'nearest' }); } else q.removeAttribute('aria-activedescendant');
+}
+function cmdRun(i) {
+  const x = cmd.hits[i];
+  if (!x) return;
+  $('#dlg-cmd').close();
+  requestAnimationFrame(() => x.run());
+}
+function openCmd() {
+  if (mr.on) return;
+  for (const d of $$('dialog[open]')) if (d.id !== 'dlg-cmd') return;
+  if (dr.open) closeDrawer();
+  cmd.all = cmdBuild();
+  cmd.sel = 0;
+  $('#cmd-q').value = '';
+  cmdRender();
+  const d = $('#dlg-cmd');
+  if (!d.open) d.showModal();
+  $('#cmd-q').focus();
+}
+$('#search-kbd').textContent = cmdMac ? '⌘K' : 'Strg K';
+$('#search-btn').title = `Schnellsuche (${cmdMac ? 'Cmd+K' : 'Strg+K'})`;
+$('#search-btn').addEventListener('click', openCmd);
+$('#cmd-q').addEventListener('input', () => { cmd.sel = 0; cmdRender(); });
+$('#cmd-q').addEventListener('keydown', e => {
+  const n = cmd.hits.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!n) return;
+    cmd.sel = (cmd.sel + (e.key === 'ArrowDown' ? 1 : -1) + n) % n;
+    cmdMark();
+  } else if (e.key === 'Enter' && !e.isComposing) {
+    e.preventDefault();
+    cmdRun(cmd.sel);
+  }
+});
+$('#cmd-list').addEventListener('mousemove', e => {
+  const li = e.target.closest('.cmd-it');
+  if (li && +li.dataset.i !== cmd.sel) { cmd.sel = +li.dataset.i; cmdMark(); }
+});
+$('#cmd-list').addEventListener('click', e => { const li = e.target.closest('.cmd-it'); if (li) cmdRun(+li.dataset.i); });
+document.addEventListener('keydown', e => {
+  if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || (e.key !== 'k' && e.key !== 'K')) return;
+  e.preventDefault();
+  if ($('#dlg-cmd').open) $('#dlg-cmd').close(); else openCmd();
+});
+
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '2.7';
+const VERSION = '2.8';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -9321,7 +10174,7 @@ function tick() {
   nwTick(now);
   if (now.getSeconds() % 10 === 3) peekAll();
   if (ymd(now) !== vacDayKey) renderVacation();
-  if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
+  if (now.getMinutes() === 0 && now.getSeconds() === 0) { checkBackup(); snapTake(); }
 }
 function renderAll() {
   applyUi();
@@ -9356,7 +10209,8 @@ const NEWS = {
   '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
   '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null],
   '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau'],
-  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => { openDrawer(); $('#dr-sync').scrollIntoView({ block: 'start' }); }, 'Zeigen']
+  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => openDrawer('devices'), 'Zeigen'],
+  '2.8': ['Neuer Look: Dunkel in Graphit oder Schwarz, mehr Akzentfarben mit Verläufen, ein neues Anpassen-Fenster und die Schnellsuche mit Strg+K.', () => openDrawer('look'), 'Ansehen']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {
@@ -9445,6 +10299,7 @@ if (lsOk && lsGet(LS_KEY) === null) state = DEFAULTS();
 state.page = startPageId() || state.page;
 persist();
 renderAll();
+snapTake();
 announceNew();
 if (mirrorFromHash()) mirrorOpen(false);
 setInterval(tick, 1000);

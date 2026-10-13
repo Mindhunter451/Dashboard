@@ -13,16 +13,8 @@
  */
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub' };
-const ACCENTS = {
-  amber:  { name: 'Bernstein', l: ['#E8A126', '#8A5604', '#FCEFD3', '#1D1404'], d: ['#F0B040', '#F3C266', '#3A2B0E', '#1D1404'] },
-  coral:  { name: 'Koralle',   l: ['#E5654B', '#A3361F', '#FBE1DA', '#2A0B05'], d: ['#F08068', '#F6A08C', '#3D1D16', '#2A0B05'] },
-  pink:   { name: 'Pink',      l: ['#D9488A', '#9C2059', '#FADDEA', '#2B0716'], d: ['#EE6FA6', '#F49CC2', '#401629', '#2B0716'] },
-  violet: { name: 'Violett',   l: ['#8A5CD8', '#5B3399', '#EAE0FA', '#FFFFFF'], d: ['#A987EE', '#C4ABF4', '#2B1E46', '#170C2B'] },
-  blue:   { name: 'Blau',      l: ['#3D7BE0', '#1E4F9E', '#DDE8FB', '#06142C'], d: ['#6A9CF0', '#9BBDF5', '#172A4A', '#06142C'] },
-  teal:   { name: 'Petrol',    l: ['#1A9AA0', '#0E6267', '#D4EFF0', '#03191A'], d: ['#3CC0C6', '#7AD6DA', '#0E2F31', '#03191A'] },
-  green:  { name: 'Grün',      l: ['#2FA36B', '#1C6B45', '#D9F1E4', '#04180D'], d: ['#4CC48A', '#7FD8AA', '#12301F', '#04180D'] }
-};
 const SIZES = { s: 320, m: 380, l: 470 };
+const DENSITY = { tight: 'Dicht', normal: 'Normal', airy: 'Luftig' };
 
 /* Widget-Typen. multi: kann es mehrfach geben, jede Kopie hat eigene Daten. w: Standardbreite in Spalten */
 const TYPES = {
@@ -91,7 +83,8 @@ const DEF_BARS = () => [
   { id: 'b5', kind: 'range', name: 'Ausbildung', from: '2024-08-01', to: '2027-07-31', example: true }
 ];
 const DEF_UI = () => ({
-  greet: 'Moin Jere', theme: 'auto', accent: 'amber', size: 'm', seconds: true, region: 'HH', sky: true,
+  greet: 'Moin Jere', theme: 'auto', dark: 'graphite', accent: 'amber', accentHex: '#E8A126', size: 'm', density: 'normal', radius: 18,
+  seconds: true, region: 'HH', sky: true,
   tiles: { fa: true, we: true, ft: true, ur: true }, countdowns: [],
   start: { mode: 'last', page: '', work: '', free: '' }
 });
@@ -288,8 +281,12 @@ function normUi(u) {
   return {
     greet: typeof u.greet === 'string' ? u.greet.slice(0, 40) : d.greet,
     theme: ['auto', 'light', 'dark'].includes(u.theme) ? u.theme : 'auto',
-    accent: ACCENTS[u.accent] ? u.accent : 'amber',
+    dark: u.dark === 'oled' ? 'oled' : 'graphite',
+    accent: ACCENT_KEYS().includes(u.accent) ? u.accent : 'amber',
+    accentHex: okValidHex(u.accentHex) ? u.accentHex.toUpperCase() : d.accentHex,
     size: SIZES[u.size] ? u.size : 'm',
+    density: DENSITY[u.density] ? u.density : 'normal',
+    radius: Number.isFinite(+u.radius) ? Math.round(okClamp(+u.radius, 4, 28) / 2) * 2 : d.radius,
     seconds: u.seconds !== false,
     sky: u.sky !== false,
     region: REGIONS[u.region] ? u.region : 'HH',

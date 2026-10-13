@@ -11,7 +11,11 @@ Ein Tipp auf den Titel einer Karte klappt sie ein. Dann bleibt nur der Kopf mit 
 Mit **Bearbeiten** legst du Seiten an, benennst sie um und sortierst sie. Auf jeder Karte kannst du dann verschieben, die Breite ändern, Einstellungen öffnen oder sie von der Seite nehmen. Über **Widget hinzufügen** legst du neue Widgets an oder holst vorhandene auf die Seite.
 **Jetzt wichtig** sammelt aus allen Widgets, was gerade zählt, und sortiert es nach Dringlichkeit: Wetterwarnungen, der nächste Termin, wann du zur Bahn los musst, Stau auf dem Weg zur Arbeit, Regen, Frost, Müll, Geburtstage, fällige Aufgaben, die Prüfung und offene Gewohnheiten. Morgens zählt der Weg, abends das, was morgen ansteht. Ein Tipp auf einen Hinweis springt zur passenden Karte. Darunter ist ein Feld zum schnellen Notieren, von überall auch mit der Taste N: Mit Todoist landet es im Eingang (ein Datum wie „morgen 9 Uhr“ erkennt Todoist selbst), ohne Todoist in einer Notiz.
 Seiten mit **Nach Tageszeit ordnen** (Schalter beim Bearbeiten) stellen morgens Wetter, Abfahrten und Pendeln nach vorn, tagsüber Termine und Aufgaben, abends Müll, Termine und Geburtstage.
-Unter **Anpassen** sind Design, Akzentfarbe, Himmel an oder aus, Kacheln, Countdowns, Bundesland, die Startseite, die Sicherung und **Seiten neu ordnen**: Daraus werden Heute, Arbeit, Privat, Fokus und Sport. Vorher zeigt eine Vorschau, was wohin kommt, eigene Seiten bleiben, wie sie sind, und die alten Seiten lassen sich später zurückholen.
+**Anpassen** öffnet ein schwebendes Fenster, auf dem Handy ein Blatt von unten, das sich nach unten wegziehen lässt. Das Cockpit bleibt dahinter sichtbar, jede Änderung wirkt sofort. Es hat vier Bereiche:
+**Aussehen**: Hell, Dunkel oder wie das System, Dunkel in Graphit oder in Schwarz (für OLED und den Spiegel), 10 Akzentfarben, eine eigene Farbe aus dem Farbwähler, 6 Verläufe und „Mit dem Tag“ (der Akzent folgt der Sonne: nachts Violett, morgens Koralle und Bernstein, mittags Petrol und Blau, abends wieder warm), Ecken von 4 bis 28 px, Abstände Dicht, Normal oder Luftig, Kartenbreite, Begrüßung, Sekunden und Himmel. Aus jeder Akzentfarbe rechnet das Cockpit in OKLCH passende Töne für Hell und Dunkel, damit Text auf Karten und auf der Akzentfläche immer gut lesbar ist.
+**Seiten**: Startseite, Bearbeiten, **Seiten neu ordnen** (daraus werden Heute, Arbeit, Privat, Fokus und Sport, vorher mit Vorschau, eigene Seiten bleiben, die alten lassen sich zurückholen), Kacheln oben, Countdowns und Bundesland.
+**Geräte**: Sync, Als App und Spiegel-Modus. **Daten**: Sicherung als Datei, Zwischenstände und Zurücksetzen.
+**Suchen** oder Strg+K (am Mac Cmd+K) öffnet die Schnellsuche: Seiten, Widgets, Aktionen und Einstellungen finden und mit Enter ausführen, zum Beispiel „privat“, „dunkel“, „lagune“ oder „countdown“.
 **Spiegel** (oder die Taste S) zeigt Uhr, Wetter, Warnungen, Termine, Abfahrten, Geburtstage, Müllabfuhr, Countdowns und den Vers auf Schwarz, im Vollbild. Mit `…/Dashboard/#spiegel` startet die Seite direkt so, praktisch für einen Kiosk-Browser am Smart Mirror. Raus geht es mit Esc.
 
 ## Als App installieren
@@ -22,7 +26,8 @@ Auf iPhone und iPad hat die App vom Home-Bildschirm ihren eigenen Speicher. Die 
 ## Daten
 
 Alles, was du einstellst, liegt nur im Browser (localStorage), getrennt für jede Adresse und jeden Browser. Der Todoist-Token, ein TomTom-Key, der Tankerkönig-Key, die Kalender-Links und das Sync-Passwort stehen nie in der Datei und auch nicht in einer Sicherung.
-Mit **Anpassen, Einstellungen sichern** bekommst du eine JSON-Datei, mit **Sicherung laden** holst du sie zurück, auch auf einem anderen Rechner. Das Cockpit erinnert dich, wenn die letzte Sicherung länger als zwei Wochen her ist.
+Mit **Anpassen, Daten, Sicherung speichern** bekommst du eine JSON-Datei, mit **Sicherung laden** holst du sie zurück, auch auf einem anderen Rechner. Ohne Sync erinnert dich das Cockpit, wenn die letzte Sicherung länger als zwei Wochen her ist.
+Dazu hebt jedes Gerät einmal am Tag einen **Zwischenstand** auf (`jere-cockpit-staende`), so wie das Cockpit beim ersten Öffnen des Tages aussah. Die letzten sieben lassen sich unter **Anpassen, Daten** zurückholen. Das ist vor allem mit Sync wichtig, weil der Sync auch Fehler auf alle Geräte verteilt. Läuft der Sync, gibt es deshalb keine Erinnerung ans Sichern als Datei mehr.
 
 ## Kalender einrichten
 
@@ -36,7 +41,7 @@ Die Termine samt Wiederholungen, Ausnahmen und Zeitzonen liest [ical.js](https:/
 
 ## Sync zwischen Geräten
 
-Mit dem Sync bleiben Handy, Mac und Spiegel auf demselben Stand. Das Cockpit legt seinen Stand in einer eigenen kleinen Ablage in deinem Cloudflare-Konto ab (ein Worker mit KV, kostenlos), und die anderen Geräte holen ihn von dort. Der Worker antwortet nur auf dein Passwort. Einrichten unter **Anpassen, Sync zwischen Geräten**, die Schritte stehen dort auch:
+Mit dem Sync bleiben Handy, Mac und Spiegel auf demselben Stand. Das Cockpit legt seinen Stand in einer eigenen kleinen Ablage in deinem Cloudflare-Konto ab (ein Worker mit KV, kostenlos), und die anderen Geräte holen ihn von dort. Der Worker antwortet nur auf dein Passwort. Einrichten unter **Anpassen, Geräte, Sync zwischen Geräten**, die Schritte stehen dort auch:
 
 1. Auf dash.cloudflare.com unter „Storage & databases“ einen KV-Namespace anlegen.
 2. Unter „Workers & Pages“ einen Worker anlegen, den Code durch `tools/sync-worker.js` ersetzen (im Cockpit mit „Code kopieren“) und auf „Deploy“ klicken.
@@ -46,7 +51,7 @@ Mit dem Sync bleiben Handy, Mac und Spiegel auf demselben Stand. Das Cockpit leg
 
 So arbeitet er: Eigene Änderungen gehen nach ein paar Sekunden Pause hoch, beim Verlassen des Tabs sofort. Offene Cockpits fragen alle zwei Minuten nach, beim Zurückkehren und wenn das Netz wieder da ist ebenfalls. Ändern zwei Geräte gleichzeitig etwas, gilt der spätere Stand. Der verdrängte bleibt als Kopie in diesem Browser (`jere-cockpit-vor-sync`) und lässt sich über den Hinweis „Zurückholen“ wieder holen. Ein Gerät mit älterer Version übernimmt keinen Stand einer neueren und lädt auch keinen hoch, bis es neu geladen wurde.
 
-Was wandert: Seiten, Widgets und ihre Einstellungen, Urlaub, Geburtstage, Müllabfuhr, Countdowns, Orte und Notizen. Was auf jedem Gerät für sich bleibt: die offene Seite, Design und Kartengröße, außerdem alles, was in eigenen Schlüsseln liegt, also Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links, Sync-Passwort und der laufende Pomodoro-Timer. Der Sync ersetzt keine Sicherung, denn er gibt auch Fehler an alle Geräte weiter.
+Was wandert: Seiten, Widgets und ihre Einstellungen, Urlaub, Geburtstage, Müllabfuhr, Countdowns, Orte und Notizen. Akzentfarbe und Ecken wandern mit. Was auf jedem Gerät für sich bleibt: die offene Seite, Hell oder Dunkel, Graphit oder Schwarz, Abstände und Kartenbreite, außerdem alles, was in eigenen Schlüsseln liegt, also Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links, Sync-Passwort, der laufende Pomodoro-Timer und die Zwischenstände. Weil der Sync auch Fehler an alle Geräte weitergibt, holst du dir in dem Fall unter **Anpassen, Daten** einen Zwischenstand von einem der letzten Tage zurück.
 
 Grenzen: KV gleicht Änderungen zwischen Rechenzentren nicht sofort ab, es kann bis zu einer Minute dauern, bis ein Gerät eine Änderung sieht. Der kostenlose Plan erlaubt etwa 1.000 Schreibvorgänge pro Tag, das reicht für einen Nutzer locker, weil das Cockpit gebündelt speichert. Der Worker nimmt Stände bis etwa 1,9 MB an.
 
@@ -84,6 +89,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**2.8** (Oktober 2026)
+Neuer Look: Der dunkle Modus ist jetzt Graphit, fast schwarz mit einem Hauch Wärme statt Nachtblau, die Karten heben sich durch feine Linien statt Schatten ab. Wahlweise echtes Schwarz für OLED-Bildschirme und den Spiegel. Nachts wird auch der Himmel oben im dunklen Modus neutraler, in Schwarz fast schwarz mit Sternen. Akzentfarben: 10 Töne, eine eigene Farbe, 6 Verläufe und „Mit dem Tag“, alles in OKLCH für Hell und Dunkel abgeleitet. Neues Anpassen-Fenster aus Glas mit vier Bereichen, Design-Vorschau, Farbkreisen, Schaltern statt Häkchen, Regler für die Ecken und Abständen in drei Stufen, auf dem Handy als Blatt von unten. Die Seiten-Tabs haben eine gleitende Pille. Neu ist die Schnellsuche mit Strg+K. Mit Sync gibt es keine Erinnerung ans Sichern mehr, dafür jeden Tag einen Zwischenstand zum Zurückholen.
 
 **2.7** (Oktober 2026)
 Sync zwischen Geräten über einen eigenen Cloudflare Worker mit KV: Stand hochladen und holen, Konflikte nach dem Prinzip „der spätere Stand gilt“ mit Kopie und „Zurückholen“, Passwort nur in diesem Browser, Anzeige in der Fußzeile. Neu im Anpassen-Fenster: Abschnitt „Sync zwischen Geräten“ mit Anleitung, Worker-Code zum Kopieren und Passwort-Generator.

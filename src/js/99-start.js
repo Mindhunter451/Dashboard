@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '2.7';
+const VERSION = '2.8';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -19,7 +19,7 @@ function tick() {
   nwTick(now);
   if (now.getSeconds() % 10 === 3) peekAll();
   if (ymd(now) !== vacDayKey) renderVacation();
-  if (now.getMinutes() === 0 && now.getSeconds() === 0) checkBackup();
+  if (now.getMinutes() === 0 && now.getSeconds() === 0) { checkBackup(); snapTake(); }
 }
 function renderAll() {
   applyUi();
@@ -54,7 +54,8 @@ const NEWS = {
   '2.4': ['Neu: Abfahrten, Geburtstage und Müllabfuhr. Und das Cockpit lässt sich jetzt als App installieren. Soll ich die drei auf deine erste Seite legen?', () => setupNews24()],
   '2.5': ['Frischer Schliff: ruhigere Karten, wichtige stehen weiter vorn. Tipp auf einen Kartentitel, dann klappt die Karte ein und zeigt nur noch das Wichtigste.', null],
   '2.6': ['Neu: „Jetzt wichtig“, Wetterwarnungen vom DWD und schnelles Notieren mit der Taste N. Soll ich deine Seiten zu Heute, Arbeit, Privat, Fokus und Sport ordnen?', () => openPlan(), 'Vorschau'],
-  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => { openDrawer(); $('#dr-sync').scrollIntoView({ block: 'start' }); }, 'Zeigen']
+  '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => openDrawer('devices'), 'Zeigen'],
+  '2.8': ['Neuer Look: Dunkel in Graphit oder Schwarz, mehr Akzentfarben mit Verläufen, ein neues Anpassen-Fenster und die Schnellsuche mit Strg+K.', () => openDrawer('look'), 'Ansehen']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {
@@ -143,6 +144,7 @@ if (lsOk && lsGet(LS_KEY) === null) state = DEFAULTS();
 state.page = startPageId() || state.page;
 persist();
 renderAll();
+snapTake();
 announceNew();
 if (mirrorFromHash()) mirrorOpen(false);
 setInterval(tick, 1000);
