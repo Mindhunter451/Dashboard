@@ -77,7 +77,7 @@ function fbLoad(lg, full) {
       }
       D.err = null;
     } catch (e) { D.err = e || new Error('Fehler'); }
-    finally { D.busy = null; D.tried = Date.now(); renderFootballAll(); fbPlan(lg); }
+    finally { D.busy = null; D.tried = Date.now(); renderFootballAll(); fbPlan(lg); mirrorDirty(); }
   })();
   return D.busy;
 }

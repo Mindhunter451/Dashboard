@@ -126,8 +126,24 @@ function renderTilesSec() {
       + (cd ? '<span class="chip">Countdown</span>' : `<input type="checkbox" class="switch" data-tile="${k}"${u.tiles[k] ? ' checked' : ''} aria-label="${esc(name)} zeigen">`) + '</li>';
   }).join('');
 }
-/* Spiegel: Vorlage, Bausteine mit Bereich, Uhr, Nachtmodus. Die Vorschau zeichnet sich bei jeder Änderung neu. */
+/* Spiegel: Vorlage, Bausteine mit Bereich, Widgets als Kurzzeilen, Uhr, Nachtmodus. Die Vorschau zeichnet sich bei jeder Änderung neu. */
 const mp = { o: 'land' };
+/* Was eine Kurzzeile zeigt, als Unterzeile in der Liste. Hilft auch, zwei gleich benannte Kopien auseinanderzuhalten. */
+function mLineSub(id) {
+  const w = state.widgets[id], c = w.cfg;
+  switch (w.type) {
+    case 'tasks': return `Fällige Aufgaben aus ${c.projects.join(', ')}`;
+    case 'progress': return mCut(c.bars.map(b => b.name).join(', '), 60) || 'Noch keine Balken';
+    case 'vacation': return 'Nächster Urlaub und freie Tage';
+    case 'learn': return c.date ? `Prüfung am ${dmy(parseYmd(c.date))}` : 'Noch ohne Prüfungsdatum';
+    case 'habits': return mCut(c.items.map(h => h.name).join(', '), 60) || 'Noch keine Gewohnheiten';
+    case 'football': return [FB_LEAGUES[c.league], c.teamName].filter(Boolean).join(', ');
+    case 'f1': return 'Nächste Session, Rennen und WM';
+    case 'fuel': return `Günstigster Preis für ${FU_TYPE[c.type] || 'Sprit'}`;
+    case 'notes': { const l = String(c.text || '').split('\n').find(x => x.trim()); return l ? mCut(l.trim(), 50) : 'Noch leer'; }
+  }
+  return '';
+}
 function renderMirrorSec() {
   const m = state.ui.mirror;
   segSet($('#dr-mpreset'), m.preset);
@@ -137,6 +153,15 @@ function renderMirrorSec() {
     + `<span class="dr-lt">${esc(MB[b.k])}${MB_SUB[b.k] ? `<small>${esc(MB_SUB[b.k])}</small>` : ''}</span>`
     + `<select class="dr-in mz-sel" data-mz="${b.k}" aria-label="Bereich für ${esc(MB[b.k])}"${b.on ? '' : ' disabled'}>${Object.entries(MZ).map(([z, n]) => `<option value="${z}"${z === b.z ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>`
     + `<input type="checkbox" class="switch" data-mon="${b.k}"${b.on ? ' checked' : ''} aria-label="${esc(MB[b.k])} zeigen"></li>`).join('');
+  const lines = mLines();
+  $('#dr-mlines').innerHTML = lines.length ? lines.map(x => {
+    const name = widgetTitle(x.w);
+    return `<li class="sort-row ml-row" data-key="${esc(x.w)}"><button type="button" class="sort-h" aria-label="${esc(name)} verschieben" title="Ziehen oder mit den Pfeiltasten schieben">${GRIP}</button>`
+      + `<span class="dr-lt">${esc(name)}<small>${esc(mLineSub(x.w))}</small></span>`
+      + `<div class="seg sm" role="group" aria-label="${esc(name)} im Spiegel" data-ml="${esc(x.w)}">${Object.entries(ML_MODES).map(([k, n]) => `<button type="button" data-v="${k}" aria-pressed="${k === x.m}">${n}</button>`).join('')}</div></li>`;
+  }).join('') : '<li class="ml-empty">Leg Widgets wie Aufgaben, Fortschritt oder Fußball auf eine Seite, dann kannst du sie hier in den Spiegel holen.</li>';
+  $('#dr-mwxh').checked = m.wxh;
+  if (document.activeElement !== $('#dr-meve')) $('#dr-meve').value = m.eve;
   setRange('#dr-msize', m.size, 70, 140, `${m.size} %`);
   $('#dr-msecs').checked = m.secs;
   $('#dr-mdim').checked = m.dim.on;
@@ -403,6 +428,28 @@ sortable($('#dr-mblocks'), { item: '.sort-row', handle: '.sort-h', done: keys =>
   commit();
   renderMirror();
 } });
+/* Kurzzeilen: Aus, Fest oder Wechsel und die Reihenfolge. Ab der ersten Änderung gilt deine Liste statt des Vorschlags. */
+$('#dr-mlines').addEventListener('click', e => {
+  const b = e.target.closest('[data-ml] [data-v]');
+  if (!b || !ML_MODES[b.dataset.v]) return;
+  const box = b.parentElement, list = mLines(), x = list.find(y => y.w === box.dataset.ml);
+  if (!x || x.m === b.dataset.v) return;
+  x.m = b.dataset.v;
+  state.ui.mirror.lines = list;
+  segSet(box, x.m);
+  commit();
+});
+sortable($('#dr-mlines'), { item: '.sort-row', handle: '.sort-h', done: keys => {
+  const list = mLines();
+  state.ui.mirror.lines = keys.map(k => list.find(x => x.w === k)).filter(Boolean);
+  commit();
+} });
+$('#dr-mwxh').addEventListener('change', e => { state.ui.mirror.wxh = e.target.checked; commit(); });
+$('#dr-meve').addEventListener('change', e => {
+  const v = e.target.value;
+  if (validHm(v) && v >= '12:00') { state.ui.mirror.eve = v; commit(); }
+  else { e.target.value = state.ui.mirror.eve; toast('Die Morgen-Vorschau startet frühestens um 12 Uhr.'); }
+});
 $('#dr-msize').addEventListener('input', e => { state.ui.mirror.size = +e.target.value; setRange('#dr-msize', state.ui.mirror.size, 70, 140, `${state.ui.mirror.size} %`); renderMirror(); slideSave(); });
 $('#dr-mdim-lvl').addEventListener('input', e => { state.ui.mirror.dim.lvl = +e.target.value; setRange('#dr-mdim-lvl', state.ui.mirror.dim.lvl, 15, 80, `${state.ui.mirror.dim.lvl} %`); slideSave(); });
 $('#dr-msecs').addEventListener('change', e => { state.ui.mirror.secs = e.target.checked; commit(); renderMirror(); });

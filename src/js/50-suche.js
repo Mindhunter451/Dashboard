@@ -70,7 +70,7 @@ function cmdBuild() {
 
   add('Einstellungen', 'Startseite festlegen', () => openDrawer('pages'), { ico: CMD_ICO.page, words: 'beim oeffnen arbeitszeit automatisch' });
   add('Einstellungen', 'Uhr und Kopf anpassen', () => openDrawer('head'), { ico: CMD_ICO.clock, words: 'groesse schrift datum kalenderwoche begruessung sekunden' });
-  add('Einstellungen', 'Spiegel einrichten', () => openDrawer('mirror'), { ico: CMD_ICO.mirror, words: 'smart mirror bausteine dimmen nachts vorschau' });
+  add('Einstellungen', 'Spiegel einrichten', () => openDrawer('mirror'), { ico: CMD_ICO.mirror, words: 'smart mirror bausteine dimmen nachts vorschau kurzzeilen wechselplatz morgen widgets' });
   add('Einstellungen', 'Countdown anlegen', () => { openDrawer('head'); setTimeout(() => { const n = $('#cd-name'); n.scrollIntoView({ block: 'center' }); n.focus({ preventScroll: true }); }, 60); }, { ico: CMD_ICO.flag, words: 'kachel pruefung termin zaehlen' });
   add('Einstellungen', 'Kacheln oben wählen und sortieren', () => { openDrawer('head'); setTimeout(() => $('#dr-tiles').scrollIntoView({ block: 'start' }), 60); }, { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub reihenfolge termin sonne' });
   add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('data'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });

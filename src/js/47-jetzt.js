@@ -249,6 +249,7 @@ function renderNow() {
 }
 let nwDirtyT = 0;
 function nowDirty() {
+  mirrorDirty();
   if (nwDirtyT) return;
   nwDirtyT = setTimeout(() => { nwDirtyT = 0; const v = views.get('now'); if (v && !v.el.hidden) { if (zu.has('now')) peekCard(v); else renderNow(); } }, 200);
 }
