@@ -1,0 +1,29 @@
+/* Auswahlfelder: echte Liste der Systeme passend einfärben (Handy) und der eigene Knopf mit Glas-Liste (Rechner) */
+option,optgroup{background-color:var(--surface);color:var(--ink)}
+.sel-native{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;border:0!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important;clip-path:inset(50%)!important}
+.sel-btn{display:inline-flex;align-items:center;gap:8px;min-width:0;max-width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s,background-color .15s}
+.sel-btn .sel-tx{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel-btn svg{flex:0 0 auto;width:16px;height:16px;margin-right:-2px;color:var(--muted);transition:transform .2s var(--ease)}
+.sel-btn:hover{border-color:color-mix(in srgb,var(--ink) 22%,var(--line))}
+.sel-btn[aria-expanded="true"]{border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.sel-btn[aria-expanded="true"] svg{transform:rotate(180deg);color:var(--ink)}
+.sel-btn:disabled{opacity:.55;cursor:default}
+.sel-btn:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+
+.sel-pop{position:fixed;inset:auto;margin:0;padding:5px;min-width:160px;max-width:calc(100vw - 16px);overflow:auto;overscroll-behavior:contain;
+  color:var(--ink);background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);
+  border:1px solid var(--glass-line);border-radius:calc(var(--r2) + 4px);box-shadow:var(--pop);font:400 14px/1.35 var(--f-body);
+  animation:sel-in .16s var(--ease)}
+.sel-pop[data-up="true"]{animation-name:sel-up}
+.sel-pop:focus{outline:0}
+.sel-opt{display:flex;align-items:center;gap:12px;padding:8px 10px 8px 12px;border-radius:max(6px,calc(var(--r2) - 2px));cursor:pointer;white-space:nowrap;user-select:none}
+.sel-opt span{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.sel-opt svg{flex:0 0 auto;width:16px;height:16px;color:var(--accent-ink);visibility:hidden}
+.sel-opt[aria-selected="true"]{font-weight:650}
+.sel-opt[aria-selected="true"] svg{visibility:visible}
+.sel-opt.on{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.sel-opt[aria-disabled="true"]{opacity:.45;cursor:default}
+.sel-grp{padding:8px 12px 4px;font-size:12px;font-weight:600;color:var(--muted)}
+@keyframes sel-in{from{opacity:0;transform:translateY(-4px) scale(.985)}}
+@keyframes sel-up{from{opacity:0;transform:translateY(4px) scale(.985)}}
+@media (prefers-reduced-motion: reduce){.sel-pop{animation:none}.sel-btn svg{transition:none}}

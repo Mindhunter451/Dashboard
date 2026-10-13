@@ -1,6 +1,6 @@
 /* Layout: Oben ein Himmel über die ganze Breite, gefärbt nach dem echten Sonnenstand, mit großer Uhr, Seiten-Tabs und
    dem Sonnenbogen des Tages. Darunter eine ruhige Leiste mit Countdowns und das Raster aus Widgets (Masonry, Spaltenzahl
-   per JS). Mobil einspaltig. Schriften: Bricolage Grotesque für Uhr und Überschriften, Figtree für Text, Literata für Verse. */
+   per JS). Mobil einspaltig. Schriften: Bricolage Grotesque für Uhr und Überschriften, Figtree für Text. */
 :root{
   --bg:#E8EDF2;
   --surface:#FFFFFF;
@@ -23,7 +23,6 @@
   --f-display:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-data:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-serif:"Literata", Georgia, "Times New Roman", serif;
   /* Ecken: --r kommt aus Anpassen (4 bis 28 px), innere Flächen runden etwas weniger */
   --r:18px;
   --r2:clamp(4px,calc(var(--r) * .66),16px);
@@ -132,13 +131,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* Platzhalter beim Laden: graue Zeilen mit einem Schimmer, statt „wird geladen“ */
 .sk-row{display:grid;grid-template-columns:2.6em minmax(0,1fr) 2.4em;gap:12px;align-items:center;padding:9px 0;list-style:none}
 .sk-row span{display:flex;flex-direction:column;gap:7px}
-.sk-row i,.sk-lines i,.is-loading::before{display:block;border-radius:6px;background:linear-gradient(100deg,var(--raise) 30%,color-mix(in srgb,var(--raise) 35%,var(--surface)) 50%,var(--raise) 70%) 0 0/300% 100%;animation:skel 1.5s ease-in-out infinite}
+.sk-row i,.is-loading::before{display:block;border-radius:6px;background:linear-gradient(100deg,var(--raise) 30%,color-mix(in srgb,var(--raise) 35%,var(--surface)) 50%,var(--raise) 70%) 0 0/300% 100%;animation:skel 1.5s ease-in-out infinite}
 .sk-row i{height:11px}
 .sk-row .sk-a{height:2.1em;border-radius:8px}
 .sk-row .sk-b{height:1.3em}
 .sk-row i.s{height:9px;opacity:.7}
-.sk-lines{display:flex;flex-direction:column;gap:12px;padding:4px 0}
-.sk-lines i{height:15px;width:100%}
 .is-loading{background:none!important;border:0!important;padding:0!important}
 .is-loading>*{display:none!important}
 .is-loading::before{content:"";height:var(--sk-h,118px);border-radius:0;
@@ -146,7 +143,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   mask:linear-gradient(#000 0 0) 0 0/100% 34px no-repeat,repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 25px) 0 50px/100% 100% no-repeat}
 .sk-list{list-style:none;margin:0;padding:0}
 @keyframes skel{from{background-position:100% 0}to{background-position:0 0}}
-@media (prefers-reduced-motion: reduce){.sk-row i,.sk-lines i,.is-loading::before{animation:none}.icon-btn.spin svg{animation-duration:3s}}
+@media (prefers-reduced-motion: reduce){.sk-row i,.is-loading::before{animation:none}.icon-btn.spin svg{animation-duration:3s}}
 
 /* Einrichten-Hinweis in einer Karte: kompakt, eine Zeile Text und ein Knopf */
 .setup{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 14px;padding:12px 12px 12px 14px;border-radius:var(--r2);background:var(--raise);border:1px dashed color-mix(in srgb,var(--muted) 38%,transparent)}
@@ -165,7 +162,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .check-row input{width:17px;height:17px;margin:0;flex:0 0 auto;accent-color:var(--accent-ink)}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
 .field label,.lbl{font-size:12px;font-weight:600;color:var(--muted)}
-.field input,.field select,.searchrow input{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
+.field input,.field select,.field .sel-btn,.searchrow input{font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0}
 .days{display:flex;flex-wrap:wrap;gap:6px;border:0;padding:0;margin:0;min-width:0}
 .days legend{padding:0;margin-bottom:6px}
 .days label{position:relative}

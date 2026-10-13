@@ -1,6 +1,6 @@
 # Jeres Tagescockpit
 
-Persönliches Dashboard mit eigenen Seiten, zum Beispiel Heute, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Ganz vorn steht „Jetzt wichtig“ mit dem, was gerade zählt. Drin sind außerdem Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar und amtlichen Warnungen, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, iCloud-Kalender, Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Vers des Tages, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu ein schwarzer Spiegel-Modus für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
+Persönliches Dashboard mit eigenen Seiten, zum Beispiel Heute, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Ganz vorn steht „Jetzt wichtig“ mit dem, was gerade zählt. Drin sind außerdem Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar und amtlichen Warnungen, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, iCloud-Kalender, Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu ein schwarzer Spiegel-Modus für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
 
 Live: https://mindhunter451.github.io/Dashboard/
 
@@ -16,7 +16,7 @@ Seiten mit **Nach Tageszeit ordnen** (Schalter beim Bearbeiten) stellen morgens 
 **Seiten**: Startseite, Bearbeiten, **Seiten neu ordnen** (daraus werden Heute, Arbeit, Privat, Fokus und Sport, vorher mit Vorschau, eigene Seiten bleiben, die alten lassen sich zurückholen), Kacheln oben, Countdowns und Bundesland.
 **Geräte**: Sync, Als App und Spiegel-Modus. **Daten**: Sicherung als Datei, Zwischenstände und Zurücksetzen.
 **Suchen** oder Strg+K (am Mac Cmd+K) öffnet die Schnellsuche: Seiten, Widgets, Aktionen und Einstellungen finden und mit Enter ausführen, zum Beispiel „privat“, „dunkel“, „lagune“ oder „countdown“.
-**Spiegel** (oder die Taste S) zeigt Uhr, Wetter, Warnungen, Termine, Abfahrten, Geburtstage, Müllabfuhr, Countdowns und den Vers auf Schwarz, im Vollbild. Mit `…/Dashboard/#spiegel` startet die Seite direkt so, praktisch für einen Kiosk-Browser am Smart Mirror. Raus geht es mit Esc.
+**Spiegel** (oder die Taste S) zeigt Uhr, Wetter, Warnungen, Termine, Abfahrten, Geburtstage, Müllabfuhr und Countdowns auf Schwarz, im Vollbild. Mit `…/Dashboard/#spiegel` startet die Seite direkt so, praktisch für einen Kiosk-Browser am Smart Mirror. Raus geht es mit Esc.
 
 ## Als App installieren
 
@@ -89,6 +89,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**2.9** (Oktober 2026)
+Fixes nach dem ersten Feedback zum neuen Look. Notizen verlieren beim automatischen Speichern nicht mehr den Fokus, das Raster hängt Karten nur noch um, wenn sich die Reihenfolge wirklich ändert, und gibt den Fokus samt Cursor sonst zurück. Auswahlfelder bekommen am Rechner eine eigene Liste im Glas-Look mit Tastatur, Tippen zum Springen und Haken am gewählten Eintrag, am Handy bleibt die native Auswahl. Alle laufenden Fortschrittsbalken nutzen die Akzentfarbe, der Arbeitstag leuchtet zusätzlich. Pendeln fragt TomTom bei einem Wackler ein zweites Mal, behält bis zu 15 Minuten die letzte gute Live-Fahrzeit und nennt sonst den echten Grund (Key abgelehnt, Kontingent aufgebraucht, nicht erreichbar). Neu ist „Key testen“ in den Einstellungen. Der Vers des Tages ist raus, samt Spiegel, Zwischenspeicher und der Schrift Literata.
 
 **2.8** (Oktober 2026)
 Neuer Look: Der dunkle Modus ist jetzt Graphit, fast schwarz mit einem Hauch Wärme statt Nachtblau, die Karten heben sich durch feine Linien statt Schatten ab. Wahlweise echtes Schwarz für OLED-Bildschirme und den Spiegel. Nachts wird auch der Himmel oben im dunklen Modus neutraler, in Schwarz fast schwarz mit Sternen. Akzentfarben: 10 Töne, eine eigene Farbe, 6 Verläufe und „Mit dem Tag“, alles in OKLCH für Hell und Dunkel abgeleitet. Neues Anpassen-Fenster aus Glas mit vier Bereichen, Design-Vorschau, Farbkreisen, Schaltern statt Häkchen, Regler für die Ecken und Abständen in drei Stufen, auf dem Handy als Blatt von unten. Die Seiten-Tabs haben eine gleitende Pille. Neu ist die Schnellsuche mit Strg+K. Mit Sync gibt es keine Erinnerung ans Sichern mehr, dafür jeden Tag einen Zwischenstand zum Zurückholen.

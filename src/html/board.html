@@ -36,6 +36,7 @@
         <summary>Live-Fahrzeit mit Stadtverkehr (optional)</summary>
         <p class="hint" style="margin-top:8px">Ohne Key rechnet das Dashboard mit normaler Fahrzeit plus gemeldeten Staus auf der Autobahn. Mit einem kostenlosen Key von developer.tomtom.com kommt die echte Live-Fahrzeit dazu, inklusive Stau in der Stadt. Der Key bleibt nur in diesem Browser.</p>
         <div class="field" style="margin-top:8px"><label for="cm-key">TomTom API-Key</label><input id="cm-key" type="password" maxlength="80" autocomplete="off" spellcheck="false"></div>
+        <div class="tt-test"><button type="button" class="btn-ghost" id="cm-key-test">Key testen</button><span class="tt-res" id="cm-key-res" role="status"></span></div>
       </details>
       <p class="err" id="cm-err" hidden></p>
       <div class="form-row">
@@ -374,21 +375,6 @@
       <button type="button" class="btn-ghost" id="ca-more" hidden></button>
     </div>
     <p class="src ca-src" id="ca-src"></p>
-  </section>
-
-  <!-- Vers des Tages -->
-  <section class="card" id="verse" data-type="verse" aria-labelledby="vs-h">
-    <div class="card-head">
-      <h2 id="vs-h"><span data-r="title">Vers des Tages</span></h2>
-      <div class="actions">
-        <button type="button" class="icon-btn" id="vs-back" hidden aria-label="Zurück zum Vers von heute" title="Zurück zu heute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 13.5L4.5 9 9 4.5"/><path d="M4.5 9H14a5.5 5.5 0 0 1 0 11h-3"/></svg></button>
-        <button type="button" class="icon-btn" id="vs-more" aria-label="Noch ein Vers" title="Noch einer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.1" fill="currentColor"/><circle cx="15" cy="9" r="1.1" fill="currentColor"/><circle cx="12" cy="12" r="1.1" fill="currentColor"/><circle cx="9" cy="15" r="1.1" fill="currentColor"/><circle cx="15" cy="15" r="1.1" fill="currentColor"/></svg></button>
-      </div>
-    </div>
-    <figure class="vs">
-      <blockquote class="vs-text" id="vs-text"><span class="sk-lines" role="img" aria-label="Vers wird geladen"><i></i><i></i><i style="width:58%"></i></span></blockquote>
-      <figcaption class="vs-cap"><a id="vs-ref" target="_blank" rel="noopener" hidden></a><span id="vs-tr"></span></figcaption>
-    </figure>
   </section>
 
   <!-- Geburtstage -->
