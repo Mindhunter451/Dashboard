@@ -18,15 +18,19 @@ const TILE_ON = { fa: true, we: true, ft: true, ur: true, cal: false, sun: false
 /* Kopf: Stil der Uhr samt Standard-Schriftstärke */
 const HEAD_STYLES = { classic: ['Klassisch', 220], giant: ['Riesig', 200], compact: ['Kompakt', 330], center: ['Zentriert', 240] };
 /* Spiegel: Bausteine und Bereiche */
-const MB = { clock: 'Uhr und Datum', notes: 'Hinweise', wx: 'Wetter', cm: 'Pendeln', cal: 'Termine', dep: 'Abfahrten', cd: 'Kacheln und Countdowns' };
-const MB_SUB = { notes: 'Warnungen, Geburtstage, Müllabfuhr', cm: 'Fahrzeit zur Arbeit oder nach Hause', cal: 'Heute und morgen', dep: 'Deine erste Haltestelle', cd: 'Wie oben, in derselben Reihenfolge' };
+const MB = { clock: 'Uhr und Datum', now: 'Jetzt wichtig', eve: 'Morgen-Vorschau', notes: 'Hinweise', wx: 'Wetter', cm: 'Pendeln', cal: 'Termine', dep: 'Abfahrten', lines: 'Kurzzeilen', cd: 'Kacheln und Countdowns', rot: 'Wechselplatz' };
+const MB_SUB = { now: 'Das Dringendste, morgens anders als abends', notes: 'Warnungen, Geburtstage, Müllabfuhr', wx: 'Jetzt und die nächsten Stunden', cm: 'Fahrzeit, Ankunft und was bremst', eve: 'Ab abends: was morgen ansteht', cal: 'Heute und morgen', lines: 'Feste Zeilen aus deinen Widgets', dep: 'Deine erste Haltestelle', cd: 'Wie oben, in derselben Reihenfolge', rot: 'Blättert alle 15 Sekunden weiter' };
 const MZ = { top: 'Oben Mitte', tl: 'Oben links', tr: 'Oben rechts', mid: 'Mitte', bl: 'Unten links', br: 'Unten rechts', bottom: 'Unten Mitte' };
 const M_PRESETS = {
-  classic: { name: 'Klassisch', blocks: [['clock', 'tl', 1], ['notes', 'tl', 1], ['wx', 'tr', 1], ['cm', 'tr', 0], ['cal', 'bl', 1], ['dep', 'br', 1], ['cd', 'br', 1]] },
-  center: { name: 'Zentriert', blocks: [['clock', 'top', 1], ['wx', 'top', 1], ['notes', 'top', 1], ['cal', 'bl', 1], ['dep', 'br', 1], ['cm', 'br', 0], ['cd', 'bottom', 1]] },
-  calm: { name: 'Ruhig', blocks: [['clock', 'mid', 1], ['wx', 'mid', 1], ['notes', 'mid', 1], ['cal', 'bl', 0], ['dep', 'br', 0], ['cm', 'br', 0], ['cd', 'bottom', 0]] }
+  classic: { name: 'Klassisch', blocks: [['clock', 'tl', 1], ['now', 'tl', 1], ['eve', 'tl', 1], ['notes', 'tl', 0], ['wx', 'tr', 1], ['cm', 'tr', 1], ['cal', 'bl', 1], ['dep', 'br', 1], ['lines', 'br', 1], ['cd', 'br', 0], ['rot', 'bottom', 1]] },
+  center: { name: 'Zentriert', blocks: [['clock', 'top', 1], ['wx', 'top', 1], ['now', 'top', 1], ['notes', 'top', 0], ['cal', 'bl', 1], ['lines', 'bl', 1], ['dep', 'br', 1], ['cm', 'br', 1], ['eve', 'br', 1], ['cd', 'bottom', 0], ['rot', 'bottom', 1]] },
+  calm: { name: 'Ruhig', blocks: [['clock', 'mid', 1], ['wx', 'mid', 1], ['now', 'mid', 1], ['notes', 'mid', 0], ['eve', 'mid', 1], ['cal', 'bl', 0], ['lines', 'bl', 0], ['dep', 'br', 0], ['cm', 'br', 0], ['cd', 'bottom', 0], ['rot', 'bottom', 1]] }
 };
 const mPresetBlocks = k => M_PRESETS[k].blocks.map(([b, z, on]) => ({ k: b, z, on: !!on }));
+/* Widgets, die im Spiegel als Kurzzeile taugen, und wie sie ohne eigene Wahl starten. Pomodoro und Schnellzugriff sind nur Knöpfe. */
+const ML_TYPES = ['tasks', 'progress', 'vacation', 'learn', 'habits', 'football', 'f1', 'fuel', 'notes'];
+const ML_DEF = { tasks: 'fix', progress: 'fix', vacation: 'fix', learn: 'rot', habits: 'rot', football: 'rot', f1: 'rot', fuel: 'rot', notes: 'off' };
+const ML_MODES = { off: 'Aus', fix: 'Fest', rot: 'Wechsel' };
 const SIZES = { s: 320, m: 380, l: 470 };
 const DENSITY = { tight: 'Dicht', normal: 'Normal', airy: 'Luftig' };
 
@@ -92,7 +96,7 @@ const DEF_UI = () => ({
   seconds: true, region: 'HH', sky: true,
   tiles: { ...TILE_ON }, countdowns: [], order: Object.keys(TILES),
   head: { style: 'classic', size: 100, weight: 220, date: true, kw: true, greet: true },
-  mirror: { preset: 'classic', blocks: mPresetBlocks('classic'), size: 100, secs: false, shift: true, dim: { on: false, from: '22:00', to: '06:00', lvl: 40 } },
+  mirror: { v: 2, preset: 'classic', blocks: mPresetBlocks('classic'), lines: null, wxh: true, eve: '20:00', size: 100, secs: false, shift: true, dim: { on: false, from: '22:00', to: '06:00', lvl: 40 } },
   start: { mode: 'last', page: '', work: '', free: '' }
 });
 /* Ausgangslage im alten Format (Version 1). Neue Nutzer laufen durch denselben Umzug wie alte Daten. */
@@ -324,21 +328,48 @@ function normHead(h) {
     date: h.date !== false, kw: h.kw !== false, greet: h.greet !== false
   };
 }
+/* Spiegel. v 2 gibt es seit 3.1 (Jetzt wichtig, Kurzzeilen, Wechselplatz, Morgen-Vorschau).
+ * lines: null heißt „wie vorgeschlagen“ (siehe mLines), sonst [{ w: Widget-ID, m: off, fix oder rot }] in deiner Reihenfolge. */
 function normMirror(m) {
   m = m && typeof m === 'object' ? m : {};
-  const blocks = [], seen = new Set();
+  let blocks = [];
+  const seen = new Set();
   for (const b of Array.isArray(m.blocks) ? m.blocks : []) {
     if (!b || !MB[b.k] || seen.has(b.k)) continue;
     seen.add(b.k);
     blocks.push({ k: b.k, z: MZ[b.z] ? b.z : 'tl', on: b.on !== false });
   }
-  // Ganz neu: Aufteilung „Klassisch“. Neue Bausteine aus späteren Versionen kommen ausgeschaltet dazu.
-  const fresh = !blocks.length;
-  for (const b of mPresetBlocks('classic')) if (!seen.has(b.k)) blocks.push({ ...b, on: fresh && b.on });
+  const fresh = !blocks.length, up = !fresh && m.v !== 2;
+  const preset = M_PRESETS[m.preset] ? m.preset : fresh ? 'classic' : '';
+  // Ganz neu oder eine unveränderte Vorlage aus 3.0: die Vorlage in ihrer neuen Fassung
+  if (fresh || (up && preset)) blocks = mPresetBlocks(preset);
+  else {
+    // Eigene Aufteilung: Fehlendes kommt hinter seinen Vorgänger aus „Klassisch“, „Jetzt wichtig“ vor die Hinweise.
+    // Beim Umstieg auf 3.1 gleich eingeschaltet, Bausteine aus späteren Versionen ausgeschaltet.
+    const cl = mPresetBlocks('classic');
+    cl.forEach((b, i) => {
+      if (seen.has(b.k)) return;
+      const nb = { ...b, on: up && b.on }, notes = blocks.findIndex(y => y.k === 'notes');
+      if (b.k === 'now' && notes >= 0) { blocks.splice(notes, 0, { ...nb, z: blocks[notes].z }); return; }
+      // Hinter den Vorgänger und in seinen Bereich, denn in einer eigenen Aufteilung kann der Bereich aus „Klassisch“ leer sein
+      const prev = cl.slice(0, i).reverse().find(x => blocks.some(y => y.k === x.k)), at = prev ? blocks.findIndex(y => y.k === prev.k) : -1;
+      blocks.splice(at >= 0 ? at + 1 : blocks.length, 0, at >= 0 ? { ...nb, z: blocks[at].z } : nb);
+    });
+  }
+  const lines = [], seenW = new Set();
+  for (const x of Array.isArray(m.lines) ? m.lines : []) {
+    if (!x || typeof x.w !== 'string' || !/^[a-z][a-z0-9-]{0,39}$/.test(x.w) || !ML_MODES[x.m] || seenW.has(x.w)) continue;
+    seenW.add(x.w);
+    lines.push({ w: x.w, m: x.m });
+  }
   const d = m.dim && typeof m.dim === 'object' ? m.dim : {};
   return {
-    preset: M_PRESETS[m.preset] ? m.preset : fresh ? 'classic' : '',
+    v: 2,
+    preset,
     blocks,
+    lines: Array.isArray(m.lines) ? lines.slice(0, 40) : null,
+    wxh: m.wxh !== false,
+    eve: validHm(m.eve) && m.eve >= '12:00' ? m.eve : '20:00',
     size: Number.isFinite(+m.size) ? Math.round(okClamp(+m.size, 70, 140) / 5) * 5 : 100,
     secs: !!m.secs,
     shift: m.shift !== false,

@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '3.0';
+const VERSION = '3.1';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -57,7 +57,8 @@ const NEWS = {
   '2.7': ['Neu: Sync zwischen Geräten. Mit einem eigenen Cloudflare Worker bleiben Handy, Mac und Spiegel auf demselben Stand. Soll ich dir zeigen, wie du ihn einrichtest?', () => openDrawer('data'), 'Zeigen'],
   '2.8': ['Neuer Look: Dunkel in Graphit oder Schwarz, mehr Akzentfarben mit Verläufen, ein neues Anpassen-Fenster und die Schnellsuche mit Strg+K.', () => openDrawer('look'), 'Ansehen'],
   '2.9': ['Feinschliff: Notizen lassen dich jetzt durchschreiben, Auswahllisten passen zum Look, alle laufenden Balken leuchten in deiner Farbe und Pendeln sagt genauer, was mit TomTom los ist. Der Vers des Tages ist raus.', null],
-  '3.0': ['Neu: Stile für die Uhr, Kacheln zum Sortieren, ein Spiegel zum Einrichten mit Vorschau, kompaktes Wetter und Pendeln und eine Galerie mit Registern. Soll ich dir den neuen Kopf zeigen?', () => openDrawer('head'), 'Zeigen']
+  '3.0': ['Neu: Stile für die Uhr, Kacheln zum Sortieren, ein Spiegel zum Einrichten mit Vorschau, kompaktes Wetter und Pendeln und eine Galerie mit Registern. Soll ich dir den neuen Kopf zeigen?', () => openDrawer('head'), 'Zeigen'],
+  '3.1': ['Der Spiegel zeigt jetzt viel mehr: deine Widgets als Kurzzeilen, einen Wechselplatz, „Jetzt wichtig“, Stunden im Wetter, die Ankunft beim Pendeln und abends die Morgen-Vorschau. Soll ich ihn dir zeigen?', () => openDrawer('mirror'), 'Zeigen']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
 function announceNew() {

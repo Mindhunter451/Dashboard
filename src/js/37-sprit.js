@@ -72,6 +72,7 @@ async function fuLoad(manual) {
   } finally {
     fu.busy = false;
     renderFuel();
+    mirrorDirty();
   }
 }
 /* Tankstellen für die gewählte Sorte, bei der Strecke nur die, die höchstens 1,5 km daneben liegen */

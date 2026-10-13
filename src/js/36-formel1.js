@@ -40,7 +40,7 @@ function f1Load(force) {
       f1.at = Date.now();
       f1.err = null;
     } catch (e) { f1.err = e || new Error('Fehler'); }
-    finally { f1.busy = null; f1.tried = Date.now(); renderF1(); f1Plan(); }
+    finally { f1.busy = null; f1.tried = Date.now(); renderF1(); f1Plan(); mirrorDirty(); }
   })();
   return f1.busy;
 }

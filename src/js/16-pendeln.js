@@ -258,8 +258,9 @@ function renderCommute() {
   $('#cm-dl').innerHTML = dl.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
   $('#cm-route').textContent = `${R.from.label || R.from.text} → ${R.to.label || R.to.text}`;
   const closures = items.filter(i => i.k === 'closure').length, works = items.filter(i => i.k === 'works').length;
-  // Kurzfassung für „Jetzt wichtig“
-  cm.sum = { dir: R.dir, mins: rmins, delay, closures, live: !!tt, at: R.at };
+  // Kurzfassung für „Jetzt wichtig“ und den Spiegel, top: was am meisten bremst
+  const top = items.find(i => i.k !== 'works');
+  cm.sum = { dir: R.dir, mins: rmins, delay, closures, live: !!tt, at: R.at, top: top ? { road: top.road || '', title: top.title || top.label || '', along: top.along } : null };
   nowDirty();
   let v, lv;
   if (closures) { v = `Achtung, ${closures === 1 ? 'eine Sperrung' : closures + ' Sperrungen'} auf deiner Strecke.`; lv = 'bad'; }

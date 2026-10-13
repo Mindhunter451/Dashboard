@@ -68,6 +68,13 @@
 .sort-row.sort-drag .sort-h{cursor:grabbing}
 .time-pair{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
 .time-pair .dr-in{width:auto}
+.dr-line .dr-time{width:auto;flex:0 0 auto}
+/* Widgets im Spiegel: Name links, Aus, Fest oder Wechsel rechts. Schmal rutscht die Wahl unter den Namen. */
+.ml-row{flex-wrap:wrap;row-gap:4px}
+.ml-row .dr-lt{flex:1 1 150px}
+.ml-row .seg{margin-left:auto;flex:0 0 auto}
+.drawer .ml-row .seg button{padding:5px 9px;font-size:12.5px}
+.ml-empty{padding:14px 4px;color:var(--muted);font-size:13px;line-height:1.45}
 
 .dr-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 16px calc(28px + env(safe-area-inset-bottom,0px));scrollbar-width:thin}
 .dr-pane{animation:pane-in .28s var(--ease)}
