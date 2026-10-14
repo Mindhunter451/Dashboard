@@ -50,7 +50,7 @@ const TYPES = {
   football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
   f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
   fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
-  cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus dem iCloud-Kalender, nach Tagen sortiert, mit Farbe pro Kalender.' },
+  cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus iCloud, Google, Outlook oder jedem Kalender mit ICS-Link, nach Tagen sortiert, mit Farbe pro Kalender.' },
   dep:      { name: 'Abfahrten', multi: true, w: 1, cat: 'go', since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
   bday:     { name: 'Geburtstage', multi: false, w: 1, cat: 'plan', since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
   waste:    { name: 'Müllabfuhr', multi: false, w: 1, cat: 'day', since: '2.4', desc: 'Welche Tonne wann rausmuss, mit Erinnerung am Vorabend. Termine aus der Datei deines Entsorgers oder als eigener Rhythmus.' }

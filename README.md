@@ -1,6 +1,6 @@
 # Jeres Tagescockpit
 
-Persönliches Dashboard mit eigenen Seiten, zum Beispiel Heute, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Ganz vorn steht „Jetzt wichtig“ mit dem, was gerade zählt. Drin sind außerdem Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar und amtlichen Warnungen, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, iCloud-Kalender, Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu ein schwarzer Spiegel-Modus für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
+Persönliches Dashboard mit eigenen Seiten, zum Beispiel Heute, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Ganz vorn steht „Jetzt wichtig“ mit dem, was gerade zählt. Drin sind außerdem Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar und amtlichen Warnungen, Pendeln mit Staus und Baustellen, Todoist-Aufgaben, Kalender (iCloud, Google, Outlook und alles mit ICS-Link), Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu ein schwarzer Spiegel-Modus für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
 
 Live: https://mindhunter451.github.io/Dashboard/
 
@@ -34,11 +34,11 @@ Dazu hebt jedes Gerät einmal am Tag einen **Zwischenstand** auf (`jere-cockpit-
 
 ## Kalender einrichten
 
-Der Kalender liest öffentlich geteilte iCloud-Kalender. Apple schickt dabei keine CORS-Freigabe, ein Browser darf den Link also nicht direkt von einer Webseite laden. Dafür gibt es eine kleine Weiterleitung als Cloudflare Worker, kostenlos und in ein paar Minuten angelegt:
+Der Kalender liest jeden Kalender mit ICS-Link: iCloud, Google, Outlook, Proton und alles andere mit einer .ics-Datei oder webcal://. Die meisten Anbieter schicken keine CORS-Freigabe, ein Browser darf den Link also nicht direkt von einer Webseite laden. Dafür gibt es eine kleine Weiterleitung als Cloudflare Worker, kostenlos und in ein paar Minuten angelegt:
 
-1. Auf dem iPhone in der Kalender-App unten auf „Kalender“, beim gewünschten Kalender auf (i), „Öffentlicher Kalender“ einschalten und den Link kopieren. Jeder mit diesem Link kann den Kalender lesen.
-2. Auf dash.cloudflare.com unter „Workers & Pages“ einen Worker mit der Vorlage „Hello World“ anlegen, den Code durch `tools/kalender-worker.js` ersetzen und auf „Deploy“ klicken. Der Worker lässt nur iCloud-Adressen durch.
-3. Im Cockpit im Kalender-Widget auf „Einrichten“, die Adresse des Workers und den Kalender-Link eintragen.
+1. Den ICS-Link holen. iCloud: auf dem iPhone in der Kalender-App unten auf „Kalender“, beim Kalender auf (i), „Öffentlicher Kalender“ einschalten und den Link kopieren. Google: am Computer in den Einstellungen des Kalenders unter „Kalender integrieren“ die „Privatadresse im iCal-Format“. Outlook: Einstellungen, Kalender, „Freigegebene Kalender“, „Kalender veröffentlichen“ und den ICS-Link nehmen. Jeder mit so einem Link kann den Kalender lesen.
+2. Auf dash.cloudflare.com unter „Workers & Pages“ einen Worker mit der Vorlage „Hello World“ anlegen, den Code durch den Code aus dem Einrichten-Formular ersetzen und auf „Deploy“ klicken. Der Code dort enthält die bekannten Anbieter und zusätzlich die Adressen deiner eigenen Kalender, die Grundfassung liegt unter `tools/kalender-worker.js`. Der Worker lässt nur diese Adressen durch und gibt nur Kalender zurück, keine Webseiten.
+3. Im Cockpit im Kalender-Widget auf „Einrichten“, die Adresse des Workers und den Kalender-Link eintragen. Das Formular prüft die Weiterleitung und sagt, wenn ein Anbieter noch fehlt und der Code neu eingefügt werden muss.
 
 Die Termine samt Wiederholungen, Ausnahmen und Zeitzonen liest [ical.js](https://github.com/kewisch/ical.js) (MPL 2.0), das erst nachgeladen wird, wenn ein Kalender eingetragen ist.
 
@@ -92,6 +92,9 @@ node build.mjs
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**3.2** (Oktober 2026)
+Der Kalender kann jetzt mehr als iCloud: Google, Outlook, Proton und jeder andere Kalender mit ICS-Link. Der Code für die Weiterleitung wird im Einrichten-Formular passend zu deinen Kalendern erzeugt und lässt weiterhin nur bekannte Adressen und nur Kalender durch. Das Formular prüft die eingetragene Weiterleitung und sagt, ob sie alle Kalender durchlässt. Dazu eine Anleitung pro Anbieter, Outlooks HTML-Link wird automatisch zum ICS-Link und Googles Link zum Anschauen wird erkannt. Ohne eigenen Namen übernimmt ein Kalender seinen Namen aus der Datei. Ganztägige Termine aus Outlook werden auch dann richtig erkannt, wenn sie als 0 bis 0 Uhr kommen.
 
 **3.1** (Oktober 2026)
 Der Spiegel zeigt viel mehr. Fast alle Widgets lassen sich als Kurzzeile hineinholen, fest oder im neuen Wechselplatz, der alle 15 Sekunden weiterblättert. Neu sind die Bausteine „Jetzt wichtig“ (das Dringendste, ohne Doppeltes), Kurzzeilen, Wechselplatz und die Morgen-Vorschau, die abends zusätzlich zeigt, was morgen ansteht. Das Wetter zeigt vier Zeitpunkte für die nächsten Stunden, Pendeln die Ankunftszeit und was gerade bremst. Pendeln ist in den Vorlagen jetzt eingeschaltet. Fußball, Formel 1 und Spritpreise laden für den Spiegel auch dann, wenn ihre Seite gerade nicht offen ist.

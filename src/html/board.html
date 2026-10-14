@@ -341,24 +341,31 @@
       </div>
     </div>
     <div class="setup" id="ca-setup" hidden>
-      <h3>iCloud-Kalender verbinden</h3>
-      <p>Deine nächsten Termine aus einem geteilten iCloud-Kalender.</p>
+      <h3>Kalender verbinden</h3>
+      <p>Deine nächsten Termine aus iCloud, Google, Outlook oder jedem Kalender mit ICS-Link.</p>
       <div class="form-row"><button type="button" class="btn" id="ca-setup-btn">Einrichten</button></div>
     </div>
     <form class="panel ca-form" id="ca-form" hidden novalidate>
       <h3>Kalender einrichten</h3>
       <ol class="ca-steps">
-        <li><b>Kalender teilen.</b> Auf dem iPhone in der Kalender-App unten auf „Kalender“, beim gewünschten Kalender auf das (i), „Öffentlicher Kalender“ einschalten, „Link teilen“ und kopieren. Auf icloud.com geht es über das Teilen-Symbol neben dem Kalender. Jeder mit diesem Link kann den Kalender lesen, gib ihn also nicht weiter.</li>
-        <li><b>Weiterleitung anlegen.</b> Apple lässt Webseiten den Kalender nicht direkt abrufen. Leg dir auf dash.cloudflare.com ein kostenloses Konto an, dann unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“. Ersetz dort den Code durch den Code unten, klick auf „Deploy“ und trag die Adresse des Workers hier ein.
-          <details class="ca-code"><summary>Code für den Worker zeigen</summary><pre id="ca-code"></pre><button type="button" class="btn-ghost" id="ca-copy">Code kopieren</button></details>
+        <li><b>Link holen.</b> Du brauchst den ICS-Link deines Kalenders. Jeder mit diesem Link kann den Kalender lesen, gib ihn also nicht weiter.
+          <div class="seg sm ca-prov" role="group" aria-label="Anbieter" id="ca-prov"><button type="button" data-prov="icloud" aria-pressed="true">iCloud</button><button type="button" data-prov="google" aria-pressed="false">Google</button><button type="button" data-prov="outlook" aria-pressed="false">Outlook</button><button type="button" data-prov="other" aria-pressed="false">Andere</button></div>
+          <p class="ca-how" data-how="icloud">Auf dem iPhone in der Kalender-App unten auf „Kalender“, beim gewünschten Kalender auf das (i), „Öffentlicher Kalender“ einschalten, „Link teilen“ und kopieren. Auf icloud.com geht es über das Teilen-Symbol neben dem Kalender.</p>
+          <p class="ca-how" data-how="google" hidden>Am Computer auf calendar.google.com links beim Kalender auf die drei Punkte und „Einstellungen und Freigabe“. Ganz unten unter „Kalender integrieren“ die „Privatadresse im iCal-Format“ kopieren. In der Google-App am Handy gibt es die nicht.</p>
+          <p class="ca-how" data-how="outlook" hidden>Auf outlook.com oder in Outlook im Web unter Einstellungen, Kalender, „Freigegebene Kalender“. Bei „Kalender veröffentlichen“ den Kalender und „Kann alle Details anzeigen“ wählen, auf „Veröffentlichen“ klicken und den ICS-Link kopieren. Bei Firmenkonten kann die IT das abschalten.</p>
+          <p class="ca-how" data-how="other" hidden>Jeder Link auf eine .ics-Datei oder mit webcal:// geht, zum Beispiel von Proton, Fastmail, Nextcloud, Ferienkalendern oder Spielplänen. Neue Adressen kommen automatisch in den Code für die Weiterleitung.</p>
         </li>
-        <li><b>Link eintragen.</b> Du kannst mehrere Kalender hinzufügen, jeder bekommt eine eigene Farbe.</li>
+        <li><b>Weiterleitung anlegen.</b> Die meisten Anbieter lassen Webseiten den Kalender nicht direkt abrufen. Leg dir auf dash.cloudflare.com ein kostenloses Konto an, dann unter „Workers &amp; Pages“ einen neuen Worker mit der Vorlage „Hello World“. Ersetz dort den Code durch den Code unten, klick auf „Deploy“ und trag die Adresse des Workers hier ein. Hast du schon einen, öffne ihn, klick auf „Edit code“, ersetz den Code und klick auf „Deploy“.
+          <details class="ca-code" id="ca-codebox"><summary>Code für den Worker zeigen</summary><pre id="ca-code"></pre><button type="button" class="btn-ghost" id="ca-copy">Code kopieren</button></details>
+        </li>
+        <li><b>Link eintragen.</b> Bis zu sechs Kalender, jeder mit eigener Farbe. Lässt du den Namen leer, nimmt das Cockpit den Namen aus dem Kalender.</li>
       </ol>
       <div class="field"><label for="ca-proxy">Adresse der Weiterleitung</label><input id="ca-proxy" type="url" maxlength="200" autocomplete="off" spellcheck="false" placeholder="https://kalender.dein-name.workers.dev"></div>
+      <p class="ca-pstat" id="ca-pstat" role="status" hidden></p>
       <ul class="ca-feeds" id="ca-feeds" hidden></ul>
       <div class="grid2 ca-addrow">
         <div class="field"><label for="ca-name">Name</label><input id="ca-name" type="text" maxlength="30" autocomplete="off" placeholder="z. B. Privat"></div>
-        <div class="field"><label for="ca-url">Kalender-Link</label><input id="ca-url" type="url" maxlength="400" autocomplete="off" spellcheck="false" placeholder="webcal://p…-caldav.icloud.com/published/2/…"></div>
+        <div class="field"><label for="ca-url">Kalender-Link</label><input id="ca-url" type="url" maxlength="400" autocomplete="off" spellcheck="false" placeholder="webcal://… oder https://….ics"></div>
       </div>
       <div class="form-row"><button type="button" class="btn-ghost" id="ca-add">+ Kalender</button></div>
       <div class="grid2">
