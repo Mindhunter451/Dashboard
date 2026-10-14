@@ -306,7 +306,7 @@ function capHint(tg, short) {
 function capNote(id, text, pre) {
   const w = state.widgets[id];
   if (!w) return false;
-  const old = w.cfg.text, next = `${old.replace(/\s+$/, '')}${old.trim() ? '\n' : ''}${text}`.slice(0, 8000);
+  const old = w.cfg.text, next = `${old.replace(/\s+$/, '')}${old.trim() ? '\n' : ''}${text}`.slice(0, NOTE_MAX);
   w.cfg.text = next;
   commit();
   toast(`${pre}Steht jetzt in „${widgetTitle(id)}“`, () => { const x = state.widgets[id]; if (x && x.cfg.text === next) { x.cfg.text = old; commit(); } });

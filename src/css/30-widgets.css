@@ -224,6 +224,49 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 /* Notizen und Schnellzugriff */
 .notes{display:block;width:100%;min-height:150px;max-height:560px;resize:vertical;font:inherit;font-size:15px;line-height:1.55;color:var(--ink);background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .notes::placeholder{color:var(--muted)}
+/* Markdown-Editor der Notizen (CodeMirror). Doppelte Klassen, weil CodeMirror seine Grundregeln erst später einhängt. */
+.notes-md{padding:0;resize:none;display:flex;flex-direction:column;overflow:hidden;max-height:none}
+.notes-md[hidden]{display:none}
+.notes-md:focus-within{outline:2px solid var(--sea);outline-offset:2px}
+.notes-md .cm-editor{flex:1 1 auto;min-height:150px;max-height:560px;background:transparent;color:var(--ink);font:inherit;font-size:15px;line-height:1.55;border-radius:inherit}
+.notes-md .cm-editor.cm-focused{outline:none}
+.notes-md .cm-editor .cm-scroller{overflow:auto;font-family:var(--f-body);line-height:1.55}
+.notes-md .cm-editor .cm-content{padding:12px 14px;caret-color:var(--accent-ink)}
+.notes-md .cm-editor .cm-content:focus-visible{outline:none}
+.notes-md .cm-editor .cm-line{padding:0}
+.notes-md .cm-editor .cm-cursor{border-left:2px solid var(--accent-ink)}
+.notes-md .cm-editor .cm-selectionBackground,.notes-md .cm-editor.cm-focused .cm-selectionBackground{background:color-mix(in srgb,var(--accent) 30%,transparent)!important}
+.notes-md .cm-editor .cm-content ::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+.notes-md .cm-editor .cm-placeholder{color:var(--muted)}
+.notes-md .cm-line.md-h{font-family:var(--f-display);font-weight:700;letter-spacing:-.01em;line-height:1.3}
+.notes-md .cm-line.md-h1{font-size:1.55em;padding-top:.25em}
+.notes-md .cm-line.md-h2{font-size:1.3em;padding-top:.2em}
+.notes-md .cm-line.md-h3{font-size:1.14em;padding-top:.1em}
+.notes-md .cm-line.md-h5,.notes-md .cm-line.md-h6{font-size:.92em;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.notes-md .cm-line.md-setext{line-height:.5;font-size:.5em}
+.md-strong{font-weight:700}
+.md-em{font-style:italic}
+.md-strike{text-decoration:line-through;color:var(--muted)}
+.md-mark{background:color-mix(in srgb,var(--accent) 34%,transparent);border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.md-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:color-mix(in srgb,var(--ink) 8%,transparent);border-radius:4px;padding:1px 4px}
+.md-mk{color:var(--muted);font-weight:400;font-style:normal}
+.md-link{color:var(--sea);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--sea) 45%,transparent);text-underline-offset:2px}
+.md-link[data-href]{cursor:pointer}
+.md-link[data-href]:hover{text-decoration-color:var(--sea)}
+.md-img::before{content:"🖼 "}
+.md-num{color:var(--muted)}
+.md-bullet{display:inline-block;width:.38em;height:.38em;border-radius:50%;background:currentColor;opacity:.5;vertical-align:.2em;margin:0 .22em 0 .12em}
+.md-task{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:1.05em;height:1.05em;margin-right:.08em;vertical-align:-.16em;border:1.6px solid color-mix(in srgb,var(--ink) 40%,transparent);border-radius:5px;color:transparent;cursor:pointer;transition:background-color .15s,border-color .15s}
+.md-task svg{width:.78em;height:.78em}
+.md-task:hover{border-color:var(--accent-ink)}
+.md-task.on{background:var(--accent-fill);border-color:transparent;color:var(--on-accent)}
+.md-done{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 55%,transparent)}
+.notes-md .cm-line.md-quote{border-left:3px solid color-mix(in srgb,var(--accent) 65%,var(--line));padding-left:12px;color:color-mix(in srgb,var(--ink) 78%,var(--muted))}
+.notes-md .cm-line.md-pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:color-mix(in srgb,var(--ink) 6%,transparent);padding:0 10px}
+.notes-md .cm-line.md-pre-fence{font-size:.72em;color:var(--muted);line-height:1.3}
+.notes-md .cm-line.md-hr{position:relative}
+.notes-md .cm-line.md-hr::after{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--line)}
+.notes-md .cm-line.md-table{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.84em}
 .qlinks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:8px}
 .ql{position:relative;min-width:0}
 .ql a{display:flex;align-items:center;gap:10px;padding:9px 38px 9px 9px;border:1px solid var(--line);border-radius:12px;background:var(--raise);color:var(--ink);text-decoration:none;min-width:0}

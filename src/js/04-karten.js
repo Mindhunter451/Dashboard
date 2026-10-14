@@ -108,7 +108,7 @@ const PEEK = {
   },
   commute: () => ($('#cm-live').hidden ? '' : `${esc($('#cm-time').textContent)} <small>${esc($('#cm-time-lbl').textContent)}</small>`),
   notes(v) {
-    const line = (state.widgets[v.id].cfg.text || '').split('\n').map(s => s.trim()).find(Boolean);
+    const line = noteLines(state.widgets[v.id].cfg.text)[0];
     return line ? `<small>${esc(line.slice(0, 60))}</small>` : '';
   },
   links(v) { const n = state.widgets[v.id].cfg.items.length; return n ? `<small>${n} ${n === 1 ? 'Link' : 'Links'}</small>` : ''; },

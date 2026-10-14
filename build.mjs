@@ -4,6 +4,8 @@
 // src/index.html  Grundgerüst mit Platzhaltern
 //   <!--@include pfad-->  fügt eine Datei aus src/ ein (z. B. html/drawer.html)
 //   <!--@css-->           alle Dateien aus src/css/ in Namensreihenfolge
+//   <!--@vendor-->        fertige Fremd-Bibliotheken aus src/vendor/, jede in einem eigenen Block (CodeMirror für die Notizen,
+//                         gebaut mit tools/codemirror/build.mjs)
 //   <!--@js-->            alle Dateien aus src/js/ in Namensreihenfolge, in einem gemeinsamen Block
 //                         (der Code aus tools/sync-worker.js wird dabei in 49-sync.js eingesetzt)
 //
@@ -32,8 +34,12 @@ let js = list('js', '.js').map(f => `/* ${f} */\n${read('js/' + f).trim()}`).joi
 if (!js.includes(PLATZHALTER)) throw new Error('Platzhalter für den Sync-Worker fehlt in src/js/49-sync.js');
 js = js.replace(PLATZHALTER, () => JSON.stringify(syncWorker));
 
+// Fremd-Code darf kein </script enthalten, sonst endet der Block zu früh
+const vendor = list('vendor', '.js').map(f => `<script>\n${read('vendor/' + f).trim().replace(/<\/script/gi, '<\\/script')}\n</script>`).join('\n');
+
 let out = include(read('index.html'));
 out = out.replace('<!--@css-->', () => `<style>\n${css}\n</style>`);
+out = out.replace('<!--@vendor-->', () => vendor);
 out = out.replace('<!--@js-->', () => `<script>\n(() => {\n'use strict';\n${js}\n})();\n</script>`);
 if (/<!--@/.test(out)) throw new Error('Unbekannter Platzhalter in src/index.html');
 

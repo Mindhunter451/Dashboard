@@ -160,7 +160,8 @@ $('#cmd-list').addEventListener('mousemove', e => {
 });
 $('#cmd-list').addEventListener('click', e => { const li = e.target.closest('.cmd-it'); if (li) cmdRun(+li.dataset.i); });
 document.addEventListener('keydown', e => {
-  if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || (e.key !== 'k' && e.key !== 'K')) return;
+  // Im Notizen-Editor ist Strg+K ein Link, dort hat CodeMirror die Taste schon genommen
+  if (e.defaultPrevented || !(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || (e.key !== 'k' && e.key !== 'K')) return;
   e.preventDefault();
   if ($('#dlg-cmd').open) $('#dlg-cmd').close(); else openCmd();
 });
