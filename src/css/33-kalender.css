@@ -32,3 +32,15 @@
 .ca-feeds .tx span{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ca-dot{flex:0 0 18px;width:18px;height:18px;border-radius:50%;border:0;background:var(--c);padding:0}
 .ca-locrow{align-self:end;padding-bottom:9px}
+.ca-prov{margin:8px 0 6px;flex-wrap:wrap}
+.ca-how{margin:0;color:var(--muted);font-size:13.5px;line-height:1.5}
+.ca-pstat{display:flex;gap:9px;align-items:baseline;margin:-4px 0 0;font-size:13px;line-height:1.45;color:var(--ink)}
+.ca-pstat::before{content:"";flex:0 0 8px;height:8px;border-radius:50%;background:var(--muted);transform:translateY(-1px)}
+.ca-pstat[data-k="ok"]::before{background:var(--good)}
+.ca-pstat[data-k="warn"]::before{background:var(--warn)}
+.ca-pstat[data-k="err"]::before{background:var(--bad)}
+.ca-pstat[data-k="busy"]{color:var(--muted)}
+.ca-pstat[data-k="busy"]::before{animation:caPulse 1s ease-in-out infinite alternate}
+@keyframes caPulse{to{opacity:.3}}
+.ca-again{border:0;background:none;padding:0;font:inherit;font-weight:650;color:var(--sea);cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:2px}
+@media (prefers-reduced-motion: reduce){.ca-pstat[data-k="busy"]::before{animation:none}}

@@ -1,43 +1,70 @@
-/* Kalender (gibt es nur einmal): öffentlich geteilte iCloud-Kalender als ICS-Abo.
- * Apple schickt keine CORS-Freigabe, der Browser darf den Link also nicht direkt laden. Dafür gibt es eine kleine
- * Weiterleitung als Cloudflare Worker (Code unten in CA_WORKER und im Repo unter tools/kalender-worker.js).
+/* Kalender (gibt es nur einmal): Kalender mit ICS-Link, also iCloud, Google, Outlook, Proton und alles andere mit .ics.
+ * Die meisten Anbieter schicken keine CORS-Freigabe, der Browser darf den Link also nicht direkt laden. Dafür gibt es eine kleine
+ * Weiterleitung als Cloudflare Worker. Ihr Code wird hier erzeugt (caWorker) und enthält neben den bekannten Anbietern auch die
+ * Adressen deiner eigenen Kalender, die Grundfassung liegt im Repo unter tools/kalender-worker.js.
  * Links und Weiterleitung bleiben nur in diesem Browser (jere-cockpit-kalender) und kommen nicht in die Sicherung.
  * Zum Auslesen der Termine samt Wiederholungen und Zeitzonen wird ical.js nachgeladen, sobald ein Kalender da ist. */
 const CA_KEY = 'jere-cockpit-kalender', CA_CACHE = 'jere-cockpit-kalender-daten';
 const CA_COLORS = ['#3D7BE0', '#E5654B', '#2FA36B', '#8A5CD8', '#E8A126', '#D9488A', '#1A9AA0'];
 const CA_LIB = { src: 'https://unpkg.com/ical.js@2.2.1/dist/ical.es5.min.cjs', sri: 'sha384-ju8ozm4ZyuCTzjb4fvLmPUASX0zfc5jLOvyN9wadLx23y965jxfdbKTPMIeLrliP' };
-const CA_WORKER = `// Weiterleitung für Jeres Tagescockpit: holt einen öffentlich geteilten
-// iCloud-Kalender und gibt ihn mit CORS-Freigabe an den Browser weiter.
+/* Bekannte Anbieter, die der Worker immer durchlässt (Unteradressen zählen mit) */
+const CA_HOSTS = ['icloud.com', 'calendar.google.com', 'outlook.live.com', 'outlook.office365.com', 'outlook.office.com', 'calendar.proton.me'];
+const CA_PROV = [[/(^|\.)icloud\.com$/, 'iCloud'], [/(^|\.)google\.com$/, 'Google'], [/(^|\.)outlook\.(live|office365|office)\.com$/, 'Outlook'], [/(^|\.)proton\.me$/, 'Proton']];
+const caHostOk = (h, list) => !!h && list.some(d => h === d || h.endsWith('.' + d));
+function caHost(u) { const n = caNormUrl(u); try { return n ? new URL(n).hostname.toLowerCase() : ''; } catch { return ''; } }
+function caProvider(u) { const h = caHost(u), p = CA_PROV.find(([re]) => re.test(h)); return p ? p[1] : h; }
+/* Adressen eigener Kalender, die nicht zu einem bekannten Anbieter gehören */
+const caExtraHosts = feeds => [...new Set(feeds.map(f => caHost(f.url)).filter(h => /^[a-z0-9.-]+\.[a-z0-9-]+$/.test(h) && !caHostOk(h, CA_HOSTS)))].sort().slice(0, 12);
+function caWorker(feeds = []) {
+  const list = [...CA_HOSTS, ...caExtraHosts(feeds)].map(h => `  '${h}'`).join(',\n');
+  return `// Weiterleitung für Jeres Tagescockpit (Version 2): holt einen öffentlich
+// geteilten Kalender (ICS) und gibt ihn mit CORS-Freigabe an den Browser weiter.
 // Aufruf: https://<dein-worker>.workers.dev/?url=<Kalender-Link>
-const ERLAUBT = /(^|\\.)icloud\\.com$/i; // nur iCloud, sonst wäre es ein offener Proxy
+// Nur diese Adressen gehen durch (Unteradressen zählen mit), sonst wäre es ein
+// offener Proxy. Und es kommen nur Kalender zurück, keine Webseiten.
+const ERLAUBT = [
+${list}
+];
 
 export default {
   async fetch(request) {
     const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS' };
     if (request.method === 'OPTIONS') return new Response(null, { headers: cors });
+    const frage = new URL(request.url).searchParams;
+    if (frage.has('info')) return Response.json({ v: 2, erlaubt: ERLAUBT }, { headers: cors });
     let ziel;
     try {
-      ziel = new URL((new URL(request.url).searchParams.get('url') || '').replace(/^webcal:/i, 'https:'));
+      ziel = new URL((frage.get('url') || '').replace(/^webcal:/i, 'https:'));
     } catch {
       return new Response('Parameter url fehlt', { status: 400, headers: cors });
     }
-    if (ziel.protocol !== 'https:' || !ERLAUBT.test(ziel.hostname)) {
+    const host = ziel.hostname.toLowerCase();
+    if (ziel.protocol !== 'https:' || !ERLAUBT.some(d => host === d || host.endsWith('.' + d))) {
       return new Response('Diese Adresse ist nicht erlaubt', { status: 403, headers: cors });
     }
-    const antwort = await fetch(ziel, { headers: { 'User-Agent': 'Mozilla/5.0 (Kalender-Weiterleitung)' }, cf: { cacheTtl: 300 } });
-    return new Response(antwort.body, {
-      status: antwort.status,
+    const antwort = await fetch(ziel, { headers: { 'User-Agent': 'Mozilla/5.0 (Kalender-Weiterleitung)', 'Accept': 'text/calendar, */*' }, cf: { cacheTtl: 300 } });
+    if (!antwort.ok) {
+      // Gesperrt heißt beim Anbieter meist: nicht mehr geteilt
+      const status = antwort.status === 401 || antwort.status === 403 ? 404 : antwort.status;
+      return new Response('Der Kalender antwortet mit ' + antwort.status, { status, headers: cors });
+    }
+    const text = await antwort.text();
+    if (!/^\\uFEFF?\\s*BEGIN:VCALENDAR/i.test(text)) {
+      return new Response('Unter dem Link kam kein Kalender zurück', { status: 422, headers: cors });
+    }
+    return new Response(text, {
       headers: { ...cors, 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'max-age=300' }
     });
   }
 };
 `;
-const ca = { busy: false, err: '', feedErr: {}, data: lsGet(CA_CACHE), lib: null, seq: 0, more: false, draft: null, last: 0 };
+}
+const ca = { busy: false, err: '', feedErr: {}, data: lsGet(CA_CACHE), lib: null, seq: 0, more: false, draft: null, last: 0, probe: null };
 const caCfg = () => state.widgets.cal.cfg;
 function caSec() {
   const s = lsGet(CA_KEY) || {};
   const feeds = (Array.isArray(s.feeds) ? s.feeds : []).filter(f => f && typeof f.url === 'string' && f.url).slice(0, 6)
-    .map((f, i) => ({ id: String(f.id || uid()).slice(0, 16), name: String(f.name || `Kalender ${i + 1}`).slice(0, 30), url: f.url, color: CA_COLORS.includes(f.color) ? f.color : CA_COLORS[i % CA_COLORS.length] }));
+    .map((f, i) => ({ id: String(f.id || uid()).slice(0, 16), name: String(f.name || `Kalender ${i + 1}`).slice(0, 30), url: f.url, color: CA_COLORS.includes(f.color) ? f.color : CA_COLORS[i % CA_COLORS.length], ...(f.auto ? { auto: true } : {}) }));
   return { proxy: typeof s.proxy === 'string' ? s.proxy : '', feeds };
 }
 function caSaveSec(sec) {
@@ -74,7 +101,10 @@ async function caFetch(url) {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 20000);
   try {
     const r = await fetch(url, { signal: ctl.signal, cache: 'no-store' });
-    if (!r.ok) throw Object.assign(new Error('HTTP ' + r.status), { status: r.status });
+    if (!r.ok) {
+      const body = await r.text().catch(() => '');
+      throw Object.assign(new Error('HTTP ' + r.status), { status: r.status, block: r.status === 403 && /nicht erlaubt/i.test(body) });
+    }
     return await r.text();
   } finally { clearTimeout(timer); }
 }
@@ -91,8 +121,14 @@ function caExpand(ICAL, text, feed, from, to) {
   const push = (item, st, en) => {
     if (!st) return;
     if (String(item.component.getFirstPropertyValue('status') || '').toUpperCase() === 'CANCELLED') return;
-    const allDay = !!st.isDate, S = st.toJSDate();
+    let allDay = !!st.isDate, S = st.toJSDate();
     let E = en ? en.toJSDate() : null;
+    // Outlook schickt Ganztägiges manchmal als 0 bis 0 Uhr mit eigenem Merker statt als reines Datum
+    if (!allDay && st.hour === 0 && st.minute === 0 && /^true$/i.test(String(item.component.getFirstPropertyValue('x-microsoft-cdo-alldayevent') || ''))) {
+      allDay = true;
+      S = new Date(st.year, st.month - 1, st.day);
+      E = en ? new Date(en.year, en.month - 1, en.day + (en.hour || en.minute ? 1 : 0)) : null;
+    }
     if (!E || E < S) E = allDay ? addDays(S, 1) : S;
     if (allDay && +E === +S) E = addDays(S, 1);
     if (S >= to || E <= from && !(+E === +S && S >= from)) return;
@@ -117,10 +153,10 @@ function caExpand(ICAL, text, feed, from, to) {
   return out;
 }
 const CA_ERR = {
-  cors: 'Apple lässt den Browser den Kalender nicht direkt laden. Trag über die Regler oben rechts in dieser Karte deine Weiterleitung ein.',
+  cors: 'Der Anbieter lässt den Browser den Kalender nicht direkt laden. Trag über die Regler oben rechts in dieser Karte deine Weiterleitung ein.',
   net: 'Keine Verbindung zum Kalender. Das Cockpit versucht es gleich nochmal.',
-  403: 'Die Weiterleitung lässt diesen Link nicht durch. Erlaubt sind nur iCloud-Adressen.',
-  404: 'Unter diesem Link gibt es keinen Kalender. Prüf, ob er in iCloud noch öffentlich geteilt ist.',
+  block: p => `Deine Weiterleitung lässt ${p} noch nicht durch. Kopier über die Regler oben rechts den Worker-Code neu und füg ihn in Cloudflare ein.`,
+  404: 'Unter diesem Link gibt es keinen Kalender. Prüf, ob er noch öffentlich geteilt ist.',
   parse: 'Unter dem Link kam kein Kalender zurück. Prüf den Link und die Weiterleitung.',
   lib: 'Der Kalender-Leser konnte nicht geladen werden. Das Cockpit versucht es gleich nochmal.'
 };
@@ -132,17 +168,18 @@ async function caLoad() {
   ca.last = Date.now();
   renderCalAll();
   const from = sod(new Date()), to = addDays(from, 31);
-  const feedErr = {}, events = [];
+  const feedErr = {}, events = [], names = {};
   let ICAL = null;
   try { ICAL = await caLoadLib(); } catch { ca.err = CA_ERR.lib; }
   if (ICAL) {
     await Promise.all(sec.feeds.map(async f => {
       let text;
       try { text = await caFetch(caFetchUrl(f, sec.proxy)); }
-      catch (e) { feedErr[f.id] = e.status === 403 ? CA_ERR[403] : e.status === 404 ? CA_ERR[404] : e.status ? `Der Kalender antwortet mit Fehler ${e.status}.` : sec.proxy ? CA_ERR.net : CA_ERR.cors; return; }
+      catch (e) { feedErr[f.id] = e.block ? CA_ERR.block(caProvider(f.url)) : e.status === 403 || e.status === 404 || e.status === 410 ? CA_ERR[404] : e.status === 422 ? CA_ERR.parse : e.status ? `Der Kalender antwortet mit Fehler ${e.status}.` : sec.proxy ? CA_ERR.net : CA_ERR.cors; return; }
       try {
         if (!/BEGIN:VCALENDAR/i.test(text)) throw new Error('kein ICS');
         events.push(...caExpand(ICAL, text, f, from, to));
+        if (f.auto) { const n = caCalName(text); if (n && n !== f.name) names[f.id] = n; }
       } catch { feedErr[f.id] = CA_ERR.parse; }
     }));
     ca.err = '';
@@ -150,6 +187,7 @@ async function caLoad() {
   if (seq !== ca.seq) return;
   ca.busy = false;
   ca.feedErr = feedErr;
+  if (Object.keys(names).length) { const cur = caSec(); cur.feeds.forEach(f => { if (f.auto && names[f.id]) f.name = names[f.id]; }); caSaveSec(cur); }
   const okIds = new Set(sec.feeds.filter(f => !feedErr[f.id]).map(f => f.id));
   if (ICAL && okIds.size) {
     // Kalender, die gerade nicht laden, behalten ihre alten Termine
@@ -162,6 +200,11 @@ async function caLoad() {
     ca.retry = setTimeout(() => caLoad(), 3 * 6e4);
   }
   renderCalAll();
+}
+/* Name, den der Kalender selbst mitbringt (X-WR-CALNAME), Zeilenumbrüche im ICS beachtet */
+function caCalName(text) {
+  const m = /^X-WR-CALNAME(?:;[^:\r\n]*)?:(.*(?:\r?\n[ \t].*)*)/mi.exec(String(text).slice(0, 20000));
+  return m ? m[1].replace(/\r?\n[ \t]/g, '').replace(/\\([,;\\])/g, '$1').replace(/\\n/gi, ' ').trim().slice(0, 30) : '';
 }
 /* Termine eines Tages: ganztägige zuerst, dann nach Beginn */
 function caDay(d, list) {
@@ -248,47 +291,123 @@ function caOpenForm() {
   $('#ca-name').value = '';
   $('#ca-url').value = '';
   $('#ca-ferr').hidden = true;
-  $('#ca-code').textContent = CA_WORKER;
+  $('#ca-codebox').open = false;
+  const pv = sec.feeds.length ? caProvider(sec.feeds[sec.feeds.length - 1].url) : 'iCloud';
+  caShowHow(({ iCloud: 'icloud', Google: 'google', Outlook: 'outlook' })[pv] || 'other');
   caRenderDraft();
   $('#ca-form').hidden = false;
   renderCal();
   (ca.draft.length ? $('#ca-proxy') : $('#ca-url')).focus();
+  caProbe();
+}
+function caShowHow(k) {
+  $$('#ca-prov [data-prov]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.prov === k)));
+  $$('#ca-form [data-how]').forEach(p => { p.hidden = p.dataset.how !== k; });
 }
 function caRenderDraft() {
   const ul = $('#ca-feeds');
-  ul.innerHTML = ca.draft.map((f, i) => `<li><button type="button" class="ca-dot" data-cacol="${i}" style="--c:${f.color}" aria-label="Farbe von ${esc(f.name)} ändern" title="Farbe ändern"></button><div class="tx"><b>${esc(f.name)}</b><span>${esc(f.url.replace(/^(webcal|https):\/\//i, '').slice(0, 44))}…</span></div><button type="button" class="icon-btn" data-cadel="${i}" aria-label="${esc(f.name)} entfernen">${TRASH}</button></li>`).join('');
+  ul.innerHTML = ca.draft.map((f, i) => {
+    const pv = caProvider(f.url), known = CA_PROV.some(x => x[1] === pv);
+    return `<li><button type="button" class="ca-dot" data-cacol="${i}" style="--c:${f.color}" aria-label="Farbe von ${esc(f.name)} ändern" title="Farbe ändern"></button><div class="tx"><b>${esc(f.name)}</b><span>${known ? `${pv} · ` : ''}${esc(f.url.replace(/^(webcal|https):\/\//i, '').slice(0, 44))}…</span></div><button type="button" class="icon-btn" data-cadel="${i}" aria-label="${esc(f.name)} entfernen">${TRASH}</button></li>`;
+  }).join('');
   ul.hidden = !ca.draft.length;
   $('#ca-add').disabled = ca.draft.length >= 6;
   $('#ca-add').textContent = ca.draft.length >= 6 ? 'Maximal 6 Kalender' : '+ Kalender';
   $('#ca-forget').hidden = !caSec().feeds.length;
+  $('#ca-code').textContent = caWorker(ca.draft);
+  caRenderProbe();
+}
+/* Link prüfen und aufräumen: Outlook gibt neben dem ICS- auch einen HTML-Link raus, der wird umgebogen.
+ * Googles Links zum Anschauen sind keine Kalenderdatei, da hilft nur die Privatadresse. */
+function caCheckUrl(raw) {
+  const url = caNormUrl(raw);
+  if (!url) return { err: 'Der Link muss mit webcal:// oder https:// anfangen.' };
+  const x = new URL(url), h = x.hostname.toLowerCase();
+  if (/(^|\.)outlook\.(live|office365|office)\.com$/.test(h) && /\/calendar\.html?$/i.test(x.pathname)) { x.pathname = x.pathname.replace(/\.html?$/i, '.ics'); return { url: x.href, keep: x.href }; }
+  if (h === 'calendar.google.com' && !/\/ical\//i.test(x.pathname)) return { err: 'Das ist der Google-Link zum Anschauen. Nimm in den Einstellungen deines Kalenders unter „Kalender integrieren“ die „Privatadresse im iCal-Format“.' };
+  return { url, keep: raw.replace(/\s+/g, '') };
 }
 function caAddDraft() {
   const fail = m => { $('#ca-ferr').textContent = m; $('#ca-ferr').hidden = false; return false; };
   const raw = $('#ca-url').value.trim();
   if (!raw) return true;
-  const url = caNormUrl(raw);
-  if (!url) return fail('Der Link muss mit webcal:// oder https:// anfangen.');
-  if (ca.draft.some(f => caNormUrl(f.url) === url)) return fail('Diesen Kalender hast du schon drin.');
+  const chk = caCheckUrl(raw);
+  if (chk.err) return fail(chk.err);
+  if (ca.draft.some(f => caNormUrl(f.url) === chk.url)) return fail('Diesen Kalender hast du schon drin.');
   if (ca.draft.length >= 6) return fail('Mehr als 6 Kalender gehen nicht.');
-  const used = new Set(ca.draft.map(f => f.color));
-  ca.draft.push({ id: uid(), name: $('#ca-name').value.trim().slice(0, 30) || (ca.draft.length ? `Kalender ${ca.draft.length + 1}` : 'Privat'), url: raw.replace(/\s+/g, ''), color: CA_COLORS.find(x => !used.has(x)) || CA_COLORS[0] });
+  const used = new Set(ca.draft.map(f => f.color)), own = $('#ca-name').value.trim().slice(0, 30);
+  // Ohne eigenen Namen erst der Anbieter, nach dem ersten Laden der Name aus dem Kalender
+  const pv = caProvider(chk.url), name = own || (CA_PROV.some(x => x[1] === pv) && !ca.draft.some(f => f.name === pv) ? pv : `Kalender ${ca.draft.length + 1}`);
+  ca.draft.push({ id: uid(), name, url: chk.keep, color: CA_COLORS.find(x => !used.has(x)) || CA_COLORS[0], ...(own ? {} : { auto: true }) });
   $('#ca-name').value = '';
   $('#ca-url').value = '';
   $('#ca-ferr').hidden = true;
   caRenderDraft();
   return true;
 }
+/* Weiterleitung prüfen: Die neue Fassung sagt auf ?info, welche Adressen sie durchlässt.
+ * Die alte Fassung (nur iCloud) kennt das nicht und antwortet mit 400. */
+const caProxyVal = () => {
+  let v = $('#ca-proxy').value.trim();
+  if (!v) return '';
+  if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+  try { const x = new URL(v); return x.protocol === 'https:' ? x.href : ''; } catch { return ''; }
+};
+async function caProbe() {
+  const px = caProxyVal();
+  if (!px) { ca.probe = null; caRenderProbe(); return; }
+  const pr = ca.probe = { px, busy: true };
+  caRenderProbe();
+  const u = new URL(px), ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 8000);
+  u.searchParams.set('info', '1');
+  let res;
+  try {
+    const r = await fetch(u.href, { signal: ctl.signal, cache: 'no-store' });
+    const j = r.ok ? await r.json().catch(() => null) : null;
+    res = r.status === 400 ? { v: 1, ok: ['icloud.com'] } : j && Array.isArray(j.erlaubt) ? { v: +j.v || 2, ok: j.erlaubt.map(x => String(x).toLowerCase()) } : { err: r.ok ? 'form' : r.status };
+  } catch { res = { err: 'net' }; }
+  finally { clearTimeout(timer); }
+  if (ca.probe !== pr) return;
+  ca.probe = { px, ...res };
+  // Fehlt etwas, gleich den Code aufklappen
+  if (res.ok && caMissing().length) $('#ca-codebox').open = true;
+  caRenderProbe();
+}
+const caMissing = () => !ca.probe || !ca.probe.ok || !ca.draft ? [] : [...new Set(ca.draft.filter(f => !caHostOk(caHost(f.url), ca.probe.ok)).map(f => caProvider(f.url)))];
+function caRenderProbe() {
+  const el = $('#ca-pstat'), pr = ca.probe;
+  if (!pr || !ca.draft || pr.px !== caProxyVal()) { el.hidden = true; return; }
+  let k = 'ok', t;
+  const again = '<button type="button" class="ca-again" id="ca-again">Nochmal prüfen</button>';
+  if (pr.busy) { k = 'busy'; t = 'Weiterleitung wird geprüft …'; }
+  else if (pr.err === 'net') { k = 'err'; t = `Die Weiterleitung antwortet gerade nicht. Prüf die Adresse. ${again}`; }
+  else if (pr.err) { k = 'err'; t = `Unter dieser Adresse antwortet keine passende Weiterleitung${typeof pr.err === 'number' ? ` (Fehler ${pr.err})` : ''}. Prüf die Adresse. ${again}`; }
+  else {
+    const miss = caMissing(), names = miss.map(x => `<b>${esc(x)}</b>`);
+    if (miss.length) { k = 'warn'; t = `Deine Weiterleitung lässt ${names.length > 1 ? `${names.slice(0, -1).join(', ')} und ${names[names.length - 1]}` : names[0]} noch nicht durch. Kopier den Code aus Schritt 2 und ersetz damit den Code deines Workers in Cloudflare. ${again}`; }
+    else t = ca.draft.length ? 'Weiterleitung passt, alle Kalender gehen durch.' : 'Weiterleitung passt.';
+  }
+  el.dataset.k = k;
+  el.innerHTML = `<span>${t}</span>`;
+  el.hidden = false;
+}
 $('#ca-setup-btn').addEventListener('click', caOpenForm);
 $('#ca-set-btn').addEventListener('click', () => { if ($('#ca-form').hidden) caOpenForm(); else { $('#ca-form').hidden = true; renderCal(); } });
 $('#ca-add').addEventListener('click', () => { if (caAddDraft()) $('#ca-url').focus(); });
 $('#ca-url').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); caAddDraft(); } });
+$('#ca-prov').addEventListener('click', e => { const b = e.target.closest('[data-prov]'); if (b) caShowHow(b.dataset.prov); });
+$('#ca-proxy').addEventListener('change', caProbe);
+$('#ca-proxy').addEventListener('input', caRenderProbe);
+$('#ca-pstat').addEventListener('click', e => { if (e.target.closest('#ca-again')) caProbe(); });
+// Wer zum Einfügen kurz zu Cloudflare wechselt, sieht beim Zurückkommen den neuen Stand
+addEventListener('focus', () => { if (!$('#ca-form').hidden && ca.probe && !ca.probe.busy && (ca.probe.err || caMissing().length)) caProbe(); });
 $('#ca-feeds').addEventListener('click', e => {
   const d = e.target.closest('[data-cadel]'), c = e.target.closest('[data-cacol]');
   if (d) { ca.draft.splice(+d.dataset.cadel, 1); caRenderDraft(); }
   if (c) { const f = ca.draft[+c.dataset.cacol]; f.color = CA_COLORS[(CA_COLORS.indexOf(f.color) + 1) % CA_COLORS.length]; caRenderDraft(); }
 });
 $('#ca-copy').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(CA_WORKER); toast('Worker-Code kopiert'); }
+  try { await navigator.clipboard.writeText(caWorker(ca.draft || caSec().feeds)); toast('Worker-Code kopiert'); }
   catch {
     const r = document.createRange();
     r.selectNodeContents($('#ca-code'));
