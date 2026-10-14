@@ -10,6 +10,7 @@ Oben wechselst du die Seiten, per Klick, mit den Tasten 1 bis 9 oder über die A
 Ein Tipp auf den Titel einer Karte klappt sie ein. Dann bleibt nur der Kopf mit dem Wichtigsten stehen, zum Beispiel die nächste Abfahrt oder der nächste Termin. Welche Karten zu sind, merkt sich jedes Gerät selbst. Beim Scrollen erscheint oben eine schmale Leiste mit Uhrzeit und Seiten.
 Mit **Bearbeiten** legst du Seiten an, benennst sie um und sortierst sie. Auf jeder Karte kannst du dann verschieben, die Breite ändern, Einstellungen öffnen oder sie von der Seite nehmen. Die Kacheln oben lassen sich im Bearbeiten-Modus direkt ziehen. Über **Widget hinzufügen** legst du neue Widgets an oder holst vorhandene auf die Seite. Die Galerie hat Register (Alltag, Planung, Unterwegs, Freizeit) und eine Suche, Enter fügt den ersten Treffer hinzu.
 **Spritpreise** suchen auf der Pendelstrecke, rund um Zuhause oder an einem eigenen Ort. Den Ort wählst du über die Regler der Karte (oder beim zweiten Tipp auf den Ort-Knopf): per Ortssuche wie beim Wetter, mit „Wie beim Wetter“ (folgt dann dem Ort der Wetterkarte) oder „Mein Standort“. Dort stellst du auch den Umkreis (3, 5, 10 oder 25 km) und ein, ob die günstigsten oder die nächsten Tankstellen zuerst kommen. Jeder Ort hat einen eigenen Zwischenspeicher, das Hin- und Herschalten kostet also keine neue Abfrage bei Tankerkönig.
+**Notizen** schreiben Markdown wie in Obsidian: Nur die Zeile mit dem Cursor zeigt die Zeichen, der Rest steht fertig da. Geht: Überschriften (`#` bis `######`), **fett**, *kursiv*, ~~durchgestrichen~~, `==markiert==`, `Code` und Codeblöcke, Links (ein Klick öffnet sie, eine URL auf markierten Text eingefügt wird zum Link), Zitate, Listen, Trennlinien, Tabellen und Aufgaben mit `- [ ]`, die sich per Klick abhaken lassen. Enter setzt Listen und Aufgaben fort, auf einem leeren Punkt endet die Liste. Kürzel: Strg+B fett, Strg+I kursiv, Strg+K Link, Strg+Enter macht aus der Zeile eine Aufgabe oder hakt sie ab, Strg+Shift+H markiert, Strg+E Code, Tab und Shift+Tab rücken ein, am Mac Cmd statt Strg. Wer lieber das einfache Textfeld will, schaltet die Live-Vorschau in den Einstellungen der Notiz ab. Eine Notiz fasst bis zu 50.000 Zeichen.
 Wetter und Pendeln starten kompakt: jetzt, Regen in einem Satz und die Stunden, beziehungsweise Fahrzeit, Lage und wann du los musst. Details, Regenradar, Karte und Meldungen klappen per Tipp auf. Kompakt lässt sich in den Einstellungen der Karte abschalten.
 **Jetzt wichtig** sammelt aus allen Widgets, was gerade zählt, und sortiert es nach Dringlichkeit: Wetterwarnungen, der nächste Termin, wann du zur Bahn los musst, Stau auf dem Weg zur Arbeit, Regen, Frost, Müll, Geburtstage, fällige Aufgaben, die Prüfung und offene Gewohnheiten. Morgens zählt der Weg, abends das, was morgen ansteht. Ein Tipp auf einen Hinweis springt zur passenden Karte. Darunter ist ein Feld zum schnellen Notieren, von überall auch mit der Taste N: Mit Todoist landet es im Eingang (ein Datum wie „morgen 9 Uhr“ erkennt Todoist selbst), ohne Todoist in einer Notiz.
 Seiten mit **Nach Tageszeit ordnen** (Schalter beim Bearbeiten) stellen morgens Wetter, Abfahrten und Pendeln nach vorn, tagsüber Termine und Aufgaben, abends Müll, Termine und Geburtstage.
@@ -79,9 +80,11 @@ src/html/           Himmel mit Uhr, Leiste, Raster (feste Widgets), Anpassen, Di
 src/css/            Aussehen, nach Bereichen aufgeteilt
 src/js/             Logik, ein Modul pro Thema (Zustand, Widgets, Seiten, Bearbeiten, ...)
 src/pwa/            Manifest und Service Worker für die Installation als App
+src/vendor/         fertig gebaute Fremd-Bibliotheken (CodeMirror für die Notizen)
 build.mjs           baut aus src/ die index.html, sw.js und manifest.webmanifest
 icons/              App-Icons
-tools/              Code für die Kalender-Weiterleitung und die Sync-Ablage (Cloudflare Worker), der Sync-Code wird beim Bauen in 49-sync.js eingesetzt
+tools/              Code für die Kalender-Weiterleitung und die Sync-Ablage (Cloudflare Worker), der Sync-Code wird beim Bauen in 49-sync.js eingesetzt,
+                    dazu tools/codemirror/ zum Neubauen von src/vendor/codemirror.js
 ```
 
 Bauen (Node 18 oder neuer, keine Pakete nötig):
@@ -90,9 +93,14 @@ Bauen (Node 18 oder neuer, keine Pakete nötig):
 node build.mjs
 ```
 
+Fremd-Code liegt fertig gebaut in `src/vendor/` und kommt in eigene Blöcke vor das Skript. Bisher ist das nur CodeMirror für die Notizen, gebaut mit `tools/codemirror/build.mjs` (Versionen in `tools/codemirror/package.json`, neu bauen mit `npm ci && node build.mjs` in dem Ordner).
+
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**3.4** (Oktober 2026)
+Notizen mit Markdown und Live-Vorschau wie in Obsidian. Der Editor ist CodeMirror 6, fest in die Datei eingebaut (rund 300 KB, läuft also auch ohne Netz und in der App), Markdown samt Tabellen, Aufgaben, Durchstreichen und nackten Links kommt aus Lezer, dazu `==markiert==`. Nur die Zeile mit dem Cursor zeigt die Zeichen, Aufgaben lassen sich per Klick abhaken, Links per Klick öffnen. Enter setzt Listen fort, Rücktaste nimmt erst das Kästchen und dann den Punkt, dazu Kürzel für fett, kursiv, Link, Aufgabe, Markieren und Code. Notizen fassen jetzt 50.000 statt 8.000 Zeichen. Eingeklappte Karten, Anpassen und der Spiegel zeigen Notizen ohne Markdown-Zeichen und lassen erledigte Aufgaben weg. In der Schnellsuche öffnet Strg+K weiter die Suche, nur im Notizen-Editor macht es einen Link. Das einfache Textfeld gibt es weiter, umschaltbar pro Notiz.
 
 **3.3** (Oktober 2026)
 Spritpreise mit eigenem Ort: Statt nur „Hier“ gibt es jetzt einen Ort pro Widget, gesucht wie beim Wetter, „Wie beim Wetter“ (folgt dem Ort der Wetterkarte) oder der eigene Standort. Dazu Umkreis von 3 bis 25 km und die Wahl, ob die günstigsten oder die nächsten Tankstellen zuerst kommen. Jeder Ort hat seinen eigenen Zwischenspeicher, das Umschalten zwischen Strecke, Zuhause und Ort fragt Tankerkönig erst wieder, wenn die Preise älter als zehn Minuten sind. Wartet Tankerkönig noch, steht das in der Karte statt in einer Meldung. Das bisherige „Hier“ wird automatisch zu „Mein Standort“.

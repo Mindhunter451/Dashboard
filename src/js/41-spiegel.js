@@ -202,7 +202,7 @@ const MLR = {
     return { t: `${FU_TYPE[c.type]} ${numDe(b.price, 3)} € bei ${fuNice(b.brand || b.name)}`, s: fuWhere(b, R.A) + (c.mode === 'place' && !fuIsGeo(c) ? ` von ${fuPlaceName(c.place)}` : '') + (t - R.D.at > 30 * 6e4 ? `, Stand ${hm(new Date(R.D.at))}` : '') };
   },
   notes(w) {
-    const lines = String(w.cfg.text || '').split('\n').map(x => x.replace(/^[\s\-*•·]+/, '').trim()).filter(Boolean);
+    const lines = noteLines(w.cfg.text);
     if (!lines.length) return null;
     const title = w.title && w.title !== TYPES.notes.name ? w.title : '';
     return { t: mCut(title ? `${title}: ${lines[0]}` : lines[0], 70), s: mCut(lines.slice(1, 4).join(', '), 90) };

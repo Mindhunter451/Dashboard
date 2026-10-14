@@ -140,7 +140,7 @@ function mLineSub(id) {
     case 'football': return [FB_LEAGUES[c.league], c.teamName].filter(Boolean).join(', ');
     case 'f1': return 'Nächste Session, Rennen und WM';
     case 'fuel': return `Günstigster Preis für ${FU_TYPE[c.type] || 'Sprit'}, ${c.mode === 'route' ? 'auf der Strecke' : c.mode === 'home' ? 'rund um Zuhause' : fuIsGeo(c) ? 'rund um deinen Standort' : `rund um ${fuPlaceName(c.place)}`}`;
-    case 'notes': { const l = String(c.text || '').split('\n').find(x => x.trim()); return l ? mCut(l.trim(), 50) : 'Noch leer'; }
+    case 'notes': { const l = noteLines(c.text)[0]; return l ? mCut(l, 50) : 'Noch leer'; }
   }
   return '';
 }

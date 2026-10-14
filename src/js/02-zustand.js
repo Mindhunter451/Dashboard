@@ -11,6 +11,8 @@
  * state.bdays    Geburtstage: { list: [{ id, name, m, d, y }] }, y fehlt, wenn das Jahr unbekannt ist
  * state.waste    Müllabfuhr: { bins: [{ id, name, color, dates[], every, start }], file: { name, at } }
  */
+/* Längste Notiz in Zeichen, rund 25 Seiten Text */
+const NOTE_MAX = 50000;
 const KIND_NAME = { day: 'Arbeitstag', workweek: 'Arbeitswoche', month: 'Monat', year: 'Jahr', range: 'Zeitraum' };
 /* Kacheln oben. Die Reihenfolge steht in ui.order, Countdowns stehen dort als „cd:ID“ mittendrin. */
 const TILES = { fa: 'Feierabend', we: 'Wochenende', ft: 'Nächster Feiertag', ur: 'Nächster Urlaub', cal: 'Nächster Termin', sun: 'Sonne' };
@@ -43,7 +45,7 @@ const TYPES = {
   commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
   weather:  { name: 'Wetter', multi: false, w: 2, cat: 'go', desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
   links:    { name: 'Schnellzugriff', multi: true, w: 1, cat: 'day', desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
-  notes:    { name: 'Notizen', multi: true, w: 1, cat: 'day', desc: 'Ein Notizzettel, der beim Tippen automatisch speichert.' },
+  notes:    { name: 'Notizen', multi: true, w: 1, cat: 'day', desc: 'Ein Notizzettel mit Markdown wie in Obsidian: Überschriften, Listen, Aufgaben zum Abhaken und Links, gespeichert beim Tippen.' },
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, cat: 'plan', since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
   habits:   { name: 'Gewohnheiten', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
@@ -253,7 +255,7 @@ function normCfg(type, c) {
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false, compact: c.compact !== false };
     case 'commute': return { compact: c.compact !== false };
     case 'links': return { items: normLinks(c.items) };
-    case 'notes': return { text: typeof c.text === 'string' ? c.text.slice(0, 8000) : '' };
+    case 'notes': return { text: typeof c.text === 'string' ? c.text.slice(0, NOTE_MAX) : '', plain: !!c.plain };
     default: return {};
   }
 }
