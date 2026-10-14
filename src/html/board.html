@@ -298,7 +298,7 @@
         </div>
         <span class="actions" id="fu-foot">
           <button type="button" class="icon-btn" id="fu-refresh" aria-label="Preise aktualisieren" title="Aktualisieren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.4 9.6A7.9 7.9 0 0 0 5.4 7.2"/><path d="M4.6 3.8v4.1h4.1"/><path d="M4.6 14.4a7.9 7.9 0 0 0 14 2.4"/><path d="M19.4 20.2v-4.1h-4.1"/></svg></button>
-          <button type="button" class="icon-btn" id="fu-key-btn" aria-label="Tankerkönig-Key" title="Tankerkönig-Key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+          <button type="button" class="icon-btn" id="fu-key-btn" aria-label="Ort, Umkreis und Key einstellen" title="Ort, Umkreis und Key"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
         </span>
       </div>
     </div>
@@ -315,6 +315,39 @@
         <button type="button" class="btn-danger" id="fu-forget" hidden>Key entfernen</button>
       </div>
     </form>
+    <form class="panel" id="fu-set" hidden novalidate>
+      <h3>Wo soll ich suchen?</h3>
+      <div class="field">
+        <label for="fu-q">Ort suchen</label>
+        <div class="form-row searchrow" style="flex-wrap:nowrap">
+          <input id="fu-q" type="search" placeholder="z. B. Pinneberg oder Elmshorn" autocomplete="off">
+          <button type="submit" class="btn">Suchen</button>
+        </div>
+      </div>
+      <div class="links" id="fu-res"></div>
+      <p class="err" id="fu-qerr" hidden></p>
+      <div class="form-row">
+        <button type="button" class="btn-ghost" id="fu-wx">Wie beim Wetter</button>
+        <button type="button" class="btn-ghost" id="fu-geo">Mein Standort</button>
+      </div>
+      <div class="fu-opt">
+        <span>Umkreis</span>
+        <div class="seg sm" role="group" aria-label="Umkreis" id="fu-rad">
+          <button type="button" data-v="3">3 km</button><button type="button" data-v="5">5 km</button><button type="button" data-v="10">10 km</button><button type="button" data-v="25">25 km</button>
+        </div>
+      </div>
+      <div class="fu-opt">
+        <span>Zuerst zeigen</span>
+        <div class="seg sm" role="group" aria-label="Sortierung" id="fu-sort">
+          <button type="button" data-v="price">Günstigste</button><button type="button" data-v="dist">Nächste</button>
+        </div>
+      </div>
+      <p class="hint" id="fu-set-hint">Der Umkreis gilt für Zuhause und eigene Orte. Auf der Strecke sucht das Cockpit selbst entlang deiner Route.</p>
+      <div class="form-row">
+        <button type="button" class="btn" id="fu-set-done">Fertig</button>
+        <button type="button" class="btn-ghost" id="fu-key-open">Tankerkönig-Key</button>
+      </div>
+    </form>
     <div class="setup" id="fu-setup" hidden>
       <h3>Spritpreise einrichten</h3>
       <p>Mit einem kostenlosen Tankerkönig-Key siehst du die günstigsten Tankstellen in deiner Nähe.</p>
@@ -322,7 +355,7 @@
     </div>
     <div id="fu-live" hidden>
       <div class="seg sm" role="group" aria-label="Wo" id="fu-mode">
-        <button type="button" data-v="route">Auf der Strecke</button><button type="button" data-v="home">Rund um Zuhause</button><button type="button" data-v="here">Hier</button>
+        <button type="button" data-v="route">Auf der Strecke</button><button type="button" data-v="home">Rund um Zuhause</button><button type="button" data-v="place" class="fu-place"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.4-6.5-10.8a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21z"/><circle cx="12" cy="10.2" r="2.3"/></svg><span id="fu-place-name">Anderer Ort</span></button>
       </div>
       <a class="fu-best" id="fu-best" target="_blank" rel="noopener"></a>
       <ul class="fu-list" id="fu-list"></ul>

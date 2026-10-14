@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '3.2';
+const VERSION = '3.3';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -59,6 +59,7 @@ const NEWS = {
   '2.9': ['Feinschliff: Notizen lassen dich jetzt durchschreiben, Auswahllisten passen zum Look, alle laufenden Balken leuchten in deiner Farbe und Pendeln sagt genauer, was mit TomTom los ist. Der Vers des Tages ist raus.', null],
   '3.0': ['Neu: Stile für die Uhr, Kacheln zum Sortieren, ein Spiegel zum Einrichten mit Vorschau, kompaktes Wetter und Pendeln und eine Galerie mit Registern. Soll ich dir den neuen Kopf zeigen?', () => openDrawer('head'), 'Zeigen'],
   '3.1': ['Der Spiegel zeigt jetzt viel mehr: deine Widgets als Kurzzeilen, einen Wechselplatz, „Jetzt wichtig“, Stunden im Wetter, die Ankunft beim Pendeln und abends die Morgen-Vorschau. Soll ich ihn dir zeigen?', () => openDrawer('mirror'), 'Zeigen'],
+  '3.3': ['Spritpreise mit eigenem Ort: Such dir einen Ort, nimm den vom Wetter oder deinen Standort, dazu Umkreis und Sortierung. Soll ich dir die Einstellungen zeigen?', () => { if (!pagesUsing('fuel').length) { setEdit(true); openGallery(); return; } nwJump('fuel'); setTimeout(() => { if (fuKey()) fuOpenSet(true); else fuOpenForm(); }, 350); }, 'Zeigen'],
   '3.2': ['Der Kalender kann jetzt auch Google, Outlook und jeden anderen Kalender mit ICS-Link. Deine Weiterleitung braucht dafür einmal neuen Code, die Einrichtung zeigt dir, was fehlt.', () => { if (!pagesUsing('cal').length) { setEdit(true); openGallery(); return; } nwJump('cal'); setTimeout(caOpenForm, 350); }, 'Einrichten']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);

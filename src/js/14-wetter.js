@@ -64,6 +64,7 @@ async function loadWeather(loc, seq) {
     if (seq !== undefined && seq !== wx.seq) return true;
     wx.live = true; wx.loc = loc; wx.data = d; wx.at = d.cachedAt || Date.now(); wx.offline = !!d.cachedAt;
     renderWeather();
+    renderFuel(); // Spritpreise „wie beim Wetter“ folgen dem Ort
     sky.minute = -1;
     skyTick(new Date());
     renderMirror();

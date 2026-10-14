@@ -195,11 +195,11 @@ const MLR = {
     if (!fuKey()) return null;
     const c = fuCfg(), t = +now;
     // Tankerkönig nur fragen, wenn die Preise alt sind, und höchstens alle 5 Minuten (fuLoad hält sich selbst an 10 Minuten)
-    if (mr.on && !fu.busy && (c.mode !== 'here' || fu.here) && t - mr.fu > 5 * 6e4) { mr.fu = t; fuLoad(); }
+    if (mr.on && !fu.busy && (!fuIsGeo(c) || fu.here) && t - mr.fu > 5 * 6e4) { mr.fu = t; fuLoad(); }
     const R = fuRows();
-    if (!R || !R.list.length || t - fu.data.at > 6 * 36e5) return null;
+    if (!R || !R.list.length || t - R.D.at > 6 * 36e5) return null;
     const open = R.list.filter(s => s.open), b = open[0] || R.list[0];
-    return { t: `${FU_TYPE[c.type]} ${numDe(b.price, 3)} € bei ${fuNice(b.brand || b.name)}`, s: fuWhere(b, R.A) + (t - fu.data.at > 30 * 6e4 ? `, Stand ${hm(new Date(fu.data.at))}` : '') };
+    return { t: `${FU_TYPE[c.type]} ${numDe(b.price, 3)} € bei ${fuNice(b.brand || b.name)}`, s: fuWhere(b, R.A) + (c.mode === 'place' && !fuIsGeo(c) ? ` von ${fuPlaceName(c.place)}` : '') + (t - R.D.at > 30 * 6e4 ? `, Stand ${hm(new Date(R.D.at))}` : '') };
   },
   notes(w) {
     const lines = String(w.cfg.text || '').split('\n').map(x => x.replace(/^[\s\-*•·]+/, '').trim()).filter(Boolean);
