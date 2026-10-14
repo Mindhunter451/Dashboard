@@ -110,6 +110,14 @@
 .fu-diff[data-s="down"]{color:var(--good)}
 .fu-diff[data-s="up"]{color:var(--bad)}
 #fu-mode button:disabled{opacity:.4;cursor:default}
+#fu-mode{max-width:100%}
+#fu-mode button{white-space:nowrap}
+.fu-place{display:inline-flex;align-items:center;gap:4px;min-width:0}
+.fu-place svg{width:13px;height:13px;flex:0 0 auto}
+.fu-place span{overflow:hidden;text-overflow:ellipsis;max-width:11em}
+.fu-opt{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.fu-opt>span{font-size:13px;font-weight:600;color:var(--muted)}
+#fu-res:empty{display:none}
 
 /* Infofenster */
 .dlg-info .dlg-body{gap:16px}

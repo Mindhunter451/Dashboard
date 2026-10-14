@@ -49,7 +49,7 @@ const TYPES = {
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
   football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
   f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
-  fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause oder da, wo du gerade bist.' },
+  fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause, an einem Ort deiner Wahl oder da, wo du gerade bist.' },
   cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus iCloud, Google, Outlook oder jedem Kalender mit ICS-Link, nach Tagen sortiert, mit Farbe pro Kalender.' },
   dep:      { name: 'Abfahrten', multi: true, w: 1, cat: 'go', since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
   bday:     { name: 'Geburtstage', multi: false, w: 1, cat: 'plan', since: '2.4', desc: 'Die nächsten Geburtstage mit Alter und Countdown. Aus deinen iPhone-Kontakten übernommen oder selbst eingetragen.' },
@@ -223,6 +223,17 @@ function normWaste(o) {
   const f = o.file && typeof o.file === 'object' && strIn(o.file.name, 80) ? { name: strIn(o.file.name, 80), at: isoOrNull(o.file.at) } : null;
   return { bins, file: f };
 }
+/* Spritpreise: eigener Ort gesucht (fixed), derselbe wie beim Wetter (wx) oder dein Standort (geo). Das alte „Hier“ wird zum Standort. */
+function normFuel(c) {
+  const P = c.place && typeof c.place === 'object' ? c.place : null;
+  let place = null;
+  if (P && P.how === 'fixed' && Number.isFinite(+P.lat) && Number.isFinite(+P.lon) && Math.abs(+P.lat) <= 90 && Math.abs(+P.lon) <= 180) place = { how: 'fixed', name: strIn(P.name, 60) || 'Eigener Ort', lat: +P.lat, lon: +P.lon };
+  else if (P && (P.how === 'wx' || P.how === 'geo')) place = { how: P.how };
+  let mode = ['route', 'home', 'place'].includes(c.mode) ? c.mode : c.mode === 'here' ? 'place' : 'route';
+  if (c.mode === 'here' && !place) place = { how: 'geo' };
+  if (mode === 'place' && !place) mode = 'route';
+  return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode, place, rad: [3, 5, 10, 25].includes(+c.rad) ? +c.rad : 5, sort: c.sort === 'dist' ? 'dist' : 'price' };
+}
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
@@ -236,7 +247,7 @@ function normCfg(type, c) {
     case 'dep': return { stop: normStop(c.stop), modes: normCats(c.modes), walk: intIn(c.walk, 0, 60, 0), n: [4, 6, 8, 10].includes(+c.n) ? +c.n : 6, lines: strIn(c.lines, 60), dir: strIn(c.dir, 60) };
     case 'bday': return { n: [4, 6, 8, 12].includes(+c.n) ? +c.n : 6, cal: c.cal !== false };
     case 'waste': return { remind: c.remind !== false, at: validHm(c.at) ? c.at : '18:00' };
-    case 'fuel': return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode: ['route', 'home', 'here'].includes(c.mode) ? c.mode : 'route' };
+    case 'fuel': return normFuel(c);
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false, compact: c.compact !== false };
