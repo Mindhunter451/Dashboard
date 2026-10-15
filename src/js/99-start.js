@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '3.4';
+const VERSION = '3.5';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -59,6 +59,7 @@ const NEWS = {
   '2.9': ['Feinschliff: Notizen lassen dich jetzt durchschreiben, Auswahllisten passen zum Look, alle laufenden Balken leuchten in deiner Farbe und Pendeln sagt genauer, was mit TomTom los ist. Der Vers des Tages ist raus.', null],
   '3.0': ['Neu: Stile für die Uhr, Kacheln zum Sortieren, ein Spiegel zum Einrichten mit Vorschau, kompaktes Wetter und Pendeln und eine Galerie mit Registern. Soll ich dir den neuen Kopf zeigen?', () => openDrawer('head'), 'Zeigen'],
   '3.1': ['Der Spiegel zeigt jetzt viel mehr: deine Widgets als Kurzzeilen, einen Wechselplatz, „Jetzt wichtig“, Stunden im Wetter, die Ankunft beim Pendeln und abends die Morgen-Vorschau. Soll ich ihn dir zeigen?', () => openDrawer('mirror'), 'Zeigen'],
+  '3.5': ['Neu: Das Cockpit als echtes iPhone-Widget über die App Scriptable, mit Terminen, Geburtstagen, Wetter, Pendeln und Spritpreisen. Soll ich dir zeigen, wie es geht?', () => { openDrawer('data'); setTimeout(() => { const d = $('#dr-iw details'); if (d) { d.open = true; d.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 300); }, 'Zeigen'],
   '3.4': ['Notizen können jetzt Markdown wie in Obsidian: Überschriften, Listen, Aufgaben zum Abhaken, Links und mehr, nur die Zeile mit dem Cursor zeigt die Zeichen. Strg+Enter macht eine Aufgabe.', () => { const id = widgetsOf('notes').map(([i]) => i).find(i => pagesUsing(i).length); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => { const v = views.get(id); if (v && v.cm) v.cm.focus(); }, 350); }, 'Ausprobieren'],
   '3.3': ['Spritpreise mit eigenem Ort: Such dir einen Ort, nimm den vom Wetter oder deinen Standort, dazu Umkreis und Sortierung. Soll ich dir die Einstellungen zeigen?', () => { if (!pagesUsing('fuel').length) { setEdit(true); openGallery(); return; } nwJump('fuel'); setTimeout(() => { if (fuKey()) fuOpenSet(true); else fuOpenForm(); }, 350); }, 'Zeigen'],
   '3.2': ['Der Kalender kann jetzt auch Google, Outlook und jeden anderen Kalender mit ICS-Link. Deine Weiterleitung braucht dafür einmal neuen Code, die Einrichtung zeigt dir, was fehlt.', () => { if (!pagesUsing('cal').length) { setEdit(true); openGallery(); return; } nwJump('cal'); setTimeout(caOpenForm, 350); }, 'Einrichten']

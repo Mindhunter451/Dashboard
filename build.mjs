@@ -7,7 +7,8 @@
 //   <!--@vendor-->        fertige Fremd-Bibliotheken aus src/vendor/, jede in einem eigenen Block (CodeMirror für die Notizen,
 //                         gebaut mit tools/codemirror/build.mjs)
 //   <!--@js-->            alle Dateien aus src/js/ in Namensreihenfolge, in einem gemeinsamen Block
-//                         (der Code aus tools/sync-worker.js wird dabei in 49-sync.js eingesetzt)
+//                         (der Code aus tools/sync-worker.js wird dabei in 49-sync.js eingesetzt,
+//                         das iPhone-Widget aus tools/iphone-widget.js in 51-iphone.js, beide zum Kopieren im Cockpit)
 //
 // Dazu kommen für die Installation als App manifest.webmanifest und sw.js aus src/pwa/.
 // In sw.js wird __VERSION__ durch die Version aus src/js/99-start.js ersetzt, damit jede Version
@@ -33,6 +34,10 @@ const PLATZHALTER = "/*@sync-worker*/''";
 let js = list('js', '.js').map(f => `/* ${f} */\n${read('js/' + f).trim()}`).join('\n\n');
 if (!js.includes(PLATZHALTER)) throw new Error('Platzhalter für den Sync-Worker fehlt in src/js/49-sync.js');
 js = js.replace(PLATZHALTER, () => JSON.stringify(syncWorker));
+const iphoneWidget = readFileSync(join(root, 'tools', 'iphone-widget.js'), 'utf8').trim().replace(/<\//g, '<\\/');
+const IW_PLATZHALTER = "/*@iphone-widget*/''";
+if (!js.includes(IW_PLATZHALTER)) throw new Error('Platzhalter für das iPhone-Widget fehlt in src/js/51-iphone.js');
+js = js.replace(IW_PLATZHALTER, () => JSON.stringify(iphoneWidget));
 
 // Fremd-Code darf kein </script enthalten, sonst endet der Block zu früh
 const vendor = list('vendor', '.js').map(f => `<script>\n${read('vendor/' + f).trim().replace(/<\/script/gi, '<\\/script')}\n</script>`).join('\n');

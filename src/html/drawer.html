@@ -249,6 +249,26 @@
         <p class="hint" id="dr-app-ios" hidden></p>
       </div>
 
+      <h3 class="dr-gh">iPhone-Widget</h3>
+      <div class="dr-group dr-pad dr-stack" id="dr-iw">
+        <p class="hint">Termine, Geburtstage, Wetter, Pendeln und Spritpreise als echtes Widget auf dem Homescreen oder Sperrbildschirm, über die kostenlose App Scriptable. Groß zeigt alles, mittel zeigt Termine, Geburtstage und Wetter, mit dem Parameter 2 Pendeln und Spritpreise.</p>
+        <details class="sy-steps-box">
+          <summary>So richtest du es ein</summary>
+          <ol class="sy-steps">
+            <li><b>Scriptable laden.</b> Kostenlos im App Store.</li>
+            <li><b>Skript übernehmen.</b> Hier auf „Skript kopieren“ tippen. In Scriptable oben rechts auf Plus, einfügen und dem Skript oben den Namen <code>Cockpit</code> geben.</li>
+            <li><b>Zugang übernehmen.</b> Hier auf „Zugang kopieren“ tippen, das Skript in Scriptable einmal antippen und „Zugang einfügen“ wählen. Dabei fragt das iPhone nach Kalender und Standort, beides erlauben.</li>
+            <li><b>Widget anlegen.</b> Auf dem Homescreen lange drücken, „Bearbeiten“, „Widget hinzufügen“, Scriptable und die Größe wählen. Dann das Widget antippen und bei Script <code>Cockpit</code> auswählen. Für das zweite mittlere bei Parameter eine <code>2</code> eintragen.</li>
+          </ol>
+          <p class="hint">Am einfachsten machst du das direkt auf dem iPhone. Vom Mac aus geht es über die gemeinsame Zwischenablage von Apple. Eigene Auswahl über den Parameter, zum Beispiel <code>termine, wetter, sprit</code>. Gibt es eine neue Version des Skripts, kopierst du es einfach nochmal und ersetzt den Text in Scriptable.</p>
+        </details>
+        <div class="form-row">
+          <button type="button" class="btn" id="iw-copy">Skript kopieren</button>
+          <button type="button" class="btn-ghost" id="iw-key">Zugang kopieren</button>
+        </div>
+        <p class="hint" id="iw-has"></p>
+      </div>
+
       <h3 class="dr-gh">Sicherung als Datei</h3>
       <div class="dr-group dr-pad dr-stack" id="dr-data">
         <p class="hint">Mit der Datei bekommst du auf jedem Rechner genau dasselbe Cockpit, auch ohne Sync. Todoist-Token, TomTom-Key, Tankerkönig-Key, Kalender-Links und das Sync-Passwort sind nicht mit drin.</p>

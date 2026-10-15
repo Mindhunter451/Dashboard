@@ -193,6 +193,7 @@ function renderDrawer() {
   renderSnaps();
   renderPlanBtns();
   renderSync();
+  renderIw();
   $('#dr-data-err').hidden = true;
 }
 /* Bereich wechseln: Pille gleitet, Inhalt blendet weich ein */
