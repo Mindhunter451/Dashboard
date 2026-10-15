@@ -75,6 +75,7 @@ function cmdBuild() {
   add('Einstellungen', 'Kacheln oben wählen und sortieren', () => { openDrawer('head'); setTimeout(() => $('#dr-tiles').scrollIntoView({ block: 'start' }), 60); }, { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub reihenfolge termin sonne' });
   add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('data'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });
   add('Einstellungen', 'Als App installieren', () => openDrawer('data'), { ico: CMD_ICO.plus, words: 'pwa homescreen dock' });
+  add('Einstellungen', 'iPhone-Widget einrichten', () => { openDrawer('data'); setTimeout(() => { const d = $('#dr-iw details'); if (d) { d.open = true; d.scrollIntoView({ block: 'center' }); } }, 300); }, { ico: CMD_ICO.plus, words: 'scriptable homescreen sperrbildschirm ios widget' });
   add('Einstellungen', 'Zwischenstand zurückholen', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'rueckgaengig wiederherstellen backup gestern' });
   add('Einstellungen', 'Sicherung laden', () => openDrawer('data'), { ico: CMD_ICO.data, words: 'import datei backup' });
   return out;

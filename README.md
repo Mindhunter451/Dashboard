@@ -28,6 +28,16 @@ Seiten mit **Nach Tageszeit ordnen** (Schalter beim Bearbeiten) stellen morgens 
 In Chrome und Edge über „App installieren“ im Browser-Menü oder unter **Anpassen, Als App**. Auf iPhone und iPad in Safari über Teilen und „Zum Home-Bildschirm“, am Mac in Safari über Ablage und „Zum Dock hinzufügen“. Die App startet ohne Browserleiste und öffnet auch ohne Netz, das Wetter zeigt dann den letzten Stand. Updates kommen von selbst, weil der Service Worker die Seite immer zuerst frisch aus dem Netz holt.
 Auf iPhone und iPad hat die App vom Home-Bildschirm ihren eigenen Speicher. Die Einstellungen holst du über eine Sicherung rüber, Token, Keys und Kalender-Links trägst du dort einmal neu ein.
 
+## iPhone-Widget
+
+Über die kostenlose App Scriptable gibt es das Cockpit als echtes Widget für Homescreen und Sperrbildschirm, ohne Browser. Es zeigt wie „Jetzt wichtig“, was gerade zählt, in dieser Reihenfolge: Termine, Geburtstage, Wetter (mit DWD-Warnung), Pendeln und Spritpreise. Groß zeigt alles, mittel Termine, Geburtstage und Wetter, mittel mit dem Parameter `2` Pendeln und Spritpreise, klein den nächsten Termin und das Wetter. Mit dem Parameter lässt sich auch frei wählen, zum Beispiel `termine, wetter, sprit`. Ein Tipp auf einen Termin öffnet den Kalender, auf Pendeln oder eine Tankstelle die Route in Apple Karten, sonst das Cockpit.
+
+Einrichten: unter **Anpassen, Daten, iPhone-Widget** auf „Skript kopieren“ tippen, in Scriptable ein neues Skript anlegen, einfügen und `Cockpit` nennen. Dann im Cockpit „Zugang kopieren“, das Skript in Scriptable einmal starten und „Zugang einfügen“ wählen. Der Zugang bringt Sync-Adresse, Sync-Passwort und die TomTom- und Tankerkönig-Keys des Geräts mit, Scriptable legt sie im Schlüsselbund ab, die Zwischenablage wird danach geleert. Das Menü im Skript hat außerdem Vorschauen, die Keys und den Sync zum Eintragen von Hand und die Auswahl der Kalender.
+
+Termine kommen direkt aus dem Kalender des iPhones, also auch Outlook, wenn er dort eingebunden ist. Geburtstage, Adressen, Arbeitszeit, Urlaub, Bundesland, Wetterort, der Ort für die Spritpreise und die Akzentfarbe holt sich das Widget per Sync aus dem Cockpit, Notizen und alles andere nimmt es nicht mit. Pendeln zeigt die Richtung nach deiner Arbeitszeit, an freien Tagen nur, wann es weitergeht, spät abends wann du morgen los musst. Ohne TomTom-Key gibt es die Fahrzeit ohne Verkehr. Alle Widgets teilen sich einen Zwischenspeicher: Wetter und Fahrzeit werden höchstens alle 10 bis 15 Minuten geholt, Spritpreise höchstens alle 10 Minuten und nie öfter als einmal pro Minute, der Sync alle 30 Minuten. Klappt etwas nicht, bleibt der letzte Stand mit Uhrzeit stehen. Wann iOS ein Widget neu zeichnet, entscheidet das iPhone selbst, meist alle 15 bis 30 Minuten.
+
+Das Skript liegt in `tools/iphone-widget.js` und wird beim Bauen ins Cockpit eingesetzt.
+
 ## Daten
 
 Alles, was du einstellst, liegt nur im Browser (localStorage), getrennt für jede Adresse und jeden Browser. Der Todoist-Token, ein TomTom-Key, der Tankerkönig-Key, die Kalender-Links und das Sync-Passwort stehen nie in der Datei und auch nicht in einer Sicherung.
@@ -84,6 +94,7 @@ src/vendor/         fertig gebaute Fremd-Bibliotheken (CodeMirror für die Notiz
 build.mjs           baut aus src/ die index.html, sw.js und manifest.webmanifest
 icons/              App-Icons
 tools/              Code für die Kalender-Weiterleitung und die Sync-Ablage (Cloudflare Worker), der Sync-Code wird beim Bauen in 49-sync.js eingesetzt,
+                    das iPhone-Widget für Scriptable (iphone-widget.js, eingesetzt in 51-iphone.js),
                     dazu tools/codemirror/ zum Neubauen von src/vendor/codemirror.js
 ```
 
@@ -98,6 +109,9 @@ Fremd-Code liegt fertig gebaut in `src/vendor/` und kommt in eigene Blöcke vor 
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**3.5** (Oktober 2026)
+Neu: das iPhone-Widget über Scriptable (siehe oben), mit großem, mittlerem und kleinem Widget sowie Sperrbildschirm. Unter Anpassen, Daten gibt es das Skript und den Zugang zum Kopieren, die Schnellsuche findet es unter „iPhone-Widget“.
 
 **3.4** (Oktober 2026)
 Notizen mit Markdown und Live-Vorschau wie in Obsidian. Der Editor ist CodeMirror 6, fest in die Datei eingebaut (rund 300 KB, läuft also auch ohne Netz und in der App), Markdown samt Tabellen, Aufgaben, Durchstreichen und nackten Links kommt aus Lezer, dazu `==markiert==`. Nur die Zeile mit dem Cursor zeigt die Zeichen, Aufgaben lassen sich per Klick abhaken, Links per Klick öffnen. Enter setzt Listen fort, Rücktaste nimmt erst das Kästchen und dann den Punkt, dazu Kürzel für fett, kursiv, Link, Aufgabe, Markieren und Code. Notizen fassen jetzt 50.000 statt 8.000 Zeichen. Eingeklappte Karten, Anpassen und der Spiegel zeigen Notizen ohne Markdown-Zeichen und lassen erledigte Aufgaben weg. In der Schnellsuche öffnet Strg+K weiter die Suche, nur im Notizen-Editor macht es einen Link. Das einfache Textfeld gibt es weiter, umschaltbar pro Notiz.
