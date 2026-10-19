@@ -131,9 +131,10 @@ function fbFavHtml(D, c, lg, now) {
   const lbl = live ? '<span class="live">Live</span>' : next ? 'Nächstes Spiel' : last ? 'Letztes Spiel' : '';
   const sub = row ? `Platz ${pos} · ${row.points} ${row.points === 1 ? 'Punkt' : 'Punkte'} · ${row.matches} ${row.matches === 1 ? 'Spiel' : 'Spiele'}` : '';
   return `<div class="fb-top"><button type="button" class="fb-head" data-fbteam="${id}" data-lg="${lg}">${fbLogo(icon, 'lg', row ? row.shortName : t0.shortName)}<span><b>${esc(name)}</b><small>${esc(sub)}</small></span></button>${form.length ? fbFormHtml(form) : ''}</div>`
-    + (show ? `<p class="fb-label">${lbl}</p>${fbMatchBox(show, lg, now)}` : '');
+    + (show ? `<p class="fb-label">${lbl}</p>${fbMatchBox(show, lg, now)}${show === last ? '' : fbTvLine(c, lg, D, show, now)}` : '');
 }
-function fbDayHtml(v, D, lg, fav, now) {
+function fbDayHtml(v, D, lg, c, now) {
+  const fav = c.team;
   const groups = [...new Set((D.matches || []).map(m => m.group.groupOrderID))].sort((a, b) => a - b);
   if (!groups.length) return '<p class="empty">Noch keine Spiele angesetzt.</p>';
   const curG = D.cur ? D.cur.groupOrderID : groups[0];
@@ -145,9 +146,9 @@ function fbDayHtml(v, D, lg, fav, now) {
   let day = '';
   for (const m of ms) {
     const d = new Date(kick(m)), k = ymd(d);
-    if (k !== day) { day = k; html += `<li class="fb-day">${WDL[d.getDay()]}, ${dm(d)}</li>`; }
+    if (k !== day) { day = k; html += `<li class="fb-day"><span>${WDL[d.getDay()]}, ${dm(d)}</span>${fbConfDay(c, lg, D, ms.filter(x => ymd(new Date(kick(x))) === k))}</li>`; }
     const s = fbScore(m), live = fbIsLive(m, now), started = now >= kick(m);
-    const sc = s && (m.matchIsFinished || started) ? `<span class="fb-sc"${live ? ' data-live' : ''}${live ? ' title="Läuft gerade"' : ''}>${s[0]}:${s[1]}</span>` : `<span class="fb-sc time">${hm(d)}</span>`;
+    const sc = s && (m.matchIsFinished || started) ? `<span class="fb-sc"${live ? ' data-live' : ''}${live ? ' title="Läuft gerade"' : ''}>${s[0]}:${s[1]}</span>` : fbTvAt(c, lg, m);
     const isFav = fav && (m.team1.teamId === fav || m.team2.teamId === fav);
     html += `<li class="fb-row${isFav ? ' fav' : ''}">${fbTeamBtn(m.team1, lg)}${sc}${fbTeamBtn(m.team2, lg, true)}</li>`;
   }
@@ -208,8 +209,8 @@ function renderFootball(v) {
   fav.innerHTML = fbFavHtml(D, c, lg, now);
   v.tab = v.tab || 'day';
   segSet(q('[data-r="tabs"]'), v.tab);
-  body.innerHTML = v.tab === 'table' ? fbTableHtml(D, lg, c.team) : v.tab === 'scorers' ? fbScorersHtml(D, lg) : fbDayHtml(v, D, lg, c.team, now);
-  q('[data-r="src"]').textContent = `Stand ${hm(new Date(D.tried || D.at))} Uhr${D.err ? ', Aktualisieren hat gerade nicht geklappt' : ''} · Daten: OpenLigaDB`;
+  body.innerHTML = v.tab === 'table' ? fbTableHtml(D, lg, c.team) : v.tab === 'scorers' ? fbScorersHtml(D, lg) : fbDayHtml(v, D, lg, c, now);
+  q('[data-r="src"]').textContent = `Stand ${hm(new Date(D.tried || D.at))} Uhr${D.err ? ', Aktualisieren hat gerade nicht geklappt' : ''} · Daten: OpenLigaDB${c.tv.on ? ` · Sender: Stand ${tvStand()}` : ''}`;
 }
 
 /* Infofenster zu einem Verein */
@@ -255,6 +256,8 @@ defineWidget('football', {
     v.el.addEventListener('click', e => {
       const t = e.target.closest('[data-fbteam]');
       if (t) return fbTeamInfo(t.dataset.lg, +t.dataset.fbteam);
+      const tv = e.target.closest('[data-fbtv]');
+      if (tv) return fbTvEdit(tv.dataset.lg, +tv.dataset.fbtv);
       const tab = e.target.closest('[data-r="tabs"] [data-v]');
       if (tab) { v.tab = tab.dataset.v; renderFootball(v); return; }
       const nav = e.target.closest('[data-fbmd]');
@@ -278,7 +281,15 @@ defineWidget('football', {
   render: renderFootball,
   settings: {
     render(box, w) {
-      box.innerHTML = `<label class="field"><span class="lbl">Liga</span><select data-s="lg">${Object.entries(FB_LEAGUES).map(([k, n]) => `<option value="${k}"${k === w.cfg.league ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label><label class="field"><span class="lbl">Lieblingsverein</span><select data-s="team"></select></label><p class="hint" data-s="hint"></p>`;
+      const pre = `fb:${w.cfg.league}:`;
+      box.innerHTML = `<label class="field"><span class="lbl">Liga</span><select data-s="lg">${Object.entries(FB_LEAGUES).map(([k, n]) => `<option value="${k}"${k === w.cfg.league ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label><label class="field"><span class="lbl">Lieblingsverein</span><select data-s="team"></select></label><p class="hint" data-s="hint"></p>`
+        + tvSetHtml(w.cfg.tv, {
+          ch: FB_TV_CH, show: FB_TV[w.cfg.league].ch, conf: true,
+          allTxt: 'Auch im Spieltag, sonst nur beim nächsten Spiel deines Vereins',
+          hint: `Die Sender folgen den Regeln der Liga, Stand ${tvStand()}. Free-TV-Spiele bei RTL, Sat.1 oder in den Dritten werden kurzfristig festgelegt. Die trägst du selbst ein: im Spieltag auf die Anstoßzeit tippen oder beim nächsten Spiel auf den Stift.`,
+          pre
+        });
+      tvSetWire(box, pre);
       const sel = box.querySelector('[data-s="team"]');
       const fill = (lg, keep) => {
         const D = fbData(lg);
@@ -291,13 +302,19 @@ defineWidget('football', {
         if (!D.table && !D.busy) fbLoad(lg).then(() => { if (box.isConnected && box.querySelector('[data-s="lg"]').value === lg) fill(lg, sel.value); });
       };
       fill(w.cfg.league, w.cfg.team);
-      box.querySelector('[data-s="lg"]').addEventListener('change', e => fill(e.target.value, 0));
+      box.querySelector('[data-s="lg"]').addEventListener('change', e => {
+        fill(e.target.value, 0);
+        // Nur die Sender, die es in dieser Liga gibt
+        const show = (FB_TV[e.target.value] || FB_TV.bl1).ch;
+        for (const x of box.querySelectorAll('[data-tvch]')) x.closest('label').hidden = !show.includes(x.dataset.tvch);
+      });
     },
     save(box, w) {
       const lg = box.querySelector('[data-s="lg"]').value, sel = box.querySelector('[data-s="team"]'), id = +sel.value || 0;
       w.cfg.league = FB_LEAGUES[lg] ? lg : 'bl1';
       w.cfg.team = id;
       w.cfg.teamName = id && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : '';
+      tvSetSave(box, w.cfg.tv);
       queueMicrotask(() => fbLoad(w.cfg.league));
       return null;
     }

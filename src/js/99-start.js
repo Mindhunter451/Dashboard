@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '3.5';
+const VERSION = '3.6';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -62,6 +62,7 @@ const NEWS = {
   '3.5': ['Neu: Das Cockpit als echtes iPhone-Widget über die App Scriptable, mit Terminen, Geburtstagen, Wetter, Pendeln und Spritpreisen. Soll ich dir zeigen, wie es geht?', () => { openDrawer('data'); setTimeout(() => { const d = $('#dr-iw details'); if (d) { d.open = true; d.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 300); }, 'Zeigen'],
   '3.4': ['Notizen können jetzt Markdown wie in Obsidian: Überschriften, Listen, Aufgaben zum Abhaken, Links und mehr, nur die Zeile mit dem Cursor zeigt die Zeichen. Strg+Enter macht eine Aufgabe.', () => { const id = widgetsOf('notes').map(([i]) => i).find(i => pagesUsing(i).length); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => { const v = views.get(id); if (v && v.cm) v.cm.focus(); }, 350); }, 'Ausprobieren'],
   '3.3': ['Spritpreise mit eigenem Ort: Such dir einen Ort, nimm den vom Wetter oder deinen Standort, dazu Umkreis und Sortierung. Soll ich dir die Einstellungen zeigen?', () => { if (!pagesUsing('fuel').length) { setEdit(true); openGallery(); return; } nwJump('fuel'); setTimeout(() => { if (fuKey()) fuOpenSet(true); else fuOpenForm(); }, 350); }, 'Zeigen'],
+  '3.6': ['Neu: Fußball und Formel 1 zeigen, wo gespielt und gefahren wird. Bei der F1 auch gratis bei ORF, ServusTV und SRF, mit VPN-Hinweis und Knopf zum Livestream. Was davon auftaucht, stellst du pro Widget ein.', () => { const id = pagesUsing('f1').length ? 'f1' : (widgetsOf('football').map(([i]) => i).find(i => pagesUsing(i).length) || ''); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => openWidgetDialog(id), 350); }, 'Einstellen'],
   '3.2': ['Der Kalender kann jetzt auch Google, Outlook und jeden anderen Kalender mit ICS-Link. Deine Weiterleitung braucht dafür einmal neuen Code, die Einrichtung zeigt dir, was fehlt.', () => { if (!pagesUsing('cal').length) { setEdit(true); openGallery(); return; } nwJump('cal'); setTimeout(caOpenForm, 350); }, 'Einrichten']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);
