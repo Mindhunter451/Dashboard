@@ -2,7 +2,8 @@
  * Ergebnisse kommen kurz nach der Session. Alle Zeiten werden in deine Ortszeit umgerechnet. */
 const JOL = 'https://api.jolpi.ca/ergast/f1';
 const f1 = { races: null, drivers: [], teams: [], last: null, season: '', round: '', at: 0, tried: 0, busy: null, err: null, tab: 'drivers', all: false, timer: null, minute: -1 };
-const F1_SESS = [['FirstPractice', '1. Training', 60], ['SecondPractice', '2. Training', 60], ['ThirdPractice', '3. Training', 60], ['SprintQualifying', 'Sprint-Qualifying', 45], ['SprintShootout', 'Sprint-Shootout', 45], ['Sprint', 'Sprint', 60], ['Qualifying', 'Qualifying', 60]];
+/* Sessions: Schlüssel bei Jolpica, Name, Dauer in Minuten, Art (für die Sender, siehe F1_TV_KINDS) */
+const F1_SESS = [['FirstPractice', '1. Training', 60, 'fp'], ['SecondPractice', '2. Training', 60, 'fp'], ['ThirdPractice', '3. Training', 60, 'fp'], ['SprintQualifying', 'Sprint-Qualifying', 45, 'sq'], ['SprintShootout', 'Sprint-Shootout', 45, 'sq'], ['Sprint', 'Sprint', 60, 'sprint'], ['Qualifying', 'Qualifying', 60, 'quali']];
 const F1_COLOR = { mercedes: '#27F4D2', ferrari: '#E8002D', mclaren: '#FF8000', red_bull: '#3671C6', rb: '#6692FF', alpine: '#FF87BC', haas: '#B6BABD', audi: '#BB0A30', sauber: '#52E252', williams: '#64C4FF', aston_martin: '#229971', cadillac: '#A8A9AD' };
 const NAT_DE = { Argentine: 'Argentinien', Argentinian: 'Argentinien', Australian: 'Australien', Austrian: 'Österreich', Belgian: 'Belgien', Brazilian: 'Brasilien', British: 'Großbritannien', Canadian: 'Kanada', Chinese: 'China', Danish: 'Dänemark', Dutch: 'Niederlande', Finnish: 'Finnland', French: 'Frankreich', German: 'Deutschland', Indian: 'Indien', Irish: 'Irland', Italian: 'Italien', Japanese: 'Japan', Mexican: 'Mexiko', Monegasque: 'Monaco', 'New Zealander': 'Neuseeland', Polish: 'Polen', Russian: 'Russland', Spanish: 'Spanien', Swedish: 'Schweden', Swiss: 'Schweiz', Thai: 'Thailand', American: 'USA', Estonian: 'Estland', Israeli: 'Israel' };
 const COUNTRY_DE = { Australia: 'Australien', Austria: 'Österreich', Azerbaijan: 'Aserbaidschan', Bahrain: 'Bahrain', Belgium: 'Belgien', Brazil: 'Brasilien', Canada: 'Kanada', China: 'China', Hungary: 'Ungarn', Italy: 'Italien', Japan: 'Japan', Malaysia: 'Malaysia', Mexico: 'Mexiko', Monaco: 'Monaco', Netherlands: 'Niederlande', Portugal: 'Portugal', Qatar: 'Katar', 'Saudi Arabia': 'Saudi-Arabien', Singapore: 'Singapur', Spain: 'Spanien', UAE: 'Vereinigte Arabische Emirate', UK: 'Großbritannien', USA: 'USA', 'United States': 'USA', Germany: 'Deutschland', France: 'Frankreich', Turkey: 'Türkei', Argentina: 'Argentinien', 'South Africa': 'Südafrika', Korea: 'Südkorea', India: 'Indien', Russia: 'Russland', Vietnam: 'Vietnam', Thailand: 'Thailand' };
@@ -10,8 +11,8 @@ const f1When = o => o && o.date ? new Date(`${o.date}T${o.time || '12:00:00Z'}`)
 const f1Short = n => String(n || '').replace(/ Grand Prix/, ' GP');
 const f1Name = d => `${d.givenName} ${d.familyName}`;
 function f1Sessions(r) {
-  const out = F1_SESS.filter(([k]) => r[k]).map(([k, name, min]) => ({ name, at: f1When(r[k]), min }));
-  out.push({ name: 'Rennen', at: f1When(r), min: 120, race: true });
+  const out = F1_SESS.filter(([k]) => r[k]).map(([k, name, min, kind]) => ({ name, at: f1When(r[k]), min, k: kind }));
+  out.push({ name: 'Rennen', at: f1When(r), min: 120, race: true, k: 'race' });
   return out.filter(s => s.at).sort((a, b) => a.at - b.at);
 }
 /* Nächstes Rennen: das erste, das noch nicht seit drei Stunden vorbei ist */
@@ -69,9 +70,9 @@ function f1NextHtml(now) {
   else cd = `in ${esc(dur(raceAt - now, true))}`;
   const items = ss.map(s => {
     const done = now >= s.at.getTime() + s.min * 6e4, isLive = s === live, isNext = !live && s === nx;
-    return `<li class="${done ? 'done' : ''}${isNext ? ' next' : ''}${s.race ? ' race' : ''}"><b>${esc(s.name)}${isLive ? ' <span class="live">Live</span>' : ''}</b><span>${WD[s.at.getDay()]} ${dm(s.at)} ${hm(s.at)}</span></li>`;
+    return `<li class="${done ? 'done' : ''}${isNext ? ' next' : ''}${s.race ? ' race' : ''}"><b>${esc(s.name)}${isLive ? ' <span class="live">Live</span>' : ''}</b><span>${WD[s.at.getDay()]} ${dm(s.at)} ${hm(s.at)}</span>${done ? '' : f1TvMini(r, s)}</li>`;
   }).join('');
-  return `<div class="f1-race"><div><b>${esc(r.raceName)}</b><small>${esc(r.Circuit.circuitName)}, ${esc(COUNTRY_DE[loc.country] || loc.country)}</small></div><span class="f1-cd">${cd}</span></div><ul class="f1-sess">${items}</ul>`;
+  return `<div class="f1-race"><div><b>${esc(r.raceName)}</b><small>${esc(r.Circuit.circuitName)}, ${esc(COUNTRY_DE[loc.country] || loc.country)}</small></div><span class="f1-cd">${cd}</span></div><ul class="f1-sess">${items}</ul>${f1TvBox(r, now)}`;
 }
 function f1DriversHtml(fav) {
   if (!f1.drivers.length) return '<p class="empty">Noch keine Punkte in dieser Saison.</p>';
@@ -124,7 +125,7 @@ function renderF1() {
   $('#f1-next').innerHTML = f1NextHtml(now);
   segSet($('#f1-tabs'), f1.tab);
   $('#f1-body').innerHTML = f1.tab === 'teams' ? f1TeamsHtml() : f1.tab === 'last' ? f1LastHtml(fav) : f1DriversHtml(fav);
-  $('#f1-src').textContent = `Stand ${hm(new Date(f1.tried || f1.at))} Uhr${f1.err ? ', Aktualisieren hat gerade nicht geklappt' : ''}${f1.round ? ` · WM-Stand nach Runde ${f1.round}` : ''} · Daten: Jolpica`;
+  $('#f1-src').textContent = `Stand ${hm(new Date(f1.tried || f1.at))} Uhr${f1.err ? ', Aktualisieren hat gerade nicht geklappt' : ''}${f1.round ? ` · WM-Stand nach Runde ${f1.round}` : ''} · Daten: Jolpica${state.widgets.f1.cfg.tv.on ? ` · Sender: Stand ${tvStand()}` : ''}`;
   f1.minute = Math.floor(now / 6e4);
 }
 /* Countdown und Sessions jede Minute auffrischen */
@@ -187,6 +188,7 @@ async function f1TeamInfo(id) {
   } catch { fillInfo(key, '[data-r="res"]', '<p class="hint">Die Ergebnisse sind gerade nicht erreichbar.</p>'); }
 }
 $('#f1').addEventListener('click', e => {
+  if (e.target.closest('[data-tvedit]')) return f1TvEdit();
   const d = e.target.closest('[data-f1d]'), t = e.target.closest('[data-f1t]');
   if (d) return f1DriverInfo(d.dataset.f1d);
   if (t) return f1TeamInfo(t.dataset.f1t);
@@ -202,8 +204,15 @@ defineWidget('f1', {
   settings: {
     render(box, w) {
       const opts = f1.drivers.map(x => `<option value="${esc(x.Driver.driverId)}"${x.Driver.driverId === w.cfg.fav ? ' selected' : ''}>${esc(f1Name(x.Driver))}</option>`).join('');
-      box.innerHTML = `<label class="field"><span class="lbl">Lieblingsfahrer (wird hervorgehoben)</span><select data-s="fav"><option value="">Keiner</option>${opts}</select></label>`;
+      box.innerHTML = `<label class="field"><span class="lbl">Lieblingsfahrer (wird hervorgehoben)</span><select data-s="fav"><option value="">Keiner</option>${opts}</select></label>`
+        + tvSetHtml(w.cfg.tv, {
+          ch: F1_TV_CH, show: F1_TV_CH, kinds: true, vpn: true,
+          allTxt: 'An jeder Session im Zeitplan, sonst nur im Kasten für die nächste',
+          hint: `Gratis heißt frei in Österreich oder der Schweiz, aus Deutschland mit VPN. RTL zeigt einzelne Rennen frei, dafür brauchst du kein VPN. Stand der Senderliste: ${tvStand()}. Weicht ein Rennen ab, änderst du es mit dem Stift im Kasten.`,
+          pre: 'f1:'
+        });
+      tvSetWire(box, 'f1:');
     },
-    save(box, w) { w.cfg.fav = box.querySelector('[data-s="fav"]').value; return null; }
+    save(box, w) { w.cfg.fav = box.querySelector('[data-s="fav"]').value; tvSetSave(box, w.cfg.tv); return null; }
   }
 });

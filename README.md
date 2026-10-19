@@ -80,6 +80,13 @@ Für die Müllabfuhr lädst du die ICS-Datei deines Entsorgers oder trägst pro 
 
 Die amtlichen Warnungen des Deutschen Wetterdienstes für den Ort des Wetter-Widgets kommen über [Bright Sky](https://brightsky.dev), das die offenen Daten des DWD frei und ohne Key anbietet. Sie stehen farbig nach Warnstufe oben in der Wetterkarte, in „Jetzt wichtig“ und im Spiegel. Das gilt nur für Orte in Deutschland. Alte Warnungen werden ohne Netz nicht aufgehoben, lieber keine als eine veraltete.
 
+## Sender bei Fußball und Formel 1
+
+Für Sender gibt es keine freie Schnittstelle, deshalb steht in `src/js/33-sender.js` eine gepflegte Liste, Stand 19.10.2026. Beim Fußball gelten Regeln nach Anstoßzeit: In der 1. Liga zeigt Sky Freitag, Samstag und die englischen Wochen, DAZN den Sonntag und die Samstagskonferenz. Die 2. Liga läuft komplett bei Sky, das Topspiel am Samstagabend meistens auch bei RTL. Die 3. Liga läuft bei MagentaSport. Bei der Formel 1 zeigt Sky alles, SRF Sprint, Qualifying und Rennen, in Österreich wechseln sich ORF und ServusTV pro Rennen ab, und RTL hat einzelne Rennen frei.
+ORF, ServusTV und SRF sind nur im eigenen Land frei zu sehen, aus Deutschland braucht es ein VPN mit Server in Österreich oder der Schweiz. Die Sender können solche Server sperren, eine Garantie gibt es nicht.
+Was kurzfristig festgelegt wird (Free-TV-Spiele bei RTL oder Sat.1, die Spiele in den Dritten bei der 3. Liga) oder abweicht, trägst du selbst ein: im Spieltag auf die Anstoßzeit tippen, beim nächsten Spiel oder im Kasten der Formel 1 auf den Stift. Diese Änderungen liegen getrennt von der Liste, wandern mit dem Sync und stehen in der Sicherung. Was angezeigt wird (Sender, Sessions, nur Free-TV, Konferenzen, VPN-Hinweis, Links zum Livestream), stellst du pro Widget unter Bearbeiten, Einstellungen ein.
+Für eine neue F1-Saison bekommt `F1_TV` ein neues Jahr mit den Sendern pro Strecke (die `circuitId` von Jolpica), danach wird `TV_STAND` hochgesetzt. Fehlt eine Saison, sagt die Karte das, statt etwas Falsches zu zeigen.
+
 ## Aufbau
 
 `index.html` ist die fertige Seite, die GitHub Pages ausliefert. Sie wird gebaut, deshalb nicht von Hand bearbeiten.
@@ -88,7 +95,7 @@ Die amtlichen Warnungen des Deutschen Wetterdienstes für den Ort des Wetter-Wid
 src/index.html      Grundgerüst mit Platzhaltern
 src/html/           Himmel mit Uhr, Leiste, Raster (feste Widgets), Anpassen, Dialoge, Vorlagen, Spiegel
 src/css/            Aussehen, nach Bereichen aufgeteilt
-src/js/             Logik, ein Modul pro Thema (Zustand, Widgets, Seiten, Bearbeiten, ...)
+src/js/             Logik, ein Modul pro Thema (Zustand, Widgets, Seiten, Bearbeiten, Sender, ...)
 src/pwa/            Manifest und Service Worker für die Installation als App
 src/vendor/         fertig gebaute Fremd-Bibliotheken (CodeMirror für die Notizen)
 build.mjs           baut aus src/ die index.html, sw.js und manifest.webmanifest
@@ -109,6 +116,9 @@ Fremd-Code liegt fertig gebaut in `src/vendor/` und kommt in eigene Blöcke vor 
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**3.6** (Oktober 2026)
+Fußball und Formel 1 zeigen, wo es läuft. Bei der F1 hat jede Session kleine Sender, darunter ein Kasten für die nächste Session mit den Free-TV-Sendern als Links zum Livestream und dem passenden VPN-Land. Beim Fußball stehen die Sender an jeder Anstoßzeit im Spieltag und beim nächsten Spiel deines Vereins, Konferenzen in der Tageszeile. Pro Widget einstellbar: welche Sender, bei der F1 welche Sessions, nur Free-TV, Konferenzen, VPN-Hinweis, Livestream-Links und ob die Sender auch in der Liste stehen. Abweichungen pro Spiel oder Rennwochenende trägst du selbst ein, getrennt von der gepflegten Liste. Im Spiegel nennen die Kurzzeilen die Sender mit.
 
 **3.5** (Oktober 2026)
 Neu: das iPhone-Widget über Scriptable (siehe oben), mit großem, mittlerem und kleinem Widget sowie Sperrbildschirm. Unter Anpassen, Daten gibt es das Skript und den Zugang zum Kopieren, die Schnellsuche findet es unter „iPhone-Widget“.

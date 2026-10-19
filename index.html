@@ -945,6 +945,46 @@ details.tt summary{cursor:pointer;font-weight:600;font-size:13px}
 .in-res button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .in-res button:hover span{text-decoration:underline}
 
+/* Sender (Fußball und Formel 1): gratis in Grün, Abo zurückhaltend */
+.tv{display:inline-flex;align-items:center;gap:3px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font:600 12px/1.5 var(--f-body);font-style:normal;white-space:nowrap;text-decoration:none}
+.tv.free{border-color:transparent;background:color-mix(in oklab,var(--good) 15%,var(--surface));color:color-mix(in oklab,var(--good) 70%,var(--ink))}
+a.tv:hover{box-shadow:inset 0 0 0 1px currentColor}
+a.tv:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+a.tv svg{width:11px;height:11px;flex:0 0 auto}
+.tv-box{display:flex;flex-direction:column;gap:7px;padding:9px 10px 10px 12px;border-radius:12px;background:var(--raise)}
+.tv-h{display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap;font-size:13px;min-height:28px}
+.tv-h>svg,.tv-line>svg{width:16px;height:16px;color:var(--muted);flex:0 0 auto}
+.tv-h b{font-weight:700}
+.tv-h>span:not(.chip):not(.live){color:var(--muted);font:400 12.5px var(--f-data);font-variant-numeric:tabular-nums}
+.tv-h .live{font-size:12.5px}
+.tv-h .icon-btn,.tv-line .icon-btn{margin-left:auto;width:28px;height:28px;flex:0 0 28px}
+.tv-box .tv-ch{display:flex;flex-wrap:wrap;gap:6px}
+.tv-box .tv{font-size:13px;padding:3px 10px}
+.tv-box .tv.free{background:color-mix(in oklab,var(--good) 17%,var(--surface))}
+.tv-vpn,.tv-note{margin:0;font-size:12.5px;line-height:1.4;color:var(--muted)}
+.tv-mini{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.tv-mini .tv{font-size:10.5px;padding:0 6px;line-height:1.6}
+.f1-sess li.next .tv-mini .tv:not(.free){background:transparent}
+.tv-line{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:12.5px;color:var(--muted);margin-top:-4px}
+.tv-conf{display:inline-flex;align-items:center;gap:5px;font:500 12px/1.4 var(--f-body);color:var(--muted);white-space:nowrap}
+.tv-conf .tv{font-size:10.5px;padding:0 6px}
+.fb-day{display:flex;align-items:center;justify-content:space-between;gap:4px 10px;flex-wrap:wrap}
+.fb-day .tv-conf+.tv-conf{margin-left:-4px}
+.tv-at{border:0;background:transparent;color:inherit;padding:3px 4px;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:0;cursor:pointer;font:500 13px/1.1 var(--f-data)}
+.tv-at:hover{background:var(--raise)}
+.tv-at:focus-visible{outline:2px solid var(--sea);outline-offset:1px}
+.tv-at .tv-mini{justify-content:center}
+.tv-at.own>span:first-child{text-decoration:underline dotted;text-underline-offset:3px}
+/* Einstellungen und Dialog */
+.set-h{margin:4px 0 0;padding-top:12px;border-top:1px solid var(--line);font:600 13px/1.3 var(--f-body);color:var(--muted)}
+.tv-set{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:12px}
+.tv-set:disabled{opacity:.45}
+.tv-set .btn-ghost{align-self:flex-start}
+.days label[hidden]{display:none}
+.tv-rows{display:flex;flex-direction:column;gap:14px}
+.tv-row{display:flex;flex-direction:column;gap:6px}
+.tv-rows .days small{font-weight:500;opacity:.75}
+
 /* 33-kalender.css */
 /* Kalender */
 .ca-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
@@ -2592,6 +2632,26 @@ html.mirror-on body{overflow:hidden}
   </form>
 </dialog>
 
+<!-- Sender eines Spiels oder Rennwochenendes ändern (33-sender.js) -->
+<dialog class="dlg" id="dlg-tv" aria-labelledby="tv-h">
+  <form id="tv-form" novalidate>
+    <div class="dlg-head">
+      <h2 id="tv-h">Sender ändern</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body">
+      <p class="hint" id="tv-sub"></p>
+      <div class="tv-rows" id="tv-rows"></div>
+      <p class="hint" id="tv-note"></p>
+    </div>
+    <div class="dlg-foot">
+      <button type="submit" class="btn">Speichern</button>
+      <button type="button" class="btn-ghost" data-close>Abbrechen</button>
+      <button type="button" class="btn-ghost" id="tv-reset" hidden>Wieder wie in der Liste</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog class="dlg dlg-cap" id="dlg-cap" aria-labelledby="cap-h">
   <form id="cap-form" novalidate>
     <div class="dlg-head">
@@ -3184,6 +3244,7 @@ const numTxt = n => numDe(n, n % 1 ? 1 : 0);
  * state.pomo     erledigte Pomodoro-Runden pro Tag
  * state.bdays    Geburtstage: { list: [{ id, name, m, d, y }] }, y fehlt, wenn das Jahr unbekannt ist
  * state.waste    Müllabfuhr: { bins: [{ id, name, color, dates[], every, start }], file: { name, at } }
+ * state.tv       eigene Sender pro Spiel oder Rennwochenende: { ov: { 'fb:bl1:12345': ['sky', 'rtl'], 'f1:2026:vegas': { race: ['sky'] } } }
  */
 /* Längste Notiz in Zeichen, rund 25 Seiten Text */
 const NOTE_MAX = 50000;
@@ -3223,8 +3284,8 @@ const TYPES = {
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, cat: 'plan', since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
   habits:   { name: 'Gewohnheiten', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
-  f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
+  football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel und wo es läuft, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
+  f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions und wo sie laufen, auch gratis in Österreich und der Schweiz, dazu WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
   fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause, an einem Ort deiner Wahl oder da, wo du gerade bist.' },
   cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus iCloud, Google, Outlook oder jedem Kalender mit ICS-Link, nach Tagen sortiert, mit Farbe pro Kalender.' },
   dep:      { name: 'Abfahrten', multi: true, w: 1, cat: 'go', since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
@@ -3235,6 +3296,11 @@ const SOON = [];
 /* Register in der Galerie */
 const CATS = { day: 'Alltag', plan: 'Planung', go: 'Unterwegs', fun: 'Freizeit' };
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
+/* Sender für Fußball und Formel 1 (Namen, Regeln und Links stehen in 33-sender.js). Eigene Änderungen pro Spiel oder Rennen höchstens TV_OV_MAX. */
+const FB_TV_CH = ['sky', 'dazn', 'magenta', 'rtl', 'sat1', 'ard'];
+const F1_TV_CH = ['sky', 'rtl', 'orf', 'servus', 'srf'];
+const F1_TV_KINDS = { fp: 'Training', sq: 'Sprint-Quali', sprint: 'Sprint', quali: 'Qualifying', race: 'Rennen' };
+const TV_OV_MAX = 300;
 /* Verkehrsmittel im Abfahrten-Widget */
 const DP_CATS = { s: 'S-Bahn', u: 'U-Bahn', bus: 'Bus', tram: 'Straßenbahn', ferry: 'Fähre', re: 'Regionalzug', fv: 'Fernzug' };
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
@@ -3410,6 +3476,30 @@ function normFuel(c) {
   if (mode === 'place' && !place) mode = 'route';
   return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode, place, rad: [3, 5, 10, 25].includes(+c.rad) ? +c.rad : 5, sort: c.sort === 'dist' ? 'dist' : 'price' };
 }
+/* Senderanzeige in Fußball und Formel 1: an, welche Sender, nur Free-TV, auch in der Liste, Livestream-Links.
+ * Formel 1 dazu die Sessions und den VPN-Hinweis, Fußball die Konferenzen. Neue Sender sind von selbst an. */
+function normTvCfg(t, chs, kinds) {
+  t = t && typeof t === 'object' ? t : {};
+  const pick = (l, all) => (Array.isArray(l) ? all.filter(x => l.includes(x)) : all.slice());
+  const o = { on: t.on !== false, ch: pick(t.ch, chs), free: !!t.free, all: t.all !== false, link: t.link !== false };
+  if (kinds) { o.ses = pick(t.ses, Object.keys(kinds)); o.vpn = t.vpn !== false; } else o.conf = t.conf !== false;
+  return o;
+}
+/* Eigene Sender pro Spiel (fb:Liga:Spiel-ID, Liste) oder Rennwochenende (f1:Saison:Strecke, Liste pro Session-Art) */
+function normTv(t) {
+  const src = t && typeof t === 'object' && t.ov && typeof t.ov === 'object' && !Array.isArray(t.ov) ? t.ov : {};
+  const ov = {}, keep = (l, all) => all.filter(c => l.includes(c));
+  for (const [k, v] of Object.entries(src).slice(-TV_OV_MAX)) {
+    const fb = /^fb:([a-z0-9]{1,6}):\d{1,10}$/.exec(k);
+    if (fb && FB_LEAGUES[fb[1]] && Array.isArray(v)) ov[k] = keep(v, FB_TV_CH);
+    else if (/^f1:\d{4}:[a-z0-9_]{1,40}$/.test(k) && v && typeof v === 'object' && !Array.isArray(v)) {
+      const o = {};
+      for (const kk of Object.keys(F1_TV_KINDS)) if (Array.isArray(v[kk])) o[kk] = keep(v[kk], F1_TV_CH);
+      if (Object.keys(o).length) ov[k] = o;
+    }
+  }
+  return { ov };
+}
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
@@ -3417,8 +3507,8 @@ function normCfg(type, c) {
     case 'pomodoro': return { focus: intIn(c.focus, 1, 120, 25), short: intIn(c.short, 1, 60, 5), long: intIn(c.long, 1, 90, 15), every: intIn(c.every, 2, 8, 4), sound: c.sound !== false, auto: !!c.auto };
     case 'habits': return { items: normHabits(c.items) };
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
-    case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '' };
-    case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
+    case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '', tv: normTvCfg(c.tv, FB_TV_CH) };
+    case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '', tv: normTvCfg(c.tv, F1_TV_CH, F1_TV_KINDS) };
     case 'cal': return { days: [7, 14, 30].includes(+c.days) ? +c.days : 14, loc: c.loc !== false };
     case 'dep': return { stop: normStop(c.stop), modes: normCats(c.modes), walk: intIn(c.walk, 0, 60, 0), n: [4, 6, 8, 10].includes(+c.n) ? +c.n : 6, lines: strIn(c.lines, 60), dir: strIn(c.dir, 60) };
     case 'bday': return { n: [4, 6, 8, 12].includes(+c.n) ? +c.n : 6, cal: c.cal !== false };
@@ -3617,6 +3707,7 @@ function normalize(s) {
     pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
     bdays: normBdays(s.bdays),
     waste: normWaste(s.waste),
+    tv: normTv(s.tv),
     meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
 }
@@ -8189,6 +8280,282 @@ defineWidget('learn', {
   render: renderLearn
 });
 
+/* 33-sender.js */
+/* Sender für Fußball und Formel 1: wo ein Spiel oder eine Session läuft.
+ * Eine freie Schnittstelle dafür gibt es nicht, deshalb steht hier eine gepflegte Liste (Stand TV_STAND):
+ * Regeln pro Liga nach Anstoßzeit und pro Rennwochenende, wer in Österreich und der Schweiz frei überträgt.
+ * Was du selbst änderst, liegt getrennt in state.tv.ov (Schlüssel fb:Liga:Spiel-ID oder f1:Saison:Strecke)
+ * und übersteht jedes Update dieser Liste. Gratis heißt frei empfangbar im Heimatland des Senders.
+ * ORF, ServusTV und SRF sperren Zugriffe von außerhalb, aus Deutschland geht das nur mit VPN.
+ *
+ * Neue F1-Saison eintragen: in F1_TV ein Jahr mit base (wer grundsätzlich welche Sessions zeigt) und races
+ * (pro circuitId von Jolpica: at = wer in Österreich live zeigt, ORF oder ServusTV, rtl = RTL zeigt Qualifying und Rennen frei).
+ * Danach TV_STAND hochsetzen. Fehlt eine Saison, sagt die Karte das, statt etwas Falsches zu zeigen. */
+const TV_STAND = '2026-10-19';
+const TV = {
+  sky: { name: 'Sky', full: 'Sky und WOW' },
+  dazn: { name: 'DAZN' },
+  magenta: { name: 'MagentaSport' },
+  rtl: { name: 'RTL', free: true, url: 'https://plus.rtl.de/', via: 'RTL+' },
+  sat1: { name: 'Sat.1', free: true, url: 'https://www.joyn.de/play/live-tv', via: 'Joyn' },
+  ard: { name: 'ARD', full: 'ARD und die Dritten', free: true, url: 'https://www.ardmediathek.de/live', via: 'ARD Mediathek' },
+  orf: { name: 'ORF', free: true, vpn: 'Österreich', url: 'https://on.orf.at/livestreams', via: 'ORF ON' },
+  servus: { name: 'ServusTV', free: true, vpn: 'Österreich', url: 'https://www.servustv.com/de/sport', via: 'ServusTV On' },
+  srf: { name: 'SRF', free: true, vpn: 'Schweiz', url: 'https://www.srf.ch/play/tv/live', via: 'Play SRF' }
+};
+/* Formel 1. Sky zeigt in Deutschland alles, SRF Sprint und Qualifying samt Rennen (keine Trainings).
+ * In Österreich wechseln sich ORF und ServusTV ab, wer dran ist, zeigt alle Sessions. RTL hat 2026 fünf Rennen frei,
+ * offen ist davon nur noch Las Vegas. Die Rennen vor dem Stand fehlen hier, die zeigt die Karte nicht mehr an. */
+const F1_TV = {
+  2026: {
+    base: { sky: 'all', srf: ['sq', 'sprint', 'quali', 'race'] },
+    races: {
+      americas: { at: 'servus' },
+      rodriguez: { at: 'orf' },
+      interlagos: { at: 'servus' },
+      vegas: { at: 'orf', rtl: true },
+      losail: { at: 'servus' },
+      yas_marina: { at: 'orf' }
+    }
+  }
+};
+/* Fußball nach Anstoßzeit in deutscher Zeit. conf: wer die Konferenz zeigt, wenn mehrere Spiele gleichzeitig anfangen.
+ * 1. Liga: Sky hat Freitag, Samstag und die englischen Wochen, DAZN den Sonntag und die Samstagskonferenz.
+ * 2. Liga: Sky hat alles, das Topspiel am Samstagabend läuft meistens zusätzlich bei RTL.
+ * 3. Liga: MagentaSport hat alles, rund zwei Spiele pro Wochenende zeigen die Dritten.
+ * Free-TV-Spiele, die kurzfristig festgelegt werden (RTL und Sat.1 in der 1. Liga, die Dritten in der 3. Liga), trägst du per Tipp auf die Anstoßzeit ein. */
+const FB_TV = {
+  bl1: { ch: ['sky', 'dazn', 'rtl', 'sat1'], conf: 'dazn', rule: t => (t.wd === 0 ? ['dazn'] : ['sky']) },
+  bl2: { ch: ['sky', 'rtl', 'sat1'], conf: 'sky', rule: t => (t.wd === 6 && t.min >= 20 * 60 ? ['sky', 'rtl'] : ['sky']) },
+  bl3: { ch: ['magenta', 'ard'], conf: 'magenta', rule: () => ['magenta'] }
+};
+const TV_ICO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6.5" width="18" height="12.5" rx="2.5"/><path d="M8.5 2.8l3.5 3.7 3.5-3.7"/></svg>';
+const TV_OUT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 16l8-8M9.5 8H16v6.5"/></svg>';
+
+/* Anstoß in deutscher Zeit, auch wenn der Browser woanders steht: Wochentag (0 = Sonntag) und Minuten seit Mitternacht */
+let tvFmt = null;
+function deTime(ms) {
+  const d = new Date(ms);
+  try {
+    tvFmt = tvFmt || new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    const p = Object.fromEntries(tvFmt.formatToParts(d).map(x => [x.type, x.value]));
+    const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(p.weekday);
+    if (wd >= 0) return { wd, min: (+p.hour % 24) * 60 + +p.minute };
+  } catch { /* ohne Zeitzonen-Daten gilt die Zeit des Browsers */ }
+  return { wd: d.getDay(), min: d.getHours() * 60 + d.getMinutes() };
+}
+const tvStand = () => { const d = parseYmd(TV_STAND); return `${dm(d)}${d.getFullYear()}`; };
+/* Was ein Widget von einer Senderliste zeigt: nur eingeschaltete Sender, bei „Nur Free-TV“ nur freie, die freien zuerst */
+const tvFreeFirst = l => [...l.filter(c => TV[c].free), ...l.filter(c => !TV[c].free)];
+const tvShown = (list, t) => tvFreeFirst(list.filter(c => TV[c] && t.ch.includes(c) && (!t.free || TV[c].free)));
+const tvNames = list => { const n = list.map(c => TV[c].name); return n.length > 1 ? `${n.slice(0, -1).join(', ')} und ${n[n.length - 1]}` : n[0] || ''; };
+const tvTip = c => { const T = TV[c]; return T.free ? `${T.full || T.name}, gratis${T.vpn ? ` in ${T.vpn === 'Schweiz' ? 'der Schweiz' : T.vpn}, aus Deutschland mit VPN` : ''}` : `${T.full || T.name}, im Abo`; };
+function tvChip(c, link) {
+  const T = TV[c], cls = `tv${T.free ? ' free' : ''}`;
+  if (link && T.free && T.url) return `<a class="${cls}" href="${T.url}" target="_blank" rel="noopener" title="Zum Livestream bei ${esc(T.via)}">${esc(T.name)}${TV_OUT}</a>`;
+  return `<span class="${cls}" title="${esc(tvTip(c))}">${esc(T.name)}</span>`;
+}
+const tvMini = list => (list.length ? `<span class="tv-mini">${list.map(c => `<i class="tv${TV[c].free ? ' free' : ''}" title="${esc(tvTip(c))}">${esc(TV[c].name)}</i>`).join('')}</span>` : '');
+/* VPN: Schweiz für SRF, Österreich für ServusTV */
+function tvVpn(list) {
+  const by = new Map();
+  for (const c of list) if (TV[c].vpn) by.set(TV[c].vpn, [...(by.get(TV[c].vpn) || []), TV[c].name]);
+  return by.size ? `<p class="tv-vpn">VPN: ${esc([...by].map(([land, n]) => `${land} für ${n.join(' und ')}`).join(', '))}</p>` : '';
+}
+
+/* Eigene Änderungen. Neue kommen ans Ende, damit beim Kappen die ältesten gehen. */
+const tvOv = k => state.tv.ov[k] || null;
+function tvPut(k, v) {
+  delete state.tv.ov[k];
+  if (v) state.tv.ov[k] = v;
+  const ks = Object.keys(state.tv.ov);
+  for (const x of ks.slice(0, Math.max(0, ks.length - TV_OV_MAX))) delete state.tv.ov[x];
+}
+const tvOwnCount = pre => Object.keys(state.tv.ov).filter(k => k.startsWith(pre)).length;
+
+/* ---------- Formel 1 ---------- */
+const f1TvKey = r => `f1:${r.season}:${r.Circuit.circuitId}`;
+function f1TvBase(r, k) {
+  const S = F1_TV[r.season];
+  if (!S) return null;
+  const R = S.races[r.Circuit.circuitId] || {}, on = new Set();
+  for (const [c, ks] of Object.entries(S.base)) if (ks === 'all' || ks.includes(k)) on.add(c);
+  if (R.at) on.add(R.at);
+  if (R.rtl && (k === 'quali' || k === 'race')) on.add('rtl');
+  return F1_TV_CH.filter(c => on.has(c));
+}
+function f1Tv(r, k) {
+  const o = tvOv(f1TvKey(r));
+  if (o && o[k]) return { ch: o[k], own: true };
+  const b = f1TvBase(r, k);
+  return { ch: b || [], own: false, unknown: !b };
+}
+/* Die Session für den Kasten: die laufende oder die nächste von denen, die du sehen willst */
+function f1TvSession(r, now, t) {
+  const ss = f1Sessions(r).filter(s => t.ses.includes(s.k));
+  const live = ss.find(s => now >= +s.at && now < +s.at + s.min * 6e4);
+  if (live) return { s: live, live: true };
+  const nx = ss.find(s => +s.at > now);
+  return nx ? { s: nx, live: false } : null;
+}
+function f1TvBox(r, now) {
+  const t = state.widgets.f1.cfg.tv;
+  if (!t.on) return '';
+  const p = f1TvSession(r, now, t);
+  if (!p) return '';
+  const s = p.s, tv = f1Tv(r, s.k), shown = tvShown(tv.ch, t);
+  const when = p.live ? '<span class="live">läuft</span>' : `<span>${WD[s.at.getDay()]} ${dm(s.at)} ${hm(s.at)}</span>`;
+  let body;
+  if (tv.unknown) body = `<p class="tv-note">Für ${esc(r.season)} ist noch nicht eingetragen, wer überträgt. Mit dem Stift trägst du es selbst ein.</p>`;
+  else if (!shown.length) body = `<p class="tv-note">${tv.ch.length ? `Nur bei ${esc(tvNames(tv.ch))}` : 'Kein Sender eingetragen'}</p>`;
+  else body = `<div class="tv-ch">${shown.map(c => tvChip(c, t.link)).join('')}</div>${t.vpn ? tvVpn(shown) : ''}`;
+  return `<div class="tv-box"><div class="tv-h">${TV_ICO}<b>${esc(s.name)}</b>${when}${tv.own ? '<span class="chip">Eigene Auswahl</span>' : ''}<button type="button" class="icon-btn" data-tvedit aria-label="Sender für dieses Rennwochenende ändern" title="Sender ändern">${PENCIL}</button></div>${body}</div>`;
+}
+/* Kleine Sender an einer Session im Zeitplan */
+function f1TvMini(r, s) {
+  const t = state.widgets.f1.cfg.tv;
+  return t.on && t.all && t.ses.includes(s.k) ? tvMini(tvShown(f1Tv(r, s.k).ch, t)) : '';
+}
+/* Für Spiegel und Jetzt: die Sender einer Session als Text, höchstens drei */
+function f1TvText(r, s) {
+  const t = state.widgets.f1.cfg.tv;
+  return t.on && s && t.ses.includes(s.k) ? tvNames(tvShown(f1Tv(r, s.k).ch, t).slice(0, 3)) : '';
+}
+function f1TvEdit() {
+  const r = f1.races ? f1Next(Date.now()) : null;
+  if (!r) return;
+  const ss = f1Sessions(r), o = tvOv(f1TvKey(r)) || {};
+  const rows = [...new Set(ss.map(s => s.k))].map(k => {
+    const list = ss.filter(s => s.k === k), base = f1TvBase(r, k) || [];
+    const when = list.length > 1 ? [...new Set(list.map(s => WD[s.at.getDay()]))].join(', ') : `${WD[list[0].at.getDay()]} ${hm(list[0].at)}`;
+    return { k, label: `${F1_TV_KINDS[k]} · ${when}`, chs: F1_TV_CH, base, cur: o[k] || base };
+  });
+  tvDialog({ sub: `${f1Short(r.raceName)}, ${dm(ss[0].at)} bis ${dm(f1When(r))}`, key: f1TvKey(r), f1: true, rows, note: 'Gilt nur für dieses Rennwochenende. Was du so lässt, wie es ist, folgt weiter der Liste.' });
+}
+
+/* ---------- Fußball ---------- */
+const fbTvKey = (lg, m) => `fb:${lg}:${m.matchID}`;
+const fbTvBase = (lg, m) => (FB_TV[lg] ? FB_TV[lg].rule(deTime(kick(m))) : []);
+function fbTv(lg, m) {
+  const o = tvOv(fbTvKey(lg, m));
+  return o ? { ch: o, own: true } : { ch: fbTvBase(lg, m), own: false };
+}
+/* Fangen mehrere Spiele einer Liga gleichzeitig an, gibt es sie zusammen in der Konferenz */
+function fbConf(lg, D, m) {
+  const L = FB_TV[lg], k = kick(m);
+  return L && L.conf && (D.matches || []).filter(x => kick(x) === k).length >= 2 ? L.conf : null;
+}
+const fbConfOn = (t, c) => !!c && t.on && t.conf && tvShown([c], t).length > 0;
+/* Zeile unter dem nächsten Spiel deines Vereins */
+function fbTvLine(c, lg, D, m, now) {
+  const t = c.tv;
+  if (!t.on || !m || m.matchIsFinished) return '';
+  const tv = fbTv(lg, m), shown = tvShown(tv.ch, t), conf = fbConf(lg, D, m);
+  const pen = `<button type="button" class="icon-btn" data-fbtv="${m.matchID}" data-lg="${lg}" aria-label="Sender für dieses Spiel ändern" title="Sender ändern">${PENCIL}</button>`;
+  const confHtml = fbConfOn(t, conf) ? `<span class="tv-conf">auch in der Konferenz bei ${esc(TV[conf].name)}</span>` : '';
+  if (!shown.length && !confHtml) return t.free || !tv.ch.length ? '' : `<div class="tv-line">${TV_ICO}<span class="tv-note">Nur bei ${esc(tvNames(tv.ch))}</span>${pen}</div>`;
+  return `<div class="tv-line">${TV_ICO}${fbIsLive(m, now) ? '<span>Läuft bei</span>' : ''}${shown.map(c2 => tvChip(c2, t.link)).join('')}${confHtml}${tv.own ? '<span class="chip">Eigene Auswahl</span>' : ''}${pen}</div>`;
+}
+/* Anstoßzeit im Spieltag: antippen ändert die Sender, darunter die kleinen Sender */
+function fbTvAt(c, lg, m) {
+  const t = c.tv, d = new Date(kick(m));
+  if (!t.on) return `<span class="fb-sc time">${hm(d)}</span>`;
+  const tv = fbTv(lg, m);
+  return `<button type="button" class="fb-sc time tv-at${tv.own ? ' own' : ''}" data-fbtv="${m.matchID}" data-lg="${lg}" title="Sender ändern"><span>${hm(d)}</span>${t.all ? tvMini(tvShown(tv.ch, t)) : ''}</button>`;
+}
+/* Konferenzen eines Tages für die Tageszeile im Spieltag */
+function fbConfDay(c, lg, D, list) {
+  const t = c.tv, out = [], seen = new Set();
+  for (const m of list) {
+    const k = kick(m);
+    if (seen.has(k) || m.matchIsFinished) continue;
+    seen.add(k);
+    const conf = fbConf(lg, D, m);
+    if (fbConfOn(t, conf)) out.push(`<span class="tv-conf">${hm(new Date(k))} Konferenz <i class="tv">${esc(TV[conf].name)}</i></span>`);
+  }
+  return out.join('');
+}
+/* Für Spiegel und Jetzt */
+function fbTvText(c, lg, m) {
+  const t = c.tv;
+  return t.on && m && !m.matchIsFinished ? tvNames(tvShown(fbTv(lg, m).ch, t).slice(0, 2)) : '';
+}
+function fbTvEdit(lg, id) {
+  const D = fbData(lg), m = (D.matches || []).find(x => x.matchID === id);
+  if (!m || !FB_TV[lg]) return;
+  const d = new Date(kick(m)), base = fbTvBase(lg, m), nm = x => x.shortName || x.teamName, conf = fbConf(lg, D, m);
+  tvDialog({
+    sub: `${nm(m.team1)} gegen ${nm(m.team2)}, ${WDL[d.getDay()]} ${dm(d)} ${hm(d)}`,
+    key: fbTvKey(lg, m), f1: false,
+    rows: [{ k: '', label: 'Läuft bei', chs: FB_TV[lg].ch, base, cur: tvOv(fbTvKey(lg, m)) || base }],
+    note: conf ? `Die Konferenz bei ${TV[conf].name} bleibt, wie sie ist.` : ''
+  });
+}
+
+/* ---------- Sender eines Spiels oder Rennens ändern ---------- */
+const tvd = { key: '', f1: false, rows: [] };
+const tvSame = (a, b) => a.length === b.length && a.every(x => b.includes(x));
+function tvDialog(o) {
+  tvd.key = o.key;
+  tvd.f1 = o.f1;
+  tvd.rows = o.rows;
+  $('#tv-sub').textContent = o.sub;
+  $('#tv-rows').innerHTML = o.rows.map((r, i) => `<div class="tv-row"><fieldset class="days"><legend class="lbl">${esc(r.label)}</legend>${r.chs.map(c => `<label title="${esc(tvTip(c))}"><input type="checkbox" data-row="${i}" value="${c}"${r.cur.includes(c) ? ' checked' : ''}><span>${esc(TV[c].name)}${TV[c].free ? ' <small>gratis</small>' : ''}</span></label>`).join('')}</fieldset>`
+    + (tvSame(r.cur, r.base) ? '' : `<p class="hint">Laut Liste: ${esc(r.base.length ? tvNames(r.base) : 'kein Sender')}</p>`) + '</div>').join('');
+  $('#tv-note').textContent = o.note || '';
+  $('#tv-reset').hidden = !tvOv(o.key);
+  $('#dlg-tv').showModal();
+}
+$('#tv-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const sel = i => [...$('#tv-rows').querySelectorAll(`[data-row="${i}"]`)].filter(x => x.checked).map(x => x.value);
+  if (tvd.f1) {
+    const o = {};
+    tvd.rows.forEach((r, i) => { const s = sel(i); if (!tvSame(s, r.base)) o[r.k] = s; });
+    tvPut(tvd.key, Object.keys(o).length ? o : null);
+  } else {
+    const s = sel(0);
+    tvPut(tvd.key, tvSame(s, tvd.rows[0].base) ? null : s);
+  }
+  $('#dlg-tv').close();
+  commit();
+});
+$('#tv-reset').addEventListener('click', () => { tvPut(tvd.key, null); $('#dlg-tv').close(); commit(); });
+
+/* ---------- Einstellungen im Widget ---------- */
+/* o: ch (Sender zur Auswahl), show (davon sichtbar), kinds (Sessions wählbar), conf, vpn, allTxt, hint, pre (Präfix der eigenen Änderungen) */
+function tvSetHtml(t, o) {
+  const chip = (attr, k, name, on, hide) => `<label${hide ? ' hidden' : ''}><input type="checkbox" ${attr}="${k}"${on ? ' checked' : ''}><span>${esc(name)}</span></label>`;
+  const sw = (k, on, txt) => `<label class="check-row"><input type="checkbox" class="switch" data-tv="${k}"${on ? ' checked' : ''}> ${txt}</label>`;
+  const own = tvOwnCount(o.pre);
+  return `<p class="set-h">Sender</p>${sw('on', t.on, 'Zeigen, wo es läuft')}<fieldset class="tv-set" data-tv="box"${t.on ? '' : ' disabled'}>`
+    + `<fieldset class="days"><legend class="lbl">Diese Sender</legend>${o.ch.map(c => chip('data-tvch', c, TV[c].name, t.ch.includes(c), !o.show.includes(c))).join('')}</fieldset>`
+    + (o.kinds ? `<fieldset class="days"><legend class="lbl">Bei diesen Sessions</legend>${Object.entries(F1_TV_KINDS).map(([k, n]) => chip('data-tvk', k, n, t.ses.includes(k))).join('')}</fieldset>` : '')
+    + sw('free', t.free, 'Nur Free-TV')
+    + (o.conf ? sw('conf', t.conf, 'Konferenzen zeigen') : '')
+    + sw('all', t.all, o.allTxt)
+    + (o.vpn ? sw('vpn', t.vpn, 'VPN-Hinweis bei ORF, ServusTV und SRF') : '')
+    + sw('link', t.link, 'Free-TV-Sender verlinken den Livestream')
+    + `<p class="hint">${o.hint}</p>`
+    + (own ? `<button type="button" class="btn-ghost" data-tv="reset">Eigene Änderungen zurücksetzen (${own})</button>` : '')
+    + '</fieldset>';
+}
+function tvSetWire(box, pre) {
+  box._tvPre = pre;
+  box._tvReset = false;
+  box.querySelector('[data-tv="on"]').addEventListener('change', e => { box.querySelector('[data-tv="box"]').disabled = !e.target.checked; });
+  const rs = box.querySelector('[data-tv="reset"]');
+  if (rs) rs.addEventListener('click', () => { box._tvReset = true; rs.disabled = true; rs.textContent = 'Wird beim Speichern zurückgesetzt'; });
+}
+function tvSetSave(box, t) {
+  const q = s => box.querySelector(s);
+  t.on = q('[data-tv="on"]').checked;
+  t.ch = [...box.querySelectorAll('[data-tvch]')].filter(x => x.checked).map(x => x.dataset.tvch);
+  if (q('[data-tvk]')) t.ses = [...box.querySelectorAll('[data-tvk]')].filter(x => x.checked).map(x => x.dataset.tvk);
+  for (const k of ['free', 'conf', 'all', 'vpn', 'link']) { const x = q(`[data-tv="${k}"]`); if (x) t[k] = x.checked; }
+  if (box._tvReset) for (const k of Object.keys(state.tv.ov)) if (k.startsWith(box._tvPre)) delete state.tv.ov[k];
+}
+
 /* 34-info.js */
 /* Infofenster für Vereine, Fahrer und Teams, mit Kurztext aus Wikipedia */
 const wikiCache = new Map();
@@ -8379,9 +8746,10 @@ function fbFavHtml(D, c, lg, now) {
   const lbl = live ? '<span class="live">Live</span>' : next ? 'Nächstes Spiel' : last ? 'Letztes Spiel' : '';
   const sub = row ? `Platz ${pos} · ${row.points} ${row.points === 1 ? 'Punkt' : 'Punkte'} · ${row.matches} ${row.matches === 1 ? 'Spiel' : 'Spiele'}` : '';
   return `<div class="fb-top"><button type="button" class="fb-head" data-fbteam="${id}" data-lg="${lg}">${fbLogo(icon, 'lg', row ? row.shortName : t0.shortName)}<span><b>${esc(name)}</b><small>${esc(sub)}</small></span></button>${form.length ? fbFormHtml(form) : ''}</div>`
-    + (show ? `<p class="fb-label">${lbl}</p>${fbMatchBox(show, lg, now)}` : '');
+    + (show ? `<p class="fb-label">${lbl}</p>${fbMatchBox(show, lg, now)}${show === last ? '' : fbTvLine(c, lg, D, show, now)}` : '');
 }
-function fbDayHtml(v, D, lg, fav, now) {
+function fbDayHtml(v, D, lg, c, now) {
+  const fav = c.team;
   const groups = [...new Set((D.matches || []).map(m => m.group.groupOrderID))].sort((a, b) => a - b);
   if (!groups.length) return '<p class="empty">Noch keine Spiele angesetzt.</p>';
   const curG = D.cur ? D.cur.groupOrderID : groups[0];
@@ -8393,9 +8761,9 @@ function fbDayHtml(v, D, lg, fav, now) {
   let day = '';
   for (const m of ms) {
     const d = new Date(kick(m)), k = ymd(d);
-    if (k !== day) { day = k; html += `<li class="fb-day">${WDL[d.getDay()]}, ${dm(d)}</li>`; }
+    if (k !== day) { day = k; html += `<li class="fb-day"><span>${WDL[d.getDay()]}, ${dm(d)}</span>${fbConfDay(c, lg, D, ms.filter(x => ymd(new Date(kick(x))) === k))}</li>`; }
     const s = fbScore(m), live = fbIsLive(m, now), started = now >= kick(m);
-    const sc = s && (m.matchIsFinished || started) ? `<span class="fb-sc"${live ? ' data-live' : ''}${live ? ' title="Läuft gerade"' : ''}>${s[0]}:${s[1]}</span>` : `<span class="fb-sc time">${hm(d)}</span>`;
+    const sc = s && (m.matchIsFinished || started) ? `<span class="fb-sc"${live ? ' data-live' : ''}${live ? ' title="Läuft gerade"' : ''}>${s[0]}:${s[1]}</span>` : fbTvAt(c, lg, m);
     const isFav = fav && (m.team1.teamId === fav || m.team2.teamId === fav);
     html += `<li class="fb-row${isFav ? ' fav' : ''}">${fbTeamBtn(m.team1, lg)}${sc}${fbTeamBtn(m.team2, lg, true)}</li>`;
   }
@@ -8456,8 +8824,8 @@ function renderFootball(v) {
   fav.innerHTML = fbFavHtml(D, c, lg, now);
   v.tab = v.tab || 'day';
   segSet(q('[data-r="tabs"]'), v.tab);
-  body.innerHTML = v.tab === 'table' ? fbTableHtml(D, lg, c.team) : v.tab === 'scorers' ? fbScorersHtml(D, lg) : fbDayHtml(v, D, lg, c.team, now);
-  q('[data-r="src"]').textContent = `Stand ${hm(new Date(D.tried || D.at))} Uhr${D.err ? ', Aktualisieren hat gerade nicht geklappt' : ''} · Daten: OpenLigaDB`;
+  body.innerHTML = v.tab === 'table' ? fbTableHtml(D, lg, c.team) : v.tab === 'scorers' ? fbScorersHtml(D, lg) : fbDayHtml(v, D, lg, c, now);
+  q('[data-r="src"]').textContent = `Stand ${hm(new Date(D.tried || D.at))} Uhr${D.err ? ', Aktualisieren hat gerade nicht geklappt' : ''} · Daten: OpenLigaDB${c.tv.on ? ` · Sender: Stand ${tvStand()}` : ''}`;
 }
 
 /* Infofenster zu einem Verein */
@@ -8503,6 +8871,8 @@ defineWidget('football', {
     v.el.addEventListener('click', e => {
       const t = e.target.closest('[data-fbteam]');
       if (t) return fbTeamInfo(t.dataset.lg, +t.dataset.fbteam);
+      const tv = e.target.closest('[data-fbtv]');
+      if (tv) return fbTvEdit(tv.dataset.lg, +tv.dataset.fbtv);
       const tab = e.target.closest('[data-r="tabs"] [data-v]');
       if (tab) { v.tab = tab.dataset.v; renderFootball(v); return; }
       const nav = e.target.closest('[data-fbmd]');
@@ -8526,7 +8896,15 @@ defineWidget('football', {
   render: renderFootball,
   settings: {
     render(box, w) {
-      box.innerHTML = `<label class="field"><span class="lbl">Liga</span><select data-s="lg">${Object.entries(FB_LEAGUES).map(([k, n]) => `<option value="${k}"${k === w.cfg.league ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label><label class="field"><span class="lbl">Lieblingsverein</span><select data-s="team"></select></label><p class="hint" data-s="hint"></p>`;
+      const pre = `fb:${w.cfg.league}:`;
+      box.innerHTML = `<label class="field"><span class="lbl">Liga</span><select data-s="lg">${Object.entries(FB_LEAGUES).map(([k, n]) => `<option value="${k}"${k === w.cfg.league ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></label><label class="field"><span class="lbl">Lieblingsverein</span><select data-s="team"></select></label><p class="hint" data-s="hint"></p>`
+        + tvSetHtml(w.cfg.tv, {
+          ch: FB_TV_CH, show: FB_TV[w.cfg.league].ch, conf: true,
+          allTxt: 'Auch im Spieltag, sonst nur beim nächsten Spiel deines Vereins',
+          hint: `Die Sender folgen den Regeln der Liga, Stand ${tvStand()}. Free-TV-Spiele bei RTL, Sat.1 oder in den Dritten werden kurzfristig festgelegt. Die trägst du selbst ein: im Spieltag auf die Anstoßzeit tippen oder beim nächsten Spiel auf den Stift.`,
+          pre
+        });
+      tvSetWire(box, pre);
       const sel = box.querySelector('[data-s="team"]');
       const fill = (lg, keep) => {
         const D = fbData(lg);
@@ -8539,13 +8917,19 @@ defineWidget('football', {
         if (!D.table && !D.busy) fbLoad(lg).then(() => { if (box.isConnected && box.querySelector('[data-s="lg"]').value === lg) fill(lg, sel.value); });
       };
       fill(w.cfg.league, w.cfg.team);
-      box.querySelector('[data-s="lg"]').addEventListener('change', e => fill(e.target.value, 0));
+      box.querySelector('[data-s="lg"]').addEventListener('change', e => {
+        fill(e.target.value, 0);
+        // Nur die Sender, die es in dieser Liga gibt
+        const show = (FB_TV[e.target.value] || FB_TV.bl1).ch;
+        for (const x of box.querySelectorAll('[data-tvch]')) x.closest('label').hidden = !show.includes(x.dataset.tvch);
+      });
     },
     save(box, w) {
       const lg = box.querySelector('[data-s="lg"]').value, sel = box.querySelector('[data-s="team"]'), id = +sel.value || 0;
       w.cfg.league = FB_LEAGUES[lg] ? lg : 'bl1';
       w.cfg.team = id;
       w.cfg.teamName = id && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : '';
+      tvSetSave(box, w.cfg.tv);
       queueMicrotask(() => fbLoad(w.cfg.league));
       return null;
     }
@@ -8557,7 +8941,8 @@ defineWidget('football', {
  * Ergebnisse kommen kurz nach der Session. Alle Zeiten werden in deine Ortszeit umgerechnet. */
 const JOL = 'https://api.jolpi.ca/ergast/f1';
 const f1 = { races: null, drivers: [], teams: [], last: null, season: '', round: '', at: 0, tried: 0, busy: null, err: null, tab: 'drivers', all: false, timer: null, minute: -1 };
-const F1_SESS = [['FirstPractice', '1. Training', 60], ['SecondPractice', '2. Training', 60], ['ThirdPractice', '3. Training', 60], ['SprintQualifying', 'Sprint-Qualifying', 45], ['SprintShootout', 'Sprint-Shootout', 45], ['Sprint', 'Sprint', 60], ['Qualifying', 'Qualifying', 60]];
+/* Sessions: Schlüssel bei Jolpica, Name, Dauer in Minuten, Art (für die Sender, siehe F1_TV_KINDS) */
+const F1_SESS = [['FirstPractice', '1. Training', 60, 'fp'], ['SecondPractice', '2. Training', 60, 'fp'], ['ThirdPractice', '3. Training', 60, 'fp'], ['SprintQualifying', 'Sprint-Qualifying', 45, 'sq'], ['SprintShootout', 'Sprint-Shootout', 45, 'sq'], ['Sprint', 'Sprint', 60, 'sprint'], ['Qualifying', 'Qualifying', 60, 'quali']];
 const F1_COLOR = { mercedes: '#27F4D2', ferrari: '#E8002D', mclaren: '#FF8000', red_bull: '#3671C6', rb: '#6692FF', alpine: '#FF87BC', haas: '#B6BABD', audi: '#BB0A30', sauber: '#52E252', williams: '#64C4FF', aston_martin: '#229971', cadillac: '#A8A9AD' };
 const NAT_DE = { Argentine: 'Argentinien', Argentinian: 'Argentinien', Australian: 'Australien', Austrian: 'Österreich', Belgian: 'Belgien', Brazilian: 'Brasilien', British: 'Großbritannien', Canadian: 'Kanada', Chinese: 'China', Danish: 'Dänemark', Dutch: 'Niederlande', Finnish: 'Finnland', French: 'Frankreich', German: 'Deutschland', Indian: 'Indien', Irish: 'Irland', Italian: 'Italien', Japanese: 'Japan', Mexican: 'Mexiko', Monegasque: 'Monaco', 'New Zealander': 'Neuseeland', Polish: 'Polen', Russian: 'Russland', Spanish: 'Spanien', Swedish: 'Schweden', Swiss: 'Schweiz', Thai: 'Thailand', American: 'USA', Estonian: 'Estland', Israeli: 'Israel' };
 const COUNTRY_DE = { Australia: 'Australien', Austria: 'Österreich', Azerbaijan: 'Aserbaidschan', Bahrain: 'Bahrain', Belgium: 'Belgien', Brazil: 'Brasilien', Canada: 'Kanada', China: 'China', Hungary: 'Ungarn', Italy: 'Italien', Japan: 'Japan', Malaysia: 'Malaysia', Mexico: 'Mexiko', Monaco: 'Monaco', Netherlands: 'Niederlande', Portugal: 'Portugal', Qatar: 'Katar', 'Saudi Arabia': 'Saudi-Arabien', Singapore: 'Singapur', Spain: 'Spanien', UAE: 'Vereinigte Arabische Emirate', UK: 'Großbritannien', USA: 'USA', 'United States': 'USA', Germany: 'Deutschland', France: 'Frankreich', Turkey: 'Türkei', Argentina: 'Argentinien', 'South Africa': 'Südafrika', Korea: 'Südkorea', India: 'Indien', Russia: 'Russland', Vietnam: 'Vietnam', Thailand: 'Thailand' };
@@ -8565,8 +8950,8 @@ const f1When = o => o && o.date ? new Date(`${o.date}T${o.time || '12:00:00Z'}`)
 const f1Short = n => String(n || '').replace(/ Grand Prix/, ' GP');
 const f1Name = d => `${d.givenName} ${d.familyName}`;
 function f1Sessions(r) {
-  const out = F1_SESS.filter(([k]) => r[k]).map(([k, name, min]) => ({ name, at: f1When(r[k]), min }));
-  out.push({ name: 'Rennen', at: f1When(r), min: 120, race: true });
+  const out = F1_SESS.filter(([k]) => r[k]).map(([k, name, min, kind]) => ({ name, at: f1When(r[k]), min, k: kind }));
+  out.push({ name: 'Rennen', at: f1When(r), min: 120, race: true, k: 'race' });
   return out.filter(s => s.at).sort((a, b) => a.at - b.at);
 }
 /* Nächstes Rennen: das erste, das noch nicht seit drei Stunden vorbei ist */
@@ -8624,9 +9009,9 @@ function f1NextHtml(now) {
   else cd = `in ${esc(dur(raceAt - now, true))}`;
   const items = ss.map(s => {
     const done = now >= s.at.getTime() + s.min * 6e4, isLive = s === live, isNext = !live && s === nx;
-    return `<li class="${done ? 'done' : ''}${isNext ? ' next' : ''}${s.race ? ' race' : ''}"><b>${esc(s.name)}${isLive ? ' <span class="live">Live</span>' : ''}</b><span>${WD[s.at.getDay()]} ${dm(s.at)} ${hm(s.at)}</span></li>`;
+    return `<li class="${done ? 'done' : ''}${isNext ? ' next' : ''}${s.race ? ' race' : ''}"><b>${esc(s.name)}${isLive ? ' <span class="live">Live</span>' : ''}</b><span>${WD[s.at.getDay()]} ${dm(s.at)} ${hm(s.at)}</span>${done ? '' : f1TvMini(r, s)}</li>`;
   }).join('');
-  return `<div class="f1-race"><div><b>${esc(r.raceName)}</b><small>${esc(r.Circuit.circuitName)}, ${esc(COUNTRY_DE[loc.country] || loc.country)}</small></div><span class="f1-cd">${cd}</span></div><ul class="f1-sess">${items}</ul>`;
+  return `<div class="f1-race"><div><b>${esc(r.raceName)}</b><small>${esc(r.Circuit.circuitName)}, ${esc(COUNTRY_DE[loc.country] || loc.country)}</small></div><span class="f1-cd">${cd}</span></div><ul class="f1-sess">${items}</ul>${f1TvBox(r, now)}`;
 }
 function f1DriversHtml(fav) {
   if (!f1.drivers.length) return '<p class="empty">Noch keine Punkte in dieser Saison.</p>';
@@ -8679,7 +9064,7 @@ function renderF1() {
   $('#f1-next').innerHTML = f1NextHtml(now);
   segSet($('#f1-tabs'), f1.tab);
   $('#f1-body').innerHTML = f1.tab === 'teams' ? f1TeamsHtml() : f1.tab === 'last' ? f1LastHtml(fav) : f1DriversHtml(fav);
-  $('#f1-src').textContent = `Stand ${hm(new Date(f1.tried || f1.at))} Uhr${f1.err ? ', Aktualisieren hat gerade nicht geklappt' : ''}${f1.round ? ` · WM-Stand nach Runde ${f1.round}` : ''} · Daten: Jolpica`;
+  $('#f1-src').textContent = `Stand ${hm(new Date(f1.tried || f1.at))} Uhr${f1.err ? ', Aktualisieren hat gerade nicht geklappt' : ''}${f1.round ? ` · WM-Stand nach Runde ${f1.round}` : ''} · Daten: Jolpica${state.widgets.f1.cfg.tv.on ? ` · Sender: Stand ${tvStand()}` : ''}`;
   f1.minute = Math.floor(now / 6e4);
 }
 /* Countdown und Sessions jede Minute auffrischen */
@@ -8742,6 +9127,7 @@ async function f1TeamInfo(id) {
   } catch { fillInfo(key, '[data-r="res"]', '<p class="hint">Die Ergebnisse sind gerade nicht erreichbar.</p>'); }
 }
 $('#f1').addEventListener('click', e => {
+  if (e.target.closest('[data-tvedit]')) return f1TvEdit();
   const d = e.target.closest('[data-f1d]'), t = e.target.closest('[data-f1t]');
   if (d) return f1DriverInfo(d.dataset.f1d);
   if (t) return f1TeamInfo(t.dataset.f1t);
@@ -8757,9 +9143,16 @@ defineWidget('f1', {
   settings: {
     render(box, w) {
       const opts = f1.drivers.map(x => `<option value="${esc(x.Driver.driverId)}"${x.Driver.driverId === w.cfg.fav ? ' selected' : ''}>${esc(f1Name(x.Driver))}</option>`).join('');
-      box.innerHTML = `<label class="field"><span class="lbl">Lieblingsfahrer (wird hervorgehoben)</span><select data-s="fav"><option value="">Keiner</option>${opts}</select></label>`;
+      box.innerHTML = `<label class="field"><span class="lbl">Lieblingsfahrer (wird hervorgehoben)</span><select data-s="fav"><option value="">Keiner</option>${opts}</select></label>`
+        + tvSetHtml(w.cfg.tv, {
+          ch: F1_TV_CH, show: F1_TV_CH, kinds: true, vpn: true,
+          allTxt: 'An jeder Session im Zeitplan, sonst nur im Kasten für die nächste',
+          hint: `Gratis heißt frei in Österreich oder der Schweiz, aus Deutschland mit VPN. RTL zeigt einzelne Rennen frei, dafür brauchst du kein VPN. Stand der Senderliste: ${tvStand()}. Weicht ein Rennen ab, änderst du es mit dem Stift im Kasten.`,
+          pre: 'f1:'
+        });
+      tvSetWire(box, 'f1:');
     },
-    save(box, w) { w.cfg.fav = box.querySelector('[data-s="fav"]').value; return null; }
+    save(box, w) { w.cfg.fav = box.querySelector('[data-s="fav"]').value; tvSetSave(box, w.cfg.tv); return null; }
   }
 });
 
@@ -9905,7 +10298,7 @@ const MLR = {
       const next = ms.find(m => !m.matchIsFinished && kick(m) > t), last = [...ms].reverse().find(m => m.matchIsFinished);
       // Das Ergebnis steht bis zum nächsten Tag, danach kommt das nächste Spiel
       if (last && (!next || t - kick(last) < 20 * 36e5)) return { t: res(last), s: ['Endstand', pos].filter(Boolean).join(', ') };
-      if (next) return { t: vs(next), s: [when(next), pos].filter(Boolean).join(', ') };
+      if (next) { const tv = fbTvText(c, lg, next); return { t: vs(next), s: [when(next), tv && `bei ${tv}`, pos].filter(Boolean).join(', ') }; }
       return null;
     }
     const live = D.matches.filter(m => fbIsLive(m, t));
@@ -9920,14 +10313,14 @@ const MLR = {
     if (!r) return null;
     const ss = f1Sessions(r), gp = f1Short(r.raceName);
     const live = ss.find(s => t >= +s.at && t < +s.at + s.min * 6e4), nx = ss.find(s => +s.at > t);
-    if (live) return { t: `${live.name} läuft`, s: gp, lv: 'now' };
+    if (live) { const tv = f1TvText(r, live); return { t: `${live.name} läuft`, s: [gp, tv && `bei ${tv}`].filter(Boolean).join(', '), lv: 'now' }; }
     if (!nx) return null;
-    const d = nx.at, n = dayDiff(now, d);
+    const d = nx.at, n = dayDiff(now, d), tv = f1TvText(r, nx);
     const when = `${n === 0 ? 'heute' : n === 1 ? 'morgen' : n < 7 ? WDL[d.getDay()] : `${WD[d.getDay()]} ${dm(d)}`} ${hm(d)}`;
     const lead = f1.drivers[0] ? `Vorn in der WM: ${f1Name(f1.drivers[0].Driver)}` : '';
-    if (nx.race) return { t: `${gp} ${when}`, s: lead };
+    if (nx.race) return { t: `${gp} ${when}`, s: [tv && `Bei ${tv}`, lead].filter(Boolean).join(', ') };
     const race = f1When(r);
-    return { t: `${gp}: ${nx.name} ${when}`, s: `Rennen ${WDL[race.getDay()]} ${hm(race)}` };
+    return { t: `${gp}: ${nx.name} ${when}`, s: [tv && `Bei ${tv}`, `Rennen ${WDL[race.getDay()]} ${hm(race)}`].filter(Boolean).join(', ') };
   },
   fuel(w, now) {
     if (!fuKey()) return null;
@@ -12334,7 +12727,7 @@ $('#iw-key').addEventListener('click', () => {
 
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '3.5';
+const VERSION = '3.6';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -12397,6 +12790,7 @@ const NEWS = {
   '3.5': ['Neu: Das Cockpit als echtes iPhone-Widget über die App Scriptable, mit Terminen, Geburtstagen, Wetter, Pendeln und Spritpreisen. Soll ich dir zeigen, wie es geht?', () => { openDrawer('data'); setTimeout(() => { const d = $('#dr-iw details'); if (d) { d.open = true; d.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 300); }, 'Zeigen'],
   '3.4': ['Notizen können jetzt Markdown wie in Obsidian: Überschriften, Listen, Aufgaben zum Abhaken, Links und mehr, nur die Zeile mit dem Cursor zeigt die Zeichen. Strg+Enter macht eine Aufgabe.', () => { const id = widgetsOf('notes').map(([i]) => i).find(i => pagesUsing(i).length); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => { const v = views.get(id); if (v && v.cm) v.cm.focus(); }, 350); }, 'Ausprobieren'],
   '3.3': ['Spritpreise mit eigenem Ort: Such dir einen Ort, nimm den vom Wetter oder deinen Standort, dazu Umkreis und Sortierung. Soll ich dir die Einstellungen zeigen?', () => { if (!pagesUsing('fuel').length) { setEdit(true); openGallery(); return; } nwJump('fuel'); setTimeout(() => { if (fuKey()) fuOpenSet(true); else fuOpenForm(); }, 350); }, 'Zeigen'],
+  '3.6': ['Neu: Fußball und Formel 1 zeigen, wo gespielt und gefahren wird. Bei der F1 auch gratis bei ORF, ServusTV und SRF, mit VPN-Hinweis und Knopf zum Livestream. Was davon auftaucht, stellst du pro Widget ein.', () => { const id = pagesUsing('f1').length ? 'f1' : (widgetsOf('football').map(([i]) => i).find(i => pagesUsing(i).length) || ''); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => openWidgetDialog(id), 350); }, 'Einstellen'],
   '3.2': ['Der Kalender kann jetzt auch Google, Outlook und jeden anderen Kalender mit ICS-Link. Deine Weiterleitung braucht dafür einmal neuen Code, die Einrichtung zeigt dir, was fehlt.', () => { if (!pagesUsing('cal').length) { setEdit(true); openGallery(); return; } nwJump('cal'); setTimeout(caOpenForm, 350); }, 'Einrichten']
 };
 const verNum = v => String(v || '0').split('.').reduce((a, x, i) => a + (+x || 0) / 1000 ** i, 0);

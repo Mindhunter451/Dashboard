@@ -167,7 +167,7 @@ const MLR = {
       const next = ms.find(m => !m.matchIsFinished && kick(m) > t), last = [...ms].reverse().find(m => m.matchIsFinished);
       // Das Ergebnis steht bis zum nächsten Tag, danach kommt das nächste Spiel
       if (last && (!next || t - kick(last) < 20 * 36e5)) return { t: res(last), s: ['Endstand', pos].filter(Boolean).join(', ') };
-      if (next) return { t: vs(next), s: [when(next), pos].filter(Boolean).join(', ') };
+      if (next) { const tv = fbTvText(c, lg, next); return { t: vs(next), s: [when(next), tv && `bei ${tv}`, pos].filter(Boolean).join(', ') }; }
       return null;
     }
     const live = D.matches.filter(m => fbIsLive(m, t));
@@ -182,14 +182,14 @@ const MLR = {
     if (!r) return null;
     const ss = f1Sessions(r), gp = f1Short(r.raceName);
     const live = ss.find(s => t >= +s.at && t < +s.at + s.min * 6e4), nx = ss.find(s => +s.at > t);
-    if (live) return { t: `${live.name} läuft`, s: gp, lv: 'now' };
+    if (live) { const tv = f1TvText(r, live); return { t: `${live.name} läuft`, s: [gp, tv && `bei ${tv}`].filter(Boolean).join(', '), lv: 'now' }; }
     if (!nx) return null;
-    const d = nx.at, n = dayDiff(now, d);
+    const d = nx.at, n = dayDiff(now, d), tv = f1TvText(r, nx);
     const when = `${n === 0 ? 'heute' : n === 1 ? 'morgen' : n < 7 ? WDL[d.getDay()] : `${WD[d.getDay()]} ${dm(d)}`} ${hm(d)}`;
     const lead = f1.drivers[0] ? `Vorn in der WM: ${f1Name(f1.drivers[0].Driver)}` : '';
-    if (nx.race) return { t: `${gp} ${when}`, s: lead };
+    if (nx.race) return { t: `${gp} ${when}`, s: [tv && `Bei ${tv}`, lead].filter(Boolean).join(', ') };
     const race = f1When(r);
-    return { t: `${gp}: ${nx.name} ${when}`, s: `Rennen ${WDL[race.getDay()]} ${hm(race)}` };
+    return { t: `${gp}: ${nx.name} ${when}`, s: [tv && `Bei ${tv}`, `Rennen ${WDL[race.getDay()]} ${hm(race)}`].filter(Boolean).join(', ') };
   },
   fuel(w, now) {
     if (!fuKey()) return null;

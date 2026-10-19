@@ -30,6 +30,26 @@
   </form>
 </dialog>
 
+<!-- Sender eines Spiels oder Rennwochenendes ändern (33-sender.js) -->
+<dialog class="dlg" id="dlg-tv" aria-labelledby="tv-h">
+  <form id="tv-form" novalidate>
+    <div class="dlg-head">
+      <h2 id="tv-h">Sender ändern</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Schließen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dlg-body">
+      <p class="hint" id="tv-sub"></p>
+      <div class="tv-rows" id="tv-rows"></div>
+      <p class="hint" id="tv-note"></p>
+    </div>
+    <div class="dlg-foot">
+      <button type="submit" class="btn">Speichern</button>
+      <button type="button" class="btn-ghost" data-close>Abbrechen</button>
+      <button type="button" class="btn-ghost" id="tv-reset" hidden>Wieder wie in der Liste</button>
+    </div>
+  </form>
+</dialog>
+
 <dialog class="dlg dlg-cap" id="dlg-cap" aria-labelledby="cap-h">
   <form id="cap-form" novalidate>
     <div class="dlg-head">

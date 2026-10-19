@@ -10,6 +10,7 @@
  * state.pomo     erledigte Pomodoro-Runden pro Tag
  * state.bdays    Geburtstage: { list: [{ id, name, m, d, y }] }, y fehlt, wenn das Jahr unbekannt ist
  * state.waste    Müllabfuhr: { bins: [{ id, name, color, dates[], every, start }], file: { name, at } }
+ * state.tv       eigene Sender pro Spiel oder Rennwochenende: { ov: { 'fb:bl1:12345': ['sky', 'rtl'], 'f1:2026:vegas': { race: ['sky'] } } }
  */
 /* Längste Notiz in Zeichen, rund 25 Seiten Text */
 const NOTE_MAX = 50000;
@@ -49,8 +50,8 @@ const TYPES = {
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, cat: 'plan', since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
   habits:   { name: 'Gewohnheiten', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Tracker für Sport, Lernen und Co. mit Rhythmus, Serie und Verlauf zum Nachtragen.' },
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
-  football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
-  f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions, WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
+  football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel und wo es läuft, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
+  f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions und wo sie laufen, auch gratis in Österreich und der Schweiz, dazu WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
   fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause, an einem Ort deiner Wahl oder da, wo du gerade bist.' },
   cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus iCloud, Google, Outlook oder jedem Kalender mit ICS-Link, nach Tagen sortiert, mit Farbe pro Kalender.' },
   dep:      { name: 'Abfahrten', multi: true, w: 1, cat: 'go', since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
@@ -61,6 +62,11 @@ const SOON = [];
 /* Register in der Galerie */
 const CATS = { day: 'Alltag', plan: 'Planung', go: 'Unterwegs', fun: 'Freizeit' };
 const FB_LEAGUES = { bl1: '1. Bundesliga', bl2: '2. Bundesliga', bl3: '3. Liga' };
+/* Sender für Fußball und Formel 1 (Namen, Regeln und Links stehen in 33-sender.js). Eigene Änderungen pro Spiel oder Rennen höchstens TV_OV_MAX. */
+const FB_TV_CH = ['sky', 'dazn', 'magenta', 'rtl', 'sat1', 'ard'];
+const F1_TV_CH = ['sky', 'rtl', 'orf', 'servus', 'srf'];
+const F1_TV_KINDS = { fp: 'Training', sq: 'Sprint-Quali', sprint: 'Sprint', quali: 'Qualifying', race: 'Rennen' };
+const TV_OV_MAX = 300;
 /* Verkehrsmittel im Abfahrten-Widget */
 const DP_CATS = { s: 'S-Bahn', u: 'U-Bahn', bus: 'Bus', tram: 'Straßenbahn', ferry: 'Fähre', re: 'Regionalzug', fv: 'Fernzug' };
 const svgIco = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
@@ -236,6 +242,30 @@ function normFuel(c) {
   if (mode === 'place' && !place) mode = 'route';
   return { type: ['e5', 'e10', 'diesel'].includes(c.type) ? c.type : 'e5', mode, place, rad: [3, 5, 10, 25].includes(+c.rad) ? +c.rad : 5, sort: c.sort === 'dist' ? 'dist' : 'price' };
 }
+/* Senderanzeige in Fußball und Formel 1: an, welche Sender, nur Free-TV, auch in der Liste, Livestream-Links.
+ * Formel 1 dazu die Sessions und den VPN-Hinweis, Fußball die Konferenzen. Neue Sender sind von selbst an. */
+function normTvCfg(t, chs, kinds) {
+  t = t && typeof t === 'object' ? t : {};
+  const pick = (l, all) => (Array.isArray(l) ? all.filter(x => l.includes(x)) : all.slice());
+  const o = { on: t.on !== false, ch: pick(t.ch, chs), free: !!t.free, all: t.all !== false, link: t.link !== false };
+  if (kinds) { o.ses = pick(t.ses, Object.keys(kinds)); o.vpn = t.vpn !== false; } else o.conf = t.conf !== false;
+  return o;
+}
+/* Eigene Sender pro Spiel (fb:Liga:Spiel-ID, Liste) oder Rennwochenende (f1:Saison:Strecke, Liste pro Session-Art) */
+function normTv(t) {
+  const src = t && typeof t === 'object' && t.ov && typeof t.ov === 'object' && !Array.isArray(t.ov) ? t.ov : {};
+  const ov = {}, keep = (l, all) => all.filter(c => l.includes(c));
+  for (const [k, v] of Object.entries(src).slice(-TV_OV_MAX)) {
+    const fb = /^fb:([a-z0-9]{1,6}):\d{1,10}$/.exec(k);
+    if (fb && FB_LEAGUES[fb[1]] && Array.isArray(v)) ov[k] = keep(v, FB_TV_CH);
+    else if (/^f1:\d{4}:[a-z0-9_]{1,40}$/.test(k) && v && typeof v === 'object' && !Array.isArray(v)) {
+      const o = {};
+      for (const kk of Object.keys(F1_TV_KINDS)) if (Array.isArray(v[kk])) o[kk] = keep(v[kk], F1_TV_CH);
+      if (Object.keys(o).length) ov[k] = o;
+    }
+  }
+  return { ov };
+}
 function normCfg(type, c) {
   c = c && typeof c === 'object' ? c : {};
   switch (type) {
@@ -243,8 +273,8 @@ function normCfg(type, c) {
     case 'pomodoro': return { focus: intIn(c.focus, 1, 120, 25), short: intIn(c.short, 1, 60, 5), long: intIn(c.long, 1, 90, 15), every: intIn(c.every, 2, 8, 4), sound: c.sound !== false, auto: !!c.auto };
     case 'habits': return { items: normHabits(c.items) };
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
-    case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '' };
-    case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '' };
+    case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '', tv: normTvCfg(c.tv, FB_TV_CH) };
+    case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '', tv: normTvCfg(c.tv, F1_TV_CH, F1_TV_KINDS) };
     case 'cal': return { days: [7, 14, 30].includes(+c.days) ? +c.days : 14, loc: c.loc !== false };
     case 'dep': return { stop: normStop(c.stop), modes: normCats(c.modes), walk: intIn(c.walk, 0, 60, 0), n: [4, 6, 8, 10].includes(+c.n) ? +c.n : 6, lines: strIn(c.lines, 60), dir: strIn(c.dir, 60) };
     case 'bday': return { n: [4, 6, 8, 12].includes(+c.n) ? +c.n : 6, cal: c.cal !== false };
@@ -443,6 +473,7 @@ function normalize(s) {
     pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
     bdays: normBdays(s.bdays),
     waste: normWaste(s.waste),
+    tv: normTv(s.tv),
     meta: { since: isoOrNull(m.since) || new Date().toISOString(), backupAt: isoOrNull(m.backupAt), changedAt: isoOrNull(m.changedAt), snooze: isoOrNull(m.snooze), seen: typeof m.seen === 'string' ? m.seen.slice(0, 10) : '' }
   };
 }
