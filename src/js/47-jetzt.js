@@ -14,9 +14,9 @@ const NW_ICO = {
 
 /* Reihenfolge der Karten je Tageszeit. „Jetzt wichtig“ steht immer vorn, unbekannte Typen hinten. */
 const PH_ORDER = {
-  morning: ['now', 'weather', 'dep', 'commute', 'cal', 'tasks', 'waste', 'bday', 'pomodoro', 'progress', 'learn', 'habits', 'fuel', 'notes', 'links', 'vacation', 'football', 'f1'],
-  day: ['now', 'cal', 'tasks', 'weather', 'dep', 'pomodoro', 'commute', 'progress', 'learn', 'habits', 'notes', 'links', 'fuel', 'waste', 'bday', 'vacation', 'football', 'f1'],
-  evening: ['now', 'waste', 'cal', 'bday', 'weather', 'tasks', 'habits', 'dep', 'football', 'f1', 'notes', 'learn', 'links', 'commute', 'fuel', 'progress', 'pomodoro', 'vacation']
+  morning: ['now', 'weather', 'dep', 'commute', 'cal', 'tasks', 'waste', 'bday', 'pomodoro', 'progress', 'learn', 'habits', 'fuel', 'notes', 'links', 'vacation', 'football', 'f1', 'f1an'],
+  day: ['now', 'cal', 'tasks', 'weather', 'dep', 'pomodoro', 'commute', 'progress', 'learn', 'habits', 'notes', 'links', 'fuel', 'waste', 'bday', 'vacation', 'football', 'f1', 'f1an'],
+  evening: ['now', 'waste', 'cal', 'bday', 'weather', 'tasks', 'habits', 'dep', 'football', 'f1', 'f1an', 'notes', 'learn', 'links', 'commute', 'fuel', 'progress', 'pomodoro', 'vacation']
 };
 function smartOrder(items, now) {
   const L = PH_ORDER[dayPhase(now)];

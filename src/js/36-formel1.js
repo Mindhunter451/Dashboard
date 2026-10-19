@@ -6,7 +6,7 @@ const f1 = { races: null, drivers: [], teams: [], last: null, season: '', round:
 const F1_SESS = [['FirstPractice', '1. Training', 60, 'fp'], ['SecondPractice', '2. Training', 60, 'fp'], ['ThirdPractice', '3. Training', 60, 'fp'], ['SprintQualifying', 'Sprint-Qualifying', 45, 'sq'], ['SprintShootout', 'Sprint-Shootout', 45, 'sq'], ['Sprint', 'Sprint', 60, 'sprint'], ['Qualifying', 'Qualifying', 60, 'quali']];
 const F1_COLOR = { mercedes: '#27F4D2', ferrari: '#E8002D', mclaren: '#FF8000', red_bull: '#3671C6', rb: '#6692FF', alpine: '#FF87BC', haas: '#B6BABD', audi: '#BB0A30', sauber: '#52E252', williams: '#64C4FF', aston_martin: '#229971', cadillac: '#A8A9AD' };
 const NAT_DE = { Argentine: 'Argentinien', Argentinian: 'Argentinien', Australian: 'Australien', Austrian: 'Österreich', Belgian: 'Belgien', Brazilian: 'Brasilien', British: 'Großbritannien', Canadian: 'Kanada', Chinese: 'China', Danish: 'Dänemark', Dutch: 'Niederlande', Finnish: 'Finnland', French: 'Frankreich', German: 'Deutschland', Indian: 'Indien', Irish: 'Irland', Italian: 'Italien', Japanese: 'Japan', Mexican: 'Mexiko', Monegasque: 'Monaco', 'New Zealander': 'Neuseeland', Polish: 'Polen', Russian: 'Russland', Spanish: 'Spanien', Swedish: 'Schweden', Swiss: 'Schweiz', Thai: 'Thailand', American: 'USA', Estonian: 'Estland', Israeli: 'Israel' };
-const COUNTRY_DE = { Australia: 'Australien', Austria: 'Österreich', Azerbaijan: 'Aserbaidschan', Bahrain: 'Bahrain', Belgium: 'Belgien', Brazil: 'Brasilien', Canada: 'Kanada', China: 'China', Hungary: 'Ungarn', Italy: 'Italien', Japan: 'Japan', Malaysia: 'Malaysia', Mexico: 'Mexiko', Monaco: 'Monaco', Netherlands: 'Niederlande', Portugal: 'Portugal', Qatar: 'Katar', 'Saudi Arabia': 'Saudi-Arabien', Singapore: 'Singapur', Spain: 'Spanien', UAE: 'Vereinigte Arabische Emirate', UK: 'Großbritannien', USA: 'USA', 'United States': 'USA', Germany: 'Deutschland', France: 'Frankreich', Turkey: 'Türkei', Argentina: 'Argentinien', 'South Africa': 'Südafrika', Korea: 'Südkorea', India: 'Indien', Russia: 'Russland', Vietnam: 'Vietnam', Thailand: 'Thailand' };
+const COUNTRY_DE = { Australia: 'Australien', Austria: 'Österreich', Azerbaijan: 'Aserbaidschan', Bahrain: 'Bahrain', Belgium: 'Belgien', Brazil: 'Brasilien', Canada: 'Kanada', China: 'China', Hungary: 'Ungarn', Italy: 'Italien', Japan: 'Japan', Malaysia: 'Malaysia', Mexico: 'Mexiko', Monaco: 'Monaco', Netherlands: 'Niederlande', Portugal: 'Portugal', Qatar: 'Katar', 'Saudi Arabia': 'Saudi-Arabien', Singapore: 'Singapur', Spain: 'Spanien', UAE: 'Vereinigte Arabische Emirate', 'United Arab Emirates': 'Vereinigte Arabische Emirate', UK: 'Großbritannien', 'United Kingdom': 'Großbritannien', 'Great Britain': 'Großbritannien', USA: 'USA', 'United States': 'USA', Germany: 'Deutschland', France: 'Frankreich', Turkey: 'Türkei', Argentina: 'Argentinien', 'South Africa': 'Südafrika', Korea: 'Südkorea', India: 'Indien', Russia: 'Russland', Vietnam: 'Vietnam', Thailand: 'Thailand' };
 const f1When = o => o && o.date ? new Date(`${o.date}T${o.time || '12:00:00Z'}`) : null;
 const f1Short = n => String(n || '').replace(/ Grand Prix/, ' GP');
 const f1Name = d => `${d.givenName} ${d.familyName}`;
@@ -101,7 +101,7 @@ function f1LastHtml(fav) {
     return `<li><button type="button" class="st-row${dr.driverId === fav ? ' fav' : ''}" data-f1d="${esc(dr.driverId)}"><span class="st-pos">${esc(x.positionText)}</span><span class="st-name"><i class="tm" style="--c:${F1_COLOR[t.constructorId] || 'var(--muted)'}"></i><span><b>${esc(f1Name(dr))}</b><small>${esc(t.name)}${fl ? ' · schnellste Runde' : ''}</small></span></span><span class="st-pts">${esc(time)}<small>${+x.points ? `${esc(x.points)} Pkt` : ''}</small></span></button></li>`;
   }).join('');
   const more = r.Results.length > 10 ? `<button type="button" class="more" data-f1all>${f1.all ? 'Weniger anzeigen' : `Alle ${r.Results.length} zeigen`}</button>` : '';
-  return `<p class="sub-h">${esc(r.raceName)} · ${WD[d.getDay()]} ${dm(d)}</p><ul class="st-list">${rows}</ul>${more}`;
+  return `<p class="sub-h">${esc(r.raceName)} · ${WD[d.getDay()]} ${dm(d)}</p><ul class="st-list">${rows}</ul>${more}<button type="button" class="more an-go" data-f1an>Auf der Streckenkarte nachschauen</button>`;
 }
 function renderF1() {
   const v = views.get('f1');
@@ -189,6 +189,7 @@ async function f1TeamInfo(id) {
 }
 $('#f1').addEventListener('click', e => {
   if (e.target.closest('[data-tvedit]')) return f1TvEdit();
+  if (e.target.closest('[data-f1an]')) return anShow();
   const d = e.target.closest('[data-f1d]'), t = e.target.closest('[data-f1t]');
   if (d) return f1DriverInfo(d.dataset.f1d);
   if (t) return f1TeamInfo(t.dataset.f1t);

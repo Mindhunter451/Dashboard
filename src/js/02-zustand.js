@@ -52,6 +52,7 @@ const TYPES = {
   learn:    { name: 'Lernfortschritt', multi: true, w: 1, cat: 'plan', since: '2.1', desc: 'Countdown zur Prüfung mit Themenliste, Fortschritt und ob dein Tempo reicht.' },
   football: { name: 'Fußball', multi: true, w: 1, cat: 'fun', since: '2.2', desc: 'Eine Liga mit deinem Verein: nächstes Spiel und wo es läuft, Form, Live-Stand, Spieltag, Tabelle und Torjäger. Vereine antippen für mehr.' },
   f1:       { name: 'Formel 1', multi: false, w: 1, cat: 'fun', since: '2.2', desc: 'Nächstes Rennen mit allen Sessions und wo sie laufen, auch gratis in Österreich und der Schweiz, dazu WM-Stand und letztes Ergebnis. Fahrer und Teams antippen für mehr.' },
+  f1an:     { name: 'F1 Rennanalyse', multi: false, w: 2, cat: 'fun', since: '3.7', desc: 'Das letzte Rennen zum Nachschauen: alle Fahrer als Punkte auf der Streckenkarte im Zeitraffer, dazu Positionsverlauf, Reifen und Boxenstopps. Gibt es etwa 30 Minuten nach dem Ziel.' },
   fuel:     { name: 'Spritpreise', multi: false, w: 1, cat: 'go', since: '2.2', desc: 'Günstige Tankstellen auf deiner Pendelstrecke, rund um Zuhause, an einem Ort deiner Wahl oder da, wo du gerade bist.' },
   cal:      { name: 'Kalender', multi: false, w: 1, cat: 'plan', since: '2.3', desc: 'Deine nächsten Termine aus iCloud, Google, Outlook oder jedem Kalender mit ICS-Link, nach Tagen sortiert, mit Farbe pro Kalender.' },
   dep:      { name: 'Abfahrten', multi: true, w: 1, cat: 'go', since: '2.4', desc: 'Live-Abfahrten an deiner Haltestelle mit Verspätungen, Ausfällen und wann du loslaufen musst. Bus, Bahn, U-Bahn und Fähre.' },
@@ -84,6 +85,7 @@ const TICON = {
   learn: svgIco('<path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.6v4c1.5 1.6 3.4 2.4 5.5 2.4s4-.8 5.5-2.4v-4"/>'),
   football: svgIco('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.6l3.7 2.7-1.4 4.4H9.7l-1.4-4.4z"/>'),
   f1: svgIco('<path d="M5 21V4"/><path d="M5 4.6c4-2 6 2 10 0s4 0 4 0v8.6s-1-2-4 0-6-2-10 0"/>'),
+  f1an: svgIco('<path d="M6.5 18.5c-2.2 0-3.5-1.6-3.5-3.4 0-2.6 2.4-3.3 4.4-3.6 2.6-.4 3.1-1.6 3.1-3.1C10.5 6.2 12 4.5 14.6 4.5c2.9 0 4.4 1.9 4.4 4.2 0 3.7-3.2 4.6-3.2 6.6 0 1.6 1.2 2 2.2 2.4"/><circle cx="6.5" cy="18.5" r="1.6" fill="currentColor"/><circle cx="14.6" cy="4.5" r="1.6" fill="currentColor"/>'),
   fuel: svgIco('<path d="M5 20V5.5A1.5 1.5 0 0 1 6.5 4h6A1.5 1.5 0 0 1 14 5.5V20M3.5 20h12M5 10h9"/><path d="M14 8.5l3 2.5v6.5a1.5 1.5 0 0 0 3 0V9l-2.5-2.5"/>'),
   cal: svgIco('<rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r=".9" fill="currentColor"/><circle cx="12" cy="14.5" r=".9" fill="currentColor"/>'),
   dep: svgIco('<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9 6.6h6M8.5 17.5l-1.6 3M15.5 17.5l1.6 3"/><circle cx="8.7" cy="14.2" r=".8" fill="currentColor"/><circle cx="15.3" cy="14.2" r=".8" fill="currentColor"/>'),
@@ -275,6 +277,7 @@ function normCfg(type, c) {
     case 'learn': return { date: validYmd(c.date) ? c.date : '', time: validHm(c.time) ? c.time : '', start: validYmd(c.start) ? c.start : '', topics: normTopics(c.topics) };
     case 'football': return { league: FB_LEAGUES[c.league] ? c.league : 'bl1', team: intIn(c.team, 1, 1e7, 0), teamName: typeof c.teamName === 'string' ? c.teamName.slice(0, 60) : '', tv: normTvCfg(c.tv, FB_TV_CH) };
     case 'f1': return { fav: typeof c.fav === 'string' ? c.fav.replace(/[^a-z0-9_]/gi, '').slice(0, 40) : '', tv: normTvCfg(c.tv, F1_TV_CH, F1_TV_KINDS) };
+    case 'f1an': return { sprint: c.sprint !== false, labels: ['top', 'all', 'none'].includes(c.labels) ? c.labels : 'top' };
     case 'cal': return { days: [7, 14, 30].includes(+c.days) ? +c.days : 14, loc: c.loc !== false };
     case 'dep': return { stop: normStop(c.stop), modes: normCats(c.modes), walk: intIn(c.walk, 0, 60, 0), n: [4, 6, 8, 10].includes(+c.n) ? +c.n : 6, lines: strIn(c.lines, 60), dir: strIn(c.dir, 60) };
     case 'bday': return { n: [4, 6, 8, 12].includes(+c.n) ? +c.n : 6, cal: c.cal !== false };

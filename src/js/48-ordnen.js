@@ -24,7 +24,7 @@ function planBuild(W, used, from, span) {
     { key: 'arbeit', name: 'Arbeit', tiles: true, ids: [...tW, ...one('commute'), ...one('fuel'), ...of('progress'), ...one('vacation'), ...nW, ...lW] },
     { key: 'privat', name: 'Privat', tiles: false, ids: [...tP, ...one('cal'), ...one('bday'), ...N.filter(id => !nW.includes(id)), ...Lk.filter(id => !lW.includes(id))] },
     { key: 'fokus', name: 'Fokus', tiles: false, ids: [...one('pomodoro'), ...of('learn'), ...of('habits')] },
-    { key: 'sport', name: 'Sport', tiles: false, ids: [...of('football'), ...one('f1')] }
+    { key: 'sport', name: 'Sport', tiles: false, ids: [...of('football'), ...one('f1'), ...one('f1an')] }
   ];
   // Was nirgends passt (zum Beispiel ein künftiger Widget-Typ), kommt ans Ende von „Heute“
   const placed = new Set(plan.flatMap(p => p.ids));
