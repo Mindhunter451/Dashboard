@@ -87,6 +87,13 @@ ORF, ServusTV und SRF sind nur im eigenen Land frei zu sehen, aus Deutschland br
 Was kurzfristig festgelegt wird (Free-TV-Spiele bei RTL oder Sat.1, die Spiele in den Dritten bei der 3. Liga) oder abweicht, trägst du selbst ein: im Spieltag auf die Anstoßzeit tippen, beim nächsten Spiel oder im Kasten der Formel 1 auf den Stift. Diese Änderungen liegen getrennt von der Liste, wandern mit dem Sync und stehen in der Sicherung. Was angezeigt wird (Sender, Sessions, nur Free-TV, Konferenzen, VPN-Hinweis, Links zum Livestream), stellst du pro Widget unter Bearbeiten, Einstellungen ein.
 Für eine neue F1-Saison bekommt `F1_TV` ein neues Jahr mit den Sendern pro Strecke (die `circuitId` von Jolpica), danach wird `TV_STAND` hochgesetzt. Fehlt eine Saison, sagt die Karte das, statt etwas Falsches zu zeigen.
 
+## F1 Rennanalyse
+
+Die Rennanalyse holt Rennen und Sprints von [OpenF1](https://openf1.org), kostenlos und ohne Konto. Gesperrt ist dort nur das Live-Fenster von 30 Minuten vor bis 30 Minuten nach einer Session, deshalb taucht ein Rennen etwa eine halbe Stunde nach dem Ziel auf. Läuft eines gerade, sagt die Karte, ab wann es das gibt, und schaut dann von selbst nach.
+Ohne Konto erlaubt OpenF1 3 Abfragen pro Sekunde und 30 pro Minute. Ein Rennen braucht etwa zehn, die laufen nacheinander. Danach liegt es verdichtet im Browser (`jere-cockpit-f1-rennen`, die letzten drei angesehenen, etwa 45 KB pro Rennen) und kommt nicht in die Sicherung oder den Sync. Kurz nach dem Rennen geholte Daten werden nach sechs Stunden einmal frisch geholt, falls Strafen das Ergebnis noch ändern.
+Die Punkte auf der Karte: Die Strecke stammt aus den Positionsdaten einer schnellen Runde. Wo jeder Fahrer gerade ist, rechnet das Cockpit aus seinen Runden- und Sektorzeiten. An jeder Sektorgrenze stimmt die Zeit genau, dazwischen fährt der Punkt so wie die Vorlage-Runde, in der Boxengasse und unter roter Flagge steht er. Echte Positionsdaten aller Fahrer wären rund 60 MB pro Rennen. Im Test mit Singapur stimmte die Reihenfolge zu 95 Prozent mit der amtlichen Zeitnahme, Abweichungen gibt es kurz um Boxenstopps. Sind die Positionsdaten eines Rennens bei OpenF1 kaputt (Monaco 2026), kommt der Streckenverlauf von [MultiViewer](https://multiviewer.app), auf den OpenF1 selbst verweist.
+Dazu der Positionsverlauf Runde für Runde, die Reifen pro Fahrer, alle Boxenstopps und ein paar Fakten (Sieger, schnellste Runde, bester Aufholer, Ausfälle, Safety-Car, Wetter). Den Lieblingsfahrer aus dem Formel-1-Widget hebt sie überall hervor. Die Daten sind inoffiziell und nicht mit der Formel 1 verbunden. Die Reifendaten von OpenF1 haben 2026 vereinzelt Lücken.
+
 ## Aufbau
 
 `index.html` ist die fertige Seite, die GitHub Pages ausliefert. Sie wird gebaut, deshalb nicht von Hand bearbeiten.
@@ -95,7 +102,7 @@ Für eine neue F1-Saison bekommt `F1_TV` ein neues Jahr mit den Sendern pro Stre
 src/index.html      Grundgerüst mit Platzhaltern
 src/html/           Himmel mit Uhr, Leiste, Raster (feste Widgets), Anpassen, Dialoge, Vorlagen, Spiegel
 src/css/            Aussehen, nach Bereichen aufgeteilt
-src/js/             Logik, ein Modul pro Thema (Zustand, Widgets, Seiten, Bearbeiten, Sender, ...)
+src/js/             Logik, ein Modul pro Thema (Zustand, Widgets, Seiten, Bearbeiten, Sender, Rennanalyse, ...)
 src/pwa/            Manifest und Service Worker für die Installation als App
 src/vendor/         fertig gebaute Fremd-Bibliotheken (CodeMirror für die Notizen)
 build.mjs           baut aus src/ die index.html, sw.js und manifest.webmanifest
@@ -116,6 +123,9 @@ Fremd-Code liegt fertig gebaut in `src/vendor/` und kommt in eigene Blöcke vor 
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**3.7** (Oktober 2026)
+Neu: die F1 Rennanalyse. Das letzte Rennen oder ein beliebiges der Saison als Zeitraffer auf der Streckenkarte (1×, 10×, 30×, 60×, Runde vor und zurück, Schieber zum Spulen), daneben die Reihenfolge mit Abständen, Reifen und Boxengasse, dazu Safety-Car, rote Flagge und Zielflagge auf der Karte und in der Zeitleiste. Weitere Ansichten: Positionsverlauf, Reifen und Boxenstopps. Einstellbar: Sprints mit anbieten und an welchen Punkten die Kürzel stehen. Das Formel-1-Widget hat unter „Letztes Rennen“ einen Knopf zur Streckenkarte.
 
 **3.6** (Oktober 2026)
 Fußball und Formel 1 zeigen, wo es läuft. Bei der F1 hat jede Session kleine Sender, darunter ein Kasten für die nächste Session mit den Free-TV-Sendern als Links zum Livestream und dem passenden VPN-Land. Beim Fußball stehen die Sender an jeder Anstoßzeit im Spieltag und beim nächsten Spiel deines Vereins, Konferenzen in der Tageszeile. Pro Widget einstellbar: welche Sender, bei der F1 welche Sessions, nur Free-TV, Konferenzen, VPN-Hinweis, Livestream-Links und ob die Sender auch in der Liste stehen. Abweichungen pro Spiel oder Rennwochenende trägst du selbst ein, getrennt von der gepflegten Liste. Im Spiegel nennen die Kurzzeilen die Sender mit.

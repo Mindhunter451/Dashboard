@@ -288,6 +288,48 @@
     <p class="src" id="f1-src"></p>
   </section>
 
+  <!-- F1 Rennanalyse (38-rennanalyse.js) -->
+  <section class="card" id="f1an" data-type="f1an" aria-labelledby="an-h">
+    <div class="card-head">
+      <h2 id="an-h"><span data-r="title">F1 Rennanalyse</span></h2>
+      <span class="src" id="an-round"></span>
+    </div>
+    <div class="wx-off" id="an-off" hidden style="--sk-h:240px">
+      <h3 id="an-off-t">Rennanalyse wird geladen</h3>
+      <p id="an-off-p">Rundenzeiten, Reifen und Strecke kommen von OpenF1, das dauert ein paar Sekunden.</p>
+      <div class="form-row"><button type="button" class="btn" id="an-retry" hidden>Nochmal versuchen</button></div>
+    </div>
+    <div class="an-live" id="an-live" hidden>
+      <div class="an-top">
+        <label class="an-pick"><span class="vh">Rennen</span><select id="an-race"></select></label>
+        <span class="an-when" id="an-when"></span>
+      </div>
+      <p class="an-note" id="an-note" hidden></p>
+      <ul class="an-facts" id="an-facts"></ul>
+      <div class="seg sm fb-tabs" role="group" aria-label="Ansicht" id="an-tabs">
+        <button type="button" data-v="map">Karte</button><button type="button" data-v="pos">Positionen</button><button type="button" data-v="tyre">Reifen</button><button type="button" data-v="pit">Stopps</button>
+      </div>
+      <div class="an-map" id="an-mapbox">
+        <div class="an-stage" tabindex="0" aria-label="Streckenkarte. Pfeiltasten springen eine Runde, die Leertaste spielt ab.">
+          <svg id="an-svg" viewBox="0 0 1000 750" aria-hidden="true"></svg>
+          <span class="an-flag" id="an-flag" hidden></span>
+          <button type="button" class="btn an-big" id="an-big" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6L18.8 12z"/></svg>Rennen abspielen</button>
+        </div>
+        <ol class="an-board" id="an-board" aria-label="Reihenfolge"></ol>
+      </div>
+      <div class="an-ctl" id="an-ctl">
+        <div class="an-ctl-top">
+          <button type="button" class="icon-btn an-play" id="an-play" aria-label="Abspielen" title="Abspielen"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6L18.8 12z"/></svg></button>
+          <span class="an-lapnav"><button type="button" class="icon-btn" data-step="-1" aria-label="Eine Runde zurück" title="Eine Runde zurück"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button><span id="an-lap" aria-live="off">Start</span><button type="button" class="icon-btn" data-step="1" aria-label="Eine Runde vor" title="Eine Runde vor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button></span>
+          <div class="seg sm" role="group" aria-label="Tempo" id="an-speed"><button type="button" data-v="1" title="Echtzeit">1×</button><button type="button" data-v="10">10×</button><button type="button" data-v="30">30×</button><button type="button" data-v="60">60×</button></div>
+        </div>
+        <div class="an-track"><input type="range" id="an-time" min="0" max="100" step="1" value="0" aria-label="Zeitpunkt im Rennen"><div class="an-bands" id="an-bands" aria-hidden="true"></div></div>
+      </div>
+      <div class="an-pane" id="an-pane" hidden></div>
+    </div>
+    <p class="src" id="an-src"></p>
+  </section>
+
   <!-- Spritpreise -->
   <section class="card" id="fuel" data-type="fuel" aria-labelledby="fu-h">
     <div class="card-head">

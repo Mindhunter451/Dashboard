@@ -119,7 +119,8 @@ const PEEK = {
   },
   learn(v) { const h = v.q('[data-r="hero"]'); return h && !h.hidden ? `${esc(v.q('[data-r="days"]').textContent)} <small>${esc(v.q('[data-r="days-lbl"]').textContent)}</small>` : ''; },
   football(v) { const t = v.q('[data-r="md"]').textContent; return t ? `<small>${esc(t)}</small>` : ''; },
-  f1() { const t = $('#f1-round').textContent; return t ? `<small>${esc(t)}</small>` : ''; }
+  f1() { const t = $('#f1-round').textContent; return t ? `<small>${esc(t)}</small>` : ''; },
+  f1an() { const d = an.data, w = d && (d.drv.find(o => o.p === 1) || d.drv[0]); return d ? `${esc(d.name)}${d.sprint ? ' Sprint' : ''} <small>Sieger ${esc(w ? w.a : '')}</small>` : ''; }
 };
 function peekCard(v) {
   const el = v.el.querySelector(':scope > .card-head > .card-peek');
