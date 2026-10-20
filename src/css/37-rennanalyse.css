@@ -108,7 +108,7 @@
 .an-pc polyline.hi{opacity:1;stroke-width:3.2}
 .an-pc rect.b-sc,.an-pc rect.b-vsc{fill:color-mix(in srgb,var(--warn) 22%,transparent)}
 .an-pc rect.b-red{fill:color-mix(in srgb,var(--bad) 22%,transparent)}
-.an-ax{position:relative;height:16px;font:500 10.5px/16px var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
+.an-ax{position:relative;height:16px;font:500 11px/16px var(--f-data);color:var(--muted);font-variant-numeric:tabular-nums}
 .an-ax span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
 .an-ax span:first-child{transform:none}
 .an-ax span:last-child:not(:first-child){transform:translateX(-100%)}
@@ -151,7 +151,7 @@
 .an-pr .d{font:600 13px/1.2 var(--f-data);text-align:right;font-variant-numeric:tabular-nums;min-width:4.2em}
 .an-pr .d small{display:block;font-weight:400;font-size:11px;color:var(--muted)}
 .an-pr:hover{background:var(--raise)}
-.an-pr.best .d{color:var(--good)}
+.an-pr.best .d{color:var(--good-ink)}
 .an-pr.fav{background:color-mix(in srgb,var(--accent) 13%,transparent);border-radius:8px}
 .an-pr.sel{box-shadow:inset 0 0 0 1.5px var(--ink);border-radius:8px}
 .an-go{align-self:flex-start}

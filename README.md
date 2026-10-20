@@ -126,6 +126,9 @@ Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigke
 
 ## Versionen
 
+**3.11** (Oktober 2026)
+Feinschliff am Look nach den Regeln für App-Oberflächen aus dem taste-skill. Karten liegen jetzt flach auf dem Grund und trennen sich nur durch eine feine Linie, wichtige Karten heben sich bloß einen Hauch ab. Die Symbole im Kartenkopf und bei ruhigen Hinweisen in „Jetzt wichtig“ stehen ohne Kästchen dahinter, dringende Hinweise behalten ihre farbige Fläche. Grüne und orange Texte (zum Beispiel „Heute frei“, Verspätungen, Spritpreis-Bestwert) sind im hellen Modus dunkler und damit gut lesbar, Balken und Flächen behalten ihre Farbe. Die kleinsten Beschriftungen im Regenband, bei den Sendern und an der Achse der Rennanalyse haben jetzt mindestens 11 px.
+
 **3.10** (Oktober 2026)
 Neu: Öffis im Pendeln. Ein Umschalter oben in der Karte wechselt zwischen Auto und Bus und Bahn. Mit Öffis steht groß da, wann du los musst, dazu erste Fahrt, Ankunft, Fahrzeit, die Linien als Kette, Verspätungen, Ausfälle und wackelnde Umstiege. Aufgeklappt zeigt das Band den ganzen Weg von Tür zu Tür, darunter die nächsten Verbindungen zum Antippen. Vor Feierabend zeigt „Nach Hause“ die Fahrten ab Feierabend. Der MirrorOS, die Bausteine und „Jetzt wichtig“ zeigen mit Öffis ebenfalls Linien, Abfahrt und Ankunft. Die Daten kommen über `/plan` von Transitous, nach Absprache höchstens alle 5 Minuten und nur bei sichtbarer Karte. Unten auf der Seite steht jetzt ein Link „Kontakt und Code“, und die Abrufe bei Transitous senden die volle Seitenadresse als Referer. Kleinigkeit: Züge mit Zugnummer im Namen heißen in den Abfahrten jetzt einfach „RB71“.
 

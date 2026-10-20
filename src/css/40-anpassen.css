@@ -274,7 +274,7 @@ label.dr-line{cursor:pointer}
 .gal-add{border:0;background:var(--accent-fill);color:var(--on-accent);transition:transform .15s var(--spring),filter .15s}
 .gal-add:hover{filter:brightness(1.06);transform:scale(1.06)}
 .gal-add svg,.gal-on svg{width:18px;height:18px}
-.gal-on{color:var(--good);background:color-mix(in srgb,var(--good) 13%,transparent)}
+.gal-on{color:var(--good-ink);background:color-mix(in srgb,var(--good) 13%,transparent)}
 .gal-item.placed .gal-ico{opacity:.5}
 .gal-item.placed .gal-name{color:var(--muted)}
 .gal-none{padding:18px 6px}
