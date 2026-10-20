@@ -42,6 +42,21 @@ function mosCm(now, pv) {
     // Mit Umleitung ersetzt sie das „Freie Fahrt“, Stau oder Sperrung bleiben stehen
     + (bad || !dev ? `<p class="m-cm-how${bad ? ' warn' : ''}">${esc(how)}</p>` : '') + `${dev}${cbHtml(band)}</div>`;
 }
+/* Öffis: wann du los musst, die Fahrten der Verbindung mit Abfahrt und was danach kommt */
+function mosPt(now, pv) {
+  ptNeed(now);
+  const S = ptSummary(now);
+  if (!S) return pv ? `<p class="m-dim">${state.commute.home ? 'Kommt, sobald die Verbindungen geladen sind' : 'Trag erst deine Strecke im Pendeln-Widget ein'}</p>` : '';
+  const f = S.it, t = +now, [v, lv] = ptVerdict(f), go = ptLeave(f, t);
+  const legs = ptTr(f.legs).map(l => {
+    const m = ptLate(l.f);
+    return `<li${l.x ? ' class="x"' : ''}>${dpBadge(l)}<span class="m-to">${esc(l.f.n)}</span><b>${l.x ? 'fällt aus' : `${ptHm(l.f.t)}${m >= 1 ? `<small class="m-late">+${m}</small>` : ''}`}</b></li>`;
+  }).join('');
+  return `<div class="m-cmx"><p class="m-cm-big"><b>${esc(go[0].toUpperCase() + go.slice(1))}</b><span>an ${ptHm(f.e)}</span></p>`
+    + (lv === 'bad' || lv === 'warn' ? `<p class="m-cm-how warn">${esc(v)}</p>` : '')
+    + `<ul class="m-dep-l m-pt-l">${legs}</ul>`
+    + (S.next ? `<p class="m-dim m-pt-next">Danach los um ${ptHm(S.next.s)}, an ${ptHm(S.next.e)}</p>` : '') + '</div>';
+}
 function mosDep(w, now, pv) {
   const dep = dpMirrorOf(w, now);
   if (!dep) return { html: pv ? '<p class="m-dim">Kommt, sobald die Abfahrten geladen sind</p>' : '' };
@@ -71,7 +86,7 @@ function mosBlock(id, it, now, pv, cx) {
     switch (w.type) {
       case 'now': inner = cx.nw.length ? `<ul class="m-now">${cx.nw.map(x => mRow({ ico: x.ico, t: x.t, s: mTxt(x.s), when: x.w && x.w !== 'live' ? x.w : '', lv: x.lv, wc: x.wc })).join('')}</ul>` : pv ? '<p class="m-dim">Gerade drängt nichts.</p>' : ''; break;
       case 'weather': inner = MBR.wx(now, pv); break;
-      case 'commute': inner = mosCm(now, pv); if (cm.sum) title = cm.sum.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'; break;
+      case 'commute': inner = ptMode() ? mosPt(now, pv) : mosCm(now, pv); if (cm.sum || ptMode()) title = cm.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'; break;
       case 'cal': inner = MBR.cal(now, pv); break;
       case 'dep': { const d = mosDep(w, now, pv); inner = d.html; extra = d.extra; if (!w.title && w.cfg.stop) title = w.cfg.stop.name; break; }
       case 'bday': inner = mosBday(now); break;
@@ -80,7 +95,7 @@ function mosBlock(id, it, now, pv, cx) {
     }
   } catch { inner = ''; }
   if (!inner) return '';
-  return `<section class="mw" data-type="${w.type}" data-span="${it.s}"><h3 class="mw-h">${TICON[w.type] || ''}<span>${esc(title)}</span>${extra ? `<b>${esc(extra)}</b>` : ''}</h3>${inner}</section>`;
+  return `<section class="mw" data-type="${w.type}" data-span="${it.s}"><h3 class="mw-h">${(w.type === 'commute' && ptMode() ? TICON.dep : TICON[w.type]) || ''}<span>${esc(title)}</span>${extra ? `<b>${esc(extra)}</b>` : ''}</h3>${inner}</section>`;
 }
 function mosRender(root, now, pv) {
   const m = state.ui.mirror, page = mosPage();
@@ -103,7 +118,7 @@ function mosRender(root, now, pv) {
 /* Wie im Cockpit: Spalten nach Breite, jeder Block in die kürzeste Spalte. Passt es nicht, wird gekürzt:
  * erst Listen in den Blöcken, die unten überstehen, dann der letzte davon ganz. */
 /* mini: das Streckenband als Fließtext statt untereinander, braucht ein Drittel der Höhe */
-const MOS_FIT = [['.m-cal li', 3], ['.m-now .ml', 3], ['.m-dep-l li', 3], ['.m-eve .ml', 3], ['.m-wx-hrs', 0], ['mini'], ['.m-cal li', 2], ['.m-now .ml', 2], ['.m-dep-l li', 2], ['.m-lines .ml', 1], ['.m-eve .ml', 2], ['.cm-band', 0], ['.m-cm-dev', 0], ['.m-cal li', 1], ['.m-now .ml', 1], ['.m-dep-l li', 1]];
+const MOS_FIT = [['.m-cal li', 3], ['.m-now .ml', 3], ['.m-dep-l:not(.m-pt-l) li', 3], ['.m-eve .ml', 3], ['.m-wx-hrs', 0], ['.m-pt-next', 0], ['mini'], ['.m-cal li', 2], ['.m-now .ml', 2], ['.m-dep-l:not(.m-pt-l) li', 2], ['.m-lines .ml', 1], ['.m-eve .ml', 2], ['.cm-band', 0], ['.m-cm-dev', 0], ['.m-cal li', 1], ['.m-now .ml', 1], ['.m-dep-l:not(.m-pt-l) li', 1], ['.m-pt-l li', 2]];
 function mosLayout(root) {
   const grid = root.querySelector('.mos-grid');
   if (!grid) return;

@@ -1,4 +1,5 @@
-/* Pendeln (gibt es nur einmal): Route über OSRM, Meldungen der Autobahn GmbH, optional Live-Fahrzeit von TomTom */
+/* Pendeln (gibt es nur einmal): Route über OSRM, Meldungen der Autobahn GmbH, optional Live-Fahrzeit von TomTom.
+ * Mit dem Umschalter oben zeigt die Karte stattdessen Verbindungen mit Bus und Bahn (18-oepnv.js). */
 const TT_KEY = 'jere-cockpit-tomtom';
 const cm = { dir: new Date().getHours() < 11 ? 'work' : 'home', seq: 0, timer: null, res: null, sum: null, homeMins: null, map: null, layer: null, abCache: new Map(), cbTried: new Set(), cbBusy: false, cbPostOff: false, cbUsual: null, band: null };
 const ORDER = { closure: 0, jam: 1, slow: 2, warn: 3, works: 4 };
@@ -439,7 +440,13 @@ document.addEventListener('fullscreenchange', () => {
   const on = document.fullscreenElement === $('#cm-wrap');
   if (cm.map) { cm.map.scrollWheelZoom[on ? 'enable' : 'disable'](); setTimeout(() => cmFit(false), 120); }
 });
-function setDir(d) { if (cm.dir === d) return; cm.dir = d; cm.allInc = false; cm.res = null; loadCommute(); }
+function setDir(d) {
+  if (cm.dir === d) return;
+  cm.dir = d; cm.allInc = false; cm.res = null;
+  loadCommute();
+  // Öffis: Wer selbst umschaltet, wartet nicht auf den Mindestabstand. Jede Richtung bleibt 5 Minuten im Speicher.
+  if (ptMode()) { pt.last = 0; pt.sel = null; ptRender(new Date()); }
+}
 $('#cm-dir-home').addEventListener('click', () => setDir('home'));
 $('#cm-dir-work').addEventListener('click', () => setDir('work'));
 function openCmForm() {
@@ -509,12 +516,18 @@ $('#cm-key-test').addEventListener('click', async () => {
 /* Kompakt: Fahrzeit, Lage und wann du los musst. Karte und Meldungen klappen per Tipp auf (gilt bis zum Neuladen). */
 const cmx = { open: false };
 function cmCompactUi() {
+  cmModeUi();
   const c = state.widgets.commute.cfg, on = c.compact && !cmx.open, b = $('#cm-more'), n = cm.items ? cm.items.length : 0;
   $('#commute').classList.toggle('is-compact', on);
   b.hidden = !c.compact;
   b.setAttribute('aria-expanded', String(!on));
   const what = cm.band ? 'Strecke, Karte' : 'Karte';
   b.querySelector('span').textContent = !on ? 'Weniger zeigen' : n ? `${what} und ${n === 1 ? 'eine Meldung' : n + ' Meldungen'}` : cm.band ? 'Strecke und Karte zeigen' : 'Karte zeigen';
+  // Öffis: Band der Verbindung und die weiteren Fahrten klappen genauso auf
+  const pb = $('#pt-more');
+  pb.hidden = !c.compact;
+  pb.setAttribute('aria-expanded', String(!on));
+  pb.querySelector('span').textContent = on ? 'Weg und weitere Verbindungen' : 'Weniger zeigen';
 }
 $('#cm-more').addEventListener('click', () => {
   cmx.open = !cmx.open;
@@ -523,4 +536,4 @@ $('#cm-more').addEventListener('click', () => {
   schedLayout();
 });
 $('#cm-compact').addEventListener('change', e => { state.widgets.commute.cfg.compact = e.target.checked; cmx.open = false; commit(); });
-defineWidget('commute', { render: cmCompactUi });
+defineWidget('commute', { render() { cmCompactUi(); ptRender(new Date()); } });

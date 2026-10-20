@@ -43,7 +43,7 @@ const TYPES = {
   tasks:    { name: 'Aufgaben', multi: true, w: 1, cat: 'day', desc: 'Deine Todoist-Projekte zum Abhaken. Pro Widget legst du fest, welche Projekte es zeigt.' },
   progress: { name: 'Fortschritt', multi: true, w: 1, cat: 'plan', desc: 'Balken für Arbeitstag, Arbeitswoche, Monat, Jahr oder eigene Zeiträume.' },
   vacation: { name: 'Urlaub', multi: false, w: 1, cat: 'plan', desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
-  commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
+  commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Mit dem Auto Fahrzeit, Staus und Baustellen, mit Öffis deine nächsten Verbindungen von Tür zu Tür.' },
   weather:  { name: 'Wetter', multi: false, w: 2, cat: 'go', desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
   links:    { name: 'Schnellzugriff', multi: true, w: 1, cat: 'day', desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
   notes:    { name: 'Notizen', multi: true, w: 1, cat: 'day', desc: 'Ein Notizzettel mit Markdown wie in Obsidian: Überschriften, Listen, Aufgaben zum Abhaken und Links, gespeichert beim Tippen.' },
@@ -298,7 +298,7 @@ function normCfg(type, c) {
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false, compact: c.compact !== false };
-    case 'commute': return { compact: c.compact !== false };
+    case 'commute': return { compact: c.compact !== false, mode: c.mode === 'pt' ? 'pt' : 'car' };
     case 'links': return { items: normLinks(c.items) };
     case 'notes': return { text: typeof c.text === 'string' ? c.text.slice(0, NOTE_MAX) : '', plain: !!c.plain };
     default: return {};

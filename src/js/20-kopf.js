@@ -15,7 +15,7 @@ function tickTiles(now) {
     const s = at(now, wb.start), e = at(now, wb.end);
     if (why) setTile('#t-fa', 'Heute frei', why === 'Kein Arbeitstag' ? 'Kein Arbeitstag laut Balken' : why, 'good');
     else if (now >= e) setTile('#t-fa', 'Geschafft', `seit ${wb.end} Uhr`, 'good');
-    else setTile('#t-fa', `in ${dur(e - now, true)}`, `um ${wb.end} Uhr${wb.example ? ' (Beispielzeit)' : ''}${cm.homeMins ? `, Heimweg ca. ${cm.homeMins} Min` : ''}`, now >= s ? 'hot' : null);
+    else setTile('#t-fa', `in ${dur(e - now, true)}`, `um ${wb.end} Uhr${wb.example ? ' (Beispielzeit)' : ''}${cm.homeMins && !ptMode() ? `, Heimweg ca. ${cm.homeMins} Min` : ''}`, now >= s ? 'hot' : null);
   }
   // Wochenende
   const mon = addDays(t, -((now.getDay() + 6) % 7));

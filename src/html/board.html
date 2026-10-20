@@ -20,6 +20,10 @@
     <div class="card-head">
       <h2 id="cm-h"><span data-r="title">Pendeln</span></h2>
       <div class="actions">
+        <div class="seg seg-ico" role="group" aria-label="Unterwegs mit">
+          <button type="button" id="cm-mode-car" aria-pressed="true" aria-label="Auto" title="Auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14v-4.6l-2.1-5H7.1L5 12.4z"/><path d="M5 12.4h14M6.6 17v2.2M17.4 17v2.2"/><circle cx="8.2" cy="14.7" r=".6"/><circle cx="15.8" cy="14.7" r=".6"/></svg></button>
+          <button type="button" id="cm-mode-pt" aria-pressed="false" aria-label="Öffis" title="Öffis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9 6.6h6M8.5 17.5l-1.6 3M15.5 17.5l1.6 3"/><circle cx="8.7" cy="14.2" r=".8" fill="currentColor"/><circle cx="15.3" cy="14.2" r=".8" fill="currentColor"/></svg></button>
+        </div>
         <div class="seg" role="group" aria-label="Richtung">
           <button type="button" id="cm-dir-home" aria-pressed="true">Nach Hause</button>
           <button type="button" id="cm-dir-work" aria-pressed="false">Zur Arbeit</button>
@@ -40,7 +44,7 @@
         <div class="field" style="margin-top:8px"><label for="cm-key">TomTom API-Key</label><input id="cm-key" type="password" maxlength="80" autocomplete="off" spellcheck="false"></div>
         <div class="tt-test"><button type="button" class="btn-ghost" id="cm-key-test">Key testen</button><span class="tt-res" id="cm-key-res" role="status"></span></div>
       </details>
-      <label class="check-row"><input type="checkbox" class="switch" id="cm-compact"> Kompakt, Karte und Meldungen per Tipp</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="cm-compact"> Kompakt, Details per Tipp</label>
       <p class="err" id="cm-err" hidden></p>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
@@ -50,7 +54,7 @@
 
     <div class="setup" id="cm-empty" hidden>
       <h3>Strecke einrichten</h3>
-      <p>Wohnort und Arbeit eintragen, dann siehst du Fahrzeit, Staus und Baustellen.</p>
+      <p>Wohnort und Arbeit eintragen, dann siehst du Fahrzeit und Staus mit dem Auto oder deine Verbindungen mit Bus und Bahn.</p>
       <div class="form-row"><button type="button" class="btn" id="cm-empty-btn">Eintragen</button></div>
     </div>
 
@@ -82,10 +86,38 @@
       <p class="hint" id="cm-hint"></p>
     </div>
 
-    <div class="links">
+    <div class="links cm-car">
       <a class="btn-ghost" id="cm-gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener" hidden>Live-Verkehr in Google Maps ↗</a>
     </div>
-    <p class="src" id="cm-src"></p>
+    <p class="src cm-car" id="cm-src"></p>
+
+    <!-- Öffis: Verbindungen über Transitous (18-oepnv.js) -->
+    <div class="wx-off pt-only" id="pt-off" hidden>
+      <h3 id="pt-off-title"></h3>
+      <p id="pt-off-text"></p>
+    </div>
+    <div class="pt-live pt-only" id="pt-live" hidden>
+      <div class="vac-hero">
+        <div class="big"><b id="pt-time">0</b><span id="pt-time-lbl">Min bis los</span></div>
+        <dl class="legend" id="pt-dl"></dl>
+      </div>
+      <div class="pt-sum">
+        <p class="pt-chain" id="pt-chain"></p>
+        <p class="pt-note" id="pt-note"></p>
+      </div>
+      <p class="verdict" id="pt-verdict"></p>
+      <button type="button" class="more-tg" id="pt-more" aria-expanded="false" aria-controls="pt-live" hidden><span>Weg und weitere Verbindungen</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="pt-detail">
+        <div class="pt-alerts" id="pt-alerts"></div>
+        <div id="pt-band"></div>
+        <h3 class="sub-h" id="pt-list-h">Verbindungen</h3>
+        <ul class="pt-list" id="pt-list"></ul>
+      </div>
+    </div>
+    <div class="links pt-only">
+      <a class="btn-ghost" id="pt-gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener">In Google Maps ↗</a>
+    </div>
+    <p class="src pt-only" id="pt-src"></p>
   </section>
 
   <!-- Wetter -->

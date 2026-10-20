@@ -17,7 +17,8 @@ const DP_ERR = {
 /* Liniennummer kurz und so, wie sie an der Haltestelle steht: „S1“, „U3“, „5“, „RE 3“ wird „RE3“ */
 function dpLine(st) {
   let n = String(st.displayName || st.routeShortName || st.tripShortName || '').trim();
-  n = n.replace(/^(Bus|STR|Tram)\s+(?=\S)/i, '').replace(/^(S|U|RE|RB|A)\s+(?=\d)/i, '$1');
+  // Züge tragen manchmal die Zugnummer mit, etwa „RB71 (81863)“
+  n = n.replace(/\s*\(\d+\)$/, '').replace(/^(Bus|STR|Tram)\s+(?=\S)/i, '').replace(/^(S|U|RE|RB|A)\s+(?=\d)/i, '$1');
   return n.slice(0, 10) || '?';
 }
 function dpCat(mode, line) {
@@ -81,14 +82,14 @@ async function dpLoad(stop, need) {
   const q = new URLSearchParams({ stopId: stop.id, n: String(need), language: 'de' });
   try {
     let j;
-    try { j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000); }
+    try { j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000, TRS_REF); }
     catch (e) {
       // IDs von Haltestellen ändern sich manchmal mit neuen Fahrplandaten. Dann über die Koordinaten suchen.
       if (!/HTTP (400|404|422)/.test(e.message) || stop.lat == null) throw e;
       q.delete('stopId');
       q.set('center', `${stop.lat},${stop.lon}`);
       q.set('radius', '120');
-      j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000);
+      j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000, TRS_REF);
     }
     if (!j || !Array.isArray(j.stopTimes)) throw new Error('format');
     dp.data[k] = { at: Date.now(), need, list: j.stopTimes.map(dpSlim).filter(Boolean).sort((a, b) => a.t - b.t), alerts: dpAlerts(j.stopTimes) };
@@ -209,7 +210,7 @@ async function dpSearch(box, near) {
   const p = new URLSearchParams(near ? { place: bias, type: 'STOP', numResults: '8' } : { text: q, type: 'STOP', numResults: '8', language: 'de' });
   if (!near && bias) p.set('place', bias);
   let list;
-  try { list = await getJson(`${TRS}/v1/${near ? 'reverse-geocode' : 'geocode'}?${p}`, 12000); }
+  try { list = await getJson(`${TRS}/v1/${near ? 'reverse-geocode' : 'geocode'}?${p}`, 12000, TRS_REF); }
   catch { if (box.isConnected) hits.innerHTML = '<li class="empty">Die Suche ist gerade nicht erreichbar. Versuch es gleich nochmal.</li>'; return; }
   if (!box.isConnected) return;
   const stops = (Array.isArray(list) ? list : []).filter(m => m && m.id && m.name && (!m.type || m.type === 'STOP')).slice(0, 8);
