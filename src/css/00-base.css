@@ -20,6 +20,9 @@
   --good:#2F8458;
   --bad:#B3392C;
   --warn:#C9700E;
+  /* Status als Text: dunkler, damit er auf Karte und Grund lesbar bleibt (mind. 4.5:1). Flächen nehmen --good und --warn. */
+  --good-ink:#1F7047;
+  --warn-ink:#9A5405;
   --f-display:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-data:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -33,10 +36,11 @@
   --pad-b:20px;
   --card-gap:14px;
   --arc-h:96px;
-  /* Ebenen: ruhige Karten liegen flach, normale leicht erhaben, wichtige Karten schweben etwas höher */
+  /* Ebenen: Karten liegen auf dem Grund und trennen sich durch eine feine Linie. Wichtige Karten heben sich nur
+     einen Hauch ab, echte Schatten bleiben für das, was schwebt (Fenster, Menüs). */
   --card-line:rgba(15,27,43,.075);
-  --shadow-1:0 1px 2px rgba(15,27,43,.04),0 3px 12px -4px rgba(15,27,43,.07);
-  --shadow-2:0 1px 2px rgba(15,27,43,.05),0 12px 30px -10px rgba(15,27,43,.2);
+  --shadow-1:0 1px 2px rgba(15,27,43,.035);
+  --shadow-2:0 1px 2px rgba(15,27,43,.04),0 4px 14px -6px rgba(15,27,43,.09);
   --surface-hi:var(--surface);
   --quiet:color-mix(in srgb,var(--surface) 48%,var(--bg));
   /* Füllung für Balken, die nicht „jetzt“ sind. Die Akzentfarbe bleibt für jetzt, heute und Aktionen. */
@@ -56,7 +60,7 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#11100F; --surface:#1A1918; --raise:#242321; --ink:#ECE9E5; --muted:#A7A49F; --line:#2C2B29;
-    --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+    --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A; --good-ink:var(--good); --warn-ink:var(--warn);
     --card-line:rgba(255,255,255,.065);
     --shadow-1:none;
     --shadow-2:inset 0 1px 0 rgba(255,255,255,.045);
@@ -78,7 +82,7 @@
 }
 :root[data-theme="dark"]{
   --bg:#11100F; --surface:#1A1918; --raise:#242321; --ink:#ECE9E5; --muted:#A7A49F; --line:#2C2B29;
-  --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A;
+  --sea:#7FB0DE; --rain:#5BA4E8; --good:#5DBE89; --bad:#EF7B6E; --warn:#F2A24A; --good-ink:var(--good); --warn-ink:var(--warn);
   --card-line:rgba(255,255,255,.065);
   --shadow-1:none;
   --shadow-2:inset 0 1px 0 rgba(255,255,255,.045);

@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '3.10';
+const VERSION = '3.11';
 function tick() {
   const now = new Date();
   tickHeader(now);

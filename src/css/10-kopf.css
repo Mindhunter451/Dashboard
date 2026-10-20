@@ -132,7 +132,7 @@
 .t-label{margin:0;font:600 13px/1.3 var(--f-body);color:var(--muted)}
 .t-val{margin:3px 0 1px;font:640 clamp(21px,2vw,27px)/1.1 var(--f-display);font-variation-settings:'wdth' 86;letter-spacing:-.015em;text-wrap:balance}
 .tile[data-hot] .t-val{color:var(--accent-ink)}
-.tile[data-good] .t-val{color:var(--good)}
+.tile[data-good] .t-val{color:var(--good-ink)}
 .t-sub{margin:0;color:var(--muted);font-size:13px;line-height:1.4;overflow-wrap:anywhere}
 /* Bearbeiten: Kacheln direkt hier verschieben */
 .next.sortable{overflow:visible}

@@ -1,7 +1,7 @@
 /* Spiegel-Modus: reines Schwarz, nur Schrift. Größen in cqmin, also relativ zum Spiegel selbst.
    So sieht die verkleinerte Vorschau im Anpassen-Fenster genauso aus wie der echte Spiegel. Funktioniert hoch und quer. */
 .mirror{position:fixed;inset:0;z-index:200;background:#000;color:#F2F4F7;overflow:hidden;cursor:none;container-type:size;
-  --m-dim:#8B93A0;font-family:var(--f-body)}
+  --m-dim:#8B93A0;--good-ink:var(--good);--warn-ink:var(--warn);font-family:var(--f-body)}
 .mirror.awake{cursor:auto}
 html.mirror-on body{overflow:hidden}
 .m-in{position:absolute;inset:0;padding:clamp(28px,5cqmin,72px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);

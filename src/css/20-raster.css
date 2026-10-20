@@ -19,13 +19,13 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .card-head .icon-btn svg{width:18px;height:18px}
 .card-head .btn-ghost{padding:5px 11px}
 /* Die negativen Ränder lassen die Klickfläche etwas größer werden, ohne dass sich Symbol und Text verschieben */
-.card-tg{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:calc(100% + 11px);margin:-3px -8px -3px -3px;padding:3px 8px 3px 3px;border:0;border-radius:11px;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:left}
+.card-tg{display:inline-flex;align-items:center;gap:9px;min-width:0;max-width:calc(100% + 14px);margin:-6px -8px -6px -6px;padding:6px 8px 6px 6px;border:0;border-radius:11px;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-align:left}
 .card-tg:hover{background:color-mix(in srgb,var(--ink) 4.5%,transparent)}
 .card-tt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card-ico{flex:0 0 28px;width:28px;height:28px;border-radius:min(9px,var(--r2));display:grid;place-items:center;background:var(--raise);color:var(--muted)}
+/* Symbol schlicht in Grau, ohne Kästchen dahinter. Die Karte sagt mit Titel und Inhalt, was sie ist. */
+.card-ico{flex:0 0 18px;width:18px;height:18px;display:grid;place-items:center;color:var(--muted)}
 .card[data-tier="hero"] .card-ico{color:var(--ink)}
-.card[data-tier="quiet"] .card-ico{background:color-mix(in srgb,var(--ink) 5%,transparent)}
-.card-ico svg{width:16px;height:16px}
+.card-ico svg{width:18px;height:18px}
 .card-chev{flex:0 0 14px;width:14px;height:14px;margin-left:-3px;color:var(--muted);opacity:0;transition:opacity .15s,transform .25s var(--ease)}
 .card-tg:hover .card-chev,.card-tg:focus-visible .card-chev{opacity:1}
 @media (hover:none){.card-chev{opacity:.5}}
