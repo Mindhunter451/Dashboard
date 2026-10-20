@@ -226,8 +226,8 @@ label.dr-line{cursor:pointer}
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:12px;padding-top:4px}
 .sync::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:7px;vertical-align:1px}
 .sync[data-mode="error"]::before,.sync[data-mode="none"]::before{background:var(--bad)}
-.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:9px 10px 9px 18px;border-radius:999px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 28px rgba(0,0,0,.22);z-index:3100;max-width:calc(100% - 32px);font-size:14px}
-.toast button{background:transparent;border:0;color:var(--accent);font-weight:700;padding:4px 8px;border-radius:999px}
+.toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);padding:9px 10px 9px 18px;border-radius:23px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 28px rgba(0,0,0,.22);z-index:3100;max-width:680px;font-size:14px}
+.toast button{white-space:nowrap;background:transparent;border:0;color:var(--accent);font-weight:700;padding:4px 8px;border-radius:999px}
 @media (prefers-reduced-motion: reduce){.fill{transition:none}}
 
 /* Dialoge: Widget-Galerie und Widget-Einstellungen */

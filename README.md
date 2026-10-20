@@ -124,6 +124,9 @@ Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigke
 
 ## Versionen
 
+**3.8** (Oktober 2026)
+Feinschliff bei den F1-Sendern. Im Dialog „Sender ändern“ steht jetzt, was ein Sender kostet: gratis, gratis mit VPN oder Abo. Im Kasten der nächsten Session tragen ORF, ServusTV und SRF ein kleines VPN direkt am Sender. Die Liste kann für RTL jetzt auch einzelne Sessions, neu drin ist das Qualifying in Austin. Der Knopf, der deine eigene Auswahl verwirft, heißt jetzt „Eigene Auswahl löschen“. Unter dem Sender-Kasten ist derselbe Abstand wie zwischen den anderen Teilen der Karte. Hinweise unten am Rand bleiben auf dem Handy auch mit mehreren Zeilen sauber abgerundet.
+
 **3.7** (Oktober 2026)
 Neu: die F1 Rennanalyse. Das letzte Rennen oder ein beliebiges der Saison als Zeitraffer auf der Streckenkarte (1×, 10×, 30×, 60×, Runde vor und zurück, Schieber zum Spulen), daneben die Reihenfolge mit Abständen, Reifen und Boxengasse, dazu Safety-Car, rote Flagge und Zielflagge auf der Karte und in der Zeitleiste. Weitere Ansichten: Positionsverlauf, Reifen und Boxenstopps. Einstellbar: Sprints mit anbieten und an welchen Punkten die Kürzel stehen. Das Formel-1-Widget hat unter „Letztes Rennen“ einen Knopf zur Streckenkarte.
 
