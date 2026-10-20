@@ -150,3 +150,81 @@ html.mirror-on body{overflow:hidden}
 .mirror.mp{position:absolute;inset:auto;left:0;top:0;z-index:auto;width:1600px;height:900px;transform-origin:0 0;transform:scale(var(--mp-s,.24));cursor:default;pointer-events:none}
 .mp-frame[data-o="port"] .mirror.mp{width:900px;height:1600px}
 .mp-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+/* MirrorOS „Wie im Dashboard“: oben Uhr und Datum wie im Cockpit, darunter die Kacheln, dann die Widgets der Seite
+   in Spalten, ohne Rahmen. Alles in em, damit „Größe“ den ganzen Spiegel mitnimmt. */
+.m-in.mos{display:flex;flex-direction:column;gap:clamp(16px,3cqmin,40px);font-size:calc(clamp(15px,2.2cqmin,27px) * var(--m-k,1))}
+.mos-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5em;min-width:0}
+.mos-clock{min-width:0}
+.mos-greet{margin:0 0 .6em;font-weight:600;color:var(--m-dim)}
+.mos .m-time{font-size:5.8em}
+.mos-side{display:flex;flex-direction:column;align-items:flex-end;gap:.2em;text-align:right;min-width:0;padding-bottom:.2em}
+.mos-side p{margin:0;line-height:1.3}
+.mos-day{font:500 2em/1.1 var(--f-display);font-variation-settings:'wdth' 85;letter-spacing:-.01em}
+.mos-date{font-size:1.15em}
+.mos-tiles{list-style:none;margin:0;padding:.9em 0 0;border-top:1px solid #1E2229;display:flex;flex-wrap:wrap;gap:.7em 3em}
+.mos-tiles li{display:flex;flex-direction:column;gap:.1em;min-width:0;max-width:16em}
+.mos-tiles span{font-size:.8em}
+.mos-tiles b{font:400 1.5em/1.15 var(--f-display);font-variation-settings:'wdth' 82}
+.mos-tiles small{font-size:.75em;color:#6E7682;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mos-grid{position:relative;flex:1 1 auto;min-height:0;column-gap:2.4em;row-gap:1.6em}
+.mos-empty{margin:0}
+.mw{position:absolute;left:0;top:0;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+.mw-h{display:flex;align-items:center;gap:.5em;width:100%;margin:0 0 .65em;font-size:.78em;font-weight:600;line-height:1.2;color:var(--m-dim);letter-spacing:.02em}
+.mw-h svg{width:1.2em;height:1.2em;flex:0 0 auto}
+.mw-h b{margin-left:auto;color:#F2F4F7;font-weight:600}
+.mos .mb{align-items:flex-start;text-align:left}
+.mos .m-now{font-size:1.08em}
+.mos .m-lines{font-size:1em}
+.mos .m-lines b{color:#F2F4F7;font-weight:500}
+.mos .m-wx p{font-size:1.05em}
+.mos .m-wx-now{font-size:4em}
+.mos .m-wx .m-dim{max-width:none}
+.mos .m-wx-hrs{font-size:.9em;margin-top:.8em;gap:1.6em}
+.mos .m-cal h3,.mos .m-eve h3{font-size:.8em;margin-bottom:.45em}
+.mos .m-cal ul{font-size:1.08em}
+.mos .m-eve ul{font-size:1em}
+.mos .m-eve>p{font-size:1em}
+.m-dep-l{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:.4em;font-size:1.05em;line-height:1.25}
+.m-dep-l li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:.6em}
+.m-dep-l .dp-line{font-size:.72em;min-width:2.5em}
+.m-dep-l b{font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.m-dep-l li.x{color:var(--m-dim)}
+.m-dep-l li.x .m-to{text-decoration:line-through}
+.mos .m-to{max-width:none}
+/* Pendeln im MirrorOS: große Fahrzeit, darunter das Streckenband statt der Karte */
+.m-cmx{display:flex;flex-direction:column;align-items:flex-start;width:100%}
+.m-cm-big{margin:0;display:flex;align-items:baseline;gap:.5em;flex-wrap:wrap;font-size:1.2em}
+.m-cm-big b{font:400 2.1em/1 var(--f-display);font-variation-settings:'wdth' 82;letter-spacing:-.01em}
+.m-cm-big span{color:var(--m-dim)}
+.m-cmx .m-cm-how{margin:.3em 0 0;font-size:1em}
+.m-cmx .m-cm-how.warn{color:#F2A24A}
+.m-cm-dev{margin:.35em 0 0;font-size:.95em;line-height:1.3;color:#8FC1FF}
+.mirror{--cb-ok:#4A515C;--cb-slow:#F2A24A;--cb-warn:#F2A24A;--cb-jam:#F2735F;--cb-closure:#F2735F;--cb-works:#3A3F47;--cb-dev:#8FC1FF;--cb-none:transparent}
+.mirror .cm-band{list-style:none;margin:.8em 0 0;padding:0;width:100%;display:flex;flex-direction:column;font-size:1em}
+.mirror .cm-band li{position:relative;padding-left:1.6em}
+.mirror .cm-band li::before{content:"";position:absolute;left:.42em;top:0;bottom:0;width:.16em;background:linear-gradient(var(--in) 0 50%,var(--out) 50% 100%)}
+.mirror .cb{display:flex;align-items:baseline;justify-content:space-between;gap:.8em;padding:.22em 0;font-size:inherit;line-height:1.25}
+.mirror .cb::after{content:"";position:absolute;left:.2em;top:calc(.22em + .625em - .3em);width:.6em;height:.6em;border-radius:50%;background:#000;box-shadow:inset 0 0 0 .13em #C9CED6}
+.mirror .cb:is([data-k="start"],[data-k="end"])::after{background:#F2F4F7;box-shadow:none}
+.mirror .cb-n b{font-weight:500}
+.mirror .cb-n small{color:var(--m-dim);font-size:.78em;font-weight:400;margin-left:.3em}
+.mirror .cb time{font:inherit;color:var(--m-dim);font-variant-numeric:tabular-nums;white-space:nowrap}
+.mirror .cb[data-k="end"] time{color:#F2F4F7;font-weight:500}
+.mirror .cb[data-k="via"]{color:#8FC1FF}
+.mirror .cb[data-k="via"] small{color:inherit}
+.mirror .cb[data-k="via"]::after{box-shadow:inset 0 0 0 .13em #8FC1FF}
+.mirror .cb[data-k="skip"]{color:#5C636E}
+.mirror .cb[data-k="skip"] b{text-decoration:line-through}
+.mirror .cb[data-k="skip"]::after{box-shadow:inset 0 0 0 .1em #4A515C}
+.mirror .cb-inc{padding:.05em 0 .15em;font-size:.82em;font-weight:500}
+.mirror .cb-inc:is([data-lv="jam"],[data-lv="closure"]){color:#F2735F}
+.mirror .cb-inc:is([data-lv="slow"],[data-lv="warn"]){color:#F2A24A}
+.mirror .cb-inc[data-lv="works"]{color:var(--m-dim)}
+.mw-eve .m-eve h3{font-size:.8em}
+@container (orientation: portrait){.mos .m-time{font-size:5.4em}.mos-head{flex-direction:column;align-items:flex-start}.mos-side{align-items:flex-start;text-align:left}}
+/* Kurzes Streckenband, wenn der Platz nicht reicht: die Orte mit Uhrzeit hintereinander */
+.mirror .cm-band.mini{flex-direction:row;flex-wrap:wrap;gap:.15em .9em;margin-top:.5em;font-size:.92em}
+.mirror .cm-band.mini li{padding-left:0}
+.mirror .cm-band.mini li::before,.mirror .cm-band.mini .cb::after,.mirror .cm-band.mini .cb-inc,.mirror .cm-band.mini .cb:is([data-k="start"],[data-k="via"]),.mirror .cm-band.mini small{display:none}
+.mirror .cm-band.mini .cb{gap:.4em;padding:0;justify-content:flex-start}

@@ -32,6 +32,8 @@
       <h3>Deine Strecke</h3>
       <div class="field"><label for="cm-home">Zuhause</label><input id="cm-home" type="text" maxlength="120" placeholder="Straße Hausnummer, Ort" autocomplete="off"></div>
       <div class="field"><label for="cm-work">Arbeit</label><input id="cm-work" type="text" maxlength="120" placeholder="Straße Hausnummer, Ort" autocomplete="off"></div>
+      <div class="field"><label for="cm-via">Orte unterwegs <small>(fürs Streckenband)</small></label><input id="cm-via" type="text" maxlength="400" placeholder="z. B. A23, Stellingen, Fruchtallee" autocomplete="off" aria-describedby="cm-via-hint cm-via-res">
+        <p class="hint" id="cm-via-hint">In Fahrtrichtung zur Arbeit, mit Komma getrennt: Autobahnen, Ausfahrten, Straßen oder Stadtteile. Auf dem Heimweg geht es andersherum.</p><p class="hint" id="cm-via-res" role="status"></p></div>
       <details class="tt" id="cm-tt">
         <summary>Live-Fahrzeit mit Stadtverkehr (optional)</summary>
         <p class="hint" style="margin-top:8px">Ohne Key rechnet das Dashboard mit normaler Fahrzeit plus gemeldeten Staus auf der Autobahn. Mit einem kostenlosen Key von developer.tomtom.com kommt die echte Live-Fahrzeit dazu, inklusive Stau in der Stadt. Der Key bleibt nur in diesem Browser.</p>
@@ -64,7 +66,9 @@
       </div>
       <p class="cm-route" id="cm-route"></p>
       <p class="verdict" id="cm-verdict"></p>
+      <p class="cm-dev" id="cm-dev" hidden></p>
       <button type="button" class="more-tg" id="cm-more" aria-expanded="false" aria-controls="cm-live" hidden><span>Karte und Meldungen</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="cm-band-box" id="cm-band" hidden></div>
       <ul class="incidents" id="cm-inc"></ul>
       <div class="cm-wrap" id="cm-wrap">
         <div class="cm-map" id="cm-map"></div>

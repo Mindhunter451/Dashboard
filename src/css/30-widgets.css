@@ -161,6 +161,31 @@
 #commute.is-compact .big b{font-size:52px}
 #commute.is-compact .more-tg{margin-top:0}
 #commute.is-compact #cm-hint[data-k="info"]{display:none}
+/* Streckenband: deine Orte untereinander, die Linie dazwischen zeigt den Verkehr auf dem Abschnitt */
+#commute{--cb-ok:color-mix(in oklab,var(--sea) 75%,var(--surface));--cb-slow:var(--warn);--cb-warn:var(--warn);--cb-jam:var(--bad);--cb-closure:var(--bad);--cb-works:color-mix(in oklab,var(--muted) 60%,var(--surface));--cb-dev:var(--accent);--cb-none:transparent}
+.cm-band{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.cm-band li{position:relative;padding-left:26px}
+.cm-band li::before{content:"";position:absolute;left:7px;top:0;bottom:0;width:3px;background:linear-gradient(var(--in) 0 50%,var(--out) 50% 100%)}
+.cb{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:4px 0;font-size:14px;line-height:1.3}
+.cb::after{content:"";position:absolute;left:3px;top:calc(4px + .65em - 5.5px);width:11px;height:11px;border-radius:50%;background:var(--surface);box-shadow:inset 0 0 0 2.5px var(--ink)}
+.cb:is([data-k="start"],[data-k="end"])::after{background:var(--ink)}
+.cb[data-k="via"]{color:var(--accent-ink)}
+.cb[data-k="via"]::after{box-shadow:inset 0 0 0 2.5px var(--accent)}
+.cb[data-k="skip"]{color:var(--muted)}
+.cb[data-k="skip"] b{text-decoration:line-through;font-weight:500}
+.cb[data-k="skip"]::after{box-shadow:inset 0 0 0 2px color-mix(in oklab,var(--muted) 70%,var(--surface))}
+.cb-n{min-width:0;overflow-wrap:anywhere}
+.cb-n b{font-weight:600}
+.cb-n small{color:var(--muted);font-size:12.5px;font-weight:500;margin-left:3px}
+.cb[data-k="via"] small{color:inherit}
+.cb time{font:500 13px var(--f-data);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.cb[data-k="end"] time{color:var(--ink);font-weight:700}
+.cb-inc{padding:1px 0 2px;font-size:12.5px;font-weight:600;line-height:1.3}
+.cb-inc:is([data-lv="jam"],[data-lv="closure"]){color:var(--bad)}
+.cb-inc:is([data-lv="slow"],[data-lv="warn"]){color:var(--accent-ink)}
+.cb-inc[data-lv="works"]{color:var(--muted)}
+.cm-dev{margin:0;font-size:14px;font-weight:600;line-height:1.35;color:var(--accent-ink)}
+#commute.is-compact .cm-band-box{display:none}
 .verdict{margin:0;font-weight:700;font-size:15px;line-height:1.35}
 .verdict[data-lv="bad"]{color:var(--bad)}
 .verdict[data-lv="warn"]{color:var(--accent-ink)}

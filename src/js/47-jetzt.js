@@ -90,10 +90,11 @@ function nwItems(now, load) {
     const toWork = S.dir === 'work' && t >= st - 150 * 6e4 && t <= st + 15 * 6e4;
     const toHome = S.dir === 'home' && t >= en - 45 * 6e4 && t <= en + 90 * 6e4;
     if (toWork || toHome) {
-      const arr = hm(new Date(t + S.mins * 6e4));
-      add('cm', S.closures ? 84 : S.delay >= 10 ? 76 : S.delay >= 3 ? 62 : 46, {
+      const arr = hm(new Date(t + (S.sec || S.mins * 60) * 1000));
+      // Eine Umleitung aus dem Streckenband zählt etwa wie leichter Stau
+      add('cm', S.closures ? 84 : S.delay >= 10 ? 76 : S.delay >= 3 || S.dev ? 62 : 46, {
         ico: 'commute', t: `${toWork ? 'Zur Arbeit' : 'Nach Hause'} ${S.mins} Min`,
-        s: esc(S.closures ? `${S.closures === 1 ? 'Eine Sperrung' : `${S.closures} Sperrungen`} auf der Strecke` : S.delay >= 1 ? `${Math.round(S.delay)} Min Stau, an ${arr} Uhr` : `Freie Fahrt, an ${arr} Uhr`),
+        s: esc(S.closures ? `${S.closures === 1 ? 'Eine Sperrung' : `${S.closures} Sperrungen`} auf der Strecke` : S.dev ? `${cbDevShort(S.dev)}, an ${arr} Uhr` : S.delay >= 1 ? `${Math.round(S.delay)} Min Stau, an ${arr} Uhr` : `Freie Fahrt, an ${arr} Uhr`),
         w: S.live ? 'live' : '', lv: S.closures ? 'bad' : S.delay >= 3 ? 'warn' : '', to: nwTarget('commute')
       });
     }

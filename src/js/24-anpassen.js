@@ -146,6 +146,12 @@ function mLineSub(id) {
 }
 function renderMirrorSec() {
   const m = state.ui.mirror;
+  segSet($('#dr-mlayout'), m.layout);
+  for (const el of $$('#dr-p-mirror [data-mlay]')) el.hidden = el.dataset.mlay !== m.layout;
+  const pg2 = mosPage(), sel = $('#dr-mpage');
+  sel.innerHTML = state.pages.map(p => `<option value="${esc(p.id)}"${p.id === pg2.id ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  $('#dr-mpage-new').disabled = state.pages.length >= 12 || state.pages.some(p => p.name === 'Spiegel');
+  $('#dr-mboot').checked = state.ui.mosBoot;
   segSet($('#dr-mpreset'), m.preset);
   segSet($('#mp-o'), mp.o);
   $('#mp-frame').dataset.o = mp.o;
@@ -394,6 +400,30 @@ $('#dr-tiles').addEventListener('change', e => {
 sortable($('#dr-tiles'), { item: '.sort-row', handle: '.sort-h', done: keys => { state.ui.order = normOrder(keys, state.ui.countdowns); commit(); } });
 /* Spiegel */
 $('#dr-mirror').addEventListener('click', () => { closeDrawer(); mirrorOpen(true); });
+$('#dr-mlayout').addEventListener('click', e => {
+  const b = e.target.closest('[data-v]');
+  if (!b || b.dataset.v === state.ui.mirror.layout) return;
+  state.ui.mirror.layout = b.dataset.v;
+  commit();
+  renderMirrorSec();
+});
+$('#dr-mpage').addEventListener('change', e => { state.ui.mirror.page = e.target.value; commit(); renderMirrorSec(); });
+/* Seite „Spiegel“ mit dem, was am Spiegel taugt: vorhandene Widgets, nichts Neues */
+$('#dr-mpage-new').addEventListener('click', () => {
+  if (state.pages.length >= 12) return;
+  const placed = new Set(state.pages.flatMap(p => p.items.map(x => x.w)));
+  const pick = t => { const ids = Object.keys(state.widgets).filter(id => state.widgets[id].type === t); return ids.find(id => placed.has(id)) || ids[0] || null; };
+  const items = [['now', 2], ['weather', 2], ['commute', 1], ['cal', 1], ['dep', 1], ['tasks', 1], ['bday', 1], ['waste', 1], ['f1', 1], ['football', 1]]
+    .map(([t, sp]) => ({ w: pick(t), s: sp })).filter(x => x.w);
+  let id;
+  do id = 'p' + uid(); while (pageById(id));
+  state.pages.push({ id, name: 'Spiegel', tiles: true, items });
+  state.ui.mirror.page = id;
+  commit();
+  renderMirrorSec();
+  toast('Seite „Spiegel“ angelegt. Im Bearbeiten-Modus ordnest du sie wie jede andere Seite.');
+});
+$('#dr-mboot').addEventListener('change', e => { state.ui.mosBoot = e.target.checked; commit(); });
 $('#mp-o').addEventListener('click', e => {
   const b = e.target.closest('[data-v]');
   if (!b) return;

@@ -46,7 +46,7 @@ function cmdBuild() {
   add('Aktionen', 'Schnell notieren', openCapture, { key: 'N', ico: CMD_ICO.note, top: true, words: 'notiz aufgabe todo idee merken' });
   add('Aktionen', edit.on ? 'Bearbeiten beenden' : 'Seiten und Widgets bearbeiten', () => setEdit(!edit.on), { ico: CMD_ICO.edit, top: true, words: 'bearbeiten verschieben anordnen breite entfernen' });
   add('Aktionen', 'Widget hinzufügen', () => { setEdit(true); openGallery(); }, { ico: CMD_ICO.plus, top: true, words: 'neu galerie karte' });
-  add('Aktionen', 'Spiegel-Modus starten', () => mirrorOpen(true), { key: 'S', ico: CMD_ICO.mirror, top: true, words: 'vollbild smart mirror wand kiosk' });
+  add('Aktionen', 'MirrorOS starten', () => mirrorOpen(true), { key: 'S', ico: CMD_ICO.mirror, top: true, words: 'spiegel modus vollbild smart mirror wand kiosk' });
   add('Aktionen', 'Anpassen öffnen', () => openDrawer('look'), { ico: CMD_ICO.tune, top: true, words: 'einstellungen optionen' });
   if (syncMode().startsWith('cloud')) add('Aktionen', 'Jetzt abgleichen', () => $('#sy-now').click(), { ico: CMD_ICO.sync, words: 'sync cloud geraete' });
   add('Aktionen', 'Sicherung als Datei speichern', exportState, { ico: CMD_ICO.save, words: 'export backup download' });
@@ -70,7 +70,7 @@ function cmdBuild() {
 
   add('Einstellungen', 'Startseite festlegen', () => openDrawer('pages'), { ico: CMD_ICO.page, words: 'beim oeffnen arbeitszeit automatisch' });
   add('Einstellungen', 'Uhr und Kopf anpassen', () => openDrawer('head'), { ico: CMD_ICO.clock, words: 'groesse schrift datum kalenderwoche begruessung sekunden' });
-  add('Einstellungen', 'Spiegel einrichten', () => openDrawer('mirror'), { ico: CMD_ICO.mirror, words: 'smart mirror bausteine dimmen nachts vorschau kurzzeilen wechselplatz morgen widgets' });
+  add('Einstellungen', 'MirrorOS einrichten', () => openDrawer('mirror'), { ico: CMD_ICO.mirror, words: 'spiegel smart mirror seite aufbau dashboard bausteine dimmen nachts vorschau kurzzeilen wechselplatz morgen widgets startet geraet' });
   add('Einstellungen', 'Countdown anlegen', () => { openDrawer('head'); setTimeout(() => { const n = $('#cd-name'); n.scrollIntoView({ block: 'center' }); n.focus({ preventScroll: true }); }, 60); }, { ico: CMD_ICO.flag, words: 'kachel pruefung termin zaehlen' });
   add('Einstellungen', 'Kacheln oben wählen und sortieren', () => { openDrawer('head'); setTimeout(() => $('#dr-tiles').scrollIntoView({ block: 'start' }), 60); }, { ico: CMD_ICO.grid, words: 'feierabend wochenende feiertag urlaub reihenfolge termin sonne' });
   add('Einstellungen', 'Sync zwischen Geräten', () => openDrawer('data'), { ico: CMD_ICO.sync, words: 'cloud cloudflare worker handy mac' });

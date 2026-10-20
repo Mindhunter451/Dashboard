@@ -169,7 +169,11 @@ function dpMirrorWidget() {
 }
 function dpMirror(now) {
   const w = dpMirrorWidget();
-  if (!w) return null;
+  return w ? dpMirrorOf(w, now) : null;
+}
+/* Abfahrten eines bestimmten Widgets für den Spiegel, lädt nach, wenn die Daten älter als eine Minute sind */
+function dpMirrorOf(w, now) {
+  if (!w.cfg.stop) return null;
   const st = w.cfg.stop, D = dp.data[st.id], t = +now;
   if ((!D || t - D.at > 6e4) && !dp.busy[st.id] && t - (dp.last[st.id] || 0) > 6e4) setTimeout(() => dpLoad(st, Math.max(dpNeed(w.cfg), D ? D.need : 0)), 50);
   if (!D) return null;

@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '3.8';
+const VERSION = '3.9';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -10,6 +10,7 @@ function tick() {
   skyTick(now);
   caTick(now);
   dpTick(now);
+  cbTick(now);
   bdTick(now);
   wsTick(now);
   mirrorTick(now);
@@ -64,6 +65,7 @@ const NEWS = {
   '3.3': ['Spritpreise mit eigenem Ort: Such dir einen Ort, nimm den vom Wetter oder deinen Standort, dazu Umkreis und Sortierung. Soll ich dir die Einstellungen zeigen?', () => { if (!pagesUsing('fuel').length) { setEdit(true); openGallery(); return; } nwJump('fuel'); setTimeout(() => { if (fuKey()) fuOpenSet(true); else fuOpenForm(); }, 350); }, 'Zeigen'],
   '3.6': ['Neu: Fußball und Formel 1 zeigen, wo gespielt und gefahren wird. Bei der F1 auch gratis bei ORF, ServusTV und SRF, mit VPN-Hinweis und Knopf zum Livestream. Was davon auftaucht, stellst du pro Widget ein.', () => { const id = pagesUsing('f1').length ? 'f1' : (widgetsOf('football').map(([i]) => i).find(i => pagesUsing(i).length) || ''); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => openWidgetDialog(id), 350); }, 'Einstellen'],
   '3.7': ['Neu: die F1 Rennanalyse. Das letzte Rennen im Zeitraffer auf der Streckenkarte, dazu Positionsverlauf, Reifen und Boxenstopps, kostenlos über OpenF1. Soll ich sie neben die Formel 1 legen?', () => anShow(), 'Hinzufügen'],
+  '3.9': ['Neu: der MirrorOS. Der Spiegel zeigt jetzt eine Seite deines Cockpits in schlicht, und Pendeln hat ein Streckenband mit deinen Orten unterwegs. Soll ich dir die Einstellungen zeigen?', () => openDrawer('mirror'), 'Zeigen'],
   '3.8': ['Feinschliff bei der Formel 1: Die Sender zeigen jetzt, wo du ein VPN brauchst, und RTL hat das Qualifying in Austin dazubekommen.', null],
   '3.2': ['Der Kalender kann jetzt auch Google, Outlook und jeden anderen Kalender mit ICS-Link. Deine Weiterleitung braucht dafür einmal neuen Code, die Einrichtung zeigt dir, was fehlt.', () => { if (!pagesUsing('cal').length) { setEdit(true); openGallery(); return; } nwJump('cal'); setTimeout(caOpenForm, 350); }, 'Einrichten']
 };
@@ -158,7 +160,8 @@ persist();
 renderAll();
 snapTake();
 announceNew();
-if (mirrorFromHash()) mirrorOpen(false);
+// Über die Adresse oder auf einem Gerät, das im MirrorOS startet (zum Beispiel der Rechner am Spiegel)
+if (mirrorFromHash() || state.ui.mosBoot) mirrorOpen(false);
 setInterval(tick, 1000);
 /* Handy quer oder Fenster schmaler: Listen kürzen oder wieder verlängern */
 narrowMq.addEventListener('change', () => { renderViews(); renderRadarTg(); schedLayout(); });
