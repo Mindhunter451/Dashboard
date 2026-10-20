@@ -106,7 +106,7 @@ const PEEK = {
     const r = v.refs && [...v.refs.values()][0];
     return r ? `${esc(r.b.name)} <small>${esc(r.pct.textContent)}</small>` : '';
   },
-  commute: () => ($('#cm-live').hidden ? '' : `${esc($('#cm-time').textContent)} <small>${esc($('#cm-time-lbl').textContent)}</small>`),
+  commute: () => { const p = ptMode() ? 'pt' : 'cm'; return $(`#${p}-live`).hidden ? '' : `${esc($(`#${p}-time`).textContent)} <small>${esc($(`#${p}-time-lbl`).textContent)}</small>`; },
   notes(v) {
     const line = noteLines(state.widgets[v.id].cfg.text)[0];
     return line ? `<small>${esc(line.slice(0, 60))}</small>` : '';

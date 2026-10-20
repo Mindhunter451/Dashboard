@@ -186,6 +186,52 @@
 .cb-inc[data-lv="works"]{color:var(--muted)}
 .cm-dev{margin:0;font-size:14px;font-weight:600;line-height:1.35;color:var(--accent-ink)}
 #commute.is-compact .cm-band-box{display:none}
+/* Auto oder Öffis: Umschalter mit Symbolen, die jeweils andere Hälfte der Karte ist aus */
+.seg-ico button{display:inline-flex;align-items:center;padding:4px 9px}
+.seg-ico svg{width:18px;height:18px}
+#commute[data-mode="pt"] :is(#cm-off,#cm-live,.cm-car){display:none!important}
+#commute:not([data-mode="pt"]) .pt-only{display:none!important}
+#commute{--cb-walk:color-mix(in oklab,var(--muted) 45%,var(--surface))}
+.pt-live{display:flex;flex-direction:column;gap:12px}
+#pt-off.busy h3::after{content:"";display:inline-block;width:.7em;height:.7em;margin-left:9px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;vertical-align:-1px;animation:spin .9s linear infinite;opacity:.6}
+.big b.word{font-size:52px;letter-spacing:-.03em}
+.pt-sum{display:flex;flex-direction:column;gap:5px}
+.pt-chain,.pt-note{margin:0}
+.pt-note{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.pt-ch{display:inline-flex;flex-wrap:wrap;align-items:center;gap:5px 6px}
+.pt-chain .pt-ch{gap:6px 7px}
+.pt-arr{font-style:normal;color:var(--muted);font-size:15px;line-height:1}
+.pt-w{display:inline-flex;align-items:center;gap:1px;color:var(--muted);font:600 13px/1 var(--f-data);font-variant-numeric:tabular-nums}
+.pt-wi{width:17px;height:17px}
+#pt-dl dd .dp-line{font-size:12px;height:1.65em;min-width:2.4em;vertical-align:1px;margin-right:2px}
+.verdict[data-lv="plan"]{color:var(--muted);font-weight:600;font-size:14px}
+.pt-detail{display:flex;flex-direction:column;gap:12px}
+.pt-alerts{display:flex;flex-direction:column;gap:6px}
+.pt-alerts:empty{display:none}
+.pt-alerts .dp-line,.pt-band .dp-line{font-size:12px;height:1.65em;min-width:2.4em}
+/* Band der Verbindung: Haltestellen als Punkte, dazwischen die Linie in ihrer Farbe, Fußwege grau */
+.pt-band .pt-seg{display:flex;align-items:center;gap:8px;padding:3px 0 3px 26px;font-size:13px;line-height:1.3;color:var(--muted)}
+.pt-band .pt-seg[data-k="leg"]{padding:6px 0 6px 26px;color:var(--ink);font-weight:600}
+.pt-band li::before{left:6.5px;width:4px}
+.pt-band .pt-seg small{color:var(--muted);font-weight:500;margin-left:2px}
+.pt-band .pt-seg[data-k="walk"]::before{background:repeating-linear-gradient(var(--in) 0 3px,transparent 3px 7px)}
+.pt-band .cb small{margin-left:0;display:inline-flex;flex-wrap:wrap;gap:0 6px}
+.pt-band .cb .cb-n b{margin-right:6px}
+/* Weitere Verbindungen, die gewählte ist hervorgehoben und steht oben im Band */
+.pt-list{list-style:none;margin:-4px 0 0;padding:0;display:flex;flex-direction:column}
+.pt-row{display:grid;grid-template-columns:4.1em minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 10px;margin:0 -10px;width:calc(100% + 20px);border:0;border-radius:11px;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.pt-row:hover{background:var(--raise)}
+.pt-row[aria-pressed="true"]{background:color-mix(in oklab,var(--accent) 11%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--accent) 30%,var(--line))}
+.pt-row:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pt-hm{display:flex;flex-direction:column;gap:1px;font-variant-numeric:tabular-nums}
+.pt-hm b{font:660 18px/1.1 var(--f-display);font-variation-settings:'wdth' 86}
+.pt-hm small,.pt-mid small{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.pt-mid{min-width:0;display:flex;flex-direction:column;gap:4px}
+.pt-mid .dp-line{font-size:12.5px;height:1.7em;min-width:2.5em}
+.pt-st{font-size:13px;white-space:nowrap}
+.pt-row.x .pt-hm b{text-decoration:line-through;color:var(--muted)}
+#commute.is-compact .pt-detail{display:none}
+#commute.is-compact .pt-live{gap:8px}
 .verdict{margin:0;font-weight:700;font-size:15px;line-height:1.35}
 .verdict[data-lv="bad"]{color:var(--bad)}
 .verdict[data-lv="warn"]{color:var(--accent-ink)}

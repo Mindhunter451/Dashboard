@@ -84,8 +84,24 @@ function nwItems(now, load) {
   }
 
   // Pendeln: morgens vor Arbeitsbeginn und rund um den Feierabend, an freien Tagen nicht
-  const S = cm.sum, wb = workBar();
-  if (S && t - S.at < 20 * 6e4 && wb && !freeReason(wb, now)) {
+  const S = cm.sum, wb = workBar(), P = ptMode() ? ptSummary(now) : null;
+  // Mit Öffis: wann du los musst, die Linien und wann du ankommst
+  if (P && wb && !freeReason(wb, now)) {
+    const st = +at(now, wb.start), en = +at(now, wb.end);
+    const toWork = P.dir === 'work' && t >= st - 150 * 6e4 && t <= st + 15 * 6e4;
+    const toHome = P.dir === 'home' && t >= en - 45 * 6e4 && t <= en + 90 * 6e4;
+    if (toWork || toHome) {
+      const f = P.it, m = Math.floor((f.s - t) / 6e4), w = ptWorst(f), x = ptX(f), go = ptLeave(f, t);
+      const first = ptTr(f.legs)[0];
+      // Unter 80, damit der Spiegel es nicht doppelt zeigt, wenn dort schon Pendeln steht. Ein Ausfall darf doppelt.
+      add('cm', x ? 84 : m <= 5 ? 78 : m <= 15 ? 72 : w.m >= 5 ? 66 : 48, {
+        ico: 'dep', t: `${toWork ? 'Zur Arbeit' : 'Nach Hause'}, ${go}`,
+        s: `${ptChain(f, false)}<span>${esc(`${ptHm(first.f.t)} ab ${first.f.n}, an ${ptHm(f.e)}`)}</span>${x ? '<span class="dp-x">fällt aus</span>' : w.m >= 1 ? `<span class="dp-late${w.m >= 5 ? ' big' : ''}">+${w.m}</span>` : ''}`,
+        w: m < 1 ? 'jetzt' : m < 60 ? `${m} Min` : ptHm(f.s), lv: x ? 'bad' : m < 2 ? 'now' : w.m >= 3 ? 'warn' : '', to: nwTarget('commute')
+      });
+    }
+  }
+  if (!ptMode() && S && t - S.at < 20 * 6e4 && wb && !freeReason(wb, now)) {
     const st = +at(now, wb.start), en = +at(now, wb.end);
     const toWork = S.dir === 'work' && t >= st - 150 * 6e4 && t <= st + 15 * 6e4;
     const toHome = S.dir === 'home' && t >= en - 45 * 6e4 && t <= en + 90 * 6e4;

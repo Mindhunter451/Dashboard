@@ -200,6 +200,9 @@ html.mirror-on body{overflow:hidden}
 .m-cmx .m-cm-how{margin:.3em 0 0;font-size:1em}
 .m-cmx .m-cm-how.warn{color:#F2A24A}
 .m-cm-dev{margin:.35em 0 0;font-size:.95em;line-height:1.3;color:#8FC1FF}
+.m-pt-l{margin-top:.6em}
+.m-pt-l .m-late{margin-left:.35em;font-size:.8em;color:#F2A24A}
+.m-pt-next{margin:.5em 0 0;font-size:.9em}
 .mirror{--cb-ok:#4A515C;--cb-slow:#F2A24A;--cb-warn:#F2A24A;--cb-jam:#F2735F;--cb-closure:#F2735F;--cb-works:#3A3F47;--cb-dev:#8FC1FF;--cb-none:transparent}
 .mirror .cm-band{list-style:none;margin:.8em 0 0;padding:0;width:100%;display:flex;flex-direction:column;font-size:1em}
 .mirror .cm-band li{position:relative;padding-left:1.6em}

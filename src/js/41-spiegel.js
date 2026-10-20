@@ -253,7 +253,7 @@ function mirrorEve(now, cx, pv) {
   const wb = workBar(), why = wb ? freeReason(wb, day) : holidayName(day) ? `Feiertag: ${holidayName(day)}` : null;
   if (why === 'Urlaub') { const v = vacationOn(day); add(5, 'vacation', 'Urlaubstag', v && v.label ? v.label : ''); }
   else if (why && why.startsWith('Feiertag')) add(5, 'vacation', why, 'Frei');
-  else if (wb && !why) add(5, 'commute', `Arbeit ab ${wb.start} Uhr`, cm.res && cm.res.route ? `Fahrt ohne Stau etwa ${Math.round(cm.res.route.duration / 60)} Min` : '');
+  else if (wb && !why) add(5, 'commute', `Arbeit ab ${wb.start} Uhr`, cm.res && cm.res.route && !ptMode() ? `Fahrt ohne Stau etwa ${Math.round(cm.res.route.duration / 60)} Min` : '');
   // Termine, die an dem Tag beginnen. Steht der Baustein Termine im Spiegel, listet der sie schon.
   if (ca.data && caSec().feeds.length && !cx.on.cal) {
     const list = caDay(day, ca.data.events), all = list.filter(e => e.a), timed = list.filter(e => !e.a && caStartsOn(e, day));
@@ -351,6 +351,13 @@ const MBR = {
     return `<section class="mb m-wx" data-b="wx"><div class="m-wx-now"><span class="m-wx-ico">${icon(w[1], c.is_day !== 0)}</span><b>${Number.isFinite(c.temperature_2m) ? Math.round(c.temperature_2m) + '°' : ''}</b></div><p>${esc(w[0])}</p><p class="m-dim">${esc(sub)}</p>${mirrorHours(d, now)}</section>`;
   },
   cm(now, pv) {
+    if (ptMode()) {
+      ptNeed(now);
+      const P = ptSummary(now);
+      if (!P) return pv ? mPh('cm', state.commute.home ? 'Kommt, sobald die Verbindungen geladen sind' : 'Trag erst deine Strecke im Pendeln-Widget ein') : '';
+      const f = P.it, go = ptLeave(f, +now), [v, lv] = ptVerdict(f);
+      return `<section class="mb m-cm" data-b="cm"><h3>${P.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'}</h3><p><b>${esc(go[0].toUpperCase() + go.slice(1))}</b><span>an ${ptHm(f.e)}</span></p><p class="m-cm-how${lv === 'bad' || lv === 'warn' ? ' warn' : ''}"><span>${esc(ptTr(f.legs).map(l => `${l.line} ${ptHm(l.f.t)}`).join(', dann '))}</span>${lv === 'bad' || lv === 'warn' ? `<span class="m-dim">${esc(v)}</span>` : ''}</p></section>`;
+    }
     const s = cm.sum;
     if (!s) return pv ? mPh('cm', state.commute.home ? 'Kommt, sobald die Strecke berechnet ist' : 'Trag erst deine Strecke im Pendeln-Widget ein') : '';
     // Nach Hause vor Feierabend: ab Feierabend gerechnet, sonst ab jetzt

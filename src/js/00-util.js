@@ -53,11 +53,12 @@ const LEFT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke
 const RIGHT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-async function getJson(url, ms = 9000) {
+/* init: weitere fetch-Optionen, zum Beispiel ein anderer Referer für Transitous */
+async function getJson(url, ms = 9000, init = null) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), ms);
   try {
-    const r = await fetch(url, { signal: ctl.signal });
+    const r = await fetch(url, { ...(init || {}), signal: ctl.signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
     // Ohne Netz liefert der Service Worker die letzte Antwort und schreibt dazu, von wann sie ist

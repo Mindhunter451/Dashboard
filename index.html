@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&family=Figtree:ital,wght@0,400..700;1,400&display=swap">
 <meta name="theme-color" content="#1D3672">
 <meta name="description" content="Jeres persönliches Dashboard mit Uhr, Wetter, Terminen, Abfahrten und mehr.">
+<link rel="author" href="https://github.com/Mindhunter451/Dashboard">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -648,6 +649,52 @@ h2 small{font:500 13px var(--f-body);color:var(--muted);margin-left:2px;letter-s
 .cb-inc[data-lv="works"]{color:var(--muted)}
 .cm-dev{margin:0;font-size:14px;font-weight:600;line-height:1.35;color:var(--accent-ink)}
 #commute.is-compact .cm-band-box{display:none}
+/* Auto oder Öffis: Umschalter mit Symbolen, die jeweils andere Hälfte der Karte ist aus */
+.seg-ico button{display:inline-flex;align-items:center;padding:4px 9px}
+.seg-ico svg{width:18px;height:18px}
+#commute[data-mode="pt"] :is(#cm-off,#cm-live,.cm-car){display:none!important}
+#commute:not([data-mode="pt"]) .pt-only{display:none!important}
+#commute{--cb-walk:color-mix(in oklab,var(--muted) 45%,var(--surface))}
+.pt-live{display:flex;flex-direction:column;gap:12px}
+#pt-off.busy h3::after{content:"";display:inline-block;width:.7em;height:.7em;margin-left:9px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;vertical-align:-1px;animation:spin .9s linear infinite;opacity:.6}
+.big b.word{font-size:52px;letter-spacing:-.03em}
+.pt-sum{display:flex;flex-direction:column;gap:5px}
+.pt-chain,.pt-note{margin:0}
+.pt-note{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.pt-ch{display:inline-flex;flex-wrap:wrap;align-items:center;gap:5px 6px}
+.pt-chain .pt-ch{gap:6px 7px}
+.pt-arr{font-style:normal;color:var(--muted);font-size:15px;line-height:1}
+.pt-w{display:inline-flex;align-items:center;gap:1px;color:var(--muted);font:600 13px/1 var(--f-data);font-variant-numeric:tabular-nums}
+.pt-wi{width:17px;height:17px}
+#pt-dl dd .dp-line{font-size:12px;height:1.65em;min-width:2.4em;vertical-align:1px;margin-right:2px}
+.verdict[data-lv="plan"]{color:var(--muted);font-weight:600;font-size:14px}
+.pt-detail{display:flex;flex-direction:column;gap:12px}
+.pt-alerts{display:flex;flex-direction:column;gap:6px}
+.pt-alerts:empty{display:none}
+.pt-alerts .dp-line,.pt-band .dp-line{font-size:12px;height:1.65em;min-width:2.4em}
+/* Band der Verbindung: Haltestellen als Punkte, dazwischen die Linie in ihrer Farbe, Fußwege grau */
+.pt-band .pt-seg{display:flex;align-items:center;gap:8px;padding:3px 0 3px 26px;font-size:13px;line-height:1.3;color:var(--muted)}
+.pt-band .pt-seg[data-k="leg"]{padding:6px 0 6px 26px;color:var(--ink);font-weight:600}
+.pt-band li::before{left:6.5px;width:4px}
+.pt-band .pt-seg small{color:var(--muted);font-weight:500;margin-left:2px}
+.pt-band .pt-seg[data-k="walk"]::before{background:repeating-linear-gradient(var(--in) 0 3px,transparent 3px 7px)}
+.pt-band .cb small{margin-left:0;display:inline-flex;flex-wrap:wrap;gap:0 6px}
+.pt-band .cb .cb-n b{margin-right:6px}
+/* Weitere Verbindungen, die gewählte ist hervorgehoben und steht oben im Band */
+.pt-list{list-style:none;margin:-4px 0 0;padding:0;display:flex;flex-direction:column}
+.pt-row{display:grid;grid-template-columns:4.1em minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 10px;margin:0 -10px;width:calc(100% + 20px);border:0;border-radius:11px;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.pt-row:hover{background:var(--raise)}
+.pt-row[aria-pressed="true"]{background:color-mix(in oklab,var(--accent) 11%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--accent) 30%,var(--line))}
+.pt-row:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.pt-hm{display:flex;flex-direction:column;gap:1px;font-variant-numeric:tabular-nums}
+.pt-hm b{font:660 18px/1.1 var(--f-display);font-variation-settings:'wdth' 86}
+.pt-hm small,.pt-mid small{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.pt-mid{min-width:0;display:flex;flex-direction:column;gap:4px}
+.pt-mid .dp-line{font-size:12.5px;height:1.7em;min-width:2.5em}
+.pt-st{font-size:13px;white-space:nowrap}
+.pt-row.x .pt-hm b{text-decoration:line-through;color:var(--muted)}
+#commute.is-compact .pt-detail{display:none}
+#commute.is-compact .pt-live{gap:8px}
 .verdict{margin:0;font-weight:700;font-size:15px;line-height:1.35}
 .verdict[data-lv="bad"]{color:var(--bad)}
 .verdict[data-lv="warn"]{color:var(--accent-ink)}
@@ -1096,7 +1143,7 @@ a.tv svg{width:11px;height:11px;flex:0 0 auto}
 .dp-alert summary{cursor:pointer;font-weight:600}
 .dp-alert p{margin:6px 0 0;color:var(--muted);white-space:pre-line}
 .dp-src{display:flex;flex-wrap:wrap;gap:2px 12px}
-.dp-src a,.hint a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.dp-src a,.hint a,#pt-src a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .dp-search{display:flex;flex-wrap:wrap;gap:6px}
 .dp-search input{flex:1 1 12em;font:inherit;font-size:15px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
 .dp-hits{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:250px;overflow:auto}
@@ -1633,6 +1680,8 @@ label.dr-line{cursor:pointer}
 
 /* Fuß und Toast */
 .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;color:var(--muted);font-size:12px;padding-top:4px}
+.foot a{color:inherit;text-underline-offset:2px}
+.foot a:hover{color:var(--ink)}
 .sync::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:7px;vertical-align:1px}
 .sync[data-mode="error"]::before,.sync[data-mode="none"]::before{background:var(--bad)}
 .toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);padding:9px 10px 9px 18px;border-radius:23px;display:flex;gap:10px;align-items:center;box-shadow:0 8px 28px rgba(0,0,0,.22);z-index:3100;max-width:680px;font-size:14px}
@@ -1932,6 +1981,9 @@ html.mirror-on body{overflow:hidden}
 .m-cmx .m-cm-how{margin:.3em 0 0;font-size:1em}
 .m-cmx .m-cm-how.warn{color:#F2A24A}
 .m-cm-dev{margin:.35em 0 0;font-size:.95em;line-height:1.3;color:#8FC1FF}
+.m-pt-l{margin-top:.6em}
+.m-pt-l .m-late{margin-left:.35em;font-size:.8em;color:#F2A24A}
+.m-pt-next{margin:.5em 0 0;font-size:.9em}
 .mirror{--cb-ok:#4A515C;--cb-slow:#F2A24A;--cb-warn:#F2A24A;--cb-jam:#F2735F;--cb-closure:#F2735F;--cb-works:#3A3F47;--cb-dev:#8FC1FF;--cb-none:transparent}
 .mirror .cm-band{list-style:none;margin:.8em 0 0;padding:0;width:100%;display:flex;flex-direction:column;font-size:1em}
 .mirror .cm-band li{position:relative;padding-left:1.6em}
@@ -2057,6 +2109,10 @@ html.mirror-on body{overflow:hidden}
     <div class="card-head">
       <h2 id="cm-h"><span data-r="title">Pendeln</span></h2>
       <div class="actions">
+        <div class="seg seg-ico" role="group" aria-label="Unterwegs mit">
+          <button type="button" id="cm-mode-car" aria-pressed="true" aria-label="Auto" title="Auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14v-4.6l-2.1-5H7.1L5 12.4z"/><path d="M5 12.4h14M6.6 17v2.2M17.4 17v2.2"/><circle cx="8.2" cy="14.7" r=".6"/><circle cx="15.8" cy="14.7" r=".6"/></svg></button>
+          <button type="button" id="cm-mode-pt" aria-pressed="false" aria-label="Öffis" title="Öffis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9 6.6h6M8.5 17.5l-1.6 3M15.5 17.5l1.6 3"/><circle cx="8.7" cy="14.2" r=".8" fill="currentColor"/><circle cx="15.3" cy="14.2" r=".8" fill="currentColor"/></svg></button>
+        </div>
         <div class="seg" role="group" aria-label="Richtung">
           <button type="button" id="cm-dir-home" aria-pressed="true">Nach Hause</button>
           <button type="button" id="cm-dir-work" aria-pressed="false">Zur Arbeit</button>
@@ -2077,7 +2133,7 @@ html.mirror-on body{overflow:hidden}
         <div class="field" style="margin-top:8px"><label for="cm-key">TomTom API-Key</label><input id="cm-key" type="password" maxlength="80" autocomplete="off" spellcheck="false"></div>
         <div class="tt-test"><button type="button" class="btn-ghost" id="cm-key-test">Key testen</button><span class="tt-res" id="cm-key-res" role="status"></span></div>
       </details>
-      <label class="check-row"><input type="checkbox" class="switch" id="cm-compact"> Kompakt, Karte und Meldungen per Tipp</label>
+      <label class="check-row"><input type="checkbox" class="switch" id="cm-compact"> Kompakt, Details per Tipp</label>
       <p class="err" id="cm-err" hidden></p>
       <div class="form-row">
         <button type="submit" class="btn">Speichern</button>
@@ -2087,7 +2143,7 @@ html.mirror-on body{overflow:hidden}
 
     <div class="setup" id="cm-empty" hidden>
       <h3>Strecke einrichten</h3>
-      <p>Wohnort und Arbeit eintragen, dann siehst du Fahrzeit, Staus und Baustellen.</p>
+      <p>Wohnort und Arbeit eintragen, dann siehst du Fahrzeit und Staus mit dem Auto oder deine Verbindungen mit Bus und Bahn.</p>
       <div class="form-row"><button type="button" class="btn" id="cm-empty-btn">Eintragen</button></div>
     </div>
 
@@ -2119,10 +2175,38 @@ html.mirror-on body{overflow:hidden}
       <p class="hint" id="cm-hint"></p>
     </div>
 
-    <div class="links">
+    <div class="links cm-car">
       <a class="btn-ghost" id="cm-gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener" hidden>Live-Verkehr in Google Maps ↗</a>
     </div>
-    <p class="src" id="cm-src"></p>
+    <p class="src cm-car" id="cm-src"></p>
+
+    <!-- Öffis: Verbindungen über Transitous (18-oepnv.js) -->
+    <div class="wx-off pt-only" id="pt-off" hidden>
+      <h3 id="pt-off-title"></h3>
+      <p id="pt-off-text"></p>
+    </div>
+    <div class="pt-live pt-only" id="pt-live" hidden>
+      <div class="vac-hero">
+        <div class="big"><b id="pt-time">0</b><span id="pt-time-lbl">Min bis los</span></div>
+        <dl class="legend" id="pt-dl"></dl>
+      </div>
+      <div class="pt-sum">
+        <p class="pt-chain" id="pt-chain"></p>
+        <p class="pt-note" id="pt-note"></p>
+      </div>
+      <p class="verdict" id="pt-verdict"></p>
+      <button type="button" class="more-tg" id="pt-more" aria-expanded="false" aria-controls="pt-live" hidden><span>Weg und weitere Verbindungen</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="pt-detail">
+        <div class="pt-alerts" id="pt-alerts"></div>
+        <div id="pt-band"></div>
+        <h3 class="sub-h" id="pt-list-h">Verbindungen</h3>
+        <ul class="pt-list" id="pt-list"></ul>
+      </div>
+    </div>
+    <div class="links pt-only">
+      <a class="btn-ghost" id="pt-gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener">In Google Maps ↗</a>
+    </div>
+    <p class="src pt-only" id="pt-src"></p>
   </section>
 
   <!-- Wetter -->
@@ -2608,7 +2692,7 @@ html.mirror-on body{overflow:hidden}
 
   <footer class="foot">
     <span class="sync" id="sync" data-mode="local">Gespeichert in diesem Browser.</span>
-    <span><span id="foot-region">Feiertage: Hamburg</span> · <span id="foot-ver"></span></span>
+    <span><span id="foot-region">Feiertage: Hamburg</span> · <span id="foot-ver"></span> · <a href="https://github.com/Mindhunter451/Dashboard" target="_blank" rel="noopener author">Kontakt und Code</a></span>
   </footer>
 </div>
 
@@ -3346,11 +3430,12 @@ const LEFT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke
 const RIGHT = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-async function getJson(url, ms = 9000) {
+/* init: weitere fetch-Optionen, zum Beispiel ein anderer Referer für Transitous */
+async function getJson(url, ms = 9000, init = null) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), ms);
   try {
-    const r = await fetch(url, { signal: ctl.signal });
+    const r = await fetch(url, { ...(init || {}), signal: ctl.signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
     // Ohne Netz liefert der Service Worker die letzte Antwort und schreibt dazu, von wann sie ist
@@ -3603,7 +3688,7 @@ const TYPES = {
   tasks:    { name: 'Aufgaben', multi: true, w: 1, cat: 'day', desc: 'Deine Todoist-Projekte zum Abhaken. Pro Widget legst du fest, welche Projekte es zeigt.' },
   progress: { name: 'Fortschritt', multi: true, w: 1, cat: 'plan', desc: 'Balken für Arbeitstag, Arbeitswoche, Monat, Jahr oder eigene Zeiträume.' },
   vacation: { name: 'Urlaub', multi: false, w: 1, cat: 'plan', desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
-  commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Fahrzeit mit dem Auto, Staus, Baustellen und Sperrungen auf deiner Strecke.' },
+  commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Mit dem Auto Fahrzeit, Staus und Baustellen, mit Öffis deine nächsten Verbindungen von Tür zu Tür.' },
   weather:  { name: 'Wetter', multi: false, w: 2, cat: 'go', desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
   links:    { name: 'Schnellzugriff', multi: true, w: 1, cat: 'day', desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
   notes:    { name: 'Notizen', multi: true, w: 1, cat: 'day', desc: 'Ein Notizzettel mit Markdown wie in Obsidian: Überschriften, Listen, Aufgaben zum Abhaken und Links, gespeichert beim Tippen.' },
@@ -3858,7 +3943,7 @@ function normCfg(type, c) {
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false, compact: c.compact !== false };
-    case 'commute': return { compact: c.compact !== false };
+    case 'commute': return { compact: c.compact !== false, mode: c.mode === 'pt' ? 'pt' : 'car' };
     case 'links': return { items: normLinks(c.items) };
     case 'notes': return { text: typeof c.text === 'string' ? c.text.slice(0, NOTE_MAX) : '', plain: !!c.plain };
     default: return {};
@@ -4327,7 +4412,7 @@ const PEEK = {
     const r = v.refs && [...v.refs.values()][0];
     return r ? `${esc(r.b.name)} <small>${esc(r.pct.textContent)}</small>` : '';
   },
-  commute: () => ($('#cm-live').hidden ? '' : `${esc($('#cm-time').textContent)} <small>${esc($('#cm-time-lbl').textContent)}</small>`),
+  commute: () => { const p = ptMode() ? 'pt' : 'cm'; return $(`#${p}-live`).hidden ? '' : `${esc($(`#${p}-time`).textContent)} <small>${esc($(`#${p}-time-lbl`).textContent)}</small>`; },
   notes(v) {
     const line = noteLines(state.widgets[v.id].cfg.text)[0];
     return line ? `<small>${esc(line.slice(0, 60))}</small>` : '';
@@ -6288,7 +6373,8 @@ defineWidget('tasks', {
 });
 
 /* 16-pendeln.js */
-/* Pendeln (gibt es nur einmal): Route über OSRM, Meldungen der Autobahn GmbH, optional Live-Fahrzeit von TomTom */
+/* Pendeln (gibt es nur einmal): Route über OSRM, Meldungen der Autobahn GmbH, optional Live-Fahrzeit von TomTom.
+ * Mit dem Umschalter oben zeigt die Karte stattdessen Verbindungen mit Bus und Bahn (18-oepnv.js). */
 const TT_KEY = 'jere-cockpit-tomtom';
 const cm = { dir: new Date().getHours() < 11 ? 'work' : 'home', seq: 0, timer: null, res: null, sum: null, homeMins: null, map: null, layer: null, abCache: new Map(), cbTried: new Set(), cbBusy: false, cbPostOff: false, cbUsual: null, band: null };
 const ORDER = { closure: 0, jam: 1, slow: 2, warn: 3, works: 4 };
@@ -6729,7 +6815,13 @@ document.addEventListener('fullscreenchange', () => {
   const on = document.fullscreenElement === $('#cm-wrap');
   if (cm.map) { cm.map.scrollWheelZoom[on ? 'enable' : 'disable'](); setTimeout(() => cmFit(false), 120); }
 });
-function setDir(d) { if (cm.dir === d) return; cm.dir = d; cm.allInc = false; cm.res = null; loadCommute(); }
+function setDir(d) {
+  if (cm.dir === d) return;
+  cm.dir = d; cm.allInc = false; cm.res = null;
+  loadCommute();
+  // Öffis: Wer selbst umschaltet, wartet nicht auf den Mindestabstand. Jede Richtung bleibt 5 Minuten im Speicher.
+  if (ptMode()) { pt.last = 0; pt.sel = null; ptRender(new Date()); }
+}
 $('#cm-dir-home').addEventListener('click', () => setDir('home'));
 $('#cm-dir-work').addEventListener('click', () => setDir('work'));
 function openCmForm() {
@@ -6799,12 +6891,18 @@ $('#cm-key-test').addEventListener('click', async () => {
 /* Kompakt: Fahrzeit, Lage und wann du los musst. Karte und Meldungen klappen per Tipp auf (gilt bis zum Neuladen). */
 const cmx = { open: false };
 function cmCompactUi() {
+  cmModeUi();
   const c = state.widgets.commute.cfg, on = c.compact && !cmx.open, b = $('#cm-more'), n = cm.items ? cm.items.length : 0;
   $('#commute').classList.toggle('is-compact', on);
   b.hidden = !c.compact;
   b.setAttribute('aria-expanded', String(!on));
   const what = cm.band ? 'Strecke, Karte' : 'Karte';
   b.querySelector('span').textContent = !on ? 'Weniger zeigen' : n ? `${what} und ${n === 1 ? 'eine Meldung' : n + ' Meldungen'}` : cm.band ? 'Strecke und Karte zeigen' : 'Karte zeigen';
+  // Öffis: Band der Verbindung und die weiteren Fahrten klappen genauso auf
+  const pb = $('#pt-more');
+  pb.hidden = !c.compact;
+  pb.setAttribute('aria-expanded', String(!on));
+  pb.querySelector('span').textContent = on ? 'Weg und weitere Verbindungen' : 'Weniger zeigen';
 }
 $('#cm-more').addEventListener('click', () => {
   cmx.open = !cmx.open;
@@ -6813,7 +6911,7 @@ $('#cm-more').addEventListener('click', () => {
   schedLayout();
 });
 $('#cm-compact').addEventListener('change', e => { state.widgets.commute.cfg.compact = e.target.checked; cmx.open = false; commit(); });
-defineWidget('commute', { render: cmCompactUi });
+defineWidget('commute', { render() { cmCompactUi(); ptRender(new Date()); } });
 
 /* 17-strecke.js */
 /* Streckenband fürs Pendeln: deine Orte unterwegs (state.commute.via) als Kontrollpunkte auf der Strecke, mit Uhrzeit pro Ort.
@@ -7119,6 +7217,330 @@ function cbDevShort(dev) {
   return `Heute über ${dev.via[0] || 'eine andere Strecke'}${dev.save >= 1 ? `, spart ${dev.save} Min` : ''}`;
 }
 
+/* 18-oepnv.js */
+/* Öffis im Pendeln: Verbindungen von Tür zu Tür über Transitous (/plan), umschaltbar mit dem Auto.
+ * Abgesprochen mit Transitous im Matrix-Raum (Oktober 2026): höchstens eine Anfrage alle 5 Minuten, nur solange die
+ * Pendeln-Karte zu sehen ist oder der Spiegel sie zeigt, dazwischen aus dem Zwischenspeicher. Die Quellen sind verlinkt,
+ * der Kontakt steht unten auf der Seite. Damit Transitous ihn findet, schicken die Abrufe die volle Seitenadresse als Referer.
+ * Gefragt wird ohne Linienverläufe (detailedLegs=false), das hält die Antwort klein. */
+const PT_CACHE = 'jere-cockpit-oepnv', PT_FRESH = 5 * 6e4, PT_GAP = 15e3;
+const TRS_REF = { referrerPolicy: 'no-referrer-when-downgrade' };
+const pt = { store: null, busy: false, last: 0, err: '', errAt: 0, sel: null };
+const PT_ERR = {
+  net: 'Die Fahrplanauskunft ist gerade nicht erreichbar. In zwei Minuten probiert es das Cockpit wieder.',
+  busy: 'Die Fahrplanauskunft ist gerade überlastet. In zwei Minuten probiert es das Cockpit wieder.',
+  svc: 'Mit deinen Adressen findet die Fahrplanauskunft gerade nichts. Prüf sie über die Regler oben.'
+};
+const PT_WALK = '<svg class="pt-wi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.2" cy="4.3" r="1.9" fill="currentColor" stroke="none"/><path d="M12.6 9.2 11 15.6l3.1 2.6.9 3.4M11 15.6l-2.2 5.6M12.6 9.2l-3.4 1.6-.7 3.2M12.6 9.2l1.5 3 3 1.1"/></svg>';
+const ptMode = () => !!(state.widgets.commute && state.widgets.commute.cfg.mode === 'pt');
+const ptHm = ms => hm(new Date(ms));
+const ptMin = ms => Math.max(1, Math.round(ms / 6e4));
+
+/* Nach Hause vor Feierabend: Verbindungen ab Feierabend, sonst ab jetzt */
+function ptWhen(now) {
+  if (cm.dir !== 'home') return null;
+  const wb = workBar();
+  if (!wb || freeReason(wb, now)) return null;
+  const end = at(now, wb.end);
+  return +end - +now > 10 * 6e4 ? end : null;
+}
+function ptQuery(now) {
+  const [a, b] = cmPlaces();
+  if (!a || !b || a.lat == null || b.lat == null) return null;
+  const t = ptWhen(now), r = x => (+x).toFixed(5);
+  return { k: `${cm.dir}|${r(a.lat)},${r(a.lon)}|${r(b.lat)},${r(b.lon)}${t ? '|' + hm(t) : ''}`, a, b, t, r };
+}
+
+/* Zwischenspeicher: die jüngsten drei Abfragen (hin, zurück und ab Feierabend), übersteht das Neuladen */
+function ptStore() {
+  if (!pt.store) { const s = lsGet(PT_CACHE); pt.store = s && s.v === 1 && s.e && typeof s.e === 'object' ? s : { v: 1, e: {} }; }
+  return pt.store;
+}
+function ptSave(k, entry) {
+  const s = ptStore();
+  s.e[k] = entry;
+  for (const x of Object.keys(s.e).sort((p, q) => s.e[q].at - s.e[p].at).slice(3)) delete s.e[x];
+  lsSet(PT_CACHE, s);
+}
+
+/* Nur behalten, was Karte, Spiegel und „Jetzt wichtig“ brauchen */
+function ptStop(p, dep, rt, c) {
+  const t = Date.parse(dep ? p.departure || p.scheduledDeparture : p.arrival || p.scheduledArrival);
+  const s = Date.parse(dep ? p.scheduledDeparture || p.departure : p.scheduledArrival || p.arrival);
+  return { n: String(p.name || '').replace(/^Hamburg,\s*/, '').trim().slice(0, 60), t, s: Number.isFinite(s) ? s : t, rt, c, tr: String(p.track || '').slice(0, 8), str: String(p.scheduledTrack || '').slice(0, 8), x: !!p.cancelled };
+}
+function ptAlerts(l) {
+  const out = [], seen = new Set();
+  for (const a of [...(l.alerts || []), ...((l.from && l.from.alerts) || []), ...((l.to && l.to.alerts) || [])]) {
+    const h = String(a.headerText || '').trim(), d = String(a.descriptionText || '').trim(), k = (h || d).slice(0, 120);
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    out.push({ h: (h || d).slice(0, 200), d: h && d && d !== h ? d.slice(0, 800) : '' });
+    if (out.length >= 2) break;
+  }
+  return out;
+}
+function ptSlimLeg(l) {
+  const t0 = Date.parse(l.startTime), t1 = Date.parse(l.endTime);
+  if (!Number.isFinite(t0) || !Number.isFinite(t1) || !l.from || !l.to) return null;
+  if (/^(WALK|BIKE|CAR|RENTAL|FLEX|ODM)/.test(String(l.mode || ''))) return { w: 1, t0, t1 };
+  const line = dpLine(l), cat = dpCat(l.mode, line), [bg, fg] = dpColor(l, cat), rt = !!l.realTime;
+  const f = ptStop(l.from, true, rt, cat), a = ptStop(l.to, false, rt, cat);
+  if (!Number.isFinite(f.t) || !Number.isFinite(a.t)) return null;
+  return {
+    line, cat, bg, fg, f, a, rt, x: !!(l.cancelled || f.x || a.x),
+    hs: String(l.headsign || (l.tripTo && l.tripTo.name) || '').replace(/^Hamburg,\s*/, '').trim().slice(0, 60),
+    ns: Array.isArray(l.intermediateStops) ? l.intermediateStops.length : -1, al: ptAlerts(l)
+  };
+}
+function ptSlim(it) {
+  const legs = (it.legs || []).map(ptSlimLeg).filter(Boolean), s = Date.parse(it.startTime), e = Date.parse(it.endTime);
+  if (!legs.some(l => !l.w) || !Number.isFinite(s) || !Number.isFinite(e)) return null;
+  return { s, e, n: legs.filter(l => !l.w).length - 1, legs };
+}
+
+/* Wann gefragt wird: Karte zu sehen (oder der Spiegel zeigt Pendeln), Antwort älter als 5 Minuten oder aufgebraucht */
+function ptShown() {
+  if (document.visibilityState !== 'visible') return false;
+  if (mr.on) {
+    const m = state.ui.mirror;
+    if (m.layout === 'blocks') return m.blocks.some(b => b.k === 'cm' && b.on);
+    return mosPage().items.some(it => state.widgets[it.w] && state.widgets[it.w].type === 'commute');
+  }
+  return viewsOf('commute').some(v => !v.el.hidden);
+}
+const ptUp = (E, t) => E.its.filter(i => i.s >= t - 6e4);
+function ptNeed(now) {
+  if (!ptMode() || pt.busy || !ptShown()) return;
+  const q = ptQuery(now), t = +now;
+  if (!q || t - pt.last < PT_GAP || (pt.err && t - pt.errAt < 2 * 6e4)) return;
+  const E = ptStore().e[q.k], age = E ? t - E.at : Infinity;
+  // Liegt die Abfrage über eine Stunde voraus (ab Feierabend), reicht alle 15 Minuten. Nachts zwischen 1 und 4 Uhr,
+  // wenn der Spiegel durchläuft und eh kaum etwas fährt, alle 30 Minuten.
+  const h = now.getHours(), min = h >= 1 && h < 4 ? 30 * 6e4 : PT_FRESH;
+  const keep = q.t && +q.t - t > 36e5 ? 15 * 6e4 : min;
+  if (age < min || (age < keep && ptUp(E, t).length)) return;
+  ptLoad(q);
+}
+async function ptLoad(q) {
+  pt.busy = true;
+  pt.last = Date.now();
+  const p = new URLSearchParams({ fromPlace: `${q.r(q.a.lat)},${q.r(q.a.lon)}`, toPlace: `${q.r(q.b.lat)},${q.r(q.b.lon)}`, language: 'de', detailedLegs: 'false', detailedTransfers: 'false' });
+  if (q.t) p.set('time', q.t.toISOString());
+  try {
+    const j = await getJson(`${TRS}/v5/plan?${p}`, 20000, TRS_REF);
+    if (!j || !Array.isArray(j.itineraries)) throw new Error('format');
+    ptSave(q.k, { at: Date.now(), its: j.itineraries.map(ptSlim).filter(Boolean).sort((x, y) => x.s - y.s || x.e - y.e).slice(0, 8) });
+    pt.err = '';
+  } catch (e) {
+    const m = String(e && e.message);
+    pt.err = /HTTP (429|503)/.test(m) ? 'busy' : /HTTP 4\d\d/.test(m) ? 'svc' : 'net';
+    pt.errAt = Date.now();
+  }
+  pt.busy = false;
+  ptRender(new Date());
+  if (mr.on) renderMirror();
+  nowDirty();
+}
+
+/* Auswerten: welche Verbindung vorn steht, Verspätung, Ausfall */
+const ptTr = l => l.filter(x => !x.w);
+const ptId = i => `${i.s}|${ptTr(i.legs).map(l => l.line).join(',')}|${i.e}`;
+const ptX = i => ptTr(i.legs).some(l => l.x);
+const ptLate = s => (s && s.rt && Number.isFinite(s.t) && Number.isFinite(s.s) ? Math.round((s.t - s.s) / 6e4) : 0);
+/* Die größte Verspätung unterwegs, mit der Linie dazu */
+function ptWorst(i) {
+  let best = { m: 0, l: null };
+  for (const l of ptTr(i.legs)) for (const m of [ptLate(l.f), ptLate(l.a)]) if (m > best.m) best = { m, l };
+  return best;
+}
+/* Vorn steht deine Wahl, sonst die nächste, die fährt und deren Anschlüsse halten */
+function ptPick(list) { return list.find(i => ptId(i) === pt.sel) || list.find(i => !ptX(i) && !ptRisk(i)) || list.find(i => !ptX(i)) || list[0]; }
+/* Für „Jetzt wichtig“ und den Spiegel: nur aus dem Speicher, höchstens 30 Minuten alt */
+function ptSummary(now) {
+  if (!ptMode()) return null;
+  const q = ptQuery(now);
+  if (!q) return null;
+  const E = ptStore().e[q.k], t = +now;
+  if (!E || t - E.at > 30 * 6e4) return null;
+  const list = ptUp(E, t);
+  if (!list.length) return null;
+  const it = ptPick(list);
+  return { dir: cm.dir, at: E.at, it, list, q, next: list.find(i => i !== it && i.s >= it.s && !ptX(i)) || null };
+}
+const ptLeave = (i, t) => {
+  const m = Math.floor((i.s - t) / 6e4);
+  return m < 1 ? 'jetzt los' : m >= 60 ? `los um ${ptHm(i.s)}` : `los in ${m} Min`;
+};
+
+/* Kette der Fahrten: Linien, auf Wunsch mit Fußwegen dazwischen */
+function ptChain(i, walk) {
+  const parts = [];
+  for (const l of i.legs) {
+    if (!l.w) { parts.push(dpBadge(l)); continue; }
+    const m = ptMin(l.t1 - l.t0);
+    if (walk && l.t1 - l.t0 >= 6e4) parts.push(`<span class="pt-w" title="${m} Min zu Fuß">${PT_WALK}<span aria-hidden="true">${m}</span><span class="vh">${m} Min zu Fuß</span></span>`);
+  }
+  return `<span class="pt-ch">${parts.join('<i class="pt-arr" aria-hidden="true">›</i>')}</span>`;
+}
+
+/* Der Weg als Band wie beim Auto: Haltestellen als Punkte, dazwischen die Linie in ihrer Farbe oder der Fußweg */
+function ptBandRows(i, dir) {
+  const rows = [{ k: 'start', n: dir === 'home' ? 'Arbeit' : 'Zuhause', t: i.s }];
+  for (const l of i.legs) {
+    if (l.w) { rows.push({ k: 'walk', m: ptMin(l.t1 - l.t0) }); continue; }
+    const last = rows[rows.length - 1], prev = rows[rows.length - 2];
+    // Umstieg an derselben Haltestelle: ein Punkt mit an und ab
+    if (last.k === 'stop' && last.arr && last.n === l.f.n) { last.k = 'chg'; last.dep = l.f; }
+    else if (last.k === 'walk' && prev && prev.k === 'stop' && prev.arr && prev.n === l.f.n) { rows.pop(); prev.k = 'chg'; prev.dep = l.f; prev.wm = last.m; }
+    else rows.push({ k: 'stop', n: l.f.n, dep: l.f });
+    rows.push({ k: 'leg', l });
+    rows.push({ k: 'stop', n: l.a.n, arr: l.a });
+  }
+  rows.push({ k: 'end', n: dir === 'home' ? 'Zuhause' : 'Arbeit', t: i.e });
+  return rows;
+}
+const ptTrack = s => (s && s.tr ? `<span class="${s.str && s.str !== s.tr ? 'dp-chg' : ''}">${DP_RAIL.has(s.c) ? 'Gl.' : 'Steig'} ${esc(s.tr)}</span>` : '');
+const ptLateTag = s => { const m = ptLate(s); return m >= 1 ? `<span class="dp-late${m >= 5 ? ' big' : ''}">+${m}</span>` : ''; };
+function ptBandHtml(i, dir) {
+  const rows = ptBandRows(i, dir), col = r => (r.k === 'leg' ? r.l.bg : r.k === 'walk' ? 'var(--cb-walk)' : null);
+  const out = rows.map((r, j) => {
+    const c = col(r);
+    if (r.k === 'walk') return `<li class="pt-seg" data-k="walk" style="--in:${c};--out:${c}">${r.m} Min zu Fuß</li>`;
+    if (r.k === 'leg') {
+      const l = r.l, n = l.ns >= 0 ? l.ns + 1 : 0;
+      return `<li class="pt-seg" data-k="leg" style="--in:${c};--out:${c}">${dpBadge(l)}<span>${l.hs ? `Richtung ${esc(l.hs)}` : esc(l.a.n)}${n ? ` <small>${n} ${n === 1 ? 'Station' : 'Stationen'}</small>` : ''}${l.x ? ' <span class="dp-x">fällt aus</span>' : ''}</span></li>`;
+    }
+    const pc = j ? col(rows[j - 1]) : null, nc = j < rows.length - 1 ? col(rows[j + 1]) : null;
+    const inC = j === 0 ? 'var(--cb-none)' : pc || 'var(--cb-walk)', outC = j === rows.length - 1 ? 'var(--cb-none)' : nc || 'var(--cb-walk)';
+    let sub = [], time = r.t;
+    const two = (a, b) => [a, b].filter(Boolean).join(' ');
+    if (r.k === 'chg') sub = [two(`an ${ptHm(r.arr.t)}`, ptLateTag(r.arr)), r.wm ? `${r.wm} Min Weg` : 'umsteigen', two(ptTrack(r.dep), ptLateTag(r.dep))];
+    else if (r.dep) sub = [two(ptTrack(r.dep), ptLateTag(r.dep))];
+    else if (r.arr) sub = [ptLateTag(r.arr)];
+    if (r.dep) time = r.dep.t;
+    else if (r.arr) time = r.arr.t;
+    sub = sub.filter(Boolean).join(', ');
+    const k = r.k === 'chg' ? 'stop' : r.k;
+    return `<li class="cb" data-k="${k}" style="--in:${inC};--out:${outC}"><span class="cb-n"><b>${esc(r.n)}</b>${sub ? ` <small>${sub}</small>` : ''}</span><time>${ptHm(time)}</time></li>`;
+  });
+  return `<ol class="cm-band pt-band">${out.join('')}</ol>`;
+}
+function ptRowHtml(i, on) {
+  const w = ptWorst(i), x = ptX(i), n = i.n, dur = ptMin(i.e - i.s);
+  const st = x ? '<span class="dp-x">fällt aus</span>' : ptRisk(i) ? '<span class="dp-x">knapp</span>' : w.m >= 1 ? `<span class="dp-late${w.m >= 5 ? ' big' : ''}">+${w.m}</span>` : '';
+  return `<li><button type="button" class="pt-row${x ? ' x' : ''}" data-pt="${esc(ptId(i))}" aria-pressed="${on}"><span class="pt-hm"><b>${ptHm(i.s)}</b><small>an ${ptHm(i.e)}</small></span>`
+    + `<span class="pt-mid">${ptChain(i, false)}<small>${dur} Min, ${n < 1 ? 'ohne Umstieg' : n === 1 ? '1 Umstieg' : `${n} Umstiege`}</small></span><span class="pt-st">${st}</span></button></li>`;
+}
+/* Wackelt ein Umstieg? Ankunft mit Verspätung plus Fußweg nach der Abfahrt der nächsten Fahrt */
+function ptRisk(i) {
+  let prev = null, walk = 0;
+  for (const l of i.legs) {
+    if (l.w) { walk += l.t1 - l.t0; continue; }
+    if (prev && prev.a.t + walk > l.f.t) return { prev, next: l };
+    prev = l;
+    walk = 0;
+  }
+  return null;
+}
+/* Ein Satz zur Lage: Ausfall, Anschluss in Gefahr, Verspätung, pünktlich oder nur Fahrplan */
+function ptVerdict(i) {
+  const tr = ptTr(i.legs), w = ptWorst(i), x = tr.find(l => l.x), r = ptRisk(i);
+  if (x) return [`${x.line} um ${ptHm(x.f.s)} fällt aus. Nimm lieber eine andere Verbindung.`, 'bad'];
+  if (r) return [`Anschluss wackelt: ${r.prev.line} kommt erst um ${ptHm(r.prev.a.t)} in ${r.prev.a.n} an, ${r.next.line} fährt um ${ptHm(r.next.f.t)}.`, 'bad'];
+  if (w.m >= 3) return [`${w.l.line} heute +${w.m} Min, du bist um ${ptHm(i.e)} da.`, 'warn'];
+  if (tr.some(l => l.rt)) return [w.m >= 1 ? `Fast pünktlich, ${w.l.line} +${w.m} Min.` : 'Alles pünktlich laut Echtzeit.', 'ok'];
+  return ['Zeiten laut Fahrplan, Echtzeit gibt es dafür gerade nicht.', 'plan'];
+}
+function ptPane(which) { $('#pt-off').hidden = which !== 'off'; $('#pt-live').hidden = which !== 'live'; }
+function ptOff(title, text, busy) {
+  ptPane('off');
+  $('#pt-off-title').textContent = title;
+  $('#pt-off-text').textContent = text;
+  $('#pt-off').classList.toggle('busy', !!busy);
+}
+const ptSet = (sel, html) => { const el = $(sel); if (el.innerHTML !== html) el.innerHTML = html; };
+function ptRender(now) {
+  ptNeed(now);
+  if (!ptMode()) return;
+  const c = state.commute;
+  if (!c.home || !c.work) { ptPane('none'); return; }
+  const q = ptQuery(now), t = +now, dir = cm.dir;
+  const gm = $('#pt-gmaps');
+  gm.href = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent((dir === 'home' ? c.work : c.home).text)}&destination=${encodeURIComponent((dir === 'home' ? c.home : c.work).text)}&travelmode=transit`;
+  if (!q) { ptOff('Strecke wird berechnet', 'Einen Moment, die Adressen werden gerade auf der Karte gesucht.', true); return; }
+  const E = ptStore().e[q.k], list = E ? ptUp(E, t) : [];
+  const src = E ? `Stand ${ptHm(E.at)} Uhr${pt.err ? ', gerade ohne Verbindung' : ''} · ` : '';
+  ptSet('#pt-src', `${src}Daten: <a href="${DP_SRC}" target="_blank" rel="noopener">Transitous und offene Fahrplandaten</a>`);
+  if (!list.length) {
+    if (pt.err && (!E || t - E.at > PT_FRESH)) ptOff('Keine Verbindungen', PT_ERR[pt.err] || PT_ERR.net);
+    else if (E && !E.its.length && !pt.busy) ptOff('Keine Verbindung gefunden', 'Zwischen deinen Adressen findet die Fahrplanauskunft gerade keine Fahrt mit Bus und Bahn. Nachts ist das normal.');
+    else ptOff('Verbindungen werden gesucht', 'Einen Moment, die nächsten Fahrten mit Bus und Bahn kommen gleich.', true);
+    return;
+  }
+  ptPane('live');
+  const f = ptPick(list), m = Math.floor((f.s - t) / 6e4), dirTxt = dir === 'home' ? 'nach Hause' : 'zur Arbeit';
+  $('#pt-time').textContent = m < 1 ? 'jetzt' : m >= 60 ? ptHm(f.s) : String(m);
+  $('#pt-time').classList.toggle('word', m < 1);
+  $('#pt-time-lbl').textContent = m < 1 ? `los, ${dirTxt}` : m >= 60 ? `Uhr los, ${dirTxt}` : `Min bis los, ${dirTxt}`;
+  const first = ptTr(f.legs)[0], n = f.n;
+  ptSet('#pt-dl', `<dt>Erste Fahrt</dt><dd>${dpBadge(first)} ${ptHm(first.f.t)}</dd><dt>Ankunft</dt><dd>${ptHm(f.e)} Uhr</dd><dt>Fahrzeit</dt><dd>${ptMin(f.e - f.s)} Min, ${n < 1 ? 'direkt' : n === 1 ? '1 Umstieg' : `${n} Umstiege`}</dd>`);
+  ptSet('#pt-chain', ptChain(f, true));
+  $('#pt-note').textContent = q.t ? `Verbindungen ab Feierabend um ${hm(q.t)} Uhr` : `Ab ${first.f.n}${first.f.tr ? `, ${DP_RAIL.has(first.cat) ? 'Gleis' : 'Steig'} ${first.f.tr}` : ''}`;
+  const [v, lv] = ptVerdict(f), ve = $('#pt-verdict');
+  ve.textContent = v;
+  ve.dataset.lv = lv;
+  ptSet('#pt-band', ptBandHtml(f, dir));
+  // Hinweise der Verkehrsbetriebe zu den Fahrten dieser Verbindung, jeder nur einmal
+  const al = [], seen = new Set();
+  for (const l of ptTr(f.legs)) for (const a of l.al) {
+    if (seen.has(a.h)) continue;
+    seen.add(a.h);
+    const head = `${dpBadge(l)} ${esc(a.h)}`;
+    al.push(a.d ? `<details class="dp-alert"><summary>${head}</summary><p>${esc(a.d)}</p></details>` : `<p class="dp-alert">${head}</p>`);
+  }
+  ptSet('#pt-alerts', al.slice(0, 3).join(''));
+  ptSet('#pt-list', list.slice(0, 6).map(i => ptRowHtml(i, i === f)).join(''));
+  $('#pt-list-h').hidden = list.length < 2;
+}
+/* Jede Sekunde prüfen, ob eine Abfrage fällig ist (kostet nichts), alle 10 Sekunden die Minuten neu zeichnen */
+function ptTick(now) {
+  if (!ptMode()) return;
+  if (now.getSeconds() % 10 === 5 && ptShown() && !mr.on) ptRender(now);
+  else ptNeed(now);
+}
+
+/* Umschalter Auto und Öffis. Gilt für alle Geräte, auch für den Spiegel. */
+function cmModeUi() {
+  const p = ptMode(), ico = $('#commute .card-ico'), want = p ? TICON.dep : TICON.commute;
+  $('#commute').dataset.mode = p ? 'pt' : 'car';
+  if (ico && ico.dataset.m !== String(p)) { ico.innerHTML = want; ico.dataset.m = String(p); }
+  $('#cm-mode-car').setAttribute('aria-pressed', String(!p));
+  $('#cm-mode-pt').setAttribute('aria-pressed', String(p));
+}
+function cmSetMode(m) {
+  const c = state.widgets.commute && state.widgets.commute.cfg;
+  if (!c || c.mode === m) return;
+  c.mode = m;
+  cmx.open = false;
+  commit();
+  if (m === 'car' && cm.map) setTimeout(() => cmFit(false), 80);
+}
+$('#cm-mode-car').addEventListener('click', () => cmSetMode('car'));
+$('#cm-mode-pt').addEventListener('click', () => cmSetMode('pt'));
+$('#pt-list').addEventListener('click', e => {
+  const b = e.target.closest('[data-pt]');
+  if (!b) return;
+  pt.sel = b.dataset.pt;
+  ptRender(new Date());
+  nowDirty();
+});
+$('#pt-more').addEventListener('click', () => {
+  cmx.open = !cmx.open;
+  cmCompactUi();
+  schedLayout();
+});
+
 /* 20-kopf.js */
 /* Kopfzeile, Kacheln oben und Aussehen */
 function setTile(id, val, sub, mode) {
@@ -7137,7 +7559,7 @@ function tickTiles(now) {
     const s = at(now, wb.start), e = at(now, wb.end);
     if (why) setTile('#t-fa', 'Heute frei', why === 'Kein Arbeitstag' ? 'Kein Arbeitstag laut Balken' : why, 'good');
     else if (now >= e) setTile('#t-fa', 'Geschafft', `seit ${wb.end} Uhr`, 'good');
-    else setTile('#t-fa', `in ${dur(e - now, true)}`, `um ${wb.end} Uhr${wb.example ? ' (Beispielzeit)' : ''}${cm.homeMins ? `, Heimweg ca. ${cm.homeMins} Min` : ''}`, now >= s ? 'hot' : null);
+    else setTile('#t-fa', `in ${dur(e - now, true)}`, `um ${wb.end} Uhr${wb.example ? ' (Beispielzeit)' : ''}${cm.homeMins && !ptMode() ? `, Heimweg ca. ${cm.homeMins} Min` : ''}`, now >= s ? 'hot' : null);
   }
   // Wochenende
   const mon = addDays(t, -((now.getDay() + 6) % 7));
@@ -11745,6 +12167,21 @@ function mosCm(now, pv) {
     // Mit Umleitung ersetzt sie das „Freie Fahrt“, Stau oder Sperrung bleiben stehen
     + (bad || !dev ? `<p class="m-cm-how${bad ? ' warn' : ''}">${esc(how)}</p>` : '') + `${dev}${cbHtml(band)}</div>`;
 }
+/* Öffis: wann du los musst, die Fahrten der Verbindung mit Abfahrt und was danach kommt */
+function mosPt(now, pv) {
+  ptNeed(now);
+  const S = ptSummary(now);
+  if (!S) return pv ? `<p class="m-dim">${state.commute.home ? 'Kommt, sobald die Verbindungen geladen sind' : 'Trag erst deine Strecke im Pendeln-Widget ein'}</p>` : '';
+  const f = S.it, t = +now, [v, lv] = ptVerdict(f), go = ptLeave(f, t);
+  const legs = ptTr(f.legs).map(l => {
+    const m = ptLate(l.f);
+    return `<li${l.x ? ' class="x"' : ''}>${dpBadge(l)}<span class="m-to">${esc(l.f.n)}</span><b>${l.x ? 'fällt aus' : `${ptHm(l.f.t)}${m >= 1 ? `<small class="m-late">+${m}</small>` : ''}`}</b></li>`;
+  }).join('');
+  return `<div class="m-cmx"><p class="m-cm-big"><b>${esc(go[0].toUpperCase() + go.slice(1))}</b><span>an ${ptHm(f.e)}</span></p>`
+    + (lv === 'bad' || lv === 'warn' ? `<p class="m-cm-how warn">${esc(v)}</p>` : '')
+    + `<ul class="m-dep-l m-pt-l">${legs}</ul>`
+    + (S.next ? `<p class="m-dim m-pt-next">Danach los um ${ptHm(S.next.s)}, an ${ptHm(S.next.e)}</p>` : '') + '</div>';
+}
 function mosDep(w, now, pv) {
   const dep = dpMirrorOf(w, now);
   if (!dep) return { html: pv ? '<p class="m-dim">Kommt, sobald die Abfahrten geladen sind</p>' : '' };
@@ -11774,7 +12211,7 @@ function mosBlock(id, it, now, pv, cx) {
     switch (w.type) {
       case 'now': inner = cx.nw.length ? `<ul class="m-now">${cx.nw.map(x => mRow({ ico: x.ico, t: x.t, s: mTxt(x.s), when: x.w && x.w !== 'live' ? x.w : '', lv: x.lv, wc: x.wc })).join('')}</ul>` : pv ? '<p class="m-dim">Gerade drängt nichts.</p>' : ''; break;
       case 'weather': inner = MBR.wx(now, pv); break;
-      case 'commute': inner = mosCm(now, pv); if (cm.sum) title = cm.sum.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'; break;
+      case 'commute': inner = ptMode() ? mosPt(now, pv) : mosCm(now, pv); if (cm.sum || ptMode()) title = cm.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'; break;
       case 'cal': inner = MBR.cal(now, pv); break;
       case 'dep': { const d = mosDep(w, now, pv); inner = d.html; extra = d.extra; if (!w.title && w.cfg.stop) title = w.cfg.stop.name; break; }
       case 'bday': inner = mosBday(now); break;
@@ -11783,7 +12220,7 @@ function mosBlock(id, it, now, pv, cx) {
     }
   } catch { inner = ''; }
   if (!inner) return '';
-  return `<section class="mw" data-type="${w.type}" data-span="${it.s}"><h3 class="mw-h">${TICON[w.type] || ''}<span>${esc(title)}</span>${extra ? `<b>${esc(extra)}</b>` : ''}</h3>${inner}</section>`;
+  return `<section class="mw" data-type="${w.type}" data-span="${it.s}"><h3 class="mw-h">${(w.type === 'commute' && ptMode() ? TICON.dep : TICON[w.type]) || ''}<span>${esc(title)}</span>${extra ? `<b>${esc(extra)}</b>` : ''}</h3>${inner}</section>`;
 }
 function mosRender(root, now, pv) {
   const m = state.ui.mirror, page = mosPage();
@@ -11806,7 +12243,7 @@ function mosRender(root, now, pv) {
 /* Wie im Cockpit: Spalten nach Breite, jeder Block in die kürzeste Spalte. Passt es nicht, wird gekürzt:
  * erst Listen in den Blöcken, die unten überstehen, dann der letzte davon ganz. */
 /* mini: das Streckenband als Fließtext statt untereinander, braucht ein Drittel der Höhe */
-const MOS_FIT = [['.m-cal li', 3], ['.m-now .ml', 3], ['.m-dep-l li', 3], ['.m-eve .ml', 3], ['.m-wx-hrs', 0], ['mini'], ['.m-cal li', 2], ['.m-now .ml', 2], ['.m-dep-l li', 2], ['.m-lines .ml', 1], ['.m-eve .ml', 2], ['.cm-band', 0], ['.m-cm-dev', 0], ['.m-cal li', 1], ['.m-now .ml', 1], ['.m-dep-l li', 1]];
+const MOS_FIT = [['.m-cal li', 3], ['.m-now .ml', 3], ['.m-dep-l:not(.m-pt-l) li', 3], ['.m-eve .ml', 3], ['.m-wx-hrs', 0], ['.m-pt-next', 0], ['mini'], ['.m-cal li', 2], ['.m-now .ml', 2], ['.m-dep-l:not(.m-pt-l) li', 2], ['.m-lines .ml', 1], ['.m-eve .ml', 2], ['.cm-band', 0], ['.m-cm-dev', 0], ['.m-cal li', 1], ['.m-now .ml', 1], ['.m-dep-l:not(.m-pt-l) li', 1], ['.m-pt-l li', 2]];
 function mosLayout(root) {
   const grid = root.querySelector('.mos-grid');
   if (!grid) return;
@@ -12116,7 +12553,7 @@ function mirrorEve(now, cx, pv) {
   const wb = workBar(), why = wb ? freeReason(wb, day) : holidayName(day) ? `Feiertag: ${holidayName(day)}` : null;
   if (why === 'Urlaub') { const v = vacationOn(day); add(5, 'vacation', 'Urlaubstag', v && v.label ? v.label : ''); }
   else if (why && why.startsWith('Feiertag')) add(5, 'vacation', why, 'Frei');
-  else if (wb && !why) add(5, 'commute', `Arbeit ab ${wb.start} Uhr`, cm.res && cm.res.route ? `Fahrt ohne Stau etwa ${Math.round(cm.res.route.duration / 60)} Min` : '');
+  else if (wb && !why) add(5, 'commute', `Arbeit ab ${wb.start} Uhr`, cm.res && cm.res.route && !ptMode() ? `Fahrt ohne Stau etwa ${Math.round(cm.res.route.duration / 60)} Min` : '');
   // Termine, die an dem Tag beginnen. Steht der Baustein Termine im Spiegel, listet der sie schon.
   if (ca.data && caSec().feeds.length && !cx.on.cal) {
     const list = caDay(day, ca.data.events), all = list.filter(e => e.a), timed = list.filter(e => !e.a && caStartsOn(e, day));
@@ -12214,6 +12651,13 @@ const MBR = {
     return `<section class="mb m-wx" data-b="wx"><div class="m-wx-now"><span class="m-wx-ico">${icon(w[1], c.is_day !== 0)}</span><b>${Number.isFinite(c.temperature_2m) ? Math.round(c.temperature_2m) + '°' : ''}</b></div><p>${esc(w[0])}</p><p class="m-dim">${esc(sub)}</p>${mirrorHours(d, now)}</section>`;
   },
   cm(now, pv) {
+    if (ptMode()) {
+      ptNeed(now);
+      const P = ptSummary(now);
+      if (!P) return pv ? mPh('cm', state.commute.home ? 'Kommt, sobald die Verbindungen geladen sind' : 'Trag erst deine Strecke im Pendeln-Widget ein') : '';
+      const f = P.it, go = ptLeave(f, +now), [v, lv] = ptVerdict(f);
+      return `<section class="mb m-cm" data-b="cm"><h3>${P.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'}</h3><p><b>${esc(go[0].toUpperCase() + go.slice(1))}</b><span>an ${ptHm(f.e)}</span></p><p class="m-cm-how${lv === 'bad' || lv === 'warn' ? ' warn' : ''}"><span>${esc(ptTr(f.legs).map(l => `${l.line} ${ptHm(l.f.t)}`).join(', dann '))}</span>${lv === 'bad' || lv === 'warn' ? `<span class="m-dim">${esc(v)}</span>` : ''}</p></section>`;
+    }
     const s = cm.sum;
     if (!s) return pv ? mPh('cm', state.commute.home ? 'Kommt, sobald die Strecke berechnet ist' : 'Trag erst deine Strecke im Pendeln-Widget ein') : '';
     // Nach Hause vor Feierabend: ab Feierabend gerechnet, sonst ab jetzt
@@ -12458,7 +12902,8 @@ const DP_ERR = {
 /* Liniennummer kurz und so, wie sie an der Haltestelle steht: „S1“, „U3“, „5“, „RE 3“ wird „RE3“ */
 function dpLine(st) {
   let n = String(st.displayName || st.routeShortName || st.tripShortName || '').trim();
-  n = n.replace(/^(Bus|STR|Tram)\s+(?=\S)/i, '').replace(/^(S|U|RE|RB|A)\s+(?=\d)/i, '$1');
+  // Züge tragen manchmal die Zugnummer mit, etwa „RB71 (81863)“
+  n = n.replace(/\s*\(\d+\)$/, '').replace(/^(Bus|STR|Tram)\s+(?=\S)/i, '').replace(/^(S|U|RE|RB|A)\s+(?=\d)/i, '$1');
   return n.slice(0, 10) || '?';
 }
 function dpCat(mode, line) {
@@ -12522,14 +12967,14 @@ async function dpLoad(stop, need) {
   const q = new URLSearchParams({ stopId: stop.id, n: String(need), language: 'de' });
   try {
     let j;
-    try { j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000); }
+    try { j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000, TRS_REF); }
     catch (e) {
       // IDs von Haltestellen ändern sich manchmal mit neuen Fahrplandaten. Dann über die Koordinaten suchen.
       if (!/HTTP (400|404|422)/.test(e.message) || stop.lat == null) throw e;
       q.delete('stopId');
       q.set('center', `${stop.lat},${stop.lon}`);
       q.set('radius', '120');
-      j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000);
+      j = await getJson(`${TRS}/v5/stoptimes?${q}`, 15000, TRS_REF);
     }
     if (!j || !Array.isArray(j.stopTimes)) throw new Error('format');
     dp.data[k] = { at: Date.now(), need, list: j.stopTimes.map(dpSlim).filter(Boolean).sort((a, b) => a.t - b.t), alerts: dpAlerts(j.stopTimes) };
@@ -12650,7 +13095,7 @@ async function dpSearch(box, near) {
   const p = new URLSearchParams(near ? { place: bias, type: 'STOP', numResults: '8' } : { text: q, type: 'STOP', numResults: '8', language: 'de' });
   if (!near && bias) p.set('place', bias);
   let list;
-  try { list = await getJson(`${TRS}/v1/${near ? 'reverse-geocode' : 'geocode'}?${p}`, 12000); }
+  try { list = await getJson(`${TRS}/v1/${near ? 'reverse-geocode' : 'geocode'}?${p}`, 12000, TRS_REF); }
   catch { if (box.isConnected) hits.innerHTML = '<li class="empty">Die Suche ist gerade nicht erreichbar. Versuch es gleich nochmal.</li>'; return; }
   if (!box.isConnected) return;
   const stops = (Array.isArray(list) ? list : []).filter(m => m && m.id && m.name && (!m.type || m.type === 'STOP')).slice(0, 8);
@@ -13416,8 +13861,24 @@ function nwItems(now, load) {
   }
 
   // Pendeln: morgens vor Arbeitsbeginn und rund um den Feierabend, an freien Tagen nicht
-  const S = cm.sum, wb = workBar();
-  if (S && t - S.at < 20 * 6e4 && wb && !freeReason(wb, now)) {
+  const S = cm.sum, wb = workBar(), P = ptMode() ? ptSummary(now) : null;
+  // Mit Öffis: wann du los musst, die Linien und wann du ankommst
+  if (P && wb && !freeReason(wb, now)) {
+    const st = +at(now, wb.start), en = +at(now, wb.end);
+    const toWork = P.dir === 'work' && t >= st - 150 * 6e4 && t <= st + 15 * 6e4;
+    const toHome = P.dir === 'home' && t >= en - 45 * 6e4 && t <= en + 90 * 6e4;
+    if (toWork || toHome) {
+      const f = P.it, m = Math.floor((f.s - t) / 6e4), w = ptWorst(f), x = ptX(f), go = ptLeave(f, t);
+      const first = ptTr(f.legs)[0];
+      // Unter 80, damit der Spiegel es nicht doppelt zeigt, wenn dort schon Pendeln steht. Ein Ausfall darf doppelt.
+      add('cm', x ? 84 : m <= 5 ? 78 : m <= 15 ? 72 : w.m >= 5 ? 66 : 48, {
+        ico: 'dep', t: `${toWork ? 'Zur Arbeit' : 'Nach Hause'}, ${go}`,
+        s: `${ptChain(f, false)}<span>${esc(`${ptHm(first.f.t)} ab ${first.f.n}, an ${ptHm(f.e)}`)}</span>${x ? '<span class="dp-x">fällt aus</span>' : w.m >= 1 ? `<span class="dp-late${w.m >= 5 ? ' big' : ''}">+${w.m}</span>` : ''}`,
+        w: m < 1 ? 'jetzt' : m < 60 ? `${m} Min` : ptHm(f.s), lv: x ? 'bad' : m < 2 ? 'now' : w.m >= 3 ? 'warn' : '', to: nwTarget('commute')
+      });
+    }
+  }
+  if (!ptMode() && S && t - S.at < 20 * 6e4 && wb && !freeReason(wb, now)) {
     const st = +at(now, wb.start), en = +at(now, wb.end);
     const toWork = S.dir === 'work' && t >= st - 150 * 6e4 && t <= st + 15 * 6e4;
     const toHome = S.dir === 'home' && t >= en - 45 * 6e4 && t <= en + 90 * 6e4;
@@ -14476,7 +14937,7 @@ $('#iw-key').addEventListener('click', () => {
 
 /* 99-start.js */
 /* Takt und Start */
-const VERSION = '3.9';
+const VERSION = '3.10';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -14488,6 +14949,7 @@ function tick() {
   caTick(now);
   dpTick(now);
   cbTick(now);
+  ptTick(now);
   bdTick(now);
   wsTick(now);
   mirrorTick(now);
@@ -14542,6 +15004,7 @@ const NEWS = {
   '3.3': ['Spritpreise mit eigenem Ort: Such dir einen Ort, nimm den vom Wetter oder deinen Standort, dazu Umkreis und Sortierung. Soll ich dir die Einstellungen zeigen?', () => { if (!pagesUsing('fuel').length) { setEdit(true); openGallery(); return; } nwJump('fuel'); setTimeout(() => { if (fuKey()) fuOpenSet(true); else fuOpenForm(); }, 350); }, 'Zeigen'],
   '3.6': ['Neu: Fußball und Formel 1 zeigen, wo gespielt und gefahren wird. Bei der F1 auch gratis bei ORF, ServusTV und SRF, mit VPN-Hinweis und Knopf zum Livestream. Was davon auftaucht, stellst du pro Widget ein.', () => { const id = pagesUsing('f1').length ? 'f1' : (widgetsOf('football').map(([i]) => i).find(i => pagesUsing(i).length) || ''); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => openWidgetDialog(id), 350); }, 'Einstellen'],
   '3.7': ['Neu: die F1 Rennanalyse. Das letzte Rennen im Zeitraffer auf der Streckenkarte, dazu Positionsverlauf, Reifen und Boxenstopps, kostenlos über OpenF1. Soll ich sie neben die Formel 1 legen?', () => anShow(), 'Hinzufügen'],
+  '3.10': ['Neu im Pendeln: Öffis. Oben in der Karte schaltest du zwischen Auto und Bus und Bahn um, dann siehst du, wann du los musst, welche Linien du nimmst und wann du ankommst.', () => nwJump('commute'), 'Zeigen'],
   '3.9': ['Neu: der MirrorOS. Der Spiegel zeigt jetzt eine Seite deines Cockpits in schlicht, und Pendeln hat ein Streckenband mit deinen Orten unterwegs. Soll ich dir die Einstellungen zeigen?', () => openDrawer('mirror'), 'Zeigen'],
   '3.8': ['Feinschliff bei der Formel 1: Die Sender zeigen jetzt, wo du ein VPN brauchst, und RTL hat das Qualifying in Austin dazubekommen.', null],
   '3.2': ['Der Kalender kann jetzt auch Google, Outlook und jeden anderen Kalender mit ICS-Link. Deine Weiterleitung braucht dafür einmal neuen Code, die Einrichtung zeigt dir, was fehlt.', () => { if (!pagesUsing('cal').length) { setEdit(true); openGallery(); return; } nwJump('cal'); setTimeout(caOpenForm, 350); }, 'Einrichten']
