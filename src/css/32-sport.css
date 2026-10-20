@@ -64,6 +64,7 @@
 .fb-legend i{width:3px;height:12px;border-radius:2px;background:var(--c)}
 
 /* Formel 1 */
+#f1-live{display:flex;flex-direction:column;gap:var(--card-gap);min-width:0}
 .f1-next{display:flex;flex-direction:column;gap:10px}
 .f1-race{display:flex;align-items:flex-end;justify-content:space-between;gap:6px 14px;flex-wrap:wrap}
 .f1-race b{display:block;font:800 21px/1.15 var(--f-display);letter-spacing:-.01em}
@@ -147,6 +148,7 @@
 a.tv:hover{box-shadow:inset 0 0 0 1px currentColor}
 a.tv:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
 a.tv svg{width:11px;height:11px;flex:0 0 auto}
+.tv .tv-tag{font:700 9.5px/1 var(--f-body);letter-spacing:.05em;opacity:.7;margin-left:2px}
 .tv-box{display:flex;flex-direction:column;gap:7px;padding:9px 10px 10px 12px;border-radius:12px;background:var(--raise)}
 .tv-h{display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap;font-size:13px;min-height:28px}
 .tv-h>svg,.tv-line>svg{width:16px;height:16px;color:var(--muted);flex:0 0 auto}

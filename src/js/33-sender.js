@@ -6,9 +6,10 @@
  * ORF, ServusTV und SRF sperren Zugriffe von außerhalb, aus Deutschland geht das nur mit VPN.
  *
  * Neue F1-Saison eintragen: in F1_TV ein Jahr mit base (wer grundsätzlich welche Sessions zeigt) und races
- * (pro circuitId von Jolpica: at = wer in Österreich live zeigt, ORF oder ServusTV, rtl = RTL zeigt Qualifying und Rennen frei).
+ * (pro circuitId von Jolpica: at = wer in Österreich live zeigt, ORF oder ServusTV, rtl = true, wenn RTL Qualifying und Rennen frei zeigt,
+ * oder eine Liste der Sessions, die RTL zeigt, etwa ['quali']).
  * Danach TV_STAND hochsetzen. Fehlt eine Saison, sagt die Karte das, statt etwas Falsches zu zeigen. */
-const TV_STAND = '2026-10-19';
+const TV_STAND = '2026-10-20';
 const TV = {
   sky: { name: 'Sky', full: 'Sky und WOW' },
   dazn: { name: 'DAZN' },
@@ -21,13 +22,14 @@ const TV = {
   srf: { name: 'SRF', free: true, vpn: 'Schweiz', url: 'https://www.srf.ch/play/tv/live', via: 'Play SRF' }
 };
 /* Formel 1. Sky zeigt in Deutschland alles, SRF Sprint und Qualifying samt Rennen (keine Trainings).
- * In Österreich wechseln sich ORF und ServusTV ab, wer dran ist, zeigt alle Sessions. RTL hat 2026 fünf Rennen frei,
- * offen ist davon nur noch Las Vegas. Die Rennen vor dem Stand fehlen hier, die zeigt die Karte nicht mehr an. */
+ * In Österreich wechseln sich ORF und ServusTV ab, wer dran ist, zeigt alle Sessions. RTL zeigt 2026 nur einzelne Sessions frei,
+ * offen sind noch das Qualifying in Austin und Las Vegas mit Qualifying und Rennen. Die Rennen vor dem Stand fehlen hier,
+ * die zeigt die Karte nicht mehr an. */
 const F1_TV = {
   2026: {
     base: { sky: 'all', srf: ['sq', 'sprint', 'quali', 'race'] },
     races: {
-      americas: { at: 'servus' },
+      americas: { at: 'servus', rtl: ['quali'] },
       rodriguez: { at: 'orf' },
       interlagos: { at: 'servus' },
       vegas: { at: 'orf', rtl: true },
@@ -66,11 +68,15 @@ const tvStand = () => { const d = parseYmd(TV_STAND); return `${dm(d)}${d.getFul
 const tvFreeFirst = l => [...l.filter(c => TV[c].free), ...l.filter(c => !TV[c].free)];
 const tvShown = (list, t) => tvFreeFirst(list.filter(c => TV[c] && t.ch.includes(c) && (!t.free || TV[c].free)));
 const tvNames = list => { const n = list.map(c => TV[c].name); return n.length > 1 ? `${n.slice(0, -1).join(', ')} und ${n[n.length - 1]}` : n[0] || ''; };
+/* Was ein Sender kostet, kurz für Dialog und Chips: gratis, gratis mit VPN oder Abo */
+const tvCost = c => (TV[c].free ? (TV[c].vpn ? 'gratis mit VPN' : 'gratis') : 'Abo');
+const tvLand = c => (TV[c].vpn === 'Schweiz' ? 'die Schweiz' : TV[c].vpn);
 const tvTip = c => { const T = TV[c]; return T.free ? `${T.full || T.name}, gratis${T.vpn ? ` in ${T.vpn === 'Schweiz' ? 'der Schweiz' : T.vpn}, aus Deutschland mit VPN` : ''}` : `${T.full || T.name}, im Abo`; };
-function tvChip(c, link) {
-  const T = TV[c], cls = `tv${T.free ? ' free' : ''}`;
-  if (link && T.free && T.url) return `<a class="${cls}" href="${T.url}" target="_blank" rel="noopener" title="Zum Livestream bei ${esc(T.via)}">${esc(T.name)}${TV_OUT}</a>`;
-  return `<span class="${cls}" title="${esc(tvTip(c))}">${esc(T.name)}</span>`;
+/* vpn: Sender, die nur mit VPN gehen, tragen das direkt am Chip */
+function tvChip(c, link, vpn) {
+  const T = TV[c], cls = `tv${T.free ? ' free' : ''}`, tag = vpn && T.vpn ? '<small class="tv-tag">VPN</small>' : '';
+  if (link && T.free && T.url) return `<a class="${cls}" href="${T.url}" target="_blank" rel="noopener" title="${esc(`Zum Livestream bei ${T.via}${T.vpn ? `, aus Deutschland mit VPN über ${tvLand(c)}` : ''}`)}">${esc(T.name)}${tag}${TV_OUT}</a>`;
+  return `<span class="${cls}" title="${esc(tvTip(c))}">${esc(T.name)}${tag}</span>`;
 }
 const tvMini = list => (list.length ? `<span class="tv-mini">${list.map(c => `<i class="tv${TV[c].free ? ' free' : ''}" title="${esc(tvTip(c))}">${esc(TV[c].name)}</i>`).join('')}</span>` : '');
 /* VPN: Schweiz für SRF, Österreich für ServusTV */
@@ -98,7 +104,7 @@ function f1TvBase(r, k) {
   const R = S.races[r.Circuit.circuitId] || {}, on = new Set();
   for (const [c, ks] of Object.entries(S.base)) if (ks === 'all' || ks.includes(k)) on.add(c);
   if (R.at) on.add(R.at);
-  if (R.rtl && (k === 'quali' || k === 'race')) on.add('rtl');
+  if (R.rtl === true ? k === 'quali' || k === 'race' : (R.rtl || []).includes(k)) on.add('rtl');
   return F1_TV_CH.filter(c => on.has(c));
 }
 function f1Tv(r, k) {
@@ -125,7 +131,7 @@ function f1TvBox(r, now) {
   let body;
   if (tv.unknown) body = `<p class="tv-note">Für ${esc(r.season)} ist noch nicht eingetragen, wer überträgt. Mit dem Stift trägst du es selbst ein.</p>`;
   else if (!shown.length) body = `<p class="tv-note">${tv.ch.length ? `Nur bei ${esc(tvNames(tv.ch))}` : 'Kein Sender eingetragen'}</p>`;
-  else body = `<div class="tv-ch">${shown.map(c => tvChip(c, t.link)).join('')}</div>${t.vpn ? tvVpn(shown) : ''}`;
+  else body = `<div class="tv-ch">${shown.map(c => tvChip(c, t.link, t.vpn)).join('')}</div>${t.vpn ? tvVpn(shown) : ''}`;
   return `<div class="tv-box"><div class="tv-h">${TV_ICO}<b>${esc(s.name)}</b>${when}${tv.own ? '<span class="chip">Eigene Auswahl</span>' : ''}<button type="button" class="icon-btn" data-tvedit aria-label="Sender für dieses Rennwochenende ändern" title="Sender ändern">${PENCIL}</button></div>${body}</div>`;
 }
 /* Kleine Sender an einer Session im Zeitplan */
@@ -217,7 +223,7 @@ function tvDialog(o) {
   tvd.f1 = o.f1;
   tvd.rows = o.rows;
   $('#tv-sub').textContent = o.sub;
-  $('#tv-rows').innerHTML = o.rows.map((r, i) => `<div class="tv-row"><fieldset class="days"><legend class="lbl">${esc(r.label)}</legend>${r.chs.map(c => `<label title="${esc(tvTip(c))}"><input type="checkbox" data-row="${i}" value="${c}"${r.cur.includes(c) ? ' checked' : ''}><span>${esc(TV[c].name)}${TV[c].free ? ' <small>gratis</small>' : ''}</span></label>`).join('')}</fieldset>`
+  $('#tv-rows').innerHTML = o.rows.map((r, i) => `<div class="tv-row"><fieldset class="days"><legend class="lbl">${esc(r.label)}</legend>${r.chs.map(c => `<label title="${esc(tvTip(c))}"><input type="checkbox" data-row="${i}" value="${c}"${r.cur.includes(c) ? ' checked' : ''}><span>${esc(TV[c].name)} <small>${tvCost(c)}</small></span></label>`).join('')}</fieldset>`
     + (tvSame(r.cur, r.base) ? '' : `<p class="hint">Laut Liste: ${esc(r.base.length ? tvNames(r.base) : 'kein Sender')}</p>`) + '</div>').join('');
   $('#tv-note').textContent = o.note || '';
   $('#tv-reset').hidden = !tvOv(o.key);
