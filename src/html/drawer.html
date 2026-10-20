@@ -11,7 +11,7 @@
     <button type="button" role="tab" id="dr-t-look" data-tab="look" aria-controls="dr-p-look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.9-.8 1.9-1.8 0-1.3-1-1.6-1-2.8 0-1 .8-1.7 1.8-1.7h2.1a3.7 3.7 0 0 0 3.7-3.7C20.5 6.7 16.7 3.5 12 3.5z"/><circle cx="7.6" cy="11.4" r="1.1" fill="currentColor" stroke="none"/><circle cx="10.4" cy="7.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="7.8" r="1.1" fill="currentColor" stroke="none"/></svg><span>Aussehen</span></button>
     <button type="button" role="tab" id="dr-t-head" data-tab="head" aria-controls="dr-p-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span>Kopf</span></button>
     <button type="button" role="tab" id="dr-t-pages" data-tab="pages" aria-controls="dr-p-pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7.5" height="9" rx="2"/><rect x="13" y="3.5" width="7.5" height="5.5" rx="2"/><rect x="3.5" y="14.5" width="7.5" height="6" rx="2"/><rect x="13" y="11" width="7.5" height="9.5" rx="2"/></svg><span>Seiten</span></button>
-    <button type="button" role="tab" id="dr-t-mirror" data-tab="mirror" aria-controls="dr-p-mirror"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/></svg><span>Spiegel</span></button>
+    <button type="button" role="tab" id="dr-t-mirror" data-tab="mirror" aria-controls="dr-p-mirror"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M9 21h6M12 17v4M7 8.5l3-3M7 12.5l7-7"/></svg><span>MirrorOS</span></button>
     <button type="button" role="tab" id="dr-t-data" data-tab="data" aria-controls="dr-p-data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6"/><path d="M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg><span>Daten</span></button>
   </div>
   <div class="dr-body" id="dr-body">
@@ -140,10 +140,21 @@
         <div class="mp-frame" id="mp-frame" data-o="land"><div class="mirror mp" aria-hidden="true"><div class="m-in" id="mp-in"></div></div></div>
         <div class="mp-bar">
           <div class="seg" role="group" aria-label="Vorschau" id="mp-o"><button type="button" data-v="land">Quer</button><button type="button" data-v="port">Hochkant</button></div>
-          <button type="button" class="btn" id="dr-mirror">Spiegel starten</button>
+          <button type="button" class="btn" id="dr-mirror">MirrorOS starten</button>
         </div>
       </div>
 
+      <h3 class="dr-gh" id="dr-mlayout-l">Aufbau</h3>
+      <div class="dr-group">
+        <div class="dr-line"><span class="dr-lt">So sieht er aus<small>Dashboard: eine Seite des Cockpits, nur schlicht. Bausteine: frei verteilt wie bisher.</small></span>
+          <div class="seg" role="group" aria-labelledby="dr-mlayout-l" id="dr-mlayout"><button type="button" data-v="dash">Dashboard</button><button type="button" data-v="blocks">Bausteine</button></div>
+        </div>
+        <div class="dr-line" data-mlay="dash"><label class="dr-lt" for="dr-mpage">Seite<small>Reihenfolge und Breite wie auf der Seite. Was nicht auf den Bildschirm passt, fällt hinten weg.</small></label><select class="dr-in" id="dr-mpage"></select></div>
+        <div class="dr-line" data-mlay="dash"><span class="dr-lt">Eigene Seite<small>Legt die Seite „Spiegel“ mit passenden Widgets an. Danach ordnest du sie wie jede andere Seite.</small></span><button type="button" class="btn-ghost" id="dr-mpage-new">Anlegen</button></div>
+      </div>
+      <p class="dr-note" data-mlay="dash">Pomodoro, Schnellzugriff und die Rennanalyse lässt der MirrorOS aus, die leben vom Antippen. Statt der Karte zeigt Pendeln das Streckenband mit deinen Orten unterwegs.</p>
+
+      <div data-mlay="blocks">
       <h3 class="dr-gh" id="dr-mpreset-l">Aufteilung</h3>
       <div class="dr-group">
         <div class="dr-line"><span class="dr-lt">Vorlage<small>Danach kannst du jeden Baustein einzeln verschieben.</small></span>
@@ -158,6 +169,7 @@
       <h3 class="dr-gh" id="dr-mlines-l">Widgets im Spiegel</h3>
       <ul class="dr-group sort-list" id="dr-mlines" aria-labelledby="dr-mlines-l"></ul>
       <p class="dr-note">Fest heißt: steht immer im Baustein Kurzzeilen. Wechsel heißt: läuft im Wechselplatz mit, der alle 15 Sekunden weiterblättert. Pomodoro und Schnellzugriff fehlen hier, weil man am Spiegel nichts antippt.</p>
+      </div>
 
       <h3 class="dr-gh">Inhalte</h3>
       <div class="dr-group">
@@ -165,9 +177,9 @@
         <div class="dr-line"><label class="dr-lt" for="dr-meve">Morgen-Vorschau ab<small>Bis 4 Uhr nachts steht dann zusätzlich da, was morgen ansteht.</small></label><input class="dr-in dr-time" id="dr-meve" type="time" min="12:00" max="23:59"></div>
       </div>
 
-      <h3 class="dr-gh">Uhr</h3>
+      <h3 class="dr-gh">Größe und Uhr</h3>
       <div class="dr-group">
-        <div class="dr-line"><label class="dr-lt" for="dr-msize">Größe</label>
+        <div class="dr-line"><label class="dr-lt" for="dr-msize">Größe<small data-mlay="dash">Schrift und Uhr zusammen, für den Abstand zum Spiegel.</small></label>
           <div class="range-row"><input type="range" class="range" id="dr-msize" min="70" max="140" step="5"><output id="dr-msize-v" for="dr-msize"></output></div>
         </div>
         <label class="dr-line"><span class="dr-lt">Sekunden</span><input type="checkbox" class="switch" id="dr-msecs"></label>
@@ -184,7 +196,11 @@
         </div>
         <label class="dr-line"><span class="dr-lt">Schutz vor Einbrennen<small>Der Inhalt wandert alle fünf Minuten ein paar Pixel.</small></span><input type="checkbox" class="switch" id="dr-mshift"></label>
       </div>
-      <p class="dr-note">Den Spiegel startest du auch mit der Taste S oder über die Adresse mit #spiegel am Ende, zum Beispiel als Startseite im Kiosk-Browser. Raus kommst du mit Esc. Die Einstellungen wandern per Sync auf alle Geräte, du kannst den Spiegel also bequem am Rechner einrichten.</p>
+      <h3 class="dr-gh">Dieses Gerät</h3>
+      <div class="dr-group">
+        <label class="dr-line"><span class="dr-lt">Startet im MirrorOS<small>Für den Rechner am Spiegel: Das Cockpit öffnet direkt im MirrorOS und geht nach drei Minuten ohne Bedienung von allein dorthin zurück. Gilt nur für dieses Gerät.</small></span><input type="checkbox" class="switch" id="dr-mboot"></label>
+      </div>
+      <p class="dr-note">Den MirrorOS startest du auch mit der Taste S, über den Knopf oben oder die Adresse mit #mirroros am Ende. Zurück ins Dashboard kommst du mit Esc oder dem Knopf, der bei Mausbewegung oder Antippen oben rechts erscheint. Die Einstellungen wandern per Sync auf alle Geräte, nur „Startet im MirrorOS“ bleibt auf dem Gerät.</p>
     </section>
 
     <!-- Daten: Sync, App, Sicherung -->

@@ -1,6 +1,6 @@
 /* Pendeln (gibt es nur einmal): Route über OSRM, Meldungen der Autobahn GmbH, optional Live-Fahrzeit von TomTom */
 const TT_KEY = 'jere-cockpit-tomtom';
-const cm = { dir: new Date().getHours() < 11 ? 'work' : 'home', seq: 0, timer: null, res: null, sum: null, homeMins: null, map: null, layer: null, abCache: new Map() };
+const cm = { dir: new Date().getHours() < 11 ? 'work' : 'home', seq: 0, timer: null, res: null, sum: null, homeMins: null, map: null, layer: null, abCache: new Map(), cbTried: new Set(), cbBusy: false, cbPostOff: false, cbUsual: null, band: null };
 const ORDER = { closure: 0, jam: 1, slow: 2, warn: 3, works: 4 };
 const cmPlaces = () => cm.dir === 'home' ? [state.commute.work, state.commute.home] : [state.commute.home, state.commute.work];
 function cmPane(which) { for (const p of ['empty', 'off', 'live']) $('#cm-' + p).hidden = p !== which; }
@@ -124,13 +124,14 @@ async function autobahnItems(roads, g, skipWarnings) {
   return { list: out, failed };
 }
 /* TomTom-Abruf, der bei Fehlern sagt, woran es lag: key (abgelehnt), limit (Kontingent), slow (Zeitüberschreitung), net (nicht erreichbar), svc (sonstiger Fehler) */
-const ttUrl = (from, to, key) => `https://api.tomtom.com/routing/1/calculateRoute/${from.lat},${from.lon}:${to.lat},${to.lon}/json?key=${encodeURIComponent(key)}&traffic=true&travelMode=car&routeType=fastest&sectionType=traffic&computeTravelTimeFor=all&language=de-DE`;
+const ttUrl = (from, to, key) => `https://api.tomtom.com/routing/1/calculateRoute/${from.lat},${from.lon}:${to.lat},${to.lon}/json?key=${encodeURIComponent(key)}&traffic=true&travelMode=car&routeType=fastest&sectionType=traffic&computeTravelTimeFor=all&instructionsType=coded&language=de-DE`;
 const ttErr = (why, status, text) => Object.assign(new Error('tomtom'), { why, status: status || 0, text: text || '' });
-async function ttFetch(url) {
+/* body: Anfrage per POST, zum Beispiel mit Stützpunkten für die Normalstrecke im Streckenband */
+async function ttFetch(url, body) {
   const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 12000);
   try {
     let r;
-    try { r = await fetch(url, { signal: ctl.signal }); } catch (e) { throw ttErr(e && e.name === 'AbortError' ? 'slow' : 'net'); }
+    try { r = await fetch(url, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl.signal } : { signal: ctl.signal }); } catch (e) { throw ttErr(e && e.name === 'AbortError' ? 'slow' : 'net'); }
     const raw = await r.text().catch(() => '');
     let j = null;
     try { j = JSON.parse(raw); } catch { j = null; }
@@ -188,7 +189,9 @@ async function tomtom(from, to) {
     return { k: kk, label: kk === 'slow' ? 'Zähfließend' : label, road: '', along, lat: p[1], lon: p[0], src: 'tt', seg, delay: Math.round((+s.delayInSeconds || 0) / 60), title: len > 50 ? `${kk === 'slow' ? 'Zähfließend' : label} auf ${numDe(len / 1000, 1)} km` : label, dir: Number.isFinite(+s.effectiveSpeedInKmh) && s.effectiveSpeedInKmh ? `etwa ${Math.round(s.effectiveSpeedInKmh)} km/h` : '', desc: [] };
   });
   const sm = r.summary;
-  return { time: +sm.travelTimeInSeconds, delay: +sm.trafficDelayInSeconds || 0, length: +sm.lengthInMeters || 0, secs, points };
+  // Fahranweisungen: Zeit bis dahin und die Straße danach, fürs Streckenband
+  const ins = ((r.guidance && r.guidance.instructions) || []).map(x => ({ i: +x.pointIndex, t: +x.travelTimeInSeconds, street: String(x.street || ''), road: Array.isArray(x.roadNumbers) ? x.roadNumbers.join(', ') : '' })).filter(x => Number.isInteger(x.i));
+  return { time: +sm.travelTimeInSeconds, delay: +sm.trafficDelayInSeconds || 0, length: +sm.lengthInMeters || 0, secs, points, ins };
 }
 async function loadCommute() {
   clearTimeout(cm.timer);
@@ -211,7 +214,7 @@ async function loadCommute() {
     }
     if (changed) commit();
     const [from, to] = cmPlaces();
-    const q = `${from.lon},${from.lat};${to.lon},${to.lat}?overview=full&geometries=geojson&steps=true`;
+    const q = `${from.lon},${from.lat};${to.lon},${to.lat}?overview=full&geometries=geojson&steps=true&annotations=duration`;
     let o;
     try { o = await getJson(`https://routing.openstreetmap.de/routed-car/route/v1/driving/${q}`, 12000); }
     catch { o = await getJson(`https://router.project-osrm.org/route/v1/driving/${q}`, 12000); }
@@ -223,11 +226,26 @@ async function loadCommute() {
       if (m) refs.add('A' + m[1]);
     }
     const g = prepRoute(route.geometry.coordinates);
+    // Orte fürs Streckenband auf der Normalstrecke. Unbekannte schlägt die Kartensuche einmal nach, danach geht es neu los.
+    const orte = cbMatch(route, g, cm.dir);
+    if (orte.some(o => !o.on)) cbFill(route, orte.filter(o => !o.on).map(o => o.text)).then(ch => { if (ch && seq === cm.seq) { clearTimeout(cm.timer); cm.timer = setTimeout(loadCommute, 400); } });
     const tt = await ttLive(from, to);
     if (seq !== cm.seq) return;
+    const cb = {};
+    if (tt && !tt.error && tt.points.length > 1 && orte.some(o => o.on)) {
+      cb.tg = prepRoute(tt.points);
+      cb.along = cbOnRoute(orte, cb.tg);
+      cb.tbl = cbTtTable(tt, cb.tg);
+      cb.dev = cbDetour(orte, cb.along, tt, cb.tg, route);
+      if (cb.dev) {
+        const u = await cbUsual(route, from, to, orte);
+        if (seq !== cm.seq) return;
+        if (u) cb.dev.save = Math.max(0, Math.round((u.time - tt.time) / 60));
+      }
+    }
     const ab = await autobahnItems([...refs], g, !!(tt && !tt.error));
     if (seq !== cm.seq) return;
-    cm.res = { dir: cm.dir, from, to, route, refs: [...refs], ab, tt, at: Date.now() };
+    cm.res = { dir: cm.dir, from, to, route, g, orte, cb, refs: [...refs], ab, tt, at: Date.now() };
     renderCommute();
     cm.timer = setTimeout(loadCommute, 5 * 6e4);
   } catch (e) {
@@ -260,7 +278,17 @@ function renderCommute() {
   const closures = items.filter(i => i.k === 'closure').length, works = items.filter(i => i.k === 'works').length;
   // Kurzfassung für „Jetzt wichtig“ und den Spiegel, top: was am meisten bremst
   const top = items.find(i => i.k !== 'works');
-  cm.sum = { dir: R.dir, mins: rmins, delay, closures, live: !!tt, at: R.at, top: top ? { road: top.road || '', title: top.title || top.label || '', along: top.along } : null };
+  const dev = R.cb && R.cb.dev ? { via: R.cb.dev.via, miss: R.cb.dev.miss, save: R.cb.dev.save } : null;
+  cm.sum = { dir: R.dir, mins: rmins, sec: Math.round(mins * 60), delay, closures, live: !!tt, at: R.at, top: top ? { road: top.road || '', title: top.title || top.label || '', along: top.along } : null, dev };
+  // Streckenband: Meldungen auf der gezeigten Route. Mit TomTom liegen die Autobahn-Meldungen auf dessen Linie, sonst fallen sie weg.
+  cm.bandItems = items.map(i => {
+    if (i.src !== 'ab' || !(R.cb && R.cb.tg)) return i;
+    const r = nearestOn(R.cb.tg, i.lon, i.lat);
+    return r.d <= 300 ? { ...i, along: r.along } : null;
+  }).filter(Boolean);
+  cbRender(now);
+  $('#cm-dev').textContent = cbDevTxt(dev);
+  $('#cm-dev').hidden = !dev;
   nowDirty();
   let v, lv;
   if (closures) { v = `Achtung, ${closures === 1 ? 'eine Sperrung' : closures + ' Sperrungen'} auf deiner Strecke.`; lv = 'bad'; }
@@ -417,6 +445,8 @@ $('#cm-dir-work').addEventListener('click', () => setDir('work'));
 function openCmForm() {
   $('#cm-home').value = state.commute.home ? state.commute.home.text : '';
   $('#cm-work').value = state.commute.work ? state.commute.work.text : '';
+  $('#cm-via').value = (state.commute.via || []).map(v => v.text).join(', ');
+  cbFormRes();
   let key = '';
   try { key = localStorage.getItem(TT_KEY) || ''; } catch { key = ''; }
   $('#cm-key').value = key;
@@ -434,7 +464,9 @@ $('#cm-form').addEventListener('submit', e => {
   const h = $('#cm-home').value.trim(), w = $('#cm-work').value.trim();
   if (!h || !w) { $('#cm-err').textContent = 'Trag beide Adressen ein, Zuhause und Arbeit.'; $('#cm-err').hidden = false; return; }
   const keep = (old, text) => old && old.text === text ? old : { text, label: '', lat: null, lon: null };
-  state.commute = { home: keep(state.commute.home, h), work: keep(state.commute.work, w) };
+  state.commute = { home: keep(state.commute.home, h), work: keep(state.commute.work, w), via: cbParse($('#cm-via').value) };
+  cm.cbTried.clear();
+  cm.cbUsual = null;
   const k = $('#cm-key').value.trim();
   try { if (k) localStorage.setItem(TT_KEY, k); else localStorage.removeItem(TT_KEY); } catch { /* Browser speichert nicht */ }
   $('#cm-form').hidden = true;
@@ -481,7 +513,8 @@ function cmCompactUi() {
   $('#commute').classList.toggle('is-compact', on);
   b.hidden = !c.compact;
   b.setAttribute('aria-expanded', String(!on));
-  b.querySelector('span').textContent = !on ? 'Weniger zeigen' : n ? `Karte und ${n === 1 ? 'eine Meldung' : n + ' Meldungen'}` : 'Karte zeigen';
+  const what = cm.band ? 'Strecke, Karte' : 'Karte';
+  b.querySelector('span').textContent = !on ? 'Weniger zeigen' : n ? `${what} und ${n === 1 ? 'eine Meldung' : n + ' Meldungen'}` : cm.band ? 'Strecke und Karte zeigen' : 'Karte zeigen';
 }
 $('#cm-more').addEventListener('click', () => {
   cmx.open = !cmx.open;

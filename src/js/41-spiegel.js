@@ -1,13 +1,15 @@
-/* Spiegel-Modus: schwarzer Vollbild-Überblick für einen Smart Mirror oder einen Bildschirm an der Wand.
+/* Spiegel-Modus (MirrorOS): schwarzer Vollbild-Überblick für einen Smart Mirror oder einen Bildschirm an der Wand.
+ * Standard ist der Aufbau „Wie im Dashboard“ aus 41-mirroros.js. Dieser Teil hier ist der Rahmen (Öffnen, Schließen, Dimmen,
+ * Wach halten) und der ältere Aufbau mit frei verteilten Bausteinen.
  * Schwarz bleibt hinter Spiegelglas unsichtbar, deshalb nur helle Schrift ohne Flächen.
  * Was wo steht, legst du unter Anpassen, Spiegel fest: Bausteine (Uhr, Wetter, Termine …) in sieben Bereichen.
  * Dazu kommen deine Widgets als Kurzzeilen: fest im Baustein „Kurzzeilen“ oder im Wechselplatz, der alle 15 Sekunden weiterblättert.
- * Start über den Knopf oben, die Taste S oder die Adresse …/#spiegel. Beenden mit Esc oder S.
+ * Start über den Knopf oben, die Taste S oder die Adresse …/#spiegel (oder #mirroros). Beenden mit Esc, S oder dem Knopf „Zum Dashboard“.
  * Hält den Bildschirm wach (Wake Lock, wenn der Browser es kann), kann nachts dimmen und verschiebt den Inhalt
  * alle paar Minuten um ein paar Pixel, damit sich nichts einbrennt. */
 const mr = { on: false, fs: false, lock: null, idle: null, shift: -1, last: '', slot: -1, dirty: 0, fu: 0 };
 const M_ROT = 15e3;
-function mirrorFromHash() { try { return decodeURIComponent(location.hash.slice(1)).toLowerCase() === 'spiegel'; } catch { return false; } }
+function mirrorFromHash() { try { return ['spiegel', 'mirroros'].includes(decodeURIComponent(location.hash.slice(1)).toLowerCase()); } catch { return false; } }
 async function mirrorLock() {
   if (!mr.on || !('wakeLock' in navigator) || mr.lock) return;
   try { mr.lock = await navigator.wakeLock.request('screen'); mr.lock.addEventListener('release', () => { mr.lock = null; }); } catch { mr.lock = null; }
@@ -17,11 +19,12 @@ function mirrorOpen(gesture) {
   mr.on = true;
   $('#mirror').hidden = false;
   document.documentElement.classList.add('mirror-on');
-  if (!mirrorFromHash()) history.replaceState(null, '', location.pathname + location.search + '#spiegel');
+  if (!mirrorFromHash()) history.replaceState(null, '', location.pathname + location.search + '#mirroros');
   mr.fs = false;
   if (gesture && document.documentElement.requestFullscreen && !document.fullscreenElement) document.documentElement.requestFullscreen().then(() => { mr.fs = true; }).catch(() => {});
   mirrorLock();
   mirrorWake();
+  mosDir(new Date());
   mr.last = '';
   mr.shift = -1;
   mirrorTick(new Date());
@@ -352,9 +355,9 @@ const MBR = {
     if (!s) return pv ? mPh('cm', state.commute.home ? 'Kommt, sobald die Strecke berechnet ist' : 'Trag erst deine Strecke im Pendeln-Widget ein') : '';
     // Nach Hause vor Feierabend: ab Feierabend gerechnet, sonst ab jetzt
     const wb = workBar(), end = s.dir === 'home' && wb && !freeReason(wb, now) && now < at(now, wb.end) ? at(now, wb.end) : null;
-    const arr = `${end ? `ab ${wb.end}, ` : ''}an ${hm(new Date((end ? +end : +now) + s.mins * 6e4))}`;
+    const arr = `${end ? `ab ${wb.end}, ` : ''}an ${hm(new Date((end ? +end : +now) + (s.sec || s.mins * 60) * 1000))}`;
     const bad = s.closures || s.delay >= 3;
-    const how = s.closures ? (s.closures === 1 ? 'Sperrung auf der Strecke' : `${s.closures} Sperrungen`) : s.delay >= 1 ? `+${Math.round(s.delay)} Min Stau` : 'Freie Fahrt';
+    const how = s.closures ? (s.closures === 1 ? 'Sperrung auf der Strecke' : `${s.closures} Sperrungen`) : s.delay >= 1 ? `+${Math.round(s.delay)} Min Stau` : s.dev ? cbDevShort(s.dev) : 'Freie Fahrt';
     const t = s.top, why = bad && t && t.title ? mCut(`${[t.road, t.title].filter(Boolean).join(' ')}${Number.isFinite(t.along) ? `, nach ${numDe(t.along / 1000, t.along < 10000 ? 1 : 0)} km` : ''}`, 80) : '';
     return `<section class="mb m-cm" data-b="cm"><h3>${s.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'}</h3><p><b>${s.mins} Min</b><span>${esc(arr)}</span></p><p class="m-cm-how${bad ? ' warn' : ''}"><span>${esc(how)}</span>${why ? `<span class="m-dim">${esc(why)}</span>` : ''}</p></section>`;
   },
@@ -418,6 +421,8 @@ const MBR = {
 };
 /* Spiegel in ein Raster zeichnen: Bereiche ohne Inhalt fallen weg, die Mitte hält den Platz frei */
 function mirrorRender(root, now, pv) {
+  if (state.ui.mirror.layout !== 'blocks') { mosRender(root, now, pv); return; }
+  root.classList.remove('mos');
   const m = state.ui.mirror, zones = Object.fromEntries(Object.keys(MZ).map(z => [z, []])), on = {};
   for (const b of m.blocks) on[b.k] = b.on && !!MBR[b.k];
   // Erst die Bausteine, die anderen etwas abnehmen: Morgen-Vorschau, dann Jetzt wichtig
@@ -526,7 +531,14 @@ function mirrorRotate(slot) {
     dots.forEach((x, j) => x.classList.toggle('on', j === i));
   }
 }
+/* Im Spiegel wechselt Pendeln von allein die Richtung: bis 11 Uhr zur Arbeit, danach nach Hause */
+function mosDir(now) {
+  const d = now.getHours() < 11 ? 'work' : 'home';
+  if (mr.on && cm.dir !== d && state.commute.home && state.commute.work) setDir(d);
+}
 function mirrorTick(now) {
+  mosIdleTick(now);
+  if (mr.on && now.getSeconds() === 5) mosDir(now);
   if (!mr.on && !mirrorPreviewOn()) return;
   const k = `${hm(now)}|${ymd(now)}`;
   if (k !== mr.last) { mr.last = k; renderMirror(); }

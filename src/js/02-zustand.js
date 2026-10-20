@@ -121,6 +121,18 @@ function normPlace(p) {
   const ok = v => v !== null && v !== undefined && v !== '' && Number.isFinite(+v);
   return { text: p.text.trim(), label: String(p.label || ''), lat: ok(p.lat) ? +p.lat : null, lon: ok(p.lon) ? +p.lon : null };
 }
+/* Orte unterwegs fürs Streckenband, in Fahrtrichtung zur Arbeit. lat/lon/ext nur, wenn die Kartensuche sie gebraucht hat,
+ * nf: die Kartensuche kennt den Ort nicht (dann wird nicht ständig neu gesucht) */
+function normVia(list) {
+  const ok = v => v !== null && v !== undefined && v !== '' && Number.isFinite(+v), seen = new Set();
+  return (Array.isArray(list) ? list : []).filter(x => x && typeof x.text === 'string' && x.text.trim()).map(x => {
+    const o = { text: x.text.trim().replace(/\s+/g, ' ').slice(0, 60) };
+    if (ok(x.lat) && ok(x.lon)) { o.lat = +x.lat; o.lon = +x.lon; }
+    if (o.lat !== undefined && Array.isArray(x.ext) && x.ext.length === 4 && x.ext.every(ok)) o.ext = x.ext.map(Number);
+    if (x.nf === true && o.lat === undefined) o.nf = true;
+    return o;
+  }).filter(o => { const k = o.text.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 8);
+}
 function safeUrl(u) {
   let s = String(u || '').trim();
   if (!s) return null;
@@ -354,6 +366,8 @@ function normUi(u) {
     order: normOrder(u.order, cds),
     head: normHead(u.head),
     mirror: normMirror(u.mirror),
+    // Dieses Gerät startet im MirrorOS (bleibt beim Sync auf dem Gerät)
+    mosBoot: !!u.mosBoot,
     start: { mode: ['last', 'fixed', 'auto'].includes(st.mode) ? st.mode : 'last', page: pid(st.page), work: pid(st.work), free: pid(st.free) }
   };
 }
@@ -411,6 +425,9 @@ function normMirror(m) {
   const d = m.dim && typeof m.dim === 'object' ? m.dim : {};
   return {
     v: 2,
+    // Aufbau: dash zeigt eine Seite des Cockpits in schlicht (MirrorOS), blocks die frei verteilten Bausteine von früher
+    layout: m.layout === 'blocks' ? 'blocks' : 'dash',
+    page: typeof m.page === 'string' ? m.page.slice(0, 40) : '',
     preset,
     blocks,
     lines: Array.isArray(m.lines) ? lines.slice(0, 40) : null,
@@ -471,7 +488,7 @@ function normalize(s) {
     page: pages.some(p => p.id === s.page) ? s.page : pages[0].id,
     widgets,
     loc: s.loc && s.loc.mode === 'fixed' && Number.isFinite(+s.loc.lat) && Number.isFinite(+s.loc.lon) ? { mode: 'fixed', name: String(s.loc.name || 'Ort'), lat: +s.loc.lat, lon: +s.loc.lon } : { mode: 'auto' },
-    commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work) },
+    commute: { home: normPlace(s.commute && s.commute.home), work: normPlace(s.commute && s.commute.work), via: normVia(s.commute && s.commute.via) },
     flex: { days: normFlexDays(s.flex && s.flex.days), cfg: flexCfgKeep(s) },
     pomo: { log: normPomoLog(s.pomo && s.pomo.log) },
     bdays: normBdays(s.bdays),

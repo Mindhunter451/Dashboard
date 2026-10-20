@@ -15,7 +15,7 @@ function syCfg() {
 const sySave = c => lsSet(SY_KEY, c);
 
 /* Was pro Gerät bleibt: Hell oder Dunkel, Graphit oder Schwarz, Kartenbreite, Abstände und der Stil der Uhr. Akzent, Ecken, Kacheln und Spiegel wandern mit. */
-const SY_LOCAL_UI = ['theme', 'dark', 'size', 'density', 'head'];
+const SY_LOCAL_UI = ['theme', 'dark', 'size', 'density', 'head', 'mosBoot'];
 /* Was zwischen Geräten wandert: alles außer der offenen Seite, den Merkzetteln dieses Browsers und den Einstellungen pro Gerät */
 function syView(s) {
   const v = { ...s, ui: { ...s.ui } };
