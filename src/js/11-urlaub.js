@@ -116,8 +116,35 @@ function vfPreview() {
   else txt = `Das sind ${numTxt(n)} ${n === 1 ? 'Urlaubstag' : 'Urlaubstage'}${why}.`;
   $('#vf-preview').textContent = txt;
 }
-function openVacForm(entry) {
+/* Reiseziel für den Wetterplanet: Ortssuche bei Open-Meteo, der erste Treffer zählt und wird angezeigt */
+const vfp = { q: '', hit: null, timer: 0, seq: 0 };
+function vfPlaceShow() {
+  const el = $('#vf-place-hit'), q = $('#vf-place').value.trim();
+  el.textContent = !q ? '' : vfp.q !== q ? 'Suche …' : vfp.hit ? `Gefunden: ${[vfp.hit.name, vfp.hit.admin, vfp.hit.country].filter(Boolean).join(', ')}` : 'Kein Ort mit diesem Namen gefunden.';
+}
+async function vfPlaceLookup() {
+  const q = $('#vf-place').value.trim(), seq = ++vfp.seq;
+  if (!q) { vfp.q = ''; vfp.hit = null; vfPlaceShow(); return null; }
+  if (vfp.q === q) return vfp.hit;
+  vfPlaceShow();
+  let hit = null;
+  try {
+    const j = await getJson(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1&language=de&format=json`);
+    const r = j && j.results && j.results[0];
+    if (r) hit = { name: r.name, admin: r.admin1 || '', country: r.country || '', lat: r.latitude, lon: r.longitude };
+  } catch { if (seq === vfp.seq) $('#vf-place-hit').textContent = 'Ortssuche gerade nicht erreichbar.'; return undefined; }
+  if (seq !== vfp.seq) return undefined;
+  vfp.q = q; vfp.hit = hit;
+  vfPlaceShow();
+  return hit;
+}
+$('#vf-place').addEventListener('input', () => { clearTimeout(vfp.timer); vfPlaceShow(); vfp.timer = setTimeout(vfPlaceLookup, 500); });
+function openVacForm(entry, focusPlace) {
   editingVac = entry ? entry.id : null;
+  const P = entry && entry.place;
+  $('#vf-place').value = P ? P.q || P.name : '';
+  Object.assign(vfp, P ? { q: P.q || P.name, hit: { name: P.name, admin: P.admin || '', country: P.country || '', lat: P.lat, lon: P.lon } } : { q: '', hit: null });
+  vfPlaceShow();
   if (entry) {
     $('#vf-from').value = entry.from;
     $('#vf-to').value = entry.to;
@@ -140,7 +167,7 @@ function openVacForm(entry) {
   vfPreview();
   renderVacation();
   $('#vac-form').scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
-  $('#vf-from').focus({ preventScroll: true });
+  $(focusPlace ? '#vf-place' : '#vf-from').focus({ preventScroll: true });
 }
 function closeVacForm() {
   $('#vac-form').hidden = true;
@@ -155,7 +182,7 @@ $('#vf-to').addEventListener('input', vfPreview);
 $('#vf-half').addEventListener('change', vfPreview);
 $('#vf-cancel').addEventListener('click', closeVacForm);
 $('#vf-del').addEventListener('click', () => { if (editingVac) deleteVac(editingVac); });
-$('#vac-form').addEventListener('submit', e => {
+$('#vac-form').addEventListener('submit', async e => {
   e.preventDefault();
   const err = msg => { $('#vf-err').textContent = msg; $('#vf-err').hidden = false; };
   const f = $('#vf-from').value, t = $('#vf-to').value || f;
@@ -163,6 +190,14 @@ $('#vac-form').addEventListener('submit', e => {
   if (t < f) return err('Der letzte Tag liegt vor dem ersten.');
   if (dayDiff(parseYmd(f), parseYmd(t)) > 366) return err('Maximal ein Jahr am Stück.');
   const entry = { id: editingVac || uid(), from: f, to: t, label: $('#vf-label').value.trim(), half: vfSingle() && $('#vf-half').checked };
+  const pq = $('#vf-place').value.trim();
+  if (pq) {
+    clearTimeout(vfp.timer);
+    const hit = await vfPlaceLookup();
+    if (hit === undefined) return err('Das Reiseziel ließ sich gerade nicht suchen. Versuch es gleich noch mal oder lass das Feld leer.');
+    if (!hit) return err(`Kein Ort namens „${pq}“ gefunden. Versuch es mit einer Stadt in der Nähe.`);
+    entry.place = { q: pq, name: hit.name, admin: hit.admin, country: hit.country, lat: hit.lat, lon: hit.lon };
+  }
   const clash = state.vacation.entries.find(x => x.id !== entry.id && x.from <= t && f <= x.to);
   if (clash) return err(`Überschneidet sich mit „${clash.label || 'Urlaub'}“ (${dm(parseYmd(clash.from))} bis ${dm(parseYmd(clash.to))}).`);
   const i = state.vacation.entries.findIndex(x => x.id === entry.id);

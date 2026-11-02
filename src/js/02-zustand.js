@@ -168,6 +168,14 @@ const normLinks = list => (Array.isArray(list) ? list : [])
 const intIn = (x, lo, hi, d) => x !== null && x !== '' && Number.isFinite(+x) && +x >= lo && +x <= hi ? Math.round(+x) : d;
 const normDays = (list, d) => Array.isArray(list) ? [...new Set(list.map(Number).filter(x => Number.isInteger(x) && x >= 0 && x <= 6))] : d;
 const HB_RHYTHM = ['daily', 'workdays', 'weekly'];
+/* Reiseziel eines Urlaubs für den Wetterplanet (seit 3.13): nur mit gültigen Koordinaten */
+function normVacPlace(e) {
+  const P = e.place;
+  if (P && typeof P === 'object' && Number.isFinite(+P.lat) && Number.isFinite(+P.lon) && Math.abs(+P.lat) <= 90 && Math.abs(+P.lon) <= 180) {
+    e.place = { q: String(P.q || P.name || '').slice(0, 60), name: String(P.name || P.q || 'Reiseziel').slice(0, 60), admin: String(P.admin || '').slice(0, 60), country: String(P.country || '').slice(0, 60), lat: +P.lat, lon: +P.lon };
+  } else delete e.place;
+  return e;
+}
 const normHabits = list => (Array.isArray(list) ? list : []).filter(h => h && String(h.name || '').trim()).slice(0, 20).map(h => ({
   id: String(h.id || uid()).slice(0, 20),
   name: String(h.name).trim().slice(0, 40),
@@ -487,7 +495,7 @@ function normalize(s) {
       allowanceExample: v.allowanceExample !== undefined ? !!v.allowanceExample : d.vacation.allowanceExample,
       halfXmas: v.halfXmas !== false,
       entries: Array.isArray(v.entries)
-        ? v.entries.filter(e => e && validYmd(e.from) && validYmd(e.to)).map(e => ({ ...e, id: String(e.id || uid()), label: String(e.label || ''), half: !!e.half && e.from === e.to }))
+        ? v.entries.filter(e => e && validYmd(e.from) && validYmd(e.to)).map(e => normVacPlace({ ...e, id: String(e.id || uid()), label: String(e.label || ''), half: !!e.half && e.from === e.to }))
         : d.vacation.entries
     },
     ui: normUi(s.ui),
