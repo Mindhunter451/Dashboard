@@ -1,6 +1,6 @@
 # Jeres Tagescockpit
 
-Persönliches Dashboard mit eigenen Seiten, zum Beispiel Heute, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Ganz vorn steht „Jetzt wichtig“ mit dem, was gerade zählt. Drin sind außerdem Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar und amtlichen Warnungen, Pendeln mit Staus und Baustellen oder mit Bus und Bahn, Todoist-Aufgaben, Kalender (iCloud, Google, Outlook und alles mit ICS-Link), Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu der MirrorOS, eine schlichte schwarze Ansicht für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
+Persönliches Dashboard mit eigenen Seiten, zum Beispiel Heute, Arbeit, Privat, Fokus und Sport. Oben ein Himmel, der dem echten Sonnenstand folgt, mit großer Uhr und Sonnenbogen. Ganz vorn steht „Jetzt wichtig“ mit dem, was gerade zählt. Drin sind außerdem Urlaubstage, Fortschrittsbalken, Wetter mit Regenradar und amtlichen Warnungen, ein kleiner Wetterplanet, der dein Wetter live nachspielt, Pendeln mit Staus und Baustellen oder mit Bus und Bahn, Todoist-Aufgaben, Kalender (iCloud, Google, Outlook und alles mit ICS-Link), Abfahrten von Bus und Bahn, Geburtstage, Müllabfuhr, Schnellzugriff, Notizen, Pomodoro, Gewohnheiten, Lernfortschritt, Fußball, Formel 1 und Spritpreise. Dazu der MirrorOS, eine schlichte schwarze Ansicht für einen Smart Mirror. Das Cockpit lässt sich als App installieren und startet auch ohne Netz.
 
 Live: https://mindhunter451.github.io/Dashboard/
 
@@ -82,6 +82,12 @@ Für die Müllabfuhr lädst du die ICS-Datei deines Entsorgers oder trägst pro 
 
 Die amtlichen Warnungen des Deutschen Wetterdienstes für den Ort des Wetter-Widgets kommen über [Bright Sky](https://brightsky.dev), das die offenen Daten des DWD frei und ohne Key anbietet. Sie stehen farbig nach Warnstufe oben in der Wetterkarte, in „Jetzt wichtig“ und im Spiegel. Das gilt nur für Orte in Deutschland. Alte Warnungen werden ohne Netz nicht aufgehoben, lieber keine als eine veraltete.
 
+## Wetterplanet
+
+Eine kleine Low-Poly-Welt mit Häuschen, See, Steg und Bäumen, die das Wetter nachspielt. Sonne und Mond laufen nach der echten Uhrzeit über den Planeten: Links geht die Sonne zur echten Aufgangszeit auf, rechts zur Untergangszeit unter, im Winter läuft sie flacher. Nachts zieht der Mond mit seiner echten Phase seinen Bogen, Sterne kommen raus, und im Häuschen geht das Licht an, an trüben Tagen auch schon tagsüber. Die Wolken richten sich nach der Bedeckung und ziehen mit dem Wind, bei Niesel und Regen fällt es aus den Wolken, bei Schnee wird der Planet nach und nach weiß und bleibt es, solange laut Open-Meteo Schnee liegt. Bei Gewitter zucken Blitze, bei Nebel liegen Schwaden über dem Boden. Die Bäume wiegen sich je nach Wind, unter 12 Grad raucht der Schornstein, bei Frost friert der See zu, und die Laubbäume wechseln mit den Jahreszeiten die Farbe (auf der Südhalbkugel ein halbes Jahr versetzt).
+Ziehen dreht den Planeten, kurz antippen schickt ihn einmal herum, nach ein paar Sekunden dreht er sich zurück zum Häuschen. Das Wetter kommt standardmäßig vom Wetter-Widget, pro Planet geht aber auch Zuhause oder Arbeit aus dem Pendeln oder ein eigener Ort. So kann es mehrere Planeten nebeneinander geben, jeder mit seinem Wetter. Im MirrorOS steht der Planet ohne Kasten auf Schwarz.
+Gezeichnet wird mit WebGL2 ohne Fremd-Bibliothek (`src/js/52-planet.js`): flach schattierte Dreiecke, Schatten über eine Shadow Map, Himmel, Sterne, Regen und Schnee in eigenen Shadern. Gezeichnet wird nur, solange der Planet zu sehen ist, im Spiegel mit 30 Bildern pro Sekunde. Ohne WebGL2 zeigt die Karte nur Temperatur und Wetter.
+
 ## Sender bei Fußball und Formel 1
 
 Für Sender gibt es keine freie Schnittstelle, deshalb steht in `src/js/33-sender.js` eine gepflegte Liste, Stand 20.10.2026. Beim Fußball gelten Regeln nach Anstoßzeit: In der 1. Liga zeigt Sky Freitag, Samstag und die englischen Wochen, DAZN den Sonntag und die Samstagskonferenz. Die 2. Liga läuft komplett bei Sky, das Topspiel am Samstagabend meistens auch bei RTL. Die 3. Liga läuft bei MagentaSport. Bei der Formel 1 zeigt Sky alles, SRF Sprint, Qualifying und Rennen, in Österreich wechseln sich ORF und ServusTV pro Rennen ab, und RTL zeigt einzelne Sessions frei.
@@ -125,6 +131,9 @@ Fremd-Code liegt fertig gebaut in `src/vendor/` und kommt in eigene Blöcke vor 
 Alle JS-Module landen in einem gemeinsamen Block und teilen sich ihren Gültigkeitsbereich. Die Reihenfolge ergibt sich aus der Nummer im Dateinamen.
 
 ## Versionen
+
+**3.12** (November 2026)
+Neu: der Wetterplanet, eine kleine Welt mit Häuschen und See, die dein Wetter live nachspielt. Sonne und Mond zur echten Uhrzeit, Mondphase, Sterne, Licht im Fenster, Wolken nach Bedeckung, Niesel, Regen, Schnee, der liegen bleibt, Gewitter mit Blitzen, Nebel, Wind in den Bäumen, Rauch bei Kälte, Eis bei Frost und Bäume im Wechsel der Jahreszeiten. Zum Drehen ziehen, antippen für eine Runde. Pro Planet ein eigener Ort möglich, im MirrorOS ohne Kasten. Das Wetter holt dafür zusätzlich Bedeckung, Windrichtung und Schneehöhe. Kleinigkeit: „Geplant“ im Urlaub folgt jetzt der Akzentfarbe, Streifen und Status waren vorher immer blau.
 
 **3.11** (Oktober 2026)
 Feinschliff am Look nach den Regeln für App-Oberflächen aus dem taste-skill. Karten liegen jetzt flach auf dem Grund und trennen sich nur durch eine feine Linie, wichtige Karten heben sich bloß einen Hauch ab. Die Symbole im Kartenkopf und bei ruhigen Hinweisen in „Jetzt wichtig“ stehen ohne Kästchen dahinter, dringende Hinweise behalten ihre farbige Fläche. Grüne und orange Texte (zum Beispiel „Heute frei“, Verspätungen, Spritpreis-Bestwert) sind im hellen Modus dunkler und damit gut lesbar, Balken und Flächen behalten ihre Farbe. Die kleinsten Beschriftungen im Regenband, bei den Sendern und an der Achse der Rennanalyse haben jetzt mindestens 11 px.

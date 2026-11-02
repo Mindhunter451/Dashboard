@@ -102,6 +102,7 @@ const PEEK = {
     return `${esc(wsNames(up.filter(x => +x.next === +d).map(x => x.b)))} <small>${esc(wsDay(d, sod(now)))}</small>`;
   },
   vacation: () => `${esc($('#vac-free').textContent)} <small>Tage frei</small>`,
+  planet(v) { const c = pnCaption(v.id); return c ? `${esc(c.temp)} <small>${esc(c.desc)}</small>` : ''; },
   progress(v) {
     const r = v.refs && [...v.refs.values()][0];
     return r ? `${esc(r.b.name)} <small>${esc(r.pct.textContent)}</small>` : '';

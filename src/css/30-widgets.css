@@ -29,7 +29,7 @@
 .legend dd{margin:0;text-align:right;font:500 13px var(--f-data);font-variant-numeric:tabular-nums}
 .sw{width:10px;height:10px;border-radius:3px;display:inline-block;flex:0 0 10px}
 .sw-taken{background:var(--ink)}
-.sw-planned,.seg-planned{background:repeating-linear-gradient(-45deg,var(--sea) 0 4px,color-mix(in srgb,var(--sea) 45%,var(--surface)) 4px 7px)}
+.sw-planned,.seg-planned{background:repeating-linear-gradient(-45deg,var(--accent) 0 4px,color-mix(in srgb,var(--accent) 40%,var(--surface)) 4px 7px)}
 .sw-free{background:var(--raise);border:1px solid var(--line)}
 .stack{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--raise);border:1px solid var(--line)}
 .seg-taken{background:var(--ink)}
@@ -44,7 +44,7 @@
 .vac-list .icon-btn[data-del]{grid-area:del}
 .status{font:600 12px/1.8 var(--f-body);padding:0 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted);text-transform:capitalize}
 .status[data-s="läuft"]{border-color:var(--good);color:var(--good-ink)}
-.status[data-s="geplant"]{border-color:color-mix(in srgb,var(--sea) 55%,var(--line));color:var(--sea)}
+.status[data-s="geplant"]{border-color:color-mix(in srgb,var(--accent) 60%,var(--line));color:var(--accent-ink)}
 
 /* Wetter */
 .wx-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}

@@ -100,5 +100,6 @@ function widgetLabel(id) {
   if (w.type === 'tasks') return `Aufgaben: ${w.cfg.projects.join(', ')}`;
   if (w.type === 'football') return FB_LEAGUES[w.cfg.league] + (w.cfg.teamName ? `, ${w.cfg.teamName}` : '');
   if (w.type === 'dep') return w.cfg.stop ? `Abfahrten: ${w.cfg.stop.name}` : 'Abfahrten';
+  if (w.type === 'planet' && w.cfg.place) return `Wetterplanet: ${w.cfg.place.how === 'fixed' ? w.cfg.place.name : w.cfg.place.how === 'home' ? 'Zuhause' : 'Arbeit'}`;
   return TYPES[w.type].name;
 }
