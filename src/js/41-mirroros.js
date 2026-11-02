@@ -86,6 +86,7 @@ function mosBlock(id, it, now, pv, cx) {
     switch (w.type) {
       case 'now': inner = cx.nw.length ? `<ul class="m-now">${cx.nw.map(x => mRow({ ico: x.ico, t: x.t, s: mTxt(x.s), when: x.w && x.w !== 'live' ? x.w : '', lv: x.lv, wc: x.wc })).join('')}</ul>` : pv ? '<p class="m-dim">Gerade drängt nichts.</p>' : ''; break;
       case 'weather': inner = MBR.wx(now, pv); break;
+      case 'planet': inner = pnMosHtml(id, pv); if (!w.title) { const c = pnCaption(id); if (c && c.place) title = c.place; } break;
       case 'commute': inner = ptMode() ? mosPt(now, pv) : mosCm(now, pv); if (cm.sum || ptMode()) title = cm.dir === 'home' ? 'Nach Hause' : 'Zur Arbeit'; break;
       case 'cal': inner = MBR.cal(now, pv); break;
       case 'dep': { const d = mosDep(w, now, pv); inner = d.html; extra = d.extra; if (!w.title && w.cfg.stop) title = w.cfg.stop.name; break; }
@@ -114,6 +115,7 @@ function mosRender(root, now, pv) {
   const empty = !blocks.length ? `<p class="mos-empty m-dim">${pv ? `Auf der Seite „${esc(page.name)}“ liegt nichts, was der Spiegel zeigen kann.` : ''}</p>` : '';
   root.innerHTML = mosHead(now) + (page.tiles ? mosTiles() : '') + `<div class="mos-grid">${blocks.join('')}${empty}</div>`;
   mosLayout(root);
+  pnMosAttach(root, pv);
 }
 /* Wie im Cockpit: Spalten nach Breite, jeder Block in die kürzeste Spalte. Passt es nicht, wird gekürzt:
  * erst Listen in den Blöcken, die unten überstehen, dann der letzte davon ganz. */

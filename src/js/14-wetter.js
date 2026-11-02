@@ -58,12 +58,13 @@ async function startWeather() {
 }
 async function loadWeather(loc, seq) {
   const q = `latitude=${(+loc.lat).toFixed(4)}&longitude=${(+loc.lon).toFixed(4)}`;
-  const url = `https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_gusts_10m,is_day&minutely_15=precipitation&hourly=temperature_2m,precipitation_probability,weather_code,is_day&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&timezone=auto&timeformat=unixtime&forecast_days=2&wind_speed_unit=kmh`;
+  const url = `https://api.open-meteo.com/v1/forecast?${q}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m,snow_depth,is_day&minutely_15=precipitation&hourly=temperature_2m,precipitation_probability,weather_code,is_day&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&timezone=auto&timeformat=unixtime&forecast_days=2&wind_speed_unit=kmh`;
   try {
     const d = await getJson(url);
     if (seq !== undefined && seq !== wx.seq) return true;
     wx.live = true; wx.loc = loc; wx.data = d; wx.at = d.cachedAt || Date.now(); wx.offline = !!d.cachedAt;
     renderWeather();
+    for (const v of viewsOf('planet')) renderPlanet(v);
     renderFuel(); // Spritpreise „wie beim Wetter“ folgen dem Ort
     sky.minute = -1;
     skyTick(new Date());

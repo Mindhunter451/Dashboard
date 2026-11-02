@@ -45,6 +45,7 @@ const TYPES = {
   vacation: { name: 'Urlaub', multi: false, w: 1, cat: 'plan', desc: 'Resturlaub, geplante und genommene Tage, mit Feiertagen und halben Tagen.' },
   commute:  { name: 'Pendeln', multi: false, w: 1, cat: 'go', desc: 'Mit dem Auto Fahrzeit, Staus und Baustellen, mit Öffis deine nächsten Verbindungen von Tür zu Tür.' },
   weather:  { name: 'Wetter', multi: false, w: 2, cat: 'go', desc: 'Wetter jetzt, Regen der nächsten 2 Stunden, Stundenleiste und Regenradar.' },
+  planet:   { name: 'Wetterplanet', multi: true, w: 1, cat: 'go', since: '3.12', desc: 'Ein kleiner Planet mit Häuschen und See, der dein Wetter live nachspielt: Sonne und Mond zur echten Uhrzeit, Wolken, Regen, Schnee und Gewitter, nachts Sterne und Licht im Fenster. Zum Drehen ziehen.' },
   links:    { name: 'Schnellzugriff', multi: true, w: 1, cat: 'day', desc: 'Deine wichtigsten Seiten als Kacheln, zum Beispiel Webmail oder Ticketsystem.' },
   notes:    { name: 'Notizen', multi: true, w: 1, cat: 'day', desc: 'Ein Notizzettel mit Markdown wie in Obsidian: Überschriften, Listen, Aufgaben zum Abhaken und Links, gespeichert beim Tippen.' },
   pomodoro: { name: 'Pomodoro', multi: false, w: 1, cat: 'plan', since: '2.1', desc: 'Fokus-Timer mit Pausen, Ton am Ende, Aufgabe aus Todoist und deinen Runden von heute.' },
@@ -78,6 +79,7 @@ const TICON = {
   vacation: svgIco('<circle cx="12" cy="10" r="3.6"/><path d="M12 3v1.4M5 10H3.6M20.4 10H19M7 5l1 1M17 5l-1 1M3 18.5c3-2 6-2 9 0s6 2 9 0"/>'),
   commute: svgIco('<path d="M5 17h14v-4.6l-2.1-5H7.1L5 12.4z"/><path d="M5 12.4h14M6.6 17v2.2M17.4 17v2.2"/><circle cx="8.2" cy="14.7" r=".6"/><circle cx="15.8" cy="14.7" r=".6"/>'),
   weather: svgIco('<circle cx="9" cy="8" r="3"/><path d="M9 2.6v1M3.6 8h1M5.2 4.2l.7.7M12.8 4.2l-.7.7"/><path d="M7.5 19.5h9.5a3.4 3.4 0 0 0 .3-6.8 4.8 4.8 0 0 0-9.1-.6 3.7 3.7 0 0 0-.7 7.4z"/>'),
+  planet: svgIco('<circle cx="11" cy="13" r="7"/><path d="M4.4 11.4c2.2 1.3 5 1.9 8.1 1.4 2.2-.4 4-1.2 5.2-2.3M6.3 18c2.3-.6 4.7-2.1 6.2-4.3"/><circle cx="19" cy="4.8" r="1.8"/>'),
   links: svgIco('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
   notes: svgIco('<path d="M6 3.5h8.5L18.5 7.5v13H6z"/><path d="M14.5 3.5v4h4M9 12h6M9 16h6"/>'),
   pomodoro: svgIco('<circle cx="12" cy="13" r="7.5"/><path d="M12 9.2V13l2.6 1.8M10 2.6h4"/>'),
@@ -298,6 +300,11 @@ function normCfg(type, c) {
     case 'tasks': return { projects: normProjects(c.projects) };
     case 'progress': return { bars: normBars(c.bars) };
     case 'weather': return { hours: c.hours !== false, radar: c.radar !== false, compact: c.compact !== false };
+    case 'planet': {
+      const P = c.place && typeof c.place === 'object' ? c.place : null;
+      if (P && P.how === 'fixed' && Number.isFinite(+P.lat) && Number.isFinite(+P.lon) && Math.abs(+P.lat) <= 90 && Math.abs(+P.lon) <= 180) return { place: { how: 'fixed', name: strIn(P.name, 60) || 'Eigener Ort', lat: +P.lat, lon: +P.lon } };
+      return { place: P && (P.how === 'home' || P.how === 'work') ? { how: P.how } : null };
+    }
     case 'commute': return { compact: c.compact !== false, mode: c.mode === 'pt' ? 'pt' : 'car' };
     case 'links': return { items: normLinks(c.items) };
     case 'notes': return { text: typeof c.text === 'string' ? c.text.slice(0, NOTE_MAX) : '', plain: !!c.plain };
