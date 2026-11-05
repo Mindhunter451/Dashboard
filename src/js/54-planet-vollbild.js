@@ -15,7 +15,8 @@ const PN_ICO = {
   sound: pnSvg('<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/>'),
   mute: pnSvg('<path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>'),
   play: pnSvg('<path d="M8 5.5v13l10.5-6.5z"/>', true),
-  stop: pnSvg('<rect x="7" y="7" width="10" height="10" rx="1.5"/>', true)
+  stop: pnSvg('<rect x="7" y="7" width="10" height="10" rx="1.5"/>', true),
+  info: pnSvg('<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.1"/>')
 };
 const pnDeg = x => `${Math.round(x)}°`.replace('-', '−');
 const pnDoy = d => Math.round((sod(d) - new Date(d.getFullYear(), 0, 1)) / DAY);
@@ -27,6 +28,7 @@ const pnFsQ = s => pnFs.el.querySelector(s);
 
 function pnFsOpen(id) {
   if (pnFs.open) pnFsClose();
+  if (pnLeg.el) pnLegClose();
   const v = views.get(id), I = pn.inst.get(id);
   if (!v || !I || !I.ok) return;
   const el = document.createElement('div');
@@ -38,6 +40,7 @@ function pnFsOpen(id) {
     <div class="pnf-top">
       <p class="pnf-cap"><b data-r="temp"></b><span data-r="desc"></span><span class="pnf-place" data-r="place"></span></p>
       <div class="pnf-btns">
+        <button type="button" class="pnf-btn pnf-btn-leg" data-a="legend" aria-expanded="false" aria-label="Was der Planet zeigt" title="Was der Planet zeigt">${PN_ICO.info}</button>
         <button type="button" class="pnf-btn" data-a="sound" aria-pressed="false" aria-label="Geräusche zum Wetter" title="Geräusche zum Wetter">${PN_ICO.mute}</button>
         <button type="button" class="pnf-btn" data-a="night" aria-pressed="false" aria-label="Nachttisch Modus" title="Nachttisch Modus">${PN_ICO.night}</button>
         <button type="button" class="pnf-btn" data-a="close" aria-label="Vollbild schließen" title="Schließen (Esc)">${PN_ICO.close}</button>
@@ -71,6 +74,7 @@ function pnFsOpen(id) {
     else if (a.dataset.a === 'now') { pnFsReplayStop(); pnFsSetMode('h'); }
     else if (a.dataset.a === 'replay') pnFsReplay();
     else if (a.dataset.a === 'tripform') pnFsTripForm();
+    else if (a.dataset.a === 'legend') { pnFsInfoHide(); pnLegOpen(pnFs.el, pnFsBig(), a); }
   });
   pnFsQ('[data-r="range"]').addEventListener('input', e => { pnFsReplayStop(); pnFs.val = +e.target.value; pnFsApply(); });
   el.addEventListener('keydown', pnFsKey);
@@ -85,6 +89,7 @@ function pnFsOpen(id) {
 }
 function pnFsClose() {
   if (!pnFs.open) return;
+  if (pnLeg.el) pnLegClose();
   pnFsReplayStop();
   pnSndStop();
   if (pnFs.night) pnFsNight(false);
@@ -235,6 +240,7 @@ function pnFsSwap() {
   big.cv.focus({ preventScroll: true });
   big.idle = small.idle = performance.now();
   pnFsInfoHide();
+  if (pnLeg.el) pnLeg.V = big;
   pnFsRefresh();
   pnSndUpdate();
 }
@@ -298,6 +304,17 @@ function pnFsInfoHtml(hit, V) {
     }
     case 'iss': return E.iss ? box('ISS', 'Fliegt gerade über dich hinweg', `rund ${Math.round(E.iss.h)} km hoch, ${Math.round(E.iss.el)}° über dem Horizont`, 'Draußen ein heller, ruhiger Punkt am Himmel.') : '';
     case 'aurora': return box('Polarlicht', Number.isFinite(E.kp) ? `Kp ${numDe(E.kp, 1)}` : '', 'Bei klarem Himmel lohnt ein Blick nach Norden, am besten weg vom Stadtlicht.');
+    case 'birds': return box(E.X.theme === 'beach' ? 'Möwen' : 'Vögel', 'Fliegen tagsüber, wenn es ruhig ist.', 'Bei Regen und Sturm bleiben sie am Boden.');
+    case 'geese': return box('Zugvögel', now.getMonth() < 6 ? 'Graugänse auf dem Weg zurück in den Norden.' : 'Graugänse auf dem Weg in den Süden.', 'Im V sparen sie Kraft, jede fliegt im Aufwind der vorderen.');
+    case 'ducks': return box('Enten', V.life && V.life.on && V.life.on.ducks && now.getMonth() >= 3 && now.getMonth() <= 6 ? 'Eine Mutter mit ihren Küken.' : 'Ein Stockentenpaar, er mit grünem Kopf.', E.alt < -3 ? 'Nachts dösen sie und treiben nur langsam.' : 'Bei Eis und Sturm verstecken sie sich im Schilf.');
+    case 'fish': return box('Fisch', 'Springt ab und zu aus dem See.', `Das Wasser hat gerade etwa ${pnDeg(Math.max(4, E.temp * 0.8))}.`);
+    case 'butterfly': return box('Schmetterlinge', 'Flattern an warmen, ruhigen Tagen über den Blumen.', `Gerade ${pnDeg(E.temp)} und ${Math.round(E.wind)} km/h Wind.`);
+    case 'hare': return box('Hase', 'Hoppelt über seine Wiese und macht zwischendurch Pause.');
+    case 'deer': return box('Reh', 'Grast in der Dämmerung am Waldrand.', 'Morgens und abends sind Rehe am aktivsten.');
+    case 'owl': return box('Eule', 'Sitzt nachts oben im Baum am Haus und hält Ausschau.');
+    case 'bats': return box('Fledermäuse', 'Jagen in warmen Sommernächten Insekten ums Haus.');
+    case 'snowman': return box('Schneemann', E.c && Number.isFinite(E.c.snow_depth) ? `Draußen liegen ${Math.round(E.c.snow_depth * 100)} cm Schnee.` : 'Draußen liegt Schnee.', 'Er bleibt, bis der Schnee weg ist.');
+    case 'rainbow': return box('Regenbogen', 'Die Sonne steht tief und hinter dir regnet es noch.', 'Draußen lohnt ein Blick: Er steht immer gegenüber der Sonne.');
     default: return '';
   }
 }
@@ -323,6 +340,7 @@ async function pnFsNight(on) {
   if (on) {
     pnFsReplayStop();
     pnFsInfoHide();
+    if (pnLeg.el) pnLegClose();
     if (pnFs.swap) pnFsSwap();
     pnFsSetMode('h');
     try { if (pnFs.el.requestFullscreen && !document.fullscreenElement) await pnFs.el.requestFullscreen({ navigationUI: 'hide' }); } catch { /* geht nicht überall, etwa auf dem iPhone */ }

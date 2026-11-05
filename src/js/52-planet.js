@@ -10,7 +10,10 @@
  * Seit 3.13 dazu: Straße mit deinem Auto (fährt zur Pendelzeit), Windrad nach echtem Wind, Fähnchen bei Terminen, Flugzeug vor
  * dem Urlaub, Gewohnheitswald, Katze im Fenster bei Regen, Lichterkette, Kürbisse, Feuerwerk, Glühwürmchen, Polarlicht, ISS,
  * Sternschnuppen und Dunst bei schlechter Luft. Die Daten dafür kommen aus 53-planet-daten.js, Vollbild und Nachttisch aus
- * 54-planet-vollbild.js. */
+ * 54-planet-vollbild.js.
+ * Seit 3.14: weichere Wolken mit Silberrand, Nächte mit Mondlicht und Fülllicht, Leuchten mit Lichthof, See mit Tiefe, Glitzern und
+ * Ringen, weiche Schatten am Boden, Birken, Blumen, Grasbüschel, Pilze, Schilf, Seerosen, Raureif, Hitze, Frühnebel, Hagel und ein
+ * Schneemann. Tiere, Blätter, Regenbogen und Sturm in 55-planet-tiere.js, das Infofeld in 56-planet-legende.js. */
 const PN_FOV = 28 * Math.PI / 180, PN_FIT = 1.98, PN_SUN_R = 1.78, PN_PITCH = 0.36;
 const PN_RAD = Math.PI / 180;
 const pn = { inst: new Map(), raf: 0, io: null, wx: new Map() };
@@ -81,21 +84,25 @@ function pnIco(sub) {
  * Art: 0 Boden und Dinge, 1 Fenster, 2 Wasser, 3 Wolke */
 class PnMesh {
   constructor() { this.p = []; this.n = []; this.c = []; this.a = []; }
-  tri(a, b, c, col, at, inside, sw) {
+  /* sm: [Mitte, Anteil] macht die Fläche weicher (Normalen zur Mitte hin gebogen), vk: Helligkeit pro Ecke (Schatten am Boden) */
+  tri(a, b, c, col, at, inside, sw, sm, vk) {
     let n = pnV.norm(pnV.cross(pnV.sub(b, a), pnV.sub(c, a)));
     if (inside) {
       const m = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3, (a[2] + b[2] + c[2]) / 3];
-      if (pnV.dot(n, pnV.sub(m, inside)) < 0) { n = pnV.mul(n, -1); [b, c] = [c, b]; sw = sw && [sw[0], sw[2], sw[1]]; }
+      if (pnV.dot(n, pnV.sub(m, inside)) < 0) { n = pnV.mul(n, -1); [b, c] = [c, b]; sw = sw && [sw[0], sw[2], sw[1]]; vk = vk && [vk[0], vk[2], vk[1]]; }
     }
     const r = Math.random();
-    [a, b, c].forEach((v, i) => { this.p.push(...v); this.n.push(...n); this.c.push(...col); this.a.push(at[0], sw ? sw[i] : at[1], at[2], at[3] ?? r); });
+    [a, b, c].forEach((v, i) => {
+      const nn = sm ? pnV.norm(pnV.add(pnV.mul(n, 1 - sm[1]), pnV.mul(pnV.norm(pnV.sub(v, sm[0])), sm[1]))) : n, k = vk ? vk[i] : 1;
+      this.p.push(...v); this.n.push(...nn); this.c.push(col[0] * k, col[1] * k, col[2] * k); this.a.push(at[0], sw ? sw[i] : at[1], at[2], at[3] ?? r);
+    });
   }
   get count() { return this.p.length / 3; }
 }
 /* Teile eines Objekts in eigenen Koordinaten (y nach oben, z nach vorn), später auf den Planeten gesetzt */
 class PnPart {
   constructor() { this.t = []; }
-  tri(a, b, c, col, s = 1, k = 0, inside = null) { this.t.push({ p: [a, b, c], col, s, k, inside }); }
+  tri(a, b, c, col, s = 1, k = 0, inside = null, sm = null) { this.t.push({ p: [a, b, c], col, s, k, inside, sm }); }
   quad(a, b, c, d, col, s, k, inside) { this.tri(a, b, c, col, s, k, inside); this.tri(a, c, d, col, s, k, inside); }
   box(x0, y0, z0, x1, y1, z1, col, s = 1, k = 0) {
     const P = (x, y, z) => [x ? x1 : x0, y ? y1 : y0, z ? z1 : z0], m = [(x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2];
@@ -113,20 +120,26 @@ class PnPart {
       this.tri(A[j], A[i], bot, c, 0, 0, m);
     }
   }
-  /* Klumpen aus einem Ikosaeder, etwas verbeult: Baumkronen, Büsche, Steine, Wolken */
-  blob(cx, cy, cz, r, sy, cols, s, rng, sub = 1, flatY = null, k = 0) {
-    const { V, F } = pnIco(sub), jit = V.map(() => 1 + (rng() - 0.5) * 0.22);
-    const P = V.map((v, i) => { let y = cy + v[1] * r * sy * jit[i]; if (flatY !== null) y = Math.max(y, flatY); return [cx + v[0] * r * jit[i], y, cz + v[2] * r * jit[i]]; });
-    const m = [cx, cy, cz];
-    for (const [a, b, c] of F) this.tri(P[a], P[b], P[c], cols[Math.floor(rng() * cols.length)], s, k, m);
+  /* Klumpen aus einem Ikosaeder, etwas verbeult: Baumkronen, Büsche, Steine, Wolken. soft: wie weich er schattiert wird (0 kantig) */
+  blob(cx, cy, cz, r, sy, cols, s, rng, sub = 1, flatY = null, k = 0, soft = 0) {
+    this.ell(cx, cy, cz, r, r * sy, r, cols, s, rng, sub, flatY, k, soft);
+  }
+  /* Ellipsoid mit drei Radien, für Tiere und längliche Dinge */
+  ell(cx, cy, cz, rx, ry, rz, cols, s, rng, sub = 1, flatY = null, k = 0, soft = 0, jit = 0.22) {
+    const { V, F } = pnIco(sub), J = V.map(() => 1 + (rng() - 0.5) * jit);
+    const P = V.map((v, i) => { let y = cy + v[1] * ry * J[i]; if (flatY !== null) y = Math.max(y, flatY); return [cx + v[0] * rx * J[i], y, cz + v[2] * rz * J[i]]; });
+    const m = [cx, cy, cz], sm = soft ? [m, soft] : null;
+    for (const [a, b, c] of F) this.tri(P[a], P[b], P[c], cols[Math.floor(rng() * cols.length)], s, k, m, sm);
   }
 }
 /* Ein Teil auf den Planeten setzen. fr: { x, y, z, o } Achsen und Ursprung, sh: Höhe fürs Wiegen (0 = steht fest) */
-function pnPut(M, part, fr, sh = 0) {
+function pnPut(M, part, fr, sh = 0, ao = null) {
   const T = v => [fr.o[0] + fr.x[0] * v[0] + fr.y[0] * v[1] + fr.z[0] * v[2], fr.o[1] + fr.x[1] * v[0] + fr.y[1] * v[1] + fr.z[1] * v[2], fr.o[2] + fr.x[2] * v[0] + fr.y[2] * v[1] + fr.z[2] * v[2]];
+  // ao: [Höhe, Helligkeit unten] dunkelt den Fuß ab, so steht alles fest auf dem Boden statt darauf zu schweben
+  const K = ao ? v => ao[1] + (1 - ao[1]) * pnSmooth(-0.02, ao[0], v[1]) : null;
   for (const t of part.t) {
     const sw = sh ? t.p.map(v => Math.min(1, Math.max(0, v[1] / sh)) ** 1.6) : null;
-    M.tri(T(t.p[0]), T(t.p[1]), T(t.p[2]), t.col, [t.s, 0, t.k], t.inside ? T(t.inside) : null, sw);
+    M.tri(T(t.p[0]), T(t.p[1]), T(t.p[2]), t.col, [t.s, 0, t.k], t.inside ? T(t.inside) : null, sw, t.sm ? [T(t.sm[0]), t.sm[1]] : null, K ? t.p.map(K) : null);
   }
 }
 /* Achsen an einer Stelle des Planeten: y zeigt nach außen, z in Richtung fwd (oder gedreht um rot) */
@@ -232,6 +245,8 @@ function pnBuildWorld(seed, season, X = {}) {
     }
     M.tri(P[a], P[b], P[c], col, [s, 0, 0], [0, 0, 0]);
   }
+  // Bis hier das Gelände. Was darauf steht, merkt sich occ, später wird der Boden darunter etwas dunkler (weicher Schatten).
+  const nT = M.count, occ = [];
   // See: Kappe aus Dreiecken knapp unter dem Ufer
   {
     const fr = pnFrame(PN_LAKE, 1, [0, 1, 0]), rings = 4, seg = 14, Rr = PN_LR + 0.06, pts = [];
@@ -247,7 +262,7 @@ function pnBuildWorld(seed, season, X = {}) {
   // Häuschen mit hellen Wänden und rotem Dach, die Front schaut zum See
   const toLake = pnV.sub(PN_LAKE, PN_HOUSE), hf = pnFrame(PN_HOUSE, H(PN_HOUSE) - 0.004, pnV.add(pnV.mul(toLake, 0.35), [0, -0.2, 1]), 0, PN_HS);
   const housePt = (x, y, z) => pnV.add(hf.o, pnV.add(pnV.add(pnV.mul(hf.x, x), pnV.mul(hf.y, y)), pnV.mul(hf.z, z)));
-  const scene = { xmas: [], pumpkins: [], habit: [], ff: [], star: null, mill: null, flag: null, house: housePt(0, 0.1, 0) };
+  const scene = { xmas: [], pumpkins: [], habit: [], ff: [], star: null, mill: null, flag: null, house: housePt(0, 0.1, 0), crowns: [], flowers: [], hare: null, deer: null, owl: null, lake: null };
   {
     const T = new PnPart(), w = 0.105, d = 0.08, hw = 0.115, rf = 0.085, ov = 0.018;
     const br = L(PN_COL.wall), br2 = L(PN_COL.wall2), roof = L(PN_COL.roof), roof2 = L(PN_COL.roof2);
@@ -288,7 +303,8 @@ function pnBuildWorld(seed, season, X = {}) {
     win(-0.064, 0.05, 'f'); win(0.064, 0.05, 'f'); win(0, 0.05, 'r'); win(0, 0.05, 'l'); win(0, 0.05, 'b');
     // Stufe vor der Tür
     T.box(-0.03, -0.02, d, 0.03, 0.006, d + 0.02, L(PN_COL.stone), 1);
-    pnPut(M, T, hf);
+    pnPut(M, T, hf, 0, [0.045, 0.6]);
+    occ.push({ u: PN_HOUSE, r: 0.2, k: 0.42 });
     // Lichterkette an Traufe und Giebelkanten, die Lämpchen hängen ein Stück unter der Kante
     if (X.xmas) {
       const line = (a, b, n, skip) => { for (let i = skip ? 1 : 0; i <= n; i++) { const f = i / n; scene.xmas.push(housePt(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f - th - 0.004, a[2] + (b[2] - a[2]) * f)); } };
@@ -385,7 +401,8 @@ function pnBuildWorld(seed, season, X = {}) {
     T.box(-0.0085, 0.296, -0.024, 0.0085, 0.313, 0.012, wc, 0.6);
     const fr = pnFrame(PN_MILL, H(PN_MILL) - 0.006, [0, 0.35, 1], 0, 1.15), n = v => pnV.norm(v);
     scene.mill = { hub: pnV.add(fr.o, pnV.add(pnV.mul(fr.y, 0.3045), pnV.mul(fr.z, 0.0165))), x: n(fr.x), y: n(fr.y), z: n(fr.z), s: 1.15 };
-    pnPut(M, T, fr);
+    pnPut(M, T, fr, 0, [0.04, 0.6]);
+    occ.push({ u: PN_MILL, r: 0.05, k: 0.3 });
   }
   // Bäume: Kiefern bleiben grün, Laubbäume wechseln mit der Jahreszeit, am Strand stehen Palmen
   const trees = [], spots = [], pinesAt = [];
@@ -406,10 +423,27 @@ function pnBuildWorld(seed, season, X = {}) {
   const leaves = PN_COL.leaf[season.k].map(L), pines = PN_COL.pine.map(L), trunk = L(PN_COL.trunk), palms = PN_COL.palm.map(L), ptrunk = L(PN_COL.palmTrunk);
   const tree = (u, kind, sc, rot, r, g = 1) => {
     const T = new PnPart();
-    let hgt;
+    let hgt, blossom = false, bare = false;
     sc *= g;
     if (beach) kind = 'palm';
-    if (kind === 'pine') {
+    if (kind === 'birch') {
+      // Birke: schlanker weißer Stamm mit dunklen Ringen, kleine helle Krone, im Herbst gelb
+      hgt = 0.26 * sc;
+      bare = season.k === 'winter' || r() < season.bare;
+      const bw = L('#ECE8DF'), bd = L('#3B3733');
+      for (let k = 0; k < 6; k++) T.cone(0, 0, (0.0105 - k * 0.0009) * sc, (0.0096 - k * 0.0009) * sc, -0.02 + k * 0.036 * sc, -0.02 + (k + 1) * 0.036 * sc, 5, k % 2 ? bw : [bw, bw, bd, bw, bw], 0.3, rot + k);
+      const bc = season.k === 'autumn' ? [L('#E8C547'), L('#D9B23A'), L('#EFD36A')] : season.k === 'spring' ? [L('#9CCB55'), L('#AED465')] : [L('#7FB146'), L('#8DBB4E'), L('#74A63F')];
+      if (bare) {
+        for (let i = 0; i < 4; i++) {
+          const a = rot + i * 1.6, d = [Math.cos(a), Math.sin(a)], b0 = [d[0] * 0.004 * sc, (0.1 + i * 0.03) * sc, d[1] * 0.004 * sc], b1 = [d[0] * 0.045 * sc, (0.17 + i * 0.03) * sc, d[1] * 0.045 * sc];
+          const sd = pnV.mul(pnV.norm([-d[1], 0, d[0]]), 0.004 * sc);
+          T.quad(pnV.sub(b0, sd), pnV.add(b0, sd), pnV.add(b1, sd), pnV.sub(b1, sd), bw, 0.6, 0, pnV.add(pnV.mix(b0, b1, 0.5), [0, -1, 0]));
+        }
+      } else {
+        T.ell(0, 0.19 * sc, 0, 0.05 * sc, 0.075 * sc, 0.05 * sc, bc, 0.7, r, 1, null, 0, 0.35);
+        T.ell(0.028 * sc, 0.14 * sc, 0.012 * sc, 0.032 * sc, 0.045 * sc, 0.032 * sc, bc, 0.7, r, 0, null, 0, 0.3);
+      }
+    } else if (kind === 'pine') {
       hgt = 0.27 * sc;
       T.cone(0, 0, 0.014 * sc, 0.011 * sc, -0.02, 0.05 * sc, 5, trunk, 0, rot);
       const layers = [[0.085, 0.04, 0.15], [0.068, 0.1, 0.2], [0.048, 0.155, 0.27]];
@@ -433,7 +467,7 @@ function pnBuildWorld(seed, season, X = {}) {
       }
       T.blob(bend + 0.008 * sc, top - 0.012 * sc, 0.006 * sc, 0.009 * sc, 1, [L(PN_COL.coco)], 0, r, 0);
     } else {
-      const bare = r() < season.bare;
+      bare = r() < season.bare;
       hgt = 0.22 * sc;
       T.cone(0, 0, 0.016 * sc, 0.011 * sc, -0.02, (bare ? 0.17 : 0.1) * sc, 5, trunk, 0.3, rot);
       if (bare) {
@@ -445,25 +479,36 @@ function pnBuildWorld(seed, season, X = {}) {
         }
       } else {
         const cols = season.k === 'autumn' ? [leaves[Math.floor(r() * leaves.length)], leaves[Math.floor(r() * leaves.length)]] : leaves.slice(0, 3);
-        T.blob(0, 0.15 * sc, 0, 0.075 * sc, 0.92, cols, 0.7, r, 1);
-        if (r() < 0.6) T.blob(0.04 * sc, 0.12 * sc, 0.025 * sc, 0.045 * sc, 0.9, cols, 0.7, r, 0);
-        if (season.k === 'spring' && r() < 0.35) T.blob(-0.03 * sc, 0.19 * sc, 0.02 * sc, 0.03 * sc, 0.9, [leaves[3]], 0.7, r, 0);
+        T.blob(0, 0.15 * sc, 0, 0.075 * sc, 0.92, cols, 0.7, r, 1, null, 0, 0.38);
+        if (r() < 0.6) T.blob(0.04 * sc, 0.12 * sc, 0.025 * sc, 0.045 * sc, 0.9, cols, 0.7, r, 0, null, 0, 0.3);
+        if (season.k === 'spring' && r() < 0.5) {
+          // Blüte: rosa und weiße Tupfen auf der Krone
+          for (const [x, y, z] of [[-0.045, 0.19, 0.03], [0.05, 0.165, -0.035], [0.004, 0.21, -0.03], [0.03, 0.15, 0.055]]) T.blob(x * sc, y * sc, z * sc, 0.03 * sc, 0.9, [leaves[3], L('#F7DCE6'), L('#FFFFFF')], 0.7, r, 0, null, 0, 0.3);
+          blossom = true;
+        }
       }
     }
     const fr = pnFrame(u, H(u) - 0.008, null, rot, PN_TS);
-    pnPut(M, T, fr, hgt);
-    return { fr, sc, hgt, kind };
+    pnPut(M, T, fr, hgt, [0.05, 0.55]);
+    occ.push({ u: pnV.norm(u), r: (kind === 'palm' ? 0.06 : 0.1) * sc, k: kind === 'pine' ? 0.42 : 0.36 });
+    const t = { fr, sc, hgt, kind, u: pnV.norm(u), bare, blossom };
+    // Krone für fallende Blätter und Blüten, Spitze für die Eule
+    if (kind !== 'pine' && kind !== 'palm' && !bare) scene.crowns.push({ p: pnV.add(fr.o, pnV.mul(pnV.norm(fr.y), (kind === 'birch' ? 0.18 : 0.15) * sc * PN_TS)), r: 0.07 * sc * PN_TS, blossom, birch: kind === 'birch' });
+    return t;
   };
-  for (const [u, kind] of trees) {
-    const t = tree(u, kind, 0.85 + rng() * 0.4, rng() * 6.3, rng);
+  const baseTrees = [];
+  trees.forEach(([u, kind], i) => {
+    const t = tree(u, kind === 'leaf' && i % 3 === 1 ? 'birch' : kind, 0.85 + rng() * 0.4, rng() * 6.3, rng);
     if (t.kind === 'pine') pinesAt.push(t);
-  }
+    baseTrees.push(t);
+  });
   // Büsche ums Haus und Steine (mit eigenem Zufall, damit sie nicht mit den Jahreszeiten wandern)
   for (const [x, z] of [[-0.15, 0.065], [0.15, 0.07], [-0.135, -0.1], [0.145, -0.095]]) {
     const u = pnV.norm(housePt(x, 0, z)), T = new PnPart();
     if (!offRoad(u, 0.075)) continue;
-    T.blob(0, 0.012, 0, 0.034 + rng() * 0.01, 0.75, season.k === 'winter' ? [L('#6E7F52'), L('#5F7047')] : season.k === 'autumn' ? [L('#7E8F3C'), L('#A3772E')] : [L('#4F8F3A'), L('#5FA043')], 0.8, rng, 0, -0.01);
-    pnPut(M, T, pnFrame(u, H(u) - 0.004, null, 0, 1.4), 0.06);
+    T.blob(0, 0.012, 0, 0.034 + rng() * 0.01, 0.75, season.k === 'winter' ? [L('#6E7F52'), L('#5F7047')] : season.k === 'autumn' ? [L('#7E8F3C'), L('#A3772E')] : [L('#4F8F3A'), L('#5FA043')], 0.8, rng, 0, -0.01, 0, 0.4);
+    pnPut(M, T, pnFrame(u, H(u) - 0.004, null, 0, 1.4), 0.06, [0.03, 0.6]);
+    occ.push({ u, r: 0.07, k: 0.3 });
   }
   const rr = pnRng(seed ^ 0x51ab);
   for (let n = 0, tries = 0; n < 9 && tries < 500; tries++) {
@@ -472,14 +517,35 @@ function pnBuildWorld(seed, season, X = {}) {
     spots.push(u); n++;
     const T = new PnPart();
     T.blob(0, 0.005, 0, 0.026 + rr() * 0.022, 0.6, PN_COL.rock.map(L), 0.9, rr, 0);
-    pnPut(M, T, pnFrame(u, H(u) - 0.01, null, rr() * 6, 1.3));
+    pnPut(M, T, pnFrame(u, H(u) - 0.01, null, rr() * 6, 1.3), 0, [0.02, 0.62]);
+    occ.push({ u, r: 0.06, k: 0.25 });
   }
   // Am See ein paar Steine
   for (const k of [0.55, 2.1, 3.6]) {
     const fr = pnFrame(PN_LAKE, 1, [0, 1, 0]), u = pnV.norm(pnV.add(fr.y, pnV.add(pnV.mul(fr.x, Math.cos(k) * PN_LR * 1.02), pnV.mul(fr.z, Math.sin(k) * PN_LR * 1.02))));
     const T = new PnPart();
     T.blob(0, 0, 0, 0.022 + rr() * 0.012, 0.6, PN_COL.rock.map(L), 0.9, rr, 0);
-    pnPut(M, T, pnFrame(u, H(u) - 0.008, null, rr() * 6, 1.3));
+    pnPut(M, T, pnFrame(u, H(u) - 0.008, null, rr() * 6, 1.3), 0, [0.02, 0.62]);
+  }
+  // 3.14: Plätze für Blumenwiesen, Hase und Reh. Immer reserviert (auch im Winter), damit der Gewohnheitswald an seinem Platz bleibt.
+  // Eigene Zufallsfolgen, so bleiben Bäume und Steine von früher, wo sie waren.
+  const rndU = r => { const z = r() * 2 - 1, a = r() * Math.PI * 2, q = Math.sqrt(1 - z * z); return [q * Math.cos(a), z, q * Math.sin(a)]; };
+  {
+    const pr = pnRng(seed ^ 0x2545f491), patches = [];
+    for (let tries = 0; patches.length < 7 && tries < 1500; tries++) { const u = rndU(pr); if (okSpot(u, patches.length < 3 ? 0.17 : 0.15)) { patches.push(u); spots.push(u); } }
+    scene.patches = patches;
+    // Reh und Hase: auf einer Wiese am Waldrand, möglichst vorn (da schaut die Kamera meistens hin)
+    const cand = [];
+    for (let tries = 0; cand.length < 40 && tries < 3000; tries++) {
+      const u = rndU(pr);
+      if (!okSpot(u, 0.13)) continue;
+      const near = baseTrees.reduce((m, t) => Math.min(m, pnAng(u, t.u)), 9);
+      cand.push({ u, k: pnV.dot(u, pnV.norm([0.15, 0.45, 1])) - Math.abs(near - 0.2) * 1.5 });
+    }
+    cand.sort((a, b) => b.k - a.k);
+    if (cand[0]) { scene.deer = { u: cand[0].u, rot: pr() * 6.3 }; spots.push(cand[0].u); }
+    const h = cand.find(c => scene.deer && pnAng(c.u, scene.deer.u) > 0.3);
+    if (h) { scene.hare = { u: h.u, r: 0.075 }; spots.push(h.u); }
   }
   // Gewohnheitswald: jeder geschaffte Tag ein Baum, junge Bäume sind noch klein. Plätze und Form hängen nur von der Nummer ab,
   // so bleibt jeder Baum dort stehen, wo er gepflanzt wurde.
@@ -505,6 +571,86 @@ function pnBuildWorld(seed, season, X = {}) {
     }
     scene.star = pt(0, 0.28 * t.sc, 0);
   }
+  // Eule: sitzt nachts oben auf dem Laubbaum (oder der Kiefer), der dem Haus am nächsten steht
+  {
+    const t = baseTrees.filter(x => x.kind !== 'palm').sort((a, b) => pnAng(a.u, PN_HOUSE) - pnAng(b.u, PN_HOUSE))[0];
+    if (t) { const top = (t.kind === 'pine' ? 0.255 : t.kind === 'birch' ? 0.245 : 0.218) * t.sc * PN_TS; scene.owl = { p: pnV.add(t.fr.o, pnV.mul(pnV.norm(t.fr.y), top - 0.012)), y: pnV.norm(t.fr.y), pine: t.kind === 'pine' }; }
+  }
+  // Der See in eigenen Achsen (für Enten, Fische, Seerosen und Schilf), dazu die Richtung zum Steg
+  {
+    const fr = pnFrame(PN_LAKE, 1, [0, 1, 0]), d = pnV.sub(lakeEdge, PN_LAKE), dk = pnV.norm([pnV.dot(d, fr.x), pnV.dot(d, fr.z)].concat(0));
+    scene.lake = { x: fr.x, y: fr.y, z: fr.z, dock: [dk[0], dk[1]] };
+  }
+  const lakeAt = (r, a, h) => pnV.mul(pnV.norm(pnV.add(scene.lake.y, pnV.add(pnV.mul(scene.lake.x, Math.cos(a) * r), pnV.mul(scene.lake.z, Math.sin(a) * r)))), h);
+  const dockA = Math.atan2(scene.lake.dock[1], scene.lake.dock[0]);
+  const dr = pnRng(seed ^ 0x3c6ef372), G = (k, x) => L(grass.map(v => Math.max(0, Math.min(255, v * k + x))));
+  const meadow = (u, gap = 0.06) => pnAng(u, PN_LAKE) > PN_LR + 0.07 && pnAng(u, PN_HOUSE) > 0.3 && pnAng(u, doorDir) > 0.12 && offRoad(u, gap) && (!X.cockpit || pnAng(u, PN_MILL) > 0.08);
+  // Grasbüschel überall auf den Wiesen, sie wiegen sich im Wind
+  for (let n = 0, tries = 0; n < 150 && tries < 2000; tries++) {
+    const u = rndU(dr);
+    if (!meadow(u, 0.045) || H(u) > 1.03) continue;
+    n++;
+    const T = new PnPart(), k = 0.72 + dr() * 0.3, c = G(k, season.k === 'winter' ? 8 : 0), c2 = G(k * 1.12, 6);
+    for (let b = 0; b < 4; b++) {
+      const a = dr() * 6.28, ox = Math.cos(a) * 0.005, oz = Math.sin(a) * 0.005, h = 0.016 + dr() * 0.014, la = dr() * 6.28, w = 0.0034;
+      T.tri([ox - w, 0, oz], [ox + w, 0, oz], [ox + Math.cos(la) * 0.006, h, oz + Math.sin(la) * 0.006], b % 2 ? c : c2, 0.5, 0, [ox, 0.006, oz - 1]);
+    }
+    pnPut(M, T, pnFrame(u, H(u) - 0.003, null, dr() * 6.3, 1.3), 0.02);
+  }
+  // Blumenwiesen im Frühling und Sommer, im Herbst nur noch ein paar späte. Hier flattern die Schmetterlinge.
+  const fcols = beach ? ['#E8443A', '#F28DB2', '#F4C430'] : { spring: ['#F4D03F', '#FFFFFF', '#B784D8', '#F28DB2', '#F7E07A'], summer: ['#E8443A', '#4F7FD6', '#FFFFFF', '#F4C430', '#D85FA8'], autumn: ['#B784D8', '#F2B33D'], winter: [] }[season.k];
+  const np = beach ? 3 : { spring: 7, summer: 6, autumn: 2, winter: 0 }[season.k];
+  (scene.patches || []).slice(0, np).forEach((c, pi) => {
+    scene.flowers.push(c);
+    const fr = pnFrame(c, 1), n = 9 + Math.floor(dr() * 5);
+    for (let i = 0; i < n; i++) {
+      const a = dr() * 6.28, rr = Math.sqrt(dr()) * 0.065, u = pnV.norm(pnV.add(c, pnV.add(pnV.mul(fr.x, Math.cos(a) * rr), pnV.mul(fr.z, Math.sin(a) * rr))));
+      if (!meadow(u, 0.04)) continue;
+      const T = new PnPart(), h = 0.012 + dr() * 0.012, col = L(fcols[(i + pi) % fcols.length]), r0 = 0.0068 + dr() * 0.0024;
+      T.box(-0.001, -0.004, -0.001, 0.001, h, 0.001, L('#4F8A34'), 0.3);
+      T.cone(0, 0, r0, 0, h, h + 0.0024, 5, col, 0.4, dr() * 6);
+      T.blob(0, h + 0.0024, 0, 0.0022, 0.8, [L(fcols[(i + pi) % fcols.length] === '#F4D03F' ? '#E39B2D' : '#F2C230')], 0.3, dr, 0);
+      pnPut(M, T, pnFrame(u, H(u) - 0.002, null, 0, 1.3), h * 0.9);
+    }
+  });
+  // Pilze im Herbst unter den Bäumen
+  if (season.k === 'autumn' && !beach) {
+    baseTrees.filter(t => t.kind !== 'pine').slice(0, 6).forEach((t, i) => {
+      const fr = pnFrame(t.u, 1), a = dr() * 6.28;
+      for (let k = 0; k < 2 + (i % 2); k++) {
+        const b = a + k * 0.5, u = pnV.norm(pnV.add(t.u, pnV.add(pnV.mul(fr.x, Math.cos(b) * 0.06), pnV.mul(fr.z, Math.sin(b) * 0.06))));
+        if (!meadow(u, 0.04)) continue;
+        const T = new PnPart(), s2 = 1.4 + dr() * 0.8, cap = i % 3 === 2 ? L('#8A5A34') : L('#C9372C');
+        T.cone(0, 0, 0.0028 * s2, 0.0024 * s2, -0.003, 0.008 * s2, 5, L('#F1EADB'), 0.2);
+        T.blob(0, 0.0085 * s2, 0, 0.0075 * s2, 0.62, [cap], 0.6, dr, 1, 0.0075 * s2, 0, 0.45);
+        pnPut(M, T, pnFrame(u, H(u) - 0.002, null, 0, 1.3), 0, [0.008, 0.7]);
+      }
+    });
+  }
+  // Schilf am Ufer, auf der Seite gegenüber vom Steg. Wiegt sich im Wind, im Herbst und Winter strohfarben.
+  if (!beach) {
+    const rc = season.k === 'summer' || season.k === 'spring' ? [L('#5E8C3A'), L('#6F9A45'), L('#557F35')] : season.k === 'autumn' ? [L('#A89A55'), L('#8F8A4A')] : [L('#B8A877'), L('#A99A6A')];
+    for (const off of [-1.15, -0.1, 0.95]) {
+      for (let i = 0; i < 8; i++) {
+        const a = dockA + Math.PI + off + (dr() - 0.5) * 0.45, rr = 0.255 + dr() * 0.04, u = pnV.norm(lakeAt(rr, a, 1));
+        const T = new PnPart(), h = 0.05 + dr() * 0.045, la = (dr() - 0.5) * 0.014, w = 0.003, c = rc[i % rc.length];
+        T.tri([-w, -0.01, 0], [w, -0.01, 0], [la, h, 0], c, 0.3, 0, [0, h / 2, -1]);
+        T.tri([0, -0.01, -w], [0, -0.01, w], [la, h * 0.92, 0], c, 0.3, 0, [-1, h / 2, 0]);
+        if (i % 3 === 0) T.box(la - 0.0018, h * 0.72, -0.0018, la + 0.0018, h * 0.72 + 0.011, 0.0018, L('#6B4A2A'), 0.3);
+        pnPut(M, T, pnFrame(u, Math.max(PN_WL, H(u)) - 0.004, null, dr() * 6.3, 1.2), h * 1.1);
+      }
+    }
+  }
+  // Seerosen im Frühling und Sommer, nicht am Steg
+  if (!beach && (season.k === 'spring' || season.k === 'summer')) {
+    for (let i = 0; i < 6; i++) {
+      const a = dockA + 0.75 + i * 0.8 + (dr() - 0.5) * 0.3, rr = 0.1 + dr() * 0.1, u = pnV.norm(lakeAt(rr, a, 1));
+      const T = new PnPart(), r0 = 0.016 + dr() * 0.008, seg = 9, pc = i % 2 ? L('#4E8F3A') : L('#5FA043'), rot = dr() * 6.3;
+      for (let k = 0; k < seg - 1; k++) { const a0 = rot + k / seg * 6.283, a1 = rot + (k + 1) / seg * 6.283; T.tri([0, 0, 0], [Math.cos(a0) * r0, 0, Math.sin(a0) * r0], [Math.cos(a1) * r0, 0, Math.sin(a1) * r0], pc, 0, 0, [0, -1, 0]); }
+      if (i % 3 === 1) { T.cone(0.003, 0.001, 0.0068, 0, 0.0005, 0.0075, 6, L('#F5B8CF'), 0, 0.3); T.blob(0.003, 0.0045, 0.001, 0.0024, 1, [L('#F4D03F')], 0, dr, 0); }
+      pnPut(M, T, pnFrame(u, PN_WL + 0.0014, null, 0, 1.2));
+    }
+  }
   // Plätze für Glühwürmchen: über Wiesen, nicht über dem See
   const fr2 = pnRng(seed ^ 0xf1f1);
   for (let tries = 0; scene.ff.length < 40 && tries < 900; tries++) {
@@ -512,16 +658,56 @@ function pnBuildWorld(seed, season, X = {}) {
     if (pnAng(u, PN_LAKE) < PN_LR * 0.9 || pnAng(u, PN_HOUSE) < 0.2) continue;
     scene.ff.push({ u, h: H(u), ph: fr2() * 6.3, sp: 0.5 + fr2() * 0.8, s: fr2() });
   }
-  return { M, scene, cat, flag, R };
+  // Schneemann vorn links vom Haus. Eigenes Netz, gezeichnet nur, solange Schnee liegt.
+  let snowman = null;
+  if (!beach) {
+    const T = new PnPart(), w = L('#F4F7FB'), w2 = L('#E4EAF2'), coal = L('#26262A'), wood = L('#6B4A2A'), red = L('#C9372C');
+    T.blob(0, 0.016, 0, 0.019, 0.92, [w, w2], 0, dr, 1, null, 0, 0.6);
+    T.blob(0, 0.044, 0, 0.0135, 0.95, [w, w2], 0, dr, 1, null, 0, 0.6);
+    T.blob(0, 0.0645, 0, 0.0098, 0.98, [w, w2], 0, dr, 1, null, 0, 0.6);
+    const nb = [[0.0022, 0.0662], [-0.0022, 0.0662], [0, 0.0625]];
+    for (let i = 0; i < 3; i++) { const a = nb[i], b = nb[(i + 1) % 3]; T.tri([a[0], a[1], 0.0085], [b[0], b[1], 0.0085], [0, 0.0645, 0.0215], L('#EE7F1E'), 0, 0, [0, 0.0645, 0]); }
+    for (const x of [-0.0036, 0.0036]) T.box(x - 0.0013, 0.0678, 0.0078, x + 0.0013, 0.0704, 0.0094, coal, 0);
+    for (const [y, z] of [[0.048, 0.0128], [0.0405, 0.0134], [0.024, 0.0185]]) T.box(-0.0014, y - 0.0014, z - 0.0012, 0.0014, y + 0.0014, z + 0.0012, coal, 0);
+    T.box(-0.0102, 0.0532, -0.0102, 0.0102, 0.0578, 0.0102, red, 0);
+    T.box(0.0035, 0.0425, 0.0095, 0.0085, 0.0555, 0.0118, red, 0);
+    T.box(-0.0098, 0.0722, -0.0098, 0.0098, 0.0738, 0.0098, coal, 0.6);
+    T.box(-0.0068, 0.0738, -0.0068, 0.0068, 0.0872, 0.0068, coal, 0.6);
+    const stick = (a, b, wd) => { const sd = pnV.mul(pnV.norm(pnV.cross(pnV.sub(b, a), [0, 0, 1])), wd), up = [0, 0, wd]; T.quad(pnV.sub(a, sd), pnV.add(a, sd), pnV.add(b, sd), pnV.sub(b, sd), wood, 0, 0, null); T.quad(pnV.sub(a, up), pnV.add(a, up), pnV.add(b, up), pnV.sub(b, up), wood, 0, 0, null); };
+    stick([0.011, 0.047, 0], [0.032, 0.062, 0.003], 0.0011); stick([0.026, 0.058, 0.002], [0.031, 0.068, 0.002], 0.0008);
+    stick([-0.011, 0.047, 0], [-0.031, 0.059, 0.004], 0.0011);
+    const u = pnV.norm(housePt(-0.135, 0, 0.215));
+    snowman = new PnMesh();
+    pnPut(snowman, T, pnFrame(u, H(u) - 0.004, hf.z, 0.35, 1.9), 0, [0.02, 0.75]);
+    scene.snowman = pnV.mul(u, H(u) + 0.08);
+  }
+  // Weiche Schatten: der Boden unter Haus, Bäumen, Büschen und Steinen wird etwas dunkler
+  for (let i = 0; i < nT; i++) {
+    const x = M.p[i * 3], y = M.p[i * 3 + 1], z = M.p[i * 3 + 2], l = Math.hypot(x, y, z);
+    let f = 1;
+    for (const o of occ) {
+      const c = (x * o.u[0] + y * o.u[1] + z * o.u[2]) / l;
+      if (c < Math.cos(o.r * 2.6)) continue;
+      const a = Math.acos(Math.min(1, c)) / o.r;
+      f *= 1 - o.k * Math.exp(-a * a);
+    }
+    M.c[i * 3] *= f; M.c[i * 3 + 1] *= f; M.c[i * 3 + 2] *= f;
+  }
+  return { M, scene, cat, flag, R, snowman };
 }
-/* Drei Wolkenformen aus mehreren Klumpen, unten flach */
+/* Drei Wolkenformen aus mehreren Klumpen, unten flach, oben aufgetürmt. Weich schattiert, damit sie nach Watte aussehen und nicht nach Stein. */
 function pnBuildClouds(seed) {
   const rng = pnRng(seed ^ 0x9e37), out = [];
   for (let v = 0; v < 3; v++) {
     const T = new PnPart(), M = new PnMesh(), cols = PN_COL.cloud.map(pnLin), n = 3 + v;
     for (let i = 0; i < n; i++) {
       const x = (i - (n - 1) / 2) * 0.075 + (rng() - 0.5) * 0.02, r = 0.06 + rng() * 0.035 + (i === Math.floor(n / 2) ? 0.025 : 0);
-      T.blob(x, 0.01 + rng() * 0.02, (rng() - 0.5) * 0.05, r, 0.85, cols, 0, rng, 1, -0.02, 3);
+      T.blob(x, 0.01 + rng() * 0.02, (rng() - 0.5) * 0.05, r, 0.85, cols, 0, rng, 1, -0.02, 3, 0.72);
+    }
+    // Ein, zwei Türmchen obendrauf
+    for (let i = 0; i < 1 + (v > 0 ? 1 : 0); i++) {
+      const x = (i - (v > 0 ? 0.5 : 0)) * 0.07 + (rng() - 0.5) * 0.03;
+      T.blob(x, 0.07 + rng() * 0.015, (rng() - 0.5) * 0.03, 0.045 + rng() * 0.015, 0.9, cols, 0, rng, 1, -0.01, 3, 0.72);
     }
     pnPut(M, T, { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1], o: [0, 0, 0] });
     out.push(M);
@@ -582,23 +768,30 @@ vec3 sway(vec3 p, float w) {
   vec3 side = normalize(cross(n, vec3(0.3, 1.0, 0.2)));
   return p + (wt * (s + u_ws * 0.008) + side * sin(u_t * 1.1 + ph * 1.3) * 0.003) * w;
 }`;
+/* Lage pro Instanz (a_m0 bis a_m3) und Farbe (a_ti): so zeichnet ein Aufruf alle Vögel eines Schwarms. Ohne Instanzen stehen
+ * dort feste Werte (Einheitsmatrix, Weiß), dann gilt nur u_m. */
+const PN_INST = `layout(location=4) in vec4 a_m0; layout(location=5) in vec4 a_m1; layout(location=6) in vec4 a_m2; layout(location=7) in vec4 a_m3; layout(location=8) in vec3 a_ti;`;
 const PN_VS_LIT = `#version 300 es
 layout(location=0) in vec3 a_pos; layout(location=1) in vec3 a_nrm; layout(location=2) in vec3 a_col; layout(location=3) in vec4 a_at;
+${PN_INST}
 uniform mat4 u_vp, u_m;
 out vec3 v_wp, v_n, v_c; out vec4 v_at;
 ${PN_SWAY}
 void main() {
-  vec4 w = u_m * vec4(sway(a_pos, a_at.y), 1.0);
-  v_wp = w.xyz; v_n = mat3(u_m) * a_nrm; v_c = a_col; v_at = a_at;
+  mat4 M = u_m * mat4(a_m0, a_m1, a_m2, a_m3);
+  vec4 w = M * vec4(sway(a_pos, a_at.y), 1.0);
+  v_wp = w.xyz; v_n = mat3(M) * a_nrm; v_c = a_col * a_ti; v_at = a_at;
   gl_Position = u_vp * w;
 }`;
 const PN_FS_LIT = `#version 300 es
 precision highp float; precision highp sampler2DShadow;
 in vec3 v_wp, v_n, v_c; in vec4 v_at;
-uniform vec3 u_cam, u_l1d, u_l1c, u_l2d, u_l2c, u_ska, u_gna, u_tint, u_winp, u_winc, u_haze, u_rim, u_refl;
-uniform float u_snow, u_wet, u_ice, u_win, u_flash, u_fog, u_t, u_shon, u_shl, u_exp;
+uniform vec3 u_cam, u_l1d, u_l1c, u_l2d, u_l2c, u_l3d, u_l3c, u_ska, u_gna, u_tint, u_winp, u_winc, u_haze, u_rim, u_refl, u_lx, u_lz, u_lc;
+uniform float u_snow, u_wet, u_ice, u_win, u_flash, u_fog, u_t, u_shon, u_shl, u_exp, u_frost, u_dry, u_rip;
+uniform vec4 u_spl[2];
 uniform mat4 u_lvp; uniform sampler2DShadow u_shm;
 out vec4 o;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float shadowAt(vec3 n, vec3 ld) {
   float nl = dot(n, ld);
   if (nl <= 0.0) return 0.0;
@@ -607,7 +800,7 @@ float shadowAt(vec3 n, vec3 ld) {
   if (s.x < 0.0 || s.x > 1.0 || s.y < 0.0 || s.y > 1.0 || s.z > 1.0) return 1.0;
   vec2 ts = 1.0 / vec2(textureSize(u_shm, 0));
   float b = 0.0012 + 0.0025 * (1.0 - nl), sum = 0.0;
-  for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) sum += texture(u_shm, vec3(s.xy + vec2(x, y) * ts * 1.4, s.z - b));
+  for (int x = -1; x <= 1; x++) for (int y = -1; y <= 1; y++) sum += texture(u_shm, vec3(s.xy + vec2(x, y) * ts * 1.7, s.z - b));
   return sum / 9.0;
 }
 vec3 aces(vec3 x) { return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0); }
@@ -616,47 +809,84 @@ void main() {
   float kind = v_at.z;
   bool water = kind > 1.5 && kind < 2.5, cloud = kind > 2.5;
   vec3 base = v_c * u_tint;
+  float ring = 0.0, glint = 0.0;
   if (water) {
-    n = normalize(up + vec3(sin(v_wp.x * 70.0 + u_t * 1.6) + sin(v_wp.z * 53.0 - u_t * 1.2), 0.0, cos(v_wp.z * 61.0 + u_t * 1.4) + cos(v_wp.x * 47.0 - u_t)) * (0.025 + u_wet * 0.04) * (1.0 - u_ice));
+    // Koordinaten auf dem See: Mitte tiefer und dunkler, zum Ufer hin flach und heller
+    vec2 q = vec2(dot(v_wp - u_lc, u_lx), dot(v_wp - u_lc, u_lz));
+    float dc = length(q) / 0.3;
+    vec3 wn = vec3(sin(v_wp.x * 70.0 + u_t * 1.6) + sin(v_wp.z * 53.0 - u_t * 1.2), 0.0, cos(v_wp.z * 61.0 + u_t * 1.4) + cos(v_wp.x * 47.0 - u_t)) * (0.025 + u_wet * 0.04);
+    // Ringe von Regentropfen und von springenden Fischen
+    if (u_rip > 0.0) {
+      vec2 g = q * 34.0, id = floor(g), f = fract(g) - 0.5;
+      float h = hash(id), ph = fract(u_t * 0.85 + h * 7.0), d = length(f - (vec2(hash(id + 1.7), hash(id + 3.1)) - 0.5) * 0.5);
+      ring += smoothstep(0.06, 0.0, abs(d - ph * 0.42)) * (1.0 - ph) * step(0.35, h) * u_rip;
+    }
+    for (int i = 0; i < 2; i++) if (u_spl[i].w > 0.0) {
+      float d = length(q - u_spl[i].xy), rr = u_spl[i].z;
+      ring += (smoothstep(0.0035, 0.0, abs(d - rr)) + smoothstep(0.003, 0.0, abs(d - rr * 0.55)) * 0.6) * u_spl[i].w;
+    }
+    ring *= 1.0 - u_ice;
+    n = normalize(up + wn * (1.0 - u_ice));
+    base = mix(base * 0.58, base * 1.1 + vec3(0.0, 0.05, 0.045), smoothstep(0.25, 1.05, dc));
     base = mix(base, vec3(0.62, 0.74, 0.8), u_ice);
+    // Glitzern: viele kleine Wellen, die das Licht kurz zurückwerfen
+    vec3 nh = normalize(up + vec3(sin(v_wp.x * 310.0 + u_t * 3.1) * sin(v_wp.y * 170.0 - u_t * 1.7), 0.0, cos(v_wp.z * 290.0 - u_t * 2.7) * sin(v_wp.x * 150.0 + u_t)) * 0.09);
+    glint = pow(max(dot(nh, normalize(u_l1d + vd)), 0.0), 1400.0) * 2.4 * (1.0 - u_ice);
   }
   // Schnee bleibt auf Flächen liegen, die nach oben zeigen, und wächst von dort nach und nach zu
+  float upf = max(dot(n, up), 0.0);
   if (v_at.x > 0.0 && u_snow > 0.0) {
     float th = 0.12 + v_at.w * 0.55;
-    float k = smoothstep(th, th + 0.1, u_snow * v_at.x * (0.55 + 0.75 * max(dot(n, up), 0.0)));
+    float k = smoothstep(th, th + 0.1, u_snow * v_at.x * (0.55 + 0.75 * upf));
     base = mix(base, vec3(0.84, 0.88, 0.94), k);
   }
+  // Raureif: ein feiner, bläulich weißer Hauch auf Gras und Bäumen
+  float frost = 0.0;
+  if (v_at.x > 0.0 && u_frost > 0.0 && !water) {
+    frost = u_frost * v_at.x * upf * upf * (0.45 + 0.55 * v_at.w);
+    base = mix(base, vec3(0.72, 0.79, 0.86), frost * 0.42);
+  }
+  // Hitze: grünes Gras wird strohig
+  if (u_dry > 0.0 && !water && !cloud && base.g > base.r * 1.12 && base.g > base.b * 1.25) base = mix(base, vec3(base.g * 0.98, base.g * 0.84, base.g * 0.42), u_dry * v_at.x * 0.5);
   if (!water && !cloud) base *= 1.0 - 0.28 * u_wet * v_at.x;
   float s1 = u_shl < 1.5 && u_shon > 0.5 ? shadowAt(n, u_l1d) : 1.0, s2 = u_shl > 1.5 && u_shon > 0.5 ? shadowAt(n, u_l2d) : 1.0;
-  float d1 = max(dot(n, u_l1d), 0.0), d2 = max(dot(n, u_l2d), 0.0);
+  float d1 = max(dot(n, u_l1d), 0.0), d2 = max(dot(n, u_l2d), 0.0), d3 = max(dot(n, u_l3d), 0.0) * 0.8 + 0.2;
   vec3 amb = mix(u_gna, u_ska, dot(n, up) * 0.5 + 0.5);
   if (cloud) { amb = u_ska * 1.05 + u_gna * 0.3; d1 = d1 * 0.7 + 0.3; d2 = d2 * 0.6 + 0.15; }
-  vec3 light = amb + u_l1c * d1 * s1 + u_l2c * d2 * s2 + vec3(0.5, 0.58, 0.95) * u_flash * (0.4 + 0.6 * max(dot(n, up), 0.0));
+  vec3 light = amb + u_l1c * d1 * s1 + u_l2c * d2 * s2 + u_l3c * d3 + vec3(0.5, 0.58, 0.95) * u_flash * (0.4 + 0.6 * max(dot(n, up), 0.0));
   if (u_win > 0.0) {
     vec3 dl = u_winp - v_wp; float dd = dot(dl, dl);
-    light += u_winc * u_win * max(dot(n, normalize(dl)), 0.0) * 0.01 / (dd + 0.006);
+    light += u_winc * u_win * max(dot(n, normalize(dl)), 0.0) * 0.014 / (dd + 0.008);
   }
   vec3 col = base * light;
+  float fr = pow(1.0 - max(dot(n, vd), 0.0), 3.0);
   if (water) {
     float f = pow(1.0 - max(dot(n, vd), 0.0), 3.0);
     col = mix(col, u_refl, clamp(f * 0.55 + 0.06, 0.0, 1.0) * (1.0 - u_ice * 0.6));
     float sp = mix(220.0, 30.0, u_ice);
-    col += u_l1c * pow(max(dot(n, normalize(u_l1d + vd)), 0.0), sp) * 1.4 * s1 + u_l2c * pow(max(dot(n, normalize(u_l2d + vd)), 0.0), sp) * 2.0 * s2;
+    col += u_l1c * pow(max(dot(n, normalize(u_l1d + vd)), 0.0), sp) * 1.4 * s1 + u_l2c * pow(max(dot(n, normalize(u_l2d + vd)), 0.0), sp * 0.25) * 2.4 * s2;
+    col += u_l1c * glint * s1;
+    col += (u_refl * 0.6 + u_ska * 0.5 + u_l1c * 0.15) * ring;
     if (u_win > 0.0) col += u_winc * u_win * pow(max(dot(n, normalize(normalize(u_winp - v_wp) + vd)), 0.0), 40.0) * 0.5;
   } else if (!cloud && u_wet > 0.0) {
     col += u_l1c * pow(max(dot(n, normalize(u_l1d + vd)), 0.0), 36.0) * 0.18 * u_wet * v_at.x * s1;
   }
+  if (frost > 0.0) col += (u_l1c + u_l2c * 1.5 + vec3(0.04)) * step(0.992, hash(floor(v_wp.xz * 900.0) + floor(v_wp.y * 900.0))) * frost * (0.6 + 0.4 * sin(u_t * 3.0 + v_wp.x * 500.0));
   if (kind > 0.5 && kind < 1.5) col = mix(col, u_winc * 1.6, u_win);
-  float fr = pow(1.0 - max(dot(n, vd), 0.0), 3.0);
-  col += u_rim * fr * (cloud ? 0.08 : 0.18);
+  if (cloud) {
+    // Silberrand: Gegenlicht leuchtet durch die Ränder, bei tiefer Sonne golden
+    col += u_l1c * pow(max(dot(-vd, u_l1d), 0.0), 5.0) * fr * 1.6 + u_l2c * pow(max(dot(-vd, u_l2d), 0.0), 5.0) * fr * 1.2;
+  }
+  col += u_rim * fr * (cloud ? 0.1 : 0.2);
   col = mix(col, u_haze, u_fog);
   o = vec4(pow(aces(col * u_exp), vec3(1.0 / 2.2)), 1.0);
 }`;
 const PN_VS_DEP = `#version 300 es
 layout(location=0) in vec3 a_pos; layout(location=3) in vec4 a_at;
+${PN_INST}
 uniform mat4 u_lvp, u_m;
 ${PN_SWAY}
-void main() { gl_Position = u_lvp * (u_m * vec4(sway(a_pos, a_at.y), 1.0)); }`;
+void main() { gl_Position = u_lvp * (u_m * mat4(a_m0, a_m1, a_m2, a_m3) * vec4(sway(a_pos, a_at.y), 1.0)); }`;
 const PN_FS_DEP = `#version 300 es
 precision mediump float;
 out vec4 o;
@@ -708,15 +938,17 @@ const PN_VS_PTS = `#version 300 es
 layout(location=0) in vec2 a_q; layout(location=1) in vec4 a_p; layout(location=2) in vec4 a_c;
 uniform mat4 u_v, u_p;
 out vec2 v_q; out vec4 v_c;
-void main() { vec4 vc = u_v * vec4(a_p.xyz, 1.0); vc.xy += a_q * a_p.w; v_q = a_q; v_c = a_c; gl_Position = u_p * vc; }`;
+void main() { vec4 vc = u_v * vec4(a_p.xyz, 1.0); vc.xy += a_q * a_p.w * 1.82; v_q = a_q; v_c = a_c; gl_Position = u_p * vc; }`;
 const PN_FS_PTS = `#version 300 es
 precision highp float;
 in vec2 v_q; in vec4 v_c;
 out vec4 o;
+/* Innen der Kern wie bisher (auf 55 % der Fläche), außen ein schwacher, weiter Lichthof wie bei einer Kamera */
 void main() {
   float r = length(v_q);
   if (r > 1.0) discard;
-  float a = (exp(-r * r * 7.0) * 0.7 + smoothstep(0.32, 0.0, r) * 0.7) * (1.0 - r) * v_c.a;
+  float q = r / 0.55, core = q < 1.0 ? (exp(-q * q * 7.0) * 0.7 + smoothstep(0.32, 0.0, q) * 0.7) * (1.0 - q) : 0.0;
+  float a = (core + exp(-r * r * 4.5) * (1.0 - r) * 0.16) * v_c.a;
   o = vec4(v_c.rgb * a, a);
 }`;
 /* Polarlicht: Vorhänge als Band um den Nordpol des Planeten, unten grün, oben violett, mit wandernden Strahlen */
@@ -802,7 +1034,7 @@ void main() {
   float r = mix(length(c.xyz) - 0.04, 0.985, f);
   vec3 wt = u_wv - dir * dot(u_wv, dir);
   vec3 p = dir * r + wt * f * 0.1;
-  if (u_mode > 0.5) p += (tx * sin(u_t * 1.3 + a_s.x * 40.0) + ty * cos(u_t * 1.1 + a_s.y * 40.0)) * 0.014;
+  if (u_mode > 0.5 && u_mode < 1.5) p += (tx * sin(u_t * 1.3 + a_s.x * 40.0) + ty * cos(u_t * 1.1 + a_s.y * 40.0)) * 0.014;
   vec4 c0 = u_vp * vec4(p, 1.0);
   v_q = vec2(a_q.x, a_q.y * 2.0 - 1.0);
   if (u_mode < 0.5) {
@@ -910,7 +1142,7 @@ function pnIssDir(az, el) {
 const PN_PLANE_AX = pnV.norm([0.3, 1, -0.45]), PN_PLANE_E1 = pnV.norm(pnV.cross(PN_PLANE_AX, [0, 0, 1]));
 const PN_FW_COLS = [[1, 0.32, 0.25], [1, 0.8, 0.32], [0.38, 1, 0.48], [0.42, 0.62, 1], [0.86, 0.42, 1], [1, 0.97, 0.9]];
 const PN_XMAS_COLS = [[1, 0.28, 0.22], [1, 0.78, 0.28], [0.32, 1, 0.42], [0.38, 0.58, 1], [1, 0.9, 0.72]];
-const PN_PTS_MAX = 1600;
+const PN_PTS_MAX = 1600, PN_INST_MAX = 48;
 /* Liegt p von der Kamera aus hinter dem Planeten? */
 function pnHidden(eye, p) {
   const d = pnV.sub(p, eye), a = pnV.dot(d, d), b = 2 * pnV.dot(eye, d), c = pnV.dot(eye, eye) - 0.97 * 0.97, q = b * b - 4 * a * c;
@@ -919,6 +1151,19 @@ function pnHidden(eye, p) {
   return t > 0 && t < 0.995;
 }
 
+/* Regenbogen: die Sonne steht tiefer als 42°, kommt durch, und es regnet gerade oder hat eben erst geregnet (bis 45 Minuten).
+ * Das Eben-geregnet merkt sich das Cockpit pro Ort, im Vollbild mit Regler zählt die Stunde davor. Zurück kommt die Stärke 0..1. */
+function pnRainbow(I, K, c, loc, now, alt, cover, wetNow) {
+  if (alt < 1 || alt > 42 || K.storm || K.fog || K.pk === 'snow' || cover > 92) return 0;
+  const k = pnKey(loc), real = !I.ovr;
+  if (wetNow && real) pnx.rainAt.set(k, Date.now());
+  let since = wetNow ? 0 : real ? (Date.now() - (pnx.rainAt.get(k) || -1e12)) / 6e4 : 99;
+  if (!wetNow && c && c.precipitation > 0.05) since = Math.min(since, 10);
+  if (!wetNow && I.ovr && I.ovr.k === 'h') { const h = pnx.hourly.get(k), x = h && h.h && pnAtHour(h.h, +now - 36e5); if (x && x.precipitation > 0.05) since = Math.min(since, 20); }
+  if (since > 45) return 0;
+  const sun = pnSmooth(1, 5, alt) * (1 - pnSmooth(36, 42, alt)) * (1 - pnSmooth(78, 92, cover));
+  return sun * (wetNow ? Math.min(1, 0.4 + K.pi) : 1 - since / 45);
+}
 /* Eine Zeichenfläche mit eigenem WebGL-Kontext.
  * mode: 'card' (Karte), 'full' (Vollbild), 'trip' (kleiner Urlaubsplanet im Vollbild), 'mirror' (MirrorOS ohne Hintergrund).
  * opts: place (fester Ort statt der Widget-Einstellung), seed, theme ('beach'), trip (ohne Straße, Auto und Co.) */
@@ -929,6 +1174,7 @@ class PnView {
     this.snow = -1; this.ice = -1; this.win = 0; this.rain = 0; this.flash = 0; this.bolt = null; this.nextBolt = 0; this.wetA = 0; this.gloom = -1;
     this.env = null; this.envAt = 0; this.worldKey = ''; this.ovr = null; this.onPick = null; this.hits = []; this.VP = null; this.eye = null;
     this.rotA = 0; this.rotW = 0; this.fw = []; this.fwNext = 0; this.met = [null, null, null]; this.metNext = 0; this.aurA = 0;
+    this.frost = -1; this.dry = -1; this.mist = -1; this.rbow = 0; this.life = null;
     this.cl = Array.from({ length: 12 }, () => ({ v: 0 }));
     this.cv = document.createElement('canvas');
     this.cv.className = 'pn-cv';
@@ -1019,6 +1265,12 @@ class PnView {
     gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     this.aurN = (NA + 1) * 2;
     gl.bindVertexArray(null);
+    // Instanzen: ein gemeinsamer Puffer, jedes Netz kennt ihn (siehe upload), benutzt wird er nur beim Zeichnen vieler gleicher Dinge
+    this.instBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.instBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, PN_INST_MAX * 76, gl.DYNAMIC_DRAW);
+    this.instArr = new Float32Array(PN_INST_MAX * 19);
+    gl.vertexAttrib4f(4, 1, 0, 0, 0); gl.vertexAttrib4f(5, 0, 1, 0, 0); gl.vertexAttrib4f(6, 0, 0, 1, 0); gl.vertexAttrib4f(7, 0, 0, 0, 1); gl.vertexAttrib4f(8, 1, 1, 1, 1);
     // Schatten
     this.shs = 1024;
     this.shTex = gl.createTexture();
@@ -1036,7 +1288,7 @@ class PnView {
     gl.drawBuffers([gl.NONE]);
     gl.readBuffer(gl.NONE);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    this.world = null; this.worldKey = ''; this.clouds = null; this.obj = null;
+    this.world = null; this.worldKey = ''; this.clouds = null; this.obj = null; this.life = null;
     this.sized = false;
     this.ok = true;
     this.msg('');
@@ -1054,6 +1306,8 @@ class PnView {
       gl.enableVertexAttribArray(i);
       gl.vertexAttribPointer(i, n, gl.FLOAT, false, 0, 0);
     });
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.instBuf);
+    for (let i = 0; i < 5; i++) { gl.vertexAttribPointer(4 + i, i < 4 ? 4 : 3, gl.FLOAT, false, 76, i * 16); gl.vertexAttribDivisor(4 + i, 1); }
     gl.bindVertexArray(null);
     return { vao, n: M.count, bufs };
   }
@@ -1064,8 +1318,8 @@ class PnView {
     if (k === this.worldKey && this.world) return;
     const seed = this.opts.seed ?? pnHashStr(this.id);
     const W = pnBuildWorld(seed, S, X);
-    if (this.world) { this.free(this.world.mesh); this.free(this.world.cat); this.free(this.world.flag); }
-    this.world = { mesh: this.upload(W.M), scene: W.scene, cat: W.cat ? this.upload(W.cat) : null, flag: W.flag ? this.upload(W.flag) : null, R: W.R };
+    if (this.world) { this.free(this.world.mesh); this.free(this.world.cat); this.free(this.world.flag); this.free(this.world.snowman); }
+    this.world = { mesh: this.upload(W.M), scene: W.scene, cat: W.cat ? this.upload(W.cat) : null, flag: W.flag ? this.upload(W.flag) : null, snowman: W.snowman ? this.upload(W.snowman) : null, R: W.R, season: S };
     if (!this.clouds) {
       this.clouds = pnBuildClouds(seed).map(M => this.upload(M));
       // Die ersten Wolken stehen gut verteilt, auch wenn es nur wenige gibt
@@ -1142,6 +1396,29 @@ class PnView {
     this.cv.remove();
     this.ok = false;
   }
+  /* Dinge zeichnen: gleiche Netze (etwa alle Vögel) zusammen in einem Aufruf, einzelne wie bisher */
+  drawObjs(list, U, tint) {
+    const gl = this.gl, I4 = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], G = new Map();
+    for (const o of list) { const g = G.get(o.mesh); if (g) g.push(o); else G.set(o.mesh, [o]); }
+    for (const [mesh, arr] of G) {
+      gl.bindVertexArray(mesh.vao);
+      if (arr.length === 1) {
+        if (tint) gl.uniform3fv(U.u_tint, arr[0].tint || [1, 1, 1]);
+        gl.uniformMatrix4fv(U.u_m, false, arr[0].M);
+        gl.drawArrays(gl.TRIANGLES, 0, mesh.n);
+        continue;
+      }
+      const A = this.instArr, n = Math.min(arr.length, PN_INST_MAX);
+      for (let i = 0; i < n; i++) { A.set(arr[i].M, i * 19); A.set(arr[i].tint || [1, 1, 1], i * 19 + 16); }
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.instBuf);
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, A, 0, n * 19);
+      if (tint) gl.uniform3fv(U.u_tint, [1, 1, 1]);
+      gl.uniformMatrix4fv(U.u_m, false, I4);
+      for (let i = 4; i < 9; i++) gl.enableVertexAttribArray(i);
+      gl.drawArraysInstanced(gl.TRIANGLES, 0, mesh.n, n);
+      for (let i = 4; i < 9; i++) gl.disableVertexAttribArray(i);
+    }
+  }
   pt(p, s, r, g, b, a) {
     if (this.ptsN >= PN_PTS_MAX || a < 0.004) return;
     this.ptsArr.set([p[0], p[1], p[2], s, r, g, b, a], this.ptsN * 8);
@@ -1182,14 +1459,24 @@ class PnView {
     }
     const iss = alt < -6 && cover < 80 && !this.ovr ? pnIssAt(loc, +now) : null;
     const trip = cockpit ? pnTrip(now) : null;
+    // 3.14: Raureif, Hitze, Frühnebel, Hagel, Sturm und Regenbogen
+    const snowT = Math.max(clamp01(snowD * 100 / 3), K.pk === 'snow' ? 0.92 : 0), wetNow = K.pk === 'rain' || K.pk === 'drizzle';
+    const hum = c && Number.isFinite(c.relative_humidity_2m) ? c.relative_humidity_2m : NaN;
+    const frost = temp <= 0.5 && !K.pk && snowT < 0.35 && (cover < 75 || temp < -3) && alt < 25 ? clamp01((0.5 - temp) / 2.5 + 0.35) : 0;
+    const dry = season.k === 'summer' && !wetNow ? clamp01((temp - 26) / 6) : 0;
+    const dawn = alt > -4 && alt < 9 && wind < 10 && cover < 70 && !K.pk && (Number.isFinite(hum) ? hum >= 90 : season.k === 'autumn' && temp < 12);
+    const mist = K.fog ? 1 : dawn ? 0.6 : 0;
+    const rb = pnRainbow(this, K, c, loc, now, alt, cover, wetNow);
+    const tk = c ? +c.weather_code : 0;
     return {
       c, K, loc, alt, sunD, moonD, ph, ill, grey, temp, cover, n: Math.min(12, n), ws, wind, wdir, wv: pnV.mul([-Math.sin(to), 0, -Math.cos(to)], ws),
       pm: A.sun > Math.PI / 2 && A.sun <= Math.PI * 1.5, snowT: Math.max(clamp01(snowD * 100 / 3), K.pk === 'snow' ? 0.92 : 0), snowing: K.pk === 'snow',
-      iceT: temp <= -1.5 ? 1 : 0, smoke: temp < 12, lightOn: alt < 3.5 || (grey >= 0.6 && alt < 22) || grey >= 0.8, wet: K.pk === 'rain' || K.pk === 'drizzle' ? 1 : 0,
+      iceT: temp <= -1.5 ? 1 : 0, smoke: temp < 12, snowLie: snowT, lightOn: alt < 3.5 || (grey >= 0.6 && alt < 22) || grey >= 0.8, wet: K.pk === 'rain' || K.pk === 'drizzle' ? 1 : 0,
       name: D ? D.name : '', season, X, haze: clamp01((aqi - 40) / 60), dust: clamp01((dust - 30) / 150), aqi, dustV: dust, aur, kp, iss,
       ffly: cockpit && season.k === 'summer' && temp >= 13 && alt < -1 && !K.pk && wind < 22,
       car: cockpit ? pnCarState(now) : null, trip, plane: !!(trip && (trip.now || trip.days <= 30)), flag: cockpit && pnFlagUp(now),
-      fw: cockpit ? pnFireworks(now) : 0, met: pnMeteorRate(now), habitN: hb ? hb.n : 0
+      fw: cockpit ? pnFireworks(now) : 0, met: pnMeteorRate(now), habitN: hb ? hb.n : 0,
+      frost, dry, mist, hum, rainbow: rb, hail: tk === 96 || tk === 99, gale: clamp01((wind - 36) / 26), now
     };
   }
   frame(ts) {
@@ -1226,9 +1513,13 @@ class PnView {
     const gNow = ease(this.gloom, E.grey, 0.8);
     this.wetA = ease(this.wetA, E.wet, 0.4);
     this.aurA = ease(this.aurA, E.aur, 0.5);
+    this.frost = ease(this.frost, E.frost, 0.25);
+    this.dry = ease(this.dry, E.dry, 0.3);
+    this.mist = ease(this.mist, E.mist, 0.35);
+    this.rbow = ease(this.rbow, E.rainbow, 0.5);
     // Ohne Daten noch nichts überblenden: Sobald das Wetter da ist, stehen Grau, Schnee und Eis gleich richtig.
     // Nur frisch fallender Schnee legt sich sichtbar nach und nach über den Planeten.
-    if (E.c) this.gloom = gNow; else { this.gloom = -1; this.snow = -1; this.ice = -1; }
+    if (E.c) this.gloom = gNow; else { this.gloom = -1; this.snow = -1; this.ice = -1; this.frost = -1; this.dry = -1; this.mist = -1; }
     this.cl.forEach((c, i) => { c.v += ((i < E.n ? 1 : 0) - c.v) * (1 - Math.exp(-dt * 0.9 * fast)); });
     // Kamera: ziehen, nachschwingen, nach ein paar Sekunden zurück zur Hausansicht
     const still = reduceMotion;
@@ -1256,7 +1547,7 @@ class PnView {
     // Bei dichter Decke kaum direktes Licht, dafür mehr diffuses Grau. Staub in der Luft macht die Sonne wärmer.
     const direct = 1 - 0.9 * pnSmooth(0.2, 0.75, g), sunC = pnV.mul(pnV.mix(warm, [1, 0.7, 0.45], E.dust * 0.5), 1.75 * sunF * direct * (1 - E.dust * 0.25));
     const moonUp = pnSmooth(-0.05, 0.12, E.moonD[1]), moonF = (1 - dayF) * moonUp;
-    const moonC = pnV.mul([0.58, 0.64, 0.8], 0.6 * moonF * (0.2 + 0.8 * E.ill) * (1 - 0.8 * g));
+    const moonC = pnV.mul([0.58, 0.64, 0.8], 0.64 * moonF * (0.35 + 0.65 * E.ill) * (1 - 0.8 * g));
     const dark = 1 - 0.38 * pnSmooth(0.7, 0.9, g);
     let [top, mid, low] = skyColors(alt, E.pm, Math.min(0.95, g * 1.05)).map(c => c.map(x => x * dark));
     // Dunst bei schlechter Luft, gelblich bei Saharastaub: der Himmel wird am Horizont milchig
@@ -1268,7 +1559,11 @@ class PnView {
     const lt = pnLin(top), lm = pnLin(mid), ll = pnLin(low), gray = x => { const y = (x[0] + x[1] + x[2]) / 3; return pnV.mix(x, [y, y, y], 0.35); };
     const floor = pnV.mix([0.022, 0.03, 0.065], [0.03, 0.032, 0.04], g);
     const ska = pnV.add(pnV.mul(gray(pnV.mix(lt, lm, 0.6)), 0.62 + (1 - direct) * 0.45 * dayF), floor), gna = pnV.add(pnV.mul(gray(ll), 0.22), pnV.mul(floor, 0.6));
-    const rim = pnV.mul(ll, 0.7 * (0.35 + 0.65 * dayF) + 0.05), refl = pnV.add(pnV.mul(lm, 0.9), [0.01, 0.015, 0.03]);
+    // Nachts ein kühler Rand und ein schwaches Fülllicht von vorn oben (aus Sicht der Kamera), damit der Planet Form behält
+    const nightF = (1 - dayF) * (1 - 0.45 * g);
+    const rim = pnV.add(pnV.mul(ll, 0.7 * (0.35 + 0.65 * dayF) + 0.05), pnV.mul([0.11, 0.15, 0.34], nightF)), refl = pnV.add(pnV.mul(lm, 0.9), pnV.add([0.01, 0.015, 0.03], pnV.mul([0.02, 0.03, 0.06], nightF)));
+    const vdir = pnV.norm(eye), rightV = pnV.norm(pnV.cross([0, 1, 0], vdir)), upV = pnV.cross(vdir, rightV);
+    const l3d = pnV.norm(pnV.add(pnV.add(pnV.mul(vdir, 0.55), pnV.mul(upV, 0.75)), pnV.mul(rightV, -0.35))), l3c = pnV.mul([0.075, 0.1, 0.19], nightF);
     // Blitz
     if (E.K.storm) {
       if (!this.nextBolt) this.nextBolt = this.t + 1.5;
@@ -1347,6 +1642,10 @@ class PnView {
     }
     this.hits.push({ k: 'house', p: S0.house, r: 40 });
     for (const p of S0.habit) this.hits.push({ k: 'tree', p, r: 16 });
+    // Schneemann, solange Schnee liegt
+    if (this.world.snowman && this.snow > 0.55 && E.snowLie > 0.3) { objs.push({ mesh: this.world.snowman, M: I }); this.hits.push({ k: 'snowman', p: S0.snowman, r: 22, pri: -0.2 }); }
+    // Tiere, fallende Blätter, Regenbogen und Sturmschlieren (55-planet-tiere.js)
+    pnLife(this, E, dt, now, objs, { dayF, night, g, alt, eye, sunC, moonC, ska, W, H });
     // 1. Schatten
     if (shOn) {
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.shFb);
@@ -1361,7 +1660,8 @@ class PnView {
       gl.uniformMatrix4fv(Q.u.u_m, false, I);
       gl.bindVertexArray(this.world.mesh.vao);
       gl.drawArrays(gl.TRIANGLES, 0, this.world.mesh.n);
-      for (const c of [...clouds, ...objs]) { gl.uniformMatrix4fv(Q.u.u_m, false, c.M); gl.bindVertexArray(c.mesh.vao); gl.drawArrays(gl.TRIANGLES, 0, c.mesh.n); }
+      for (const c of clouds) { gl.uniformMatrix4fv(Q.u.u_m, false, c.M); gl.bindVertexArray(c.mesh.vao); gl.drawArrays(gl.TRIANGLES, 0, c.mesh.n); }
+      this.drawObjs(objs.filter(o => !o.ns), Q.u, false);
       gl.disable(gl.POLYGON_OFFSET_FILL);
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     }
@@ -1410,6 +1710,12 @@ class PnView {
     gl.uniform3fv(U.u_cam, eye);
     gl.uniform3fv(U.u_l1d, E.sunD); gl.uniform3fv(U.u_l1c, sunC);
     gl.uniform3fv(U.u_l2d, E.moonD); gl.uniform3fv(U.u_l2c, moonC);
+    gl.uniform3fv(U.u_l3d, l3d); gl.uniform3fv(U.u_l3c, l3c);
+    const LK = S0.lake;
+    if (LK) { gl.uniform3fv(U.u_lc, pnV.mul(PN_LAKE, PN_WL)); gl.uniform3fv(U.u_lx, LK.x); gl.uniform3fv(U.u_lz, LK.z); }
+    gl.uniform1f(U.u_frost, Math.max(0, this.frost)); gl.uniform1f(U.u_dry, Math.max(0, this.dry));
+    gl.uniform1f(U.u_rip, E.K.pk === 'rain' || E.K.pk === 'drizzle' ? Math.min(1, this.rain * 1.4) : 0);
+    gl.uniform4fv(U.u_spl, this.life ? this.life.spl : new Float32Array(8));
     gl.uniform3fv(U.u_ska, ska); gl.uniform3fv(U.u_gna, gna);
     gl.uniform3fv(U.u_rim, rim); gl.uniform3fv(U.u_refl, refl);
     gl.uniform3fv(U.u_haze, pnV.add(pnV.mul(pnV.mix(lm, ll, 0.5), 0.9), [0.02, 0.02, 0.025]));
@@ -1425,13 +1731,12 @@ class PnView {
     gl.uniform3fv(U.u_tint, [1, 1, 1]);
     gl.bindVertexArray(this.world.mesh.vao);
     gl.drawArrays(gl.TRIANGLES, 0, this.world.mesh.n);
-    for (const o of objs) {
-      gl.uniform3fv(U.u_tint, o.tint || [1, 1, 1]);
-      gl.uniformMatrix4fv(U.u_m, false, o.M); gl.bindVertexArray(o.mesh.vao); gl.drawArrays(gl.TRIANGLES, 0, o.mesh.n);
-    }
+    this.drawObjs(objs, U, true);
     const ct = E.K.storm ? [0.42, 0.44, 0.48] : E.K.pk || E.K.fog ? pnV.mix([0.84, 0.86, 0.88], [0.58, 0.6, 0.63], Math.min(1, E.K.pi + 0.3)) : pnV.mix([1, 1, 1], [0.78, 0.8, 0.83], clamp01((E.cover - 50) / 50));
     gl.uniform3fv(U.u_tint, pnV.mul(ct, 1 - 0.38 * g));
     for (const c of clouds) { gl.uniformMatrix4fv(U.u_m, false, c.M); gl.bindVertexArray(c.mesh.vao); gl.drawArrays(gl.TRIANGLES, 0, c.mesh.n); }
+    // Regenbogen, Blätter und Blüten, Sturmschlieren
+    pnLifeDraw(this, VP, V, Pm);
     // 4. Sonne, Mond und Fensterlicht als Leuchtpunkte
     gl.enable(gl.BLEND); gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE); gl.depthMask(false);
     const S = this.P.spr;
@@ -1460,8 +1765,6 @@ class PnView {
     const halo = pnV.mix([0.35, 0.45, 0.85], pnV.mix(low.map(x => x / 255), [1, 1, 1], 0.25), dayF);
     spr(3, [0, 0, 0], 1.55, [...halo, (0.2 + 0.2 * dayF) * (bgA ? 1 : 0.85)]);
     gl.enable(gl.DEPTH_TEST);
-    // Regenbogen bei Schauern, wenn die Sonne tief genug steht und durchkommt
-    if (E.K.pk === 'rain' && !E.K.storm && alt > 3 && alt < 42 && E.cover < 88) spr(5, [0, 0, 0], 1.5, [1, 1, 1, 0.32 * sunVis * pnSmooth(3, 8, alt) * Math.min(1, this.rain * 1.5)]);
     // 5. Rauch aus dem Schornstein und Nebelschwaden
     gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     const amb = pnV.add(pnV.mul(ska, 0.7), pnV.mul(pnV.add(sunC, moonC), 0.35)), toS = x => x.map(v => Math.min(1, v) ** (1 / 2.2));
@@ -1474,12 +1777,14 @@ class PnView {
         spr(4, pos, 0.016 + f * 0.055, [...sc, 0.55 * (1 - f) * pnSmooth(0, 0.12, f)]);
       }
     }
-    if (E.K.fog) {
-      const fc = toS(pnV.mul(pnV.add(amb, [0.05, 0.05, 0.06]), 1.1));
-      for (let i = 0; i < 9; i++) {
-        const u = pnLL(10 + (i % 3) * 20, i * 40 + this.t * 2.2);
-        spr(4, pnV.mul(u, 1.07), 0.42, [...fc, 0.32]);
+    // Nebel und Frühnebel: Schwaden, die tief über Wiese und See ziehen, bei Nebel dazu dicke Bänke weiter oben
+    if (this.mist > 0.01) {
+      const fc = toS(pnV.mul(pnV.add(amb, [0.05, 0.05, 0.06]), 1.1)), m = this.mist, mc = pnV.mix(fc, [0.92, 0.94, 0.97].map(x => x * (0.45 + 0.55 * dayF)), 0.4);
+      for (let i = 0; i < 18; i++) {
+        const la = [12, 30, 48, 24, 38, 4][i % 6] + Math.sin(i * 2.3) * 6, u = pnLL(la, i * 20 + this.t * (1.2 + (i % 3) * 0.5) + Math.sin(i) * 9);
+        spr(4, pnV.mul(u, 1.05 + (i % 2) * 0.012), 0.26 + (i % 3) * 0.06, [...mc, 0.5 * m]);
       }
+      if (m > 0.8) for (let i = 0; i < 9; i++) spr(4, pnV.mul(pnLL(10 + (i % 3) * 20, i * 40 + this.t * 2.2), 1.07), 0.42, [...fc, 0.32]);
     }
     // 6. Regen und Schnee
     if (this.rain > 0.01 && clouds.length) {
@@ -1499,6 +1804,12 @@ class PnView {
       gl.uniform4fv(D2.u.u_col, [dc[0] * lum, dc[1] * lum, dc[2] * lum, snow ? 0.95 : drizzle ? 0.7 : 0.75]);
       gl.bindVertexArray(this.drops);
       gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, Math.round(this.rain * (snow ? 700 : drizzle ? 1150 : 1400)));
+      // Hagel: dicke weiße Körner, die schnell fallen
+      if (E.hail && !snow) {
+        gl.uniform1f(D2.u.u_mode, 2); gl.uniform1f(D2.u.u_spd, 1.25); gl.uniform1f(D2.u.u_w, 2.6 * this.dpr);
+        gl.uniform4fv(D2.u.u_col, [0.95 * lum, 0.97 * lum, lum, 0.95]);
+        gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, Math.round(this.rain * 260));
+      }
     }
     // 7. Polarlicht über dem Nordpol des Planeten
     if (this.aurA > 0.01) {
@@ -1664,7 +1975,7 @@ async function pnFetch(P, key) {
   e.busy = true; e.tried = Date.now();
   pn.wx.set(key, e);
   try {
-    const j = await getJson(`https://api.open-meteo.com/v1/forecast?latitude=${(+P.lat).toFixed(4)}&longitude=${(+P.lon).toFixed(4)}&current=temperature_2m,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m,snow_depth&timezone=auto&wind_speed_unit=kmh`);
+    const j = await getJson(`https://api.open-meteo.com/v1/forecast?latitude=${(+P.lat).toFixed(4)}&longitude=${(+P.lon).toFixed(4)}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m,snow_depth&timezone=auto&wind_speed_unit=kmh`);
     if (j && j.current) { e.c = j.current; e.at = j.cachedAt || Date.now(); }
   } catch { /* nächster Versuch in einer Minute */ }
   e.busy = false;
@@ -1724,7 +2035,7 @@ function renderPlanet(v) {
   const D = pnData(v.id), loc = D ? D.loc : skyLoc(), now = new Date(), alt = sunAlt(now, +loc.lat, +loc.lon);
   const g = D ? pnWeatherKind(D.c.weather_code).grey : 0.2, low = skyColors(alt, now.getHours() >= 12, g)[2];
   v.q('[data-r="stage"]').dataset.ink = lumOf(low) > 0.42 ? 'dark' : 'light';
-  if (I) I.cv.setAttribute('aria-label', cap ? `Wetterplanet${cap.place ? ` für ${cap.place}` : ''}: ${cap.temp.replace('°', ' Grad').replace('−', 'minus ')}, ${cap.desc}. Zum Drehen ziehen, antippen für eine Runde. Mehr im Vollbild über den Knopf oben.` : 'Wetterplanet, das Wetter wird geladen');
+  if (I) I.cv.setAttribute('aria-label', cap ? `Wetterplanet${cap.place ? ` für ${cap.place}` : ''}: ${cap.temp.replace('°', ' Grad').replace('−', 'minus ')}, ${cap.desc}. Zum Drehen ziehen, antippen für eine Runde. Mehr im Vollbild über den Knopf oben, was er alles zeigt, über den Knopf mit dem i.` : 'Wetterplanet, das Wetter wird geladen');
 }
 /* Antippen in der Karte: das Auto führt zum Pendeln, das Flugzeug zum Urlaub, Haus und Fähnchen bei Terminen zum Kalender.
  * Alles andere dreht den Planeten einmal herum. */
@@ -1780,10 +2091,11 @@ defineWidget('planet', {
   mount(v) {
     v.q('[data-r="set"]').addEventListener('click', () => openWidgetDialog(v.id));
     v.q('[data-r="full"]').addEventListener('click', () => pnFsOpen(v.id));
+    v.q('[data-r="legend"]').addEventListener('click', e => pnLegOpen(v.q('[data-r="stage"]'), pn.inst.get(v.id), e.currentTarget));
     const I = pnMake(v.id, v.id, v.q('[data-r="stage"]'), 'card');
     I.onPick = pnCardPick(v.id);
   },
-  unmount(v) { if (pnFs.open && pnFs.id === v.id) pnFsClose(); const I = pn.inst.get(v.id); if (I) I.destroy(); },
+  unmount(v) { if (pnFs.open && pnFs.id === v.id) pnFsClose(); const I = pn.inst.get(v.id); if (pnLeg.V && pnLeg.V === I) pnLegClose(); if (I) I.destroy(); },
   render: renderPlanet,
   settings: {
     render(box, w) {
@@ -1793,7 +2105,7 @@ defineWidget('planet', {
       box.innerHTML = `<div class="field"><span class="lbl">Wetter von</span><div class="seg pn-how" role="group" aria-label="Ort">${Object.entries(PN_HOWS).map(([k, n]) => `<button type="button" data-how="${k}">${esc(n)}</button>`).join('')}</div>
         <p class="hint" data-s="info"></p></div>
         <div class="field pn-find"><label class="lbl" for="pn-q">Eigenen Ort suchen</label><div class="dp-search"><input id="pn-q" data-s="q" type="search" maxlength="60" autocomplete="off" placeholder="z. B. Lübeck"><button type="button" class="btn-ghost" data-s="go">Suchen</button></div><div class="pn-hits" data-s="hits"></div></div>
-        <p class="hint">${homeOff || workOff ? 'Zuhause und Arbeit gehen, sobald deine Strecke im Pendeln-Widget eingetragen ist. ' : ''}Antippen dreht den Planeten einmal herum, ziehen dreht ihn frei.</p>`;
+        <p class="hint">${homeOff || workOff ? 'Zuhause und Arbeit gehen, sobald deine Strecke im Pendeln-Widget eingetragen ist. ' : ''}Antippen dreht den Planeten einmal herum, ziehen dreht ihn frei. Was er alles zeigen kann, steht im Widget unter dem i.</p>`;
       pnSetInfo(box);
       box.querySelector('.pn-how').addEventListener('click', e => {
         const b = e.target.closest('[data-how]');

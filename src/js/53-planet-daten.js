@@ -4,7 +4,7 @@
  * Dazu, was im Cockpit los ist: Pendelzeit fürs Auto, der nächste Urlaub fürs Flugzeug und den Urlaubsplaneten, Termine fürs
  * Fähnchen, geschaffte Gewohnheitstage für den Wald, Feiertage, Silvester und Sternschnuppen.
  * Geholt wird nur, was ein sichtbarer Planet gerade braucht (Kp und ISS nur nachts), und alles wird zwischengespeichert. */
-const pnx = { hourly: new Map(), air: new Map(), kp: { v: null, at: 0, busy: false, tried: 0 }, iss: { list: null, at: 0, busy: false, tried: 0 }, memo: new Map() };
+const pnx = { hourly: new Map(), air: new Map(), rainAt: new Map(), kp: { v: null, at: 0, busy: false, tried: 0 }, iss: { list: null, at: 0, busy: false, tried: 0 }, memo: new Map() };
 const pnKey = P => `${(+P.lat).toFixed(2)}|${(+P.lon).toFixed(2)}`;
 /* Neue Daten: Szenen gleich neu berechnen, im Vollbild die Beschriftung auffrischen */
 function pnxDirty() { for (const I of pn.inst.values()) I.envAt = 0; if (pnFs.open) pnFsRefresh(); }
@@ -22,7 +22,7 @@ async function pnHourFetch(loc, k) {
   e.busy = true; e.tried = Date.now();
   pnx.hourly.set(k, e);
   try {
-    const j = await getJson(`https://api.open-meteo.com/v1/forecast?latitude=${(+loc.lat).toFixed(4)}&longitude=${(+loc.lon).toFixed(4)}&hourly=temperature_2m,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,snow_depth,precipitation&past_days=1&forecast_days=3&timezone=auto&timeformat=unixtime&wind_speed_unit=kmh`);
+    const j = await getJson(`https://api.open-meteo.com/v1/forecast?latitude=${(+loc.lat).toFixed(4)}&longitude=${(+loc.lon).toFixed(4)}&hourly=temperature_2m,relative_humidity_2m,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,snow_depth,precipitation&past_days=1&forecast_days=3&timezone=auto&timeformat=unixtime&wind_speed_unit=kmh`);
     if (j && j.hourly && Array.isArray(j.hourly.time) && j.hourly.time.length > 2) { e.h = j.hourly; e.at = Date.now(); }
   } catch { /* nächster Versuch in einer Minute */ }
   e.busy = false;
@@ -40,7 +40,7 @@ function pnAtHour(h, t) {
   const dd = Number.isFinite(d0) && Number.isFinite(d1) ? ((((d1 - d0) % 360) + 540) % 360) - 180 : 0;
   return {
     weather_code: h.weather_code[f < 0.5 ? i : j], cloud_cover: L('cloud_cover'), temperature_2m: L('temperature_2m'), wind_speed_10m: L('wind_speed_10m'),
-    wind_direction_10m: Number.isFinite(d0) ? (d0 + dd * f + 360) % 360 : NaN, snow_depth: L('snow_depth'), precipitation: L('precipitation')
+    wind_direction_10m: Number.isFinite(d0) ? (d0 + dd * f + 360) % 360 : NaN, snow_depth: L('snow_depth'), precipitation: L('precipitation'), relative_humidity_2m: L('relative_humidity_2m')
   };
 }
 
