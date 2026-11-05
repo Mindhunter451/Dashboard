@@ -1,5 +1,5 @@
 /* Takt und Start */
-const VERSION = '3.13';
+const VERSION = '3.14';
 function tick() {
   const now = new Date();
   tickHeader(now);
@@ -66,6 +66,7 @@ const NEWS = {
   '3.3': ['Spritpreise mit eigenem Ort: Such dir einen Ort, nimm den vom Wetter oder deinen Standort, dazu Umkreis und Sortierung. Soll ich dir die Einstellungen zeigen?', () => { if (!pagesUsing('fuel').length) { setEdit(true); openGallery(); return; } nwJump('fuel'); setTimeout(() => { if (fuKey()) fuOpenSet(true); else fuOpenForm(); }, 350); }, 'Zeigen'],
   '3.6': ['Neu: Fußball und Formel 1 zeigen, wo gespielt und gefahren wird. Bei der F1 auch gratis bei ORF, ServusTV und SRF, mit VPN-Hinweis und Knopf zum Livestream. Was davon auftaucht, stellst du pro Widget ein.', () => { const id = pagesUsing('f1').length ? 'f1' : (widgetsOf('football').map(([i]) => i).find(i => pagesUsing(i).length) || ''); if (!id) { setEdit(true); openGallery(); return; } nwJump(id); setTimeout(() => openWidgetDialog(id), 350); }, 'Einstellen'],
   '3.7': ['Neu: die F1 Rennanalyse. Das letzte Rennen im Zeitraffer auf der Streckenkarte, dazu Positionsverlauf, Reifen und Boxenstopps, kostenlos über OpenF1. Soll ich sie neben die Formel 1 legen?', () => anShow(), 'Hinzufügen'],
+  '3.14': ['Auf dem Wetterplanet ist mehr los: Vögel, Enten, Fische, ein Hase, ein Reh und nachts eine Eule, dazu Regenbogen, fallende Blätter, Raureif, ein Schneemann und schönere Wolken und Nächte. Was es alles gibt, steht jetzt im Widget unter dem i.', () => pnLegShow(), 'Zeigen'],
   '3.13': ['Der Wetterplanet kann jetzt Vollbild: mit Zeitregler, Zeitraffer, Nachttisch Modus samt Uhr und Geräuschen. Dazu Straße mit deinem Auto, Windrad, Gewohnheitswald, Urlaubsplanet und noch einiges zum Entdecken.', () => pnShow(true), 'Ansehen'],
   '3.12': ['Neu: der Wetterplanet. Eine kleine Welt mit Häuschen und See, die dein Wetter live nachspielt, mit Sonne und Mond zur echten Uhrzeit, Regen, Schnee und Gewitter. Soll ich ihn neben dein Wetter legen?', () => pnShow(), 'Hinzufügen'],
   '3.10': ['Neu im Pendeln: Öffis. Oben in der Karte schaltest du zwischen Auto und Bus und Bahn um, dann siehst du, wann du los musst, welche Linien du nimmst und wann du ankommst.', () => nwJump('commute'), 'Zeigen'],
